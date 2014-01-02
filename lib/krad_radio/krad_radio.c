@@ -107,8 +107,8 @@ static kr_radio *radio_create(char *sysname) {
     return NULL;
   }
   radio->app = krad_app_server_create("krad_radio", radio->sysname,
-   krad_radio_client_create, krad_radio_client_destroy,
-   krad_radio_client_handler, radio);
+   kr_radio_client_create, kr_radio_client_destroy,
+   kr_radio_client_handler, radio);
   if (radio->app == NULL) {
     radio_shutdown(radio);
     return NULL;

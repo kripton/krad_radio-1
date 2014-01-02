@@ -43,7 +43,7 @@ int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   uint64_t size;
   int ret;
   int num;
-  radio = client->krad_radio;
+  radio = client->radio;
   transponder = radio->transponder;
   app = radio->app;
   kr_transponder_path_info path_info;

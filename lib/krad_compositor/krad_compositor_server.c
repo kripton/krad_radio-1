@@ -26,7 +26,7 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   kr_app_server *app;
 
   address.path.unit = KR_COMPOSITOR;
-  radio = client->krad_radio;
+  radio = client->radio;
   compositor = radio->compositor;
   app = radio->app;
   i = 0;

@@ -113,7 +113,7 @@ int kr_mixer_command(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   i = 0;
   duration = 0;
   ptr = NULL;
-  radio = client->krad_radio;
+  radio = client->radio;
   mixer = radio->mixer;
   as = radio->app;
   path = NULL;
