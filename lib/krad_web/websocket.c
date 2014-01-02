@@ -1,6 +1,5 @@
-int32_t interweb_ws_parse_frame_header(kr_iws_client_t *client) {
-
-  interwebs_t *ws;
+int32_t interweb_ws_parse_frame_header(kr_web_client *client) {
+  kr_websocket_client *ws;
   uint8_t *size_bytes;
   uint8_t payload_sz_8;
   uint64_t payload_sz_64;
@@ -121,9 +120,8 @@ int32_t interweb_ws_parse_frame_header(kr_iws_client_t *client) {
   return bytes_read;
 }
 
-int32_t interweb_ws_parse_frame_data(kr_iws_client_t *client) {
-
-  interwebs_t *ws;
+int32_t interweb_ws_parse_frame_data(kr_web_client *client) {
+  kr_websocket_client *ws;
   int32_t ret;
   int32_t pos;
   int32_t max;
@@ -230,7 +228,7 @@ uint32_t interweb_ws_pack_frame_header(uint8_t *out, uint32_t size) {
   }
 }
 
-void interweb_ws_pack(kr_iws_client_t *client, uint8_t *buffer, size_t len) {
+void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len) {
 
   uint32_t header_len;
   uint8_t header[10];
@@ -238,15 +236,15 @@ void interweb_ws_pack(kr_iws_client_t *client, uint8_t *buffer, size_t len) {
   if (len > 0) {
     header_len = interweb_ws_pack_frame_header(header, len);
     if (client->out->space >= (header_len + len)) {
-      krad_interweb_pack_buffer(client, header, header_len);
-      krad_interweb_pack_buffer(client, buffer, len);
+      web_server_pack_buffer(client, header, header_len);
+      web_server_pack_buffer(client, buffer, len);
     } else {
       printke("ws client: no space to pack client buffer");
     }
   }
 }
 
-int32_t interweb_ws_kr_client_connect(kr_iws_client_t *client) {
+int32_t interweb_ws_kr_client_connect(kr_web_client *client) {
 
   client->ws.krclient = kr_client_create ("websocket client");
 
@@ -269,7 +267,7 @@ int32_t interweb_ws_kr_client_connect(kr_iws_client_t *client) {
   return 0;
 }
 
-int32_t interweb_ws_json_hello(kr_iws_client_t *client) {
+int32_t interweb_ws_json_hello(kr_web_client *client) {
 
   char json[128];
 
@@ -281,7 +279,7 @@ int32_t interweb_ws_json_hello(kr_iws_client_t *client) {
   return 0;
 }
 
-int32_t interweb_ws_shake(kr_iws_client_t *client) {
+int32_t interweb_ws_shake(kr_web_client *client) {
 
   int32_t pos;
   char *buffer;
@@ -311,7 +309,7 @@ int32_t interweb_ws_shake(kr_iws_client_t *client) {
   return 0;
 }
 
-int32_t krad_interweb_ws_client_handle(kr_iws_client_t *client) {
+int32_t web_ws_client_handle(kr_web_client *client) {
 
   int ret;
 

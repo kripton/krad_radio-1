@@ -1,32 +1,30 @@
 #include "krad_interweb.h"
 #include "embed.h"
 
+static void web_server_update_pollfds(kr_web_server *server);
+static void *web_server_loop(void *arg);
+static void disconnect_client(kr_web_server *server, kr_web_client *client);
+static kr_web_client *accept_client(kr_web_server *server, int sd);
 uint32_t interweb_ws_pack_frame_header(uint8_t *out, uint32_t size);
-int32_t interweb_client_get_stream(kr_iws_client_t *client);
-static void krad_interweb_pack_buffer(kr_iws_client_t *client, void *buffer,
- size_t length);
+int32_t web_client_get_stream(kr_web_client *client);
+static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz);
 
-static void krad_interweb_pack_buffer(kr_iws_client_t *client, void *buffer,
- size_t length) {
-  kr_io2_pack(client->out, buffer, length);
+static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz) {
+  kr_io2_pack(c->out, buffer, sz);
 }
 
-void interweb_ws_pack(kr_iws_client_t *client, uint8_t *buffer, size_t len);
-static int handle_json(kr_iws_client_t *client, char *json, size_t len);
+void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len);
+static int handle_json(kr_web_client *client, char *json, size_t len);
 
 int strmatch(char *string1, char *string2) {
-
   int len1;
-
   if ((string1 == NULL) || (string2 == NULL)) {
     if ((string1 == NULL) && (string2 == NULL)) {
       return 1;
     }
     return 0;
   }
-
   len1 = strlen (string1);
-
   if (len1 == strlen(string2)) {
     if (strncmp(string1, string2, len1) == 0) {
       return 1;
@@ -45,57 +43,48 @@ int strmatch(char *string1, char *string2) {
 #include "stream.c"
 #include "file.c"
 
-int32_t krad_interweb_client_handle(kr_iws_client_t *client) {
-
+int32_t krad_interweb_client_handle(kr_web_client *client) {
   int32_t ret;
-
   ret = -1;
-
   if (client->type == INTERWEB_UNKNOWN) {
     ret = krad_interweb_client_handle_request(client);
     if (client->type == INTERWEB_UNKNOWN) {
       return ret;
     }
   }
-
   switch (client->type) {
     case KR_IWS_WS:
-      ret = krad_interweb_ws_client_handle(client);
+      ret = web_ws_client_handle(client);
       break;
     case KR_IWS_FILE:
-      ret = krad_interweb_file_client_handle(client);
+      ret = web_file_client_handle(client);
       break;
     case KR_IWS_STREAM_OUT:
-      ret = krad_interweb_stream_client_handle(client);
+      ret = web_stream_client_handle(client);
       break;
     case KR_IWS_STREAM_IN:
-      ret = krad_interweb_stream_in_client_handle(client);
+      ret = web_stream_in_client_handle(client);
       break;
     default:
       break;
   }
-
   return ret;
 }
 
-static kr_iws_client_t *kr_iws_accept_client(kr_iws_t *server, int sd) {
-
-  kr_iws_client_t *client;
+static kr_web_client *accept_client(kr_web_server *server, int sd) {
+  kr_web_client *client;
   int outsize;
   int i;
   struct sockaddr_un sin;
   socklen_t sin_len;
-
   client = NULL;
-
   outsize = MAX(server->api_js_len, server->html_len);
   outsize = MAX(outsize + server->deviface_js_len,
    outsize + server->iface_js_len);
   outsize += 1024;
   outsize += outsize % 1024;
-
   while (client == NULL) {
-    for(i = 0; i < KR_IWS_MAX_CLIENTS; i++) {
+    for(i = 0; i < KR_WEB_CLIENTS_MAX; i++) {
       if (server->clients[i].sd == 0) {
         client = &server->clients[i];
         break;
@@ -121,19 +110,15 @@ static kr_iws_client_t *kr_iws_accept_client(kr_iws_t *server, int sd) {
     printke ("Krad Interweb Server: Client NOT accepted!");
     client->sd = 0;
   }
-
   return NULL;
 }
 
-static void krad_interweb_disconnect_client(kr_interweb_server_t *server,
- kr_iws_client_t *client) {
-
+static void disconnect_client(kr_web_server *server, kr_web_client *client) {
   kr_webrtc_unregister(client);
-
   close(client->sd);
   client->sd = 0;
   if (client->ws.krclient != NULL) {
-    kr_client_destroy (&client->ws.krclient);
+    kr_client_destroy(&client->ws.krclient);
   }
   client->type = 0;
   client->drop_after_sync = 0;
@@ -141,19 +126,17 @@ static void krad_interweb_disconnect_client(kr_interweb_server_t *server,
   client->hdr_pos = 0;
   client->hdrs_recvd = 0;
   client->verb = 0;
-  memset(&client->ws, 0, sizeof(interwebs_t));
+  memset(&client->ws, 0, sizeof(kr_websocket_client));
   memset(client->get, 0, sizeof(client->get));
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
   printk ("Krad Interweb Server: Client Disconnected");
 }
 
-static void krad_interweb_server_update_pollfds(kr_interweb_server_t *server) {
-
+static void web_server_update_pollfds(kr_web_server *server) {
   int r;
   int c;
   int s;
-
   s = 0;
   server->sockets[s].fd = krad_controller_get_client_fd(&server->krad_control);
   server->sockets[s].events = POLLIN;
@@ -166,7 +149,7 @@ static void krad_interweb_server_update_pollfds(kr_interweb_server_t *server) {
       server->socket_type[s] = KR_REMOTE_LISTEN;
     }
   }
-  for (c = 0; c < KR_IWS_MAX_KRCLIENTS; c++) {
+  for (c = 0; c < KR_WEB_KRCLIENTS_MAX; c++) {
     if ((server->clients[c].sd > 0) && (server->clients[c].ws.krclient != NULL)) {
       server->sockets[s].fd = kr_client_get_fd(server->clients[c].ws.krclient);
       server->sockets[s].events = POLLIN;
@@ -178,7 +161,7 @@ static void krad_interweb_server_update_pollfds(kr_interweb_server_t *server) {
       s++;
     }
   }
-  for (c = 0; c < KR_IWS_MAX_CLIENTS; c++) {
+  for (c = 0; c < KR_WEB_CLIENTS_MAX; c++) {
     if (server->clients[c].sd > 0) {
       server->sockets[s].fd = server->clients[c].sd;
       server->sockets[s].events |= POLLIN;
@@ -194,22 +177,19 @@ static void krad_interweb_server_update_pollfds(kr_interweb_server_t *server) {
   //printk ("Krad Interweb Server: sockets rejiggerd!\n");
 }
 
-static void *krad_interweb_server_loop(void *arg) {
-
-  kr_interweb_server_t *server = (kr_interweb_server_t *)arg;
-  kr_iws_client_t *client;
+static void *web_server_loop(void *arg) {
+  kr_web_server *server = (kr_web_server *)arg;
+  kr_web_client *client;
   int32_t oret;
   int32_t ret;
   int32_t s;
   int32_t r;
   int32_t read_ret;
-
-  krad_system_set_thread_name ("kr_interweb");
+  krad_system_set_thread_name("kr_web");
   server->shutdown = KRAD_INTERWEB_RUNNING;
-
   while (!server->shutdown) {
     s = 0;
-    krad_interweb_server_update_pollfds(server);
+    web_server_update_pollfds(server);
     ret = poll(server->sockets, server->socket_count, -1);
     if ((ret < 1) || (server->shutdown) || (server->sockets[s].revents)) {
       break;
@@ -218,8 +198,8 @@ static void *krad_interweb_server_loop(void *arg) {
     for (r = 0; r < MAX_REMOTES; r++) {
       if (server->tcp_sd[r] != 0) {
         if ((server->tcp_sd[r] != 0)
-            && (server->sockets[s].revents & POLLIN)) {
-          kr_iws_accept_client(server, server->tcp_sd[r]);
+         && (server->sockets[s].revents & POLLIN)) {
+          accept_client(server, server->tcp_sd[r]);
           ret--;
         }
         s++;
@@ -239,7 +219,7 @@ static void *krad_interweb_server_loop(void *arg) {
           read_ret = kr_io2_read(client->in);
           if (read_ret > 0) {
             if (krad_interweb_client_handle(client) < 0) {
-              krad_interweb_disconnect_client(server, client);
+              disconnect_client(server, client);
               continue;
             }
             if (kr_io2_want_out (client->out)) {
@@ -252,7 +232,7 @@ static void *krad_interweb_server_loop(void *arg) {
             if (read_ret == -1) {
               printke("Krad Interweb Server: Client Socket Error");
             }
-            krad_interweb_disconnect_client(server, client);
+            disconnect_client(server, client);
             continue;
           }
         }
@@ -260,12 +240,12 @@ static void *krad_interweb_server_loop(void *arg) {
           oret = kr_io2_output(client->out);
           if (oret != 0) {
             printke ("panic dropping the client");
-            krad_interweb_disconnect_client(server, client);
+            disconnect_client(server, client);
             continue;
           }
           if (!(kr_io2_want_out (client->out))) {
             if (client->drop_after_sync == 1) {
-              krad_interweb_disconnect_client(server, client);
+              disconnect_client(server, client);
               continue;
             }
             server->sockets[s].events = POLLIN;
@@ -273,13 +253,13 @@ static void *krad_interweb_server_loop(void *arg) {
         } else {
           if (server->sockets[s].revents & POLLHUP) {
             //printk ("Krad Interweb Server %d : POLLHUP\n", s);
-            krad_interweb_disconnect_client(server, client);
+            disconnect_client(server, client);
             continue;
           }
         }
         if (server->sockets[s].revents & POLLERR) {
           printke("Krad Interweb Server: POLLERR");
-          krad_interweb_disconnect_client(server, client);
+          disconnect_client(server, client);
           continue;
         }
       }
@@ -290,33 +270,30 @@ static void *krad_interweb_server_loop(void *arg) {
   return NULL;
 }
 
-void krad_interweb_server_disable (kr_interweb_t *server) {
+void kr_web_server_disable(kr_web_server *server) {
   printk ("Krad Interweb Server: Disable Started");
-  if (!krad_controller_shutdown(&server->krad_control, &server->server_thread,
+  if (!krad_controller_shutdown(&server->krad_control, &server->thread,
       30)) {
-    krad_controller_destroy(&server->krad_control, &server->server_thread);
+    krad_controller_destroy(&server->krad_control, &server->thread);
   }
-  krad_interweb_server_listen_off(server, "", 0);
+  kr_web_server_listen_off(server, "", 0);
   printk ("Krad Interweb Server: Disable Complete");
 }
 
-void krad_interweb_server_destroy(kr_interweb_t **serv) {
-
+void kr_web_server_destroy(kr_web_server **serv) {
   int i;
-  kr_interweb_t *server;
-
+  kr_web_server *server;
   if ((serv == NULL) || (*serv == NULL)) {
     return;
   }
   server = *serv;
-
   printk("Krad Interweb Server: Destroy Started");
   if (server->shutdown != KRAD_INTERWEB_SHUTINGDOWN) {
-    krad_interweb_server_disable(server);
+    kr_web_server_disable(server);
   }
-  for (i = 0; i < KR_IWS_MAX_CLIENTS; i++) {
+  for (i = 0; i < KR_WEB_CLIENTS_MAX; i++) {
     if (server->clients[i].sd > 0) {
-      krad_interweb_disconnect_client(server, &server->clients[i]);
+      disconnect_client(server, &server->clients[i]);
     }
   }
   free(server->clients);
@@ -325,17 +302,14 @@ void krad_interweb_server_destroy(kr_interweb_t **serv) {
   printk ("Krad Interweb Server: Destroy Completed");
 }
 
-void krad_interweb_server_run (kr_interweb_server_t *server) {
-  pthread_create(&server->server_thread, NULL, krad_interweb_server_loop,
-   (void *)server);
+void kr_web_server_run(kr_web_server *server) {
+  pthread_create(&server->thread, NULL, web_server_loop, (void *)server);
 }
 
-kr_interweb_server_t *krad_interweb_server_create (char *sysname, int32_t port,
+kr_web_server *kr_web_server_create(char *sysname, int32_t port,
  char *headcode, char *htmlheader, char *htmlfooter) {
-
-  kr_interweb_server_t *server;
-
-  server = calloc(1, sizeof (kr_interweb_server_t));
+  kr_web_server *server;
+  server = calloc(1, sizeof (kr_web_server));
   if (krad_control_init(&server->krad_control)) {
     free(server);
     return NULL;
@@ -346,10 +320,9 @@ kr_interweb_server_t *krad_interweb_server_create (char *sysname, int32_t port,
   server->htmlheader_source = htmlheader;
   server->htmlfooter_source = htmlfooter;
   server->shutdown = KRAD_INTERWEB_STARTING;
-  server->clients = calloc(KR_IWS_MAX_CLIENTS, sizeof(kr_iws_client_t));
-  kr_interweb_server_setup_html (server);
-  krad_interweb_server_listen_on(server, NULL, port);
-  krad_interweb_server_run(server);
-
+  server->clients = calloc(KR_WEB_CLIENTS_MAX, sizeof(kr_web_client));
+  web_server_setup_html(server);
+  kr_web_server_listen_on(server, NULL, port);
+  kr_web_server_run(server);
   return server;
 }

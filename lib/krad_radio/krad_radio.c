@@ -21,13 +21,8 @@ static void radio_shutdown(kr_radio *radio) {
     krad_app_server_disable(radio->app);
   }
   kr_timer_status(timer);
-  if (radio->remote.osc != NULL) {
-    krad_osc_destroy(radio->remote.osc);
-    radio->remote.osc = NULL;
-  }
-  kr_timer_status(timer);
-  if (radio->remote.interweb != NULL) {
-    krad_interweb_server_destroy(&radio->remote.interweb);
+  if (radio->web != NULL) {
+    kr_web_server_destroy(&radio->web);
   }
   kr_timer_status(timer);
   if (radio->transponder != NULL) {
@@ -98,12 +93,10 @@ static void kr_mixer_masterbus_setup(kr_radio *radio, kr_mixer *mixer) {
 }
 
 static kr_radio *radio_create(char *sysname) {
-
   kr_radio *radio;
   kr_mixer_setup mixer_setup;
   kr_compositor_setup compositor_setup;
   kr_transponder_setup transponder_setup;
-
   radio = calloc(1, sizeof(kr_radio));
   radio->log.startup_timer = kr_timer_create_with_name("startup");
   kr_timer_start(radio->log.startup_timer);
@@ -113,16 +106,13 @@ static kr_radio *radio_create(char *sysname) {
     radio_shutdown(radio);
     return NULL;
   }
-
   radio->app = krad_app_server_create("krad_radio", radio->sysname,
    krad_radio_client_create, krad_radio_client_destroy,
    krad_radio_client_handler, radio);
-
   if (radio->app == NULL) {
     radio_shutdown(radio);
     return NULL;
   }
-
   kr_mixer_setup_init(&mixer_setup);
   mixer_setup.user = radio;
   mixer_setup.cb = radio_mixer_info_cb;
@@ -132,7 +122,6 @@ static kr_radio *radio_create(char *sysname) {
     return NULL;
   }
   kr_mixer_masterbus_setup(radio, radio->mixer);
-
   kr_compositor_setup_init(&compositor_setup);
   //same as above and hrm also enable mix/comp from AS
   radio->compositor = kr_compositor_create(&compositor_setup);
@@ -140,7 +129,6 @@ static kr_radio *radio_create(char *sysname) {
     radio_shutdown(radio);
     return NULL;
   }
-
   transponder_setup.mixer = radio->mixer;
   transponder_setup.compositor = radio->compositor;
   radio->transponder = kr_transponder_create(&transponder_setup);
@@ -148,22 +136,13 @@ static kr_radio *radio_create(char *sysname) {
     radio_shutdown(radio);
     return NULL;
   }
-  radio->remote.osc = krad_osc_create(radio->sysname);
-  if (radio->remote.osc == NULL) {
-    radio_shutdown(radio);
-    return NULL;
-  }
-
   radio->system_broadcaster = krad_app_server_broadcaster_register(radio->app);
-
   if (radio->system_broadcaster == NULL) {
     radio_shutdown(radio);
     return NULL;
   }
-
   krad_app_server_broadcaster_register_broadcast(radio->system_broadcaster,
    EBML_ID_KRAD_SYSTEM_BROADCAST);
-
   return radio;
 }
 

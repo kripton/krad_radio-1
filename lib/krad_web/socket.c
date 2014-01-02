@@ -35,9 +35,9 @@ static int kr_interweb_server_socket_setup(char *interface, int port) {
   int s;
   int sfd = 0;
   char *interface_actual;
-  
+
   interface_actual = interface;
-  
+
   printk ("Krad Interweb Server: interface: %s port %d", interface, port);
   snprintf (port_string, 6, "%d", port);
   memset (&hints, 0, sizeof (struct addrinfo));
@@ -80,7 +80,7 @@ static int kr_interweb_server_socket_setup(char *interface, int port) {
 }
 
 #ifdef KR_LINUX
-int krad_interweb_server_listen_on_adapter (krad_iws_t *server, char *adapter,
+int web_server_listen_on_adapter(kr_web_server *server, char *adapter,
  int32_t port) {
 
   struct ifaddrs *ifaddr, *ifa;
@@ -109,7 +109,7 @@ int krad_interweb_server_listen_on_adapter (krad_iws_t *server, char *adapter,
         printke("getnameinfo() failed: %s\n", gai_strerror(s));
         return -1;
       }
-      ret = krad_interweb_server_listen_on(server, host, port);
+      ret = kr_web_server_listen_on(server, host, port);
       if (ret == 1) {
         ifs++;
       }
@@ -120,7 +120,7 @@ int krad_interweb_server_listen_on_adapter (krad_iws_t *server, char *adapter,
 }
 #endif
 
-int krad_interweb_server_listen_off (krad_iws_t *server, char *interface,
+int kr_web_server_listen_off(kr_web_server *server, char *interface,
  int32_t port) {
 
   //FIXME needs to loop thru clients and disconnect remote ones .. optionally?
@@ -128,10 +128,10 @@ int krad_interweb_server_listen_off (krad_iws_t *server, char *interface,
   int r;
   int d;
   int all_if;
-  
+
   all_if = 0;
   d = 0;
-  
+
   if (strlen(interface) == 0) {
     all_if = 1;
   }
@@ -139,7 +139,7 @@ int krad_interweb_server_listen_off (krad_iws_t *server, char *interface,
     if ((server->tcp_sd[r] != 0) &&
         ((port == 0) || (server->tcp_port[r] == port)) &&
          ((all_if == 1) || (strmatch(server->tcp_interface[r], interface)))) {
-          
+
       close(server->tcp_sd[r]);
       server->tcp_sd[r] = 0;
       d++;
@@ -153,14 +153,13 @@ int krad_interweb_server_listen_off (krad_iws_t *server, char *interface,
   return d;
 }
 
-int krad_interweb_server_listen_on(kr_interweb_server_t *server,
- char *interface, int32_t port) {
+int kr_web_server_listen_on(kr_web_server *server, char *interface, int32_t port) {
 
   int r;
   int sd;
-  
+
   sd = 0;
-  
+
   if ((interface == NULL) || (strlen(interface) == 0)) {
     interface = "[::]";
   } else {
@@ -168,7 +167,7 @@ int krad_interweb_server_listen_on(kr_interweb_server_t *server,
     if (krad_system_is_adapter (interface)) {
       //printk ("Krad Interweb Server: its an adapter,
       //we should probably bind to all ips of this adapter");
-      return krad_interweb_server_listen_on_adapter (server, interface, port);
+      return web_server_listen_on_adapter(server, interface, port);
     }
     #else
       return 0;
@@ -181,7 +180,7 @@ int krad_interweb_server_listen_on(kr_interweb_server_t *server,
         return 0;
       }
     }
-  }  
+  }
   for (r = 0; r < MAX_REMOTES; r++) {
     if ((server->tcp_sd[r] == 0) && (server->tcp_port[r] == 0)) {
       sd = kr_interweb_server_socket_setup (interface, port);

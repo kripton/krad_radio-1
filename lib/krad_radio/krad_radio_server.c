@@ -484,27 +484,20 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
         krad_radio_broadcast_subunit_destroyed (app->app_broadcaster, &address);
       }
       break;
-    case EBML_ID_KRAD_RADIO_CMD_OSC_ENABLE:
-      kr_ebml2_unpack_element_uint32 (&ebml_in, &element, &numbers[0]);
-      krad_osc_listen(radio->remote.osc, numbers[0]);
-      break;
-    case EBML_ID_KRAD_RADIO_CMD_OSC_DISABLE:
-      krad_osc_stop_listening(radio->remote.osc);
-      break;
     case EBML_ID_KRAD_RADIO_CMD_WEB_ENABLE:
       kr_ebml2_unpack_element_uint32(&ebml_in, &element, &numbers[0]);
       kr_ebml2_unpack_element_string(&ebml_in, &element, string1, sizeof(string1));
       kr_ebml2_unpack_element_string(&ebml_in, &element, string2, sizeof(string2));
       kr_ebml2_unpack_element_string(&ebml_in, &element, string3, sizeof(string3));
-      if (radio->remote.interweb != NULL) {
-        krad_interweb_server_destroy(&radio->remote.interweb);
+      if (radio->web != NULL) {
+        kr_web_server_destroy(&radio->web);
       }
-      radio->remote.interweb = krad_interweb_server_create(radio->sysname,
-      numbers[0], string1, string2, string3);
+      radio->web = kr_web_server_create(radio->sysname, numbers[0], string1,
+       string2, string3);
       break;
     case EBML_ID_KRAD_RADIO_CMD_WEB_DISABLE:
-      if (radio->remote.interweb != NULL) {
-        krad_interweb_server_destroy (&radio->remote.interweb);
+      if (radio->web != NULL) {
+        kr_web_server_destroy(&radio->web);
       }
       break;
     case EBML_ID_KRAD_RADIO_CMD_SET_DIR:

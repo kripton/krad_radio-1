@@ -1,5 +1,4 @@
-char *kr_interweb_server_load_file_or_string(char *input) {
-
+char *web_server_load_file_or_string(char *input) {
   int fd;
   char *string;
   unsigned int length;
@@ -51,8 +50,7 @@ char *kr_interweb_server_load_file_or_string(char *input) {
   }
 }
 
-void kr_interweb_server_setup_html(kr_interweb_t *server) {
-
+void web_server_setup_html(kr_web_server *server) {
   char string[64];
   char *html_template;
   int html_template_len;
@@ -82,11 +80,11 @@ void kr_interweb_server_setup_html(kr_interweb_t *server) {
   total_len += html_template_len - 4;
 
   server->headcode =
-   kr_interweb_server_load_file_or_string(server->headcode_source);
+   web_server_load_file_or_string(server->headcode_source);
   server->htmlheader =
-   kr_interweb_server_load_file_or_string(server->htmlheader_source);
+   web_server_load_file_or_string(server->htmlheader_source);
   server->htmlfooter =
-   kr_interweb_server_load_file_or_string(server->htmlfooter_source);
+   web_server_load_file_or_string(server->htmlfooter_source);
 
   if (server->headcode != NULL) {
     total_len += strlen(server->headcode);

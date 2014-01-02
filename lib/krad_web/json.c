@@ -1,4 +1,4 @@
-static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
+static int handle_json(kr_web_client *client, char *json, size_t len) {
 
   int pos;
   int got_register;
@@ -179,7 +179,7 @@ static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
   } else if (got_unregister == 1) {
     kr_webrtc_unregister(client);
   } else if (got_call == 1) {
-    for (i = 0; i < KR_IWS_MAX_CLIENTS; i++) {
+    for (i = 0; i < KR_WEB_CLIENTS_MAX; i++) {
       printk("got call");
       if (strncmp(client->server->clients[i].webrtc_user.name, name,
        KR_WEBRTC_NAME_MAX) == 0) {
@@ -187,7 +187,7 @@ static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
       }
     }
   } else if (got_answer == 1) {
-    for (i = 0; i < KR_IWS_MAX_CLIENTS; i++) {
+    for (i = 0; i < KR_WEB_CLIENTS_MAX; i++) {
       printk("got answer");
       if (strncmp(client->server->clients[i].webrtc_user.name, name,
        KR_WEBRTC_NAME_MAX) == 0) {
@@ -195,7 +195,7 @@ static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
       }
     }
   } else if (got_candidate == 1) {
-    for (i = 0; i < KR_IWS_MAX_CLIENTS; i++) {
+    for (i = 0; i < KR_WEB_CLIENTS_MAX; i++) {
       printk("got candidate");
       if (strncmp(client->server->clients[i].webrtc_user.name, name,
        KR_WEBRTC_NAME_MAX) == 0) {
@@ -207,7 +207,7 @@ static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
 }
 
 
-void krad_websocket_remove_portgroup (kr_iws_client_t *client,
+void krad_websocket_remove_portgroup (kr_web_client *client,
  kr_address_t *address) {
 
   char json[192];
@@ -219,7 +219,7 @@ void krad_websocket_remove_portgroup (kr_iws_client_t *client,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_set_portgroup_eff(kr_iws_client_t *client,
+void krad_websocket_set_portgroup_eff(kr_web_client *client,
  kr_address_t *address, float value) {
 
   char json[256];
@@ -235,7 +235,7 @@ void krad_websocket_set_portgroup_eff(kr_iws_client_t *client,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_remove_subunit(kr_iws_client_t *client,
+void krad_websocket_remove_subunit(kr_web_client *client,
  kr_address_t *address) {
 
   char json[192];
@@ -249,7 +249,7 @@ void krad_websocket_remove_subunit(kr_iws_client_t *client,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_set_portgroup_control ( kr_iws_client_t *client,
+void krad_websocket_set_portgroup_control ( kr_web_client *client,
  kr_address_t *address, float value) {
 
   char json[192];
@@ -264,7 +264,7 @@ void krad_websocket_set_portgroup_control ( kr_iws_client_t *client,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_set_portgroup_peak ( kr_iws_client_t *client,
+void krad_websocket_set_portgroup_peak ( kr_web_client *client,
  kr_address_t *address, float value) {
 
   char json[192];
@@ -276,7 +276,7 @@ void krad_websocket_set_portgroup_peak ( kr_iws_client_t *client,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_update_portgroup ( kr_iws_client_t *client,
+void krad_websocket_update_portgroup ( kr_web_client *client,
  kr_address_t *address, char *value ) {
 
   char json[192];
@@ -291,7 +291,7 @@ void krad_websocket_update_portgroup ( kr_iws_client_t *client,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_set_tag (kr_iws_client_t *client, char *tag_item,
+void krad_websocket_set_tag (kr_web_client *client, char *tag_item,
  char *tag_name, char *tag_value) {
 
   char json[1024];
@@ -304,7 +304,7 @@ void krad_websocket_set_tag (kr_iws_client_t *client, char *tag_item,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_set_cpu_usage (kr_iws_client_t *client, int usage) {
+void krad_websocket_set_cpu_usage (kr_web_client *client, int usage) {
 
   char json[96];
 
@@ -315,7 +315,7 @@ void krad_websocket_set_cpu_usage (kr_iws_client_t *client, int usage) {
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_add_comp_subunit(kr_iws_client_t *client,
+void krad_websocket_add_comp_subunit(kr_web_client *client,
  kr_crate_t *crate) {
 
   int pos;
@@ -382,7 +382,7 @@ void krad_websocket_add_comp_subunit(kr_iws_client_t *client,
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
-void krad_websocket_update_subunit(kr_iws_client_t *client,
+void krad_websocket_update_subunit(kr_web_client *client,
  kr_crate_t *crate) {
 
   int pos;
@@ -417,7 +417,7 @@ void krad_websocket_update_subunit(kr_iws_client_t *client,
   }
 }
 
-static int crate_to_json(kr_iws_client_t *client, kr_crate_t *crate) {
+static int crate_to_json(kr_web_client *client, kr_crate_t *crate) {
 
   uber_St uber;
   char json[2048];
@@ -484,7 +484,7 @@ static int crate_to_json(kr_iws_client_t *client, kr_crate_t *crate) {
   return 0;
 }
 
-static int krad_delivery_handler(kr_iws_client_t *client) {
+static int krad_delivery_handler(kr_web_client *client) {
 
   kr_crate_t *crate;
   char *string;

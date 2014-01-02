@@ -38,14 +38,7 @@ typedef struct kr_remote_control kr_remote_control;
 #include "krad_transponder.h"
 #include "krad_interweb.h"
 
-#include "krad_osc.h"
-
 extern krad_system_t krad_system;
-
-struct kr_remote_control {
-  krad_osc_t *osc;
-  krad_interweb_t *interweb;
-};
 
 struct kr_log {
   kr_timer *startup_timer;
@@ -58,8 +51,8 @@ struct kr_radio {
   kr_compositor *compositor;
   kr_transponder *transponder;
   kr_app_server *app;
+  kr_web_server *web;
   kr_app_broadcaster *system_broadcaster;
-  kr_remote_control remote;
   krad_tags *tags;
   kr_log log;
   char sysname[KRAD_SYSNAME_SZ];

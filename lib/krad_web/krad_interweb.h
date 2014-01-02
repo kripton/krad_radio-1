@@ -41,9 +41,9 @@
  */
 
 #define MAX_REMOTES 16
-#define KR_IWS_MAX_CLIENTS 64
-#define KR_IWS_MAX_KRCLIENTS 64
-#define KR_MAX_SDS KR_IWS_MAX_CLIENTS + KR_IWS_MAX_KRCLIENTS + MAX_REMOTES + 1
+#define KR_WEB_CLIENTS_MAX 64
+#define KR_WEB_KRCLIENTS_MAX 64
+#define KR_MAX_SDS KR_WEB_CLIENTS_MAX + KR_WEB_KRCLIENTS_MAX + MAX_REMOTES + 1
 #define KR_WEBRTC_NAME_MAX 64
 
 #define WS_MASK_BIT 0x80  // 10000000
@@ -61,6 +61,10 @@ enum krad_interweb_shutdown {
   KRAD_INTERWEB_DO_SHUTDOWN,
   KRAD_INTERWEB_SHUTINGDOWN,
 };
+
+typedef struct kr_web_server kr_web_server;
+typedef struct kr_web_client kr_web_client;
+typedef struct kr_websocket_client kr_websocket_client;
 
 typedef struct kr_webrtc_user kr_webrtc_user;
 typedef struct kr_webrtc_signal kr_webrtc_signal;
@@ -83,15 +87,7 @@ struct kr_webrtc_signal {
   char sdp[4096];
 };
 
-typedef struct krad_interweb_server_St kr_interweb_server_t;
-typedef struct krad_interweb_server_St krad_interweb_t;
-typedef struct krad_interweb_server_St kr_interweb_t;
-typedef struct krad_interweb_server_St kr_iws_t;
-typedef struct krad_interweb_server_St krad_iws_t;
-typedef struct krad_interweb_server_client_St krad_interweb_server_client_t;
-typedef struct krad_interweb_server_client_St kr_iws_client_t;
-
-struct krad_interweb_server_St {
+struct kr_web_server {
   char sysname[64];
   int32_t tcp_sd[MAX_REMOTES];
   int32_t tcp_port[MAX_REMOTES];
@@ -99,11 +95,11 @@ struct krad_interweb_server_St {
   int32_t shutdown;
   int32_t socket_count;
   krad_control_t krad_control;
-  krad_interweb_server_client_t *clients;
-  pthread_t server_thread;
+  kr_web_client *clients;
+  pthread_t thread;
   struct pollfd sockets[KR_MAX_SDS];
   int32_t socket_type[KR_MAX_SDS];
-  kr_iws_client_t *sockets_clients[KR_MAX_SDS];
+  kr_web_client *sockets_clients[KR_MAX_SDS];
   int32_t uberport;
   char *headcode_source;
   char *htmlheader_source;
@@ -121,7 +117,7 @@ struct krad_interweb_server_St {
   char *htmlfooter;
 };
 
-enum interweb_client_type {
+enum kr_web_client_type {
   INTERWEB_UNKNOWN = 0,
   KR_IWS_WS,
   KR_IWS_FILE,
@@ -131,7 +127,7 @@ enum interweb_client_type {
   KR_REMOTE_LISTEN,
 };
 
-enum interweb_verb {
+enum kr_web_verb {
   KR_IWS_INVALID = 0,
   KR_IWS_GET,
   KR_IWS_PUT,
@@ -142,9 +138,7 @@ enum interweb_verb {
   KR_IWS_OPTIONS,
 };
 
-typedef struct interwebs_St interwebs_t;
-
-struct interwebs_St {
+struct kr_websocket_client {
   uint8_t mask[4];
   uint32_t pos;
   uint64_t len;
@@ -159,9 +153,9 @@ struct interwebs_St {
   kr_client_t *krclient;
 };
 
-struct krad_interweb_server_client_St {
+struct kr_web_client {
   int32_t sd;
-  krad_interweb_t *server;
+  kr_web_server *server;
   kr_io2_t *in;
   kr_io2_t *out;
   kr_webrtc_user webrtc_user;
@@ -173,25 +167,23 @@ struct krad_interweb_server_client_St {
   int32_t verb;
   char get[96];
   char mount[128];
-  interwebs_t ws;
+  kr_websocket_client ws;
 };
 
-void kr_webrtc_register(kr_iws_client_t *client, char *name);
-void kr_webrtc_unregister(kr_iws_client_t *client);
-void kr_webrtc_list_users(kr_iws_client_t *client);
-void kr_webrtc_call(kr_iws_client_t *client, char *to, char *from, char *sdp);
-void kr_webrtc_answer(kr_iws_client_t *client, char *to, char *from, char *sdp);
-void kr_webrtc_candidate(kr_iws_client_t *client, char *to, char *from,
+void kr_webrtc_register(kr_web_client *client, char *name);
+void kr_webrtc_unregister(kr_web_client *client);
+void kr_webrtc_list_users(kr_web_client *client);
+void kr_webrtc_call(kr_web_client *client, char *to, char *from, char *sdp);
+void kr_webrtc_answer(kr_web_client *client, char *to, char *from, char *sdp);
+void kr_webrtc_candidate(kr_web_client *client, char *to, char *from,
  char *candidate);
 
-int32_t krad_interweb_server_listen_off (kr_interweb_server_t *server,
- char *interface, int32_t port);
-int32_t krad_interweb_server_listen_on (kr_interweb_server_t *server,
- char *interface, int32_t port);
+int32_t kr_web_server_listen_off(kr_web_server *server, char *interface, int32_t port);
+int32_t kr_web_server_listen_on(kr_web_server *server, char *interface, int32_t port);
 
-void krad_interweb_server_disable (kr_interweb_server_t *server);
-void krad_interweb_server_destroy (kr_interweb_server_t **server);
-void krad_interweb_server_run (kr_interweb_server_t *server);
-kr_interweb_server_t *krad_interweb_server_create (char *sysname, int32_t port,
+void kr_web_server_disable(kr_web_server *server);
+void kr_web_server_destroy(kr_web_server **server);
+void kr_web_server_run(kr_web_server *server);
+kr_web_server *kr_web_server_create(char *sysname, int32_t port,
  char *headcode, char *htmlheader, char *htmlfooter);
 #endif

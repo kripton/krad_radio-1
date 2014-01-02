@@ -1,4 +1,4 @@
-int32_t krad_interweb_client_find_end_of_headers(kr_iws_client_t *client) {
+int32_t krad_interweb_client_find_end_of_headers(kr_web_client *client) {
 
   int i;
   uint8_t *buf;
@@ -24,7 +24,7 @@ int32_t krad_interweb_client_find_end_of_headers(kr_iws_client_t *client) {
   return 0;
 }
 
-void debug_print_headers(kr_iws_client_t *client) {
+void debug_print_headers(kr_web_client *client) {
 
   char *headers;
 
@@ -53,7 +53,7 @@ int32_t interweb_header(char *buf, char *out, uint32_t max, char *header) {
   return 0;
 }
 
-int32_t krad_interweb_client_parse_verb(kr_iws_client_t *client) {
+int32_t krad_interweb_client_parse_verb(kr_web_client *client) {
 
   uint8_t *buf;
 
@@ -92,7 +92,7 @@ int32_t krad_interweb_client_parse_verb(kr_iws_client_t *client) {
   return -1;
 }
 
-int32_t krad_interweb_client_parse_get_request(kr_iws_client_t *client) {
+int32_t krad_interweb_client_parse_get_request(kr_web_client *client) {
 
   char *buf;
   int32_t ret;
@@ -116,7 +116,7 @@ int32_t krad_interweb_client_parse_get_request(kr_iws_client_t *client) {
       ret = interweb_header(buf, client->get, sizeof(client->get), "GET ");
       if (ret < 0) return -1;
       /*printk("GET IS %s", client->get);*/
-      if (!interweb_client_get_stream(client)) {
+      if (!web_client_get_stream(client)) {
         client->type = KR_IWS_FILE;
       }
       kr_io2_pulled(client->in, client->hdr_pos);
@@ -127,7 +127,7 @@ int32_t krad_interweb_client_parse_get_request(kr_iws_client_t *client) {
   return -1;
 }
 
-int32_t krad_interweb_client_parse_put_request(kr_iws_client_t *client) {
+int32_t krad_interweb_client_parse_put_request(kr_web_client *client) {
 
   char *buf;
   int32_t mount_len;
@@ -158,11 +158,11 @@ int32_t krad_interweb_client_parse_put_request(kr_iws_client_t *client) {
   return 0;
 }
 
-int32_t parse_post_request(kr_iws_client_t *client) {
+int32_t parse_post_request(kr_web_client *client) {
   return 0;
 }
 
-int32_t krad_interweb_client_handle_request(kr_iws_client_t *client) {
+int32_t krad_interweb_client_handle_request(kr_web_client *client) {
 
   int32_t ret;
 
