@@ -32,7 +32,6 @@ struct kr_mixer_crossfader {
 struct kr_mixer_path {
   kr_mixer_path_type type;
   kr_mixer_bus *bus;
-  char name[64];
   kr_mixer_channels channels;
   kr_mixer_crossfader *crossfader;
   kr_easer volume_easer;
@@ -96,13 +95,7 @@ int kr_mixer_get_path_info(kr_mixer_path *unit, kr_mixer_path_info *info) {
   int i;
   kr_sfx_cmd cmd;
   if ((unit == NULL) || (info == NULL)) return -1;
-  strcpy(info->name, unit->name);
   info->channels = unit->channels;
-  if (unit->bus != NULL) {
-    strncpy(info->bus, unit->bus->name, sizeof(info->bus));
-  } else {
-    info->bus[0] = '\0';
-  }
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
     info->volume[i] = unit->volume[i];
     info->map[i] = unit->map[i];
@@ -125,8 +118,6 @@ int kr_mixer_get_path_info(kr_mixer_path *unit, kr_mixer_path_info *info) {
   kr_sfx_ctl(unit->sfx, &cmd);
   if ((unit->crossfader != NULL) && (unit->crossfader->path[0] == unit)) {
     info->fade = unit->crossfader->fade;
-    strncpy(info->crossfade_group, unit->crossfader->path[1]->name,
-     sizeof(info->crossfade_group));
   } else {
     info->crossfade_group[0] = '\0';
     info->fade = 0.0f;
@@ -567,7 +558,7 @@ void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *path1,
   path2->crossfader = crossfader;
 /*
  * krad_radio_broadcast_subpath_update(mixer->as->app_broadcaster,
- * &path1->address, KR_CROSSFADE_GROUP, KR_STRING, path2->name, NULL);
+ * &path1->address, KR_CROSSFADE_GROUP, KR_STRING, path2->ame, NULL);
  */
   kr_mixer_path_ctl(path1, "crossfade", -100.0f, 0, NULL);
 }
@@ -597,7 +588,6 @@ void kr_mixer_xf_decouple(kr_mixer *mixer, kr_mixer_crossfader *crossfader) {
 
 static void path_release(kr_mixer_path *path) {
   int c;
-  printk("Krad Mixer: Destroying %s", path->name);
   path->delay = 0;
   path->delay_actual = 0;
   for (c = 0; c < KR_MXR_MAX_CHANNELS; c++) {
@@ -612,10 +602,6 @@ static void path_release(kr_mixer_path *path) {
 }
 
 static int path_setup_info_check(kr_mixer_path_info *info) {
-  if (memchr(info->name + 1, '\0', sizeof(info->name) - 1) == NULL) {
-    return -2;
-  }
-  if (strlen(info->name) == 0) return -3;
   if (info->channels < 1) return -1;
   if (info->channels > KR_MXR_MAX_CHANNELS) return -1;
   if ((info->type != KR_MXR_INPUT)
@@ -669,7 +655,6 @@ static void path_sfx_create(kr_mixer_path *path) {
 
 static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   int c;
-  strncpy(path->name, setup->info.name, sizeof(path->name));
   path->channels = setup->info.channels;
   path->type = setup->info.type;
   path->info_cb = setup->info_cb;
@@ -721,7 +706,6 @@ int kr_mixer_unlink(kr_mixer_path *path) {
     printke("mixer path unlink called with null value");
     return -1;
   }
-  printk("Krad Mixer: unlinking %s", path->name);
   if (path->crossfader != NULL) {
     kr_mixer_xf_decouple(path->mixer, path->crossfader);
   }
