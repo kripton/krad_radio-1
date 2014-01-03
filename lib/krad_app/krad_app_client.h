@@ -32,8 +32,8 @@
 #ifndef KRAD_APP_CLIENT_H
 #define KRAD_APP_CLIENT_H
 
-#define KRAD_APP_CLIENT_DOCTYPE "krad_app_client"
-#define KRAD_APP_SERVER_DOCTYPE "krad_app_server"
+#define KRAD_APP_CLIENT_DOCTYPE "kr_app_client"
+#define KRAD_APP_SERVER_DOCTYPE "kr_app_server"
 #define KRAD_APP_DOCTYPE_VERSION KR_VERSION
 #define KRAD_APP_DOCTYPE_READ_VERSION KR_VERSION
 #define EBML_ID_KRAD_APP_CMD 0x4444

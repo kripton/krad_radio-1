@@ -49,6 +49,7 @@ typedef struct kr_client_St kr_client;
 #include "krad_mixer_common.h"
 #include "krad_compositor_common.h"
 #include "krad_radio_common.h"
+#include "krad_tags.h"
 
 //typedef void (*rep_callback_t)( void *, void * );
 
@@ -177,7 +178,7 @@ struct kr_unit_control_St {
 
 typedef union {
   void *actual;
-  kr_tag_t *tag;
+  kr_tag *tag;
   kr_remote_t *remote;
   kr_mixer_info *mixer;
   kr_mixer_path_info *portgroup;
@@ -192,7 +193,7 @@ typedef union {
 
 typedef union {
   char actual;
-  kr_tag_t tag;
+  kr_tag tag;
   kr_remote_t remote;
   kr_mixer_info mixer;
   kr_mixer_path_info portgroup;
@@ -500,7 +501,7 @@ void kr_osc_disable (kr_client_t *client);
  * @param client handle of the API-connection to the station
  * @param item item to print the tags of
  */
-void kr_tags (kr_client_t *client, char *item);
+void kr_get_tags(kr_client_t *client, char *item);
 
 /**
  * @brief prints out the value of one specified tag
@@ -508,7 +509,7 @@ void kr_tags (kr_client_t *client, char *item);
  * @param item item the tag is grouped under
  * @param tag_name name of the tag to be printed
  */
-void kr_tag (kr_client_t *client, char *item, char *tag_name);
+void kr_get_tag(kr_client_t *client, char *item, char *tag_name);
 
 /**
  * @brief sets the value for a specified tag
@@ -517,7 +518,7 @@ void kr_tag (kr_client_t *client, char *item, char *tag_name);
  * @param tag_name name of the tag to be set
  * @param tag_value value to set the tag to
  */
-void kr_set_tag (kr_client_t *client, char *item, char *tag_name, char *tag_value);
+void kr_set_tag(kr_client_t *client, char *item, char *tag_name, char *tag_value);
 
 /** @} */
 

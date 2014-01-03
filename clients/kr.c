@@ -253,24 +253,23 @@ int main (int argc, char *argv[]) {
   }
 
   if (strncmp(argv[2], "tags", 4) == 0) {
-
     if (argc == 3) {
-      kr_tags(client, NULL);
+      kr_get_tags(client, NULL);
       kr_delivery_accept_and_report(client);
     }
     if (argc == 4) {
-      kr_tags(client, argv[3]);
+      kr_get_tags(client, argv[3]);
       kr_delivery_accept_and_report(client);
     }
 
   } else {
     if (strncmp(argv[2], "tag", 3) == 0) {
       if (argc == 4) {
-        kr_tag(client, NULL, argv[3]);
+        kr_get_tag(client, NULL, argv[3]);
         kr_delivery_accept_and_report(client);
       }
       if (argc == 5) {
-        kr_tag(client, argv[3], argv[4]);
+        kr_get_tag(client, argv[3], argv[4]);
         kr_delivery_accept_and_report(client);
       }
     }

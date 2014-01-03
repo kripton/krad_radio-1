@@ -250,7 +250,7 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
 
   if (((ebml_out.pos > 0)
       || (command == EBML_ID_KRAD_COMPOSITOR_CMD_LIST_SUBUNITS))
-      && (!krad_app_server_current_client_is_subscriber(app))) {
+      && (!kr_app_server_current_client_is_subscriber(app))) {
     krad_radio_pack_shipment_terminator(&ebml_out);
   }
 

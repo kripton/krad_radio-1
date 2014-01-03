@@ -10,13 +10,13 @@
 #include "krad_transponder_client.h"
 #include "krad_mixer_client.h"
 
-static int kr_radio_crate_to_rep (kr_crate_t *crate);
-static int kr_ebml_to_radio_rep (kr_ebml2_t *ebml, kr_radio_t *radio_rep);
-static void kr_crate_payload_ebml_reset (kr_crate_t *crate);
-static int kr_radio_crate_to_int (kr_crate_t *crate, int *integer);
-static int kr_ebml_to_remote_status_rep (kr_ebml2_t *ebml, kr_remote_t *remote);
-static int kr_ebml_to_tag_rep (kr_ebml2_t *ebml, kr_tag_t *tag);
-static void kr_crate_destroy (kr_crate_t **crate);
+static int kr_radio_crate_to_rep(kr_crate_t *crate);
+static int kr_ebml_to_radio_rep(kr_ebml2_t *ebml, kr_radio_t *radio_rep);
+static void kr_crate_payload_ebml_reset(kr_crate_t *crate);
+static int kr_radio_crate_to_int(kr_crate_t *crate, int *integer);
+static int kr_ebml_to_remote_status_rep(kr_ebml2_t *ebml, kr_remote_t *remote);
+static int kr_ebml_to_tag_rep(kr_ebml2_t *ebml, kr_tag *tag);
+static void kr_crate_destroy(kr_crate_t **crate);
 
 void frak_print_raw_ebml (unsigned char *buffer, int len) {
 
@@ -469,12 +469,14 @@ int kr_radio_response_get_string_from_cpu (kr_crate_t *crate, char **string) {
   return len;
 }
 
-int kr_radio_response_get_string_from_tags (kr_crate_t *crate, char **string) {
+int kr_radio_response_get_string_from_tags(kr_crate_t *crate, char **string) {
 
+  return 0;
+  /*
   int len;
   uint32_t element;
   uint64_t size;
-  kr_tag_t tag;
+  kr_tag tag;
 
   len = 0;
 
@@ -483,11 +485,12 @@ int kr_radio_response_get_string_from_tags (kr_crate_t *crate, char **string) {
     if (len > 0) {
       len += sprintf (*string + len, "\n");
     }
-    kr_ebml2_unpack_id (&crate->payload_ebml, &element, &size);
-    kr_ebml_to_tag_rep (&crate->payload_ebml, &tag);
+    kr_ebml2_unpack_id(&crate->payload_ebml, &element, &size);
+    kr_ebml_to_tag_rep(&crate->payload_ebml, &tag);
     len += sprintf (*string + len, "%s tag: %s - %s", tag.unit, tag.name, tag.value);
   }
   return len;
+  */
 }
 
 int kr_radio_crate_to_string (kr_crate_t *crate, char **string) {
@@ -670,19 +673,17 @@ int kr_crate_to_string (kr_crate_t *crate, char **string) {
 }
 
 static int kr_ebml_to_remote_status_rep (kr_ebml2_t *ebml, kr_remote_t *remote) {
-
   kr_ebml2_unpack_element_string (ebml, NULL, remote->interface, 666);
   kr_ebml2_unpack_element_uint16 (ebml, NULL, &remote->port);
-
   return 0;
 }
 
-static int kr_ebml_to_tag_rep (kr_ebml2_t *ebml, kr_tag_t *tag) {
-
-  kr_ebml2_unpack_element_string (ebml, NULL, tag->unit, 666);
-  kr_ebml2_unpack_element_string (ebml, NULL, tag->name, 666);
-  kr_ebml2_unpack_element_string (ebml, NULL, tag->value, 666);
-
+static int kr_ebml_to_tag_rep(kr_ebml2_t *ebml, kr_tag *tag) {
+  /*
+  kr_ebml2_unpack_element_string(ebml, NULL, tag->unit, 666);
+  kr_ebml2_unpack_element_string(ebml, NULL, tag->name, 666);
+  kr_ebml2_unpack_element_string(ebml, NULL, tag->value, 666);
+  */
   return 0;
 }
 
@@ -1321,7 +1322,7 @@ void kr_osc_disable (kr_client_t *client) {
   kr_client_push (client);
 }
 
-void kr_tags (kr_client_t *client, char *item) {
+void kr_get_tags(kr_client_t *client, char *item) {
 
   unsigned char *radio_command;
   unsigned char *get_tags;
@@ -1341,7 +1342,7 @@ void kr_tags (kr_client_t *client, char *item) {
   kr_client_push (client);
 }
 
-void kr_tag (kr_client_t *client, char *item, char *tag_name) {
+void kr_get_tag(kr_client_t *client, char *item, char *tag_name) {
 
   unsigned char *radio_command;
   unsigned char *get_tag;
@@ -1366,7 +1367,7 @@ void kr_tag (kr_client_t *client, char *item, char *tag_name) {
   kr_client_push (client);
 }
 
-void kr_set_tag (kr_client_t *client, char *item, char *tag_name, char *tag_value) {
+void kr_set_tag(kr_client_t *client, char *item, char *tag_name, char *tag_value) {
 
   unsigned char *radio_command;
   unsigned char *set_tag;

@@ -8,10 +8,10 @@ static void krad_radio_remote_rep_to_ebml(kr_remote_t *remote, kr_ebml2_t *ebml)
   kr_ebml_pack_uint16(ebml, EBML_ID_KRAD_RADIO_REMOTE_PORT, remote->port);
 }
 
-int krad_radio_broadcast_subunit_destroyed(krad_app_broadcaster_t *broadcaster, kr_address_t *address) {
+int kr_radio_broadcast_subunit_destroyed(kr_app_broadcaster *broadcaster, kr_address_t *address) {
 
   unsigned char buffer[256];
-  krad_broadcast_msg_t *broadcast_msg;
+  kr_broadcast_msg *broadcast_msg;
   kr_ebml2_t ebml;
   unsigned char *message_loc;
 
@@ -21,19 +21,19 @@ int krad_radio_broadcast_subunit_destroyed(krad_app_broadcaster_t *broadcaster, 
   kr_ebml_pack_int32(&ebml, EBML_ID_KRAD_RADIO_MESSAGE_TYPE, EBML_ID_KRAD_RADIO_UNIT_DESTROYED);
   kr_ebml2_finish_element(&ebml, message_loc);
 
-  broadcast_msg = krad_broadcast_msg_create(broadcaster, buffer, ebml.pos);
+  broadcast_msg = kr_broadcast_msg_create(broadcaster, buffer, ebml.pos);
 
   if (broadcast_msg != NULL) {
-    return krad_app_server_broadcaster_broadcast(broadcaster, &broadcast_msg);
+    return kr_app_server_broadcaster_broadcast(broadcaster, &broadcast_msg);
   }
 
   return -1;
 }
 
-int krad_radio_broadcast_subunit_created(krad_app_broadcaster_t *broadcaster, kr_address_t *address, void *subunit_in) {
+int kr_radio_broadcast_subunit_created(kr_app_broadcaster *broadcaster, kr_address_t *address, void *subunit_in) {
 
   unsigned char buffer[4096];
-  krad_broadcast_msg_t *broadcast_msg;
+  kr_broadcast_msg *broadcast_msg;
   kr_ebml2_t ebml;
   unsigned char *message_loc;
   unsigned char *payload_loc;
@@ -74,23 +74,23 @@ int krad_radio_broadcast_subunit_created(krad_app_broadcaster_t *broadcaster, kr
   kr_ebml2_finish_element(&ebml, payload_loc);
   kr_ebml2_finish_element(&ebml, message_loc);
 
-  broadcast_msg = krad_broadcast_msg_create(broadcaster, buffer, ebml.pos);
+  broadcast_msg = kr_broadcast_msg_create(broadcaster, buffer, ebml.pos);
 
   if (broadcast_msg != NULL) {
-    return krad_app_server_broadcaster_broadcast(broadcaster, &broadcast_msg);
+    return kr_app_server_broadcaster_broadcast(broadcaster, &broadcast_msg);
   }
 
   return -1;
 }
 
-int krad_radio_broadcast_subunit_control(krad_app_broadcaster_t *broadcaster, kr_address_t *address_in, int control, float value, void *client) {
-  return krad_radio_broadcast_subunit_update (broadcaster, address_in, control, KR_FLOAT, &value, client);
+int kr_radio_broadcast_subunit_control(kr_app_broadcaster *broadcaster, kr_address_t *address_in, int control, float value, void *client) {
+  return kr_radio_broadcast_subunit_update (broadcaster, address_in, control, KR_FLOAT, &value, client);
 }
 
-int krad_radio_broadcast_subunit_update(krad_app_broadcaster_t *broadcaster, kr_address_t *address_in, int control, int type, void *value, void *client) {
+int kr_radio_broadcast_subunit_update(kr_app_broadcaster *broadcaster, kr_address_t *address_in, int control, int type, void *value, void *client) {
 
   unsigned char buffer[1024];
-  krad_broadcast_msg_t *broadcast_msg;
+  kr_broadcast_msg *broadcast_msg;
   kr_ebml2_t ebml;
   unsigned char *message_loc;
   kr_address_t address;
@@ -140,7 +140,7 @@ int krad_radio_broadcast_subunit_update(krad_app_broadcaster_t *broadcaster, kr_
   kr_ebml2_finish_element (&ebml, payload_loc);
   kr_ebml2_finish_element (&ebml, message_loc);
 
-  broadcast_msg = krad_broadcast_msg_create (broadcaster, buffer, ebml.pos);
+  broadcast_msg = kr_broadcast_msg_create(broadcaster, buffer, ebml.pos);
   broadcast_msg->skip_client = client;
 
   if (broadcast_msg->skip_client != NULL) {
@@ -148,7 +148,7 @@ int krad_radio_broadcast_subunit_update(krad_app_broadcaster_t *broadcaster, kr_
   }
 
   if (broadcast_msg != NULL) {
-    return krad_app_server_broadcaster_broadcast ( broadcaster, &broadcast_msg );
+    return kr_app_server_broadcaster_broadcast(broadcaster, &broadcast_msg);
   }
 
   return -1;
@@ -276,7 +276,7 @@ void krad_radio_to_ebml(kr_ebml2_t *ebml, kr_radio *radio) {
   kr_ebml_pack_string(ebml, EBML_ID_KRAD_RADIO_SYSTEM_INFO, krad_system_info());
   kr_ebml_pack_string(ebml, EBML_ID_KRAD_RADIO_LOGNAME, radio->log.filename);
   kr_ebml_pack_uint64(ebml, EBML_ID_KRAD_RADIO_UPTIME, krad_system_daemon_uptime());
-  kr_ebml_pack_uint32(ebml, EBML_ID_KRAD_RADIO_UPTIME, krad_app_server_num_clients(radio->app));
+  kr_ebml_pack_uint32(ebml, EBML_ID_KRAD_RADIO_UPTIME, kr_app_server_num_clients(radio->app));
   kr_ebml_pack_uint32(ebml, EBML_ID_KRAD_RADIO_SYSTEM_CPU_USAGE, krad_system_get_cpu_usage());
 }
 
@@ -303,9 +303,9 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   kr_remote_t remote;
   kr_app_server *app;
   int i;
-  krad_tags_t *krad_tags;
+  kr_tags *tags;
 
-  krad_tags = NULL;
+  tags = NULL;
   i = 0;
   string1[0] = '\0';
   string2[0] = '\0';
@@ -351,11 +351,11 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
     case EBML_ID_KRAD_RADIO_CMD_LIST_TAGS:
       kr_ebml2_unpack_element_string(&ebml_in, &element, string1, sizeof(string1));
       if (strncmp("station", string1, 7) == 0) {
-        krad_tags = radio->tags;
+        tags = radio->tags;
       } else {
-        krad_tags = kr_radio_find_tags_for_item(radio, string1);
+        tags = kr_radio_find_tags_for_item(radio, string1);
       }
-      if (krad_tags != NULL) {
+      if (tags != NULL) {
         i = 0;
         address.path.unit = KR_STATION;
         address.path.subunit.station_subunit = KR_TAGS;
@@ -363,7 +363,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
         kr_ebml_pack_uint32(&ebml_out, EBML_ID_KRAD_RADIO_MESSAGE_TYPE,
          EBML_ID_KRAD_SUBUNIT_INFO);
         kr_ebml2_start_element(&ebml_out, EBML_ID_KRAD_RADIO_MESSAGE_PAYLOAD, &payload);
-        while (krad_tags_get_next_tag(krad_tags, &i, &tag_name, &tag_val)) {
+        while (kr_tags_get_next_tag(tags, &i, &tag_name, &tag_val)) {
           kr_ebml2_start_element (&ebml_out, EBML_ID_KRAD_RADIO_TAG, &tag);
           kr_ebml_pack_string(&ebml_out, EBML_ID_KRAD_RADIO_TAG_ITEM, string1);
           kr_ebml_pack_string(&ebml_out, EBML_ID_KRAD_RADIO_TAG_NAME, tag_name);
@@ -382,17 +382,17 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       kr_ebml2_unpack_element_string (&ebml_in, &element, string2, sizeof(string2));
       kr_ebml2_unpack_element_string (&ebml_in, &element, string3, sizeof(string3));
       if (strncmp("station", string1, 7) == 0) {
-        krad_tags_set_tag(radio->tags, string2, string3);
+        kr_tags_set_tag(radio->tags, string2, string3);
       } else {
-        krad_tags = kr_radio_find_tags_for_item(radio, string1);
-        if (krad_tags != NULL) {
-          krad_tags_set_tag ( krad_tags, string2, string3);
+        tags = kr_radio_find_tags_for_item(radio, string1);
+        if (tags != NULL) {
+          kr_tags_set_tag(tags, string2, string3);
           printk ("Set Tag %s on %s to %s", string2, string1, string3);
         } else {
           printke ("Could not find %s", string1);
         }
       }
-      //krad_app_server_broadcast_tag ( app, tag_item, tag_name, tag_value);
+      //krad_app_server_broadcast_tag(app, tag_item, tag_name, tag_value);
       break;
     case EBML_ID_KRAD_RADIO_CMD_GET_TAG:
       ret = kr_ebml2_unpack_id (&ebml_in, &element, &size);
@@ -400,12 +400,12 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       kr_ebml2_unpack_element_string(&ebml_in, &element, string2, sizeof(string2));
       kr_ebml2_unpack_element_string(&ebml_in, &element, string3, sizeof(string3));
       if (strncmp("station", string1, 7) == 0) {
-        tag_val = krad_tags_get_tag (radio->tags, string2);
+        tag_val = kr_tags_get_tag(radio->tags, string2);
       } else {
         tag_val = "";
-        krad_tags = kr_radio_find_tags_for_item(radio, string1);
-        if (krad_tags != NULL) {
-          tag_val = krad_tags_get_tag(krad_tags, string2 );
+        tags = kr_radio_find_tags_for_item(radio, string1);
+        if (tags != NULL) {
+          tag_val = kr_tags_get_tag(tags, string2 );
           printk ("Got Tag %s on %s - %s", string2, string1, tag_val);
         } else {
           printke ("Could not find %s", string1);
@@ -450,9 +450,9 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       break;
     case EBML_ID_KRAD_RADIO_CMD_REMOTE_ENABLE:
       printk ("command remote enable");
-      kr_ebml2_unpack_element_string (&ebml_in, &element, remote.interface, sizeof(string1));
-      kr_ebml2_unpack_element_uint16 (&ebml_in, &element, &remote.port);
-      if (krad_app_server_enable_remote (app, remote.interface, remote.port)) {
+      kr_ebml2_unpack_element_string(&ebml_in, &element, remote.interface, sizeof(string1));
+      kr_ebml2_unpack_element_uint16(&ebml_in, &element, &remote.port);
+      if (kr_app_server_enable_remote(app, remote.interface, remote.port)) {
         //FIXME this is wrong in the case of adapter based matches with multiple ips
         // perhaps switch to callback based create broadcast?
         address.path.unit = KR_STATION;
@@ -463,7 +463,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
             break;
           }
         }
-        krad_radio_broadcast_subunit_created ( app->app_broadcaster, &address, (void *)&remote);
+        kr_radio_broadcast_subunit_created(app->app_broadcaster, &address, (void *)&remote);
       }
       break;
     case EBML_ID_KRAD_RADIO_CMD_REMOTE_DISABLE:
@@ -471,14 +471,14 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       kr_ebml2_unpack_element_string (&ebml_in, &element, string1, sizeof(string1));
       kr_ebml2_unpack_element_uint32 (&ebml_in, &element, &numbers[0]);
       while (1) {
-        i = krad_app_server_disable_remote (app, string1, numbers[0]);
+        i = kr_app_server_disable_remote(app, string1, numbers[0]);
         if (i < 0) {
           break;
         }
         address.path.unit = KR_STATION;
         address.path.subunit.station_subunit = KR_REMOTE;
         address.id.number = i;
-        krad_radio_broadcast_subunit_destroyed (app->app_broadcaster, &address);
+        kr_radio_broadcast_subunit_destroyed(app->app_broadcaster, &address);
       }
       break;
     case EBML_ID_KRAD_RADIO_CMD_WEB_ENABLE:
@@ -505,14 +505,14 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       break;
     case EBML_ID_KRAD_RADIO_CMD_BROADCAST_SUBSCRIBE:
       kr_ebml2_unpack_element_uint32(&ebml_in, &element, &numbers[0]);
-      krad_app_server_add_client_to_broadcast(app, numbers[0]);
+      kr_app_server_add_client_to_broadcast(app, numbers[0]);
       break;
     default:
       printke ("Krad Radio Command Unknown! %u", command);
       return -1;
   }
 
-  if ((ebml_out.pos > 0) && (!krad_app_server_current_client_is_subscriber(app))) {
+  if ((ebml_out.pos > 0) && (!kr_app_server_current_client_is_subscriber(app))) {
     krad_radio_pack_shipment_terminator(&ebml_out);
   }
 

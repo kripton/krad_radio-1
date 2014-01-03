@@ -1,148 +1,125 @@
 #include "krad_tags.h"
 
-void krad_tags_destroy (krad_tags_t *krad_tags) {
-
+void kr_tags_destroy(kr_tags *tags) {
   int t;
-  pthread_rwlock_wrlock (&krad_tags->krad_tags_rwlock);
+  pthread_rwlock_wrlock(&tags->tags_rwlock);
   for (t = 0; t < KRAD_MAX_TAGS; t++) {
-    if (krad_tags->tags[t].name != NULL) {
-      free (krad_tags->tags[t].name);
-      krad_tags->tags[t].name = NULL;
-      free (krad_tags->tags[t].value);
-      krad_tags->tags[t].value = NULL;
+    if (tags->tags[t].name != NULL) {
+      free(tags->tags[t].name);
+      tags->tags[t].name = NULL;
+      free(tags->tags[t].value);
+      tags->tags[t].value = NULL;
     }
   }
-
-  free (krad_tags->item);
-  pthread_rwlock_unlock (&krad_tags->krad_tags_rwlock);
-  pthread_rwlock_destroy (&krad_tags->krad_tags_rwlock);
-  free (krad_tags->tags);
-  free (krad_tags);
+  free(tags->item);
+  pthread_rwlock_unlock(&tags->tags_rwlock);
+  pthread_rwlock_destroy(&tags->tags_rwlock);
+  free(tags->tags);
+  free(tags);
 }
 
-krad_tags_t *krad_tags_create (char *item) {
-
-  krad_tags_t *krad_tags = calloc(1, sizeof(krad_tags_t));
-
-  krad_tags->tags = calloc(KRAD_MAX_TAGS, sizeof(krad_tag_t));
-  
-  if (krad_tags->tags == NULL) {
+kr_tags *kr_tags_create(char *item) {
+  kr_tags *tags = calloc(1, sizeof(kr_tags));
+  tags->tags = calloc(KRAD_MAX_TAGS, sizeof(kr_tag));
+  if (tags->tags == NULL) {
     failfast ("Krad Tags: Out of memory");
   }
-  
-  krad_tags->item = strdup (item);
-
-  if (krad_tags->item == NULL) {
+  tags->item = strdup(item);
+  if (tags->item == NULL) {
     failfast ("Krad Tags: Out of memory");
   }
-  
-  pthread_rwlock_init (&krad_tags->krad_tags_rwlock, NULL);
-  
-  return krad_tags;
+  pthread_rwlock_init(&tags->tags_rwlock, NULL);
+  return tags;
 }
 
-void krad_tags_set_set_tag_callback (krad_tags_t *krad_tags, void *callback_pointer, 
-                   void (*set_tag_callback)( void *, char *, char *, char *, int)) {
-
-
-  krad_tags->callback_pointer = callback_pointer;
-  krad_tags->set_tag_callback = set_tag_callback;
+void kr_tags_set_set_tag_callback(kr_tags *tags, void *callback_pointer,
+ void (*set_tag_callback)( void *, char *, char *, char *, int)) {
+  tags->callback_pointer = callback_pointer;
+  tags->set_tag_callback = set_tag_callback;
 }
 
-char *krad_tags_get_tag (krad_tags_t *krad_tags, char *name) {
-
+char *kr_tags_get_tag(kr_tags *tags, char *name) {
   int t;
-
   for (t = 0; t < KRAD_MAX_TAGS; t++) {
-    if (krad_tags->tags[t].name != NULL) {
-      if (strcmp(krad_tags->tags[t].name, name) == 0) {
-        return krad_tags->tags[t].value;
+    if (tags->tags[t].name != NULL) {
+      if (strcmp(tags->tags[t].name, name) == 0) {
+        return tags->tags[t].value;
       }
     }
   }
   return "";
 }
 
-void krad_tags_set_tag (krad_tags_t *krad_tags, char *name, char *value) {
-  krad_tags_set_tag_opt (krad_tags, name, value, 0);
+void kr_tags_set_tag(kr_tags *tags, char *name, char *value) {
+  kr_tags_set_tag_opt(tags, name, value, 0);
 }
 
-void krad_tags_set_tag_internal (krad_tags_t *krad_tags, char *name, char *value) {
-  krad_tags_set_tag_opt (krad_tags, name, value, 1);
+void kr_tags_set_tag_internal(kr_tags *tags, char *name, char *value) {
+  kr_tags_set_tag_opt(tags, name, value, 1);
 }
 
-void krad_tags_set_tag_opt (krad_tags_t *krad_tags, char *name, char *value, int internal) {
-
+void kr_tags_set_tag_opt(kr_tags *tags, char *name, char *value, int internal) {
   //printk ("set tag %s %s", name, value);
-
   int t;
-
   if ((name == NULL) || (strlen(name) == 0)) {
     return;
   }
-
-  pthread_rwlock_wrlock (&krad_tags->krad_tags_rwlock);
-
+  pthread_rwlock_wrlock(&tags->tags_rwlock);
   for (t = 0; t < KRAD_MAX_TAGS; t++) {
-    if (krad_tags->tags[t].name != NULL) {
-      if (strcmp(krad_tags->tags[t].name, name) == 0) {
-        free (krad_tags->tags[t].value);
-        krad_tags->tags[t].value = NULL;
+    if (tags->tags[t].name != NULL) {
+      if (strcmp(tags->tags[t].name, name) == 0) {
+        free(tags->tags[t].value);
+        tags->tags[t].value = NULL;
         if ((value != NULL) && (strlen(value))) {
-          krad_tags->tags[t].value = strdup (value);
+          tags->tags[t].value = strdup(value);
           //UPDATED tag
-          if (krad_tags->set_tag_callback) {
-            krad_tags->set_tag_callback (krad_tags->callback_pointer, krad_tags->item, 
-                           krad_tags->tags[t].name, krad_tags->tags[t].value, internal);
+          if (tags->set_tag_callback) {
+            tags->set_tag_callback(tags->callback_pointer, tags->item,
+             tags->tags[t].name, tags->tags[t].value, internal);
           }
         } else {
           //CLEARED tag
-          if (krad_tags->set_tag_callback) {
-            krad_tags->set_tag_callback (krad_tags->callback_pointer, krad_tags->item, 
-                           krad_tags->tags[t].name, "", internal);
-          }          
-          free (krad_tags->tags[t].name);
-          krad_tags->tags[t].name = NULL;
+          if (tags->set_tag_callback) {
+            tags->set_tag_callback(tags->callback_pointer, tags->item,
+             tags->tags[t].name, "", internal);
+          }
+          free(tags->tags[t].name);
+          tags->tags[t].name = NULL;
         }
-        pthread_rwlock_unlock (&krad_tags->krad_tags_rwlock);        
+        pthread_rwlock_unlock(&tags->tags_rwlock);
         return;
       }
     }
   }
-  
   if ((value == NULL) || (strlen(value) == 0)) {
     //wanted to create a tag with name but no value
-    pthread_rwlock_unlock (&krad_tags->krad_tags_rwlock);  
+    pthread_rwlock_unlock(&tags->tags_rwlock);
     return;
   }
-  
   for (t = 0; t < KRAD_MAX_TAGS; t++) {
-    if (krad_tags->tags[t].name == NULL) {
+    if (tags->tags[t].name == NULL) {
       // NEW tag
-      krad_tags->tags[t].name = strdup (name);
-      krad_tags->tags[t].value = strdup (value);
-      if (krad_tags->set_tag_callback) {
-        krad_tags->set_tag_callback (krad_tags->callback_pointer, krad_tags->item, 
-                       krad_tags->tags[t].name, krad_tags->tags[t].value, internal);
-      }      
-      pthread_rwlock_unlock (&krad_tags->krad_tags_rwlock);
+      tags->tags[t].name = strdup(name);
+      tags->tags[t].value = strdup(value);
+      if (tags->set_tag_callback) {
+        tags->set_tag_callback(tags->callback_pointer, tags->item,
+         tags->tags[t].name, tags->tags[t].value, internal);
+      }
+      pthread_rwlock_unlock(&tags->tags_rwlock);
       return;
     }
   }
 }
 
-int krad_tags_get_next_tag (krad_tags_t *krad_tags, int *tagnum, char **name, char **value) {
-
+int kr_tags_get_next_tag(kr_tags *tags, int *tagnum, char **name, char **value) {
   int t;
-
   for (t = *tagnum; t < KRAD_MAX_TAGS; t++) {
-    if (krad_tags->tags[t].name != NULL) {
-      *name = krad_tags->tags[t].name;
-      *value = krad_tags->tags[t].value;
+    if (tags->tags[t].name != NULL) {
+      *name = tags->tags[t].name;
+      *value = tags->tags[t].value;
       *tagnum = ++t;
       return 1;
     }
   }
-  
   return 0;
 }

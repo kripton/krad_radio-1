@@ -10,7 +10,6 @@
 typedef struct krad_radio_rep_St krad_radio_rep_t;
 typedef struct krad_radio_rep_St kr_radio_t;
 typedef struct kr_remote_St kr_remote_t;
-typedef struct kr_tag_St kr_tag_t;
 
 typedef enum {
   KR_LOG_ERROR = 1,
@@ -37,13 +36,6 @@ struct krad_radio_rep_St {
 struct kr_remote_St {
   uint16_t port;
   char interface[128];
-};
-
-struct kr_tag_St {
-  char unit[256];
-  char name[256];
-  char value[256];
-  char source[256];
 };
 
 #endif // KRAD_RADIO_COMMON_H

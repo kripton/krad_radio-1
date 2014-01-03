@@ -142,7 +142,7 @@ int kr_mixer_command(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       kr_ebml2_unpack_element_float(&ebml_in, &element, &floatval);
       kr_ebml2_unpack_element_uint32(&ebml_in, &element, &numbers[0]);
       duration = numbers[0];
-      if ((duration == 0) && (krad_app_server_current_client_is_subscriber(as))) {
+      if ((duration == 0) && (kr_app_server_current_client_is_subscriber(as))) {
         ptr = as->current_client;
       }
       path = path_find(mixer, name);
@@ -161,7 +161,7 @@ int kr_mixer_command(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       path = path_find(mixer, name);
       if (path) {
         duration = numbers[6];
-        if ((duration == 0) && (krad_app_server_current_client_is_subscriber(as))) {
+        if ((duration == 0) && (kr_app_server_current_client_is_subscriber(as))) {
           ptr = as->current_client;
         }
         sfx = kr_mixer_path_sfx_kludge(path);
@@ -273,7 +273,7 @@ int kr_mixer_command(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       return -1;
   }
   if (((ebml_out.pos > 0) || (command == EBML_ID_KRAD_MIXER_CMD_LIST_PORTGROUPS)) &&
-       (!krad_app_server_current_client_is_subscriber(as))) {
+       (!kr_app_server_current_client_is_subscriber(as))) {
     krad_radio_pack_shipment_terminator(&ebml_out);
   }
   kr_io2_pulled(in, ebml_in.pos);

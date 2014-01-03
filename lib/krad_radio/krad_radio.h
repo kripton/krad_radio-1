@@ -53,7 +53,7 @@ struct kr_radio {
   kr_app_server *app;
   kr_web_server *web;
   kr_app_broadcaster *system_broadcaster;
-  krad_tags *tags;
+  kr_tags *tags;
   kr_log log;
   char sysname[KRAD_SYSNAME_SZ];
 };

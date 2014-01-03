@@ -15,10 +15,10 @@ static void radio_shutdown(kr_radio *radio) {
   krad_system_monitor_cpu_off();
   kr_timer_status(timer);
   if (radio->system_broadcaster != NULL) {
-    krad_app_server_broadcaster_unregister(&radio->system_broadcaster);
+    kr_app_server_broadcaster_unregister(&radio->system_broadcaster);
   }
   if (radio->app != NULL) {
-    krad_app_server_disable(radio->app);
+    kr_app_server_disable(radio->app);
   }
   kr_timer_status(timer);
   if (radio->web != NULL) {
@@ -41,11 +41,11 @@ static void radio_shutdown(kr_radio *radio) {
   }
   kr_timer_status(timer);
   if (radio->tags != NULL) {
-    krad_tags_destroy(radio->tags);
+    kr_tags_destroy(radio->tags);
     radio->tags = NULL;
   }
   if (radio->app != NULL) {
-    krad_app_server_destroy(radio->app);
+    kr_app_server_destroy(radio->app);
     radio->app = NULL;
   }
   if (radio->log.startup_timer != NULL) {
@@ -101,14 +101,14 @@ static kr_radio *radio_create(char *sysname) {
   radio->log.startup_timer = kr_timer_create_with_name("startup");
   kr_timer_start(radio->log.startup_timer);
   strncpy(radio->sysname, sysname, sizeof(radio->sysname));
-  radio->tags = krad_tags_create("station");
+  radio->tags = kr_tags_create("station");
   if (radio->tags == NULL) {
     radio_shutdown(radio);
     return NULL;
   }
-  radio->app = krad_app_server_create("krad_radio", radio->sysname,
-   kr_radio_client_create, kr_radio_client_destroy,
-   kr_radio_client_handler, radio);
+  radio->app = kr_app_server_create("krad_radio", radio->sysname,
+   kr_radio_client_create, kr_radio_client_destroy, kr_radio_client_handler,
+   radio);
   if (radio->app == NULL) {
     radio_shutdown(radio);
     return NULL;
@@ -136,12 +136,12 @@ static kr_radio *radio_create(char *sysname) {
     radio_shutdown(radio);
     return NULL;
   }
-  radio->system_broadcaster = krad_app_server_broadcaster_register(radio->app);
+  radio->system_broadcaster = kr_app_server_broadcaster_register(radio->app);
   if (radio->system_broadcaster == NULL) {
     radio_shutdown(radio);
     return NULL;
   }
-  krad_app_server_broadcaster_register_broadcast(radio->system_broadcaster,
+  kr_app_server_broadcaster_register_broadcast(radio->system_broadcaster,
    EBML_ID_KRAD_SYSTEM_BROADCAST);
   return radio;
 }
@@ -150,7 +150,7 @@ static void radio_start(kr_radio *radio) {
   krad_system_monitor_cpu_on();
   krad_system_set_monitor_cpu_callback((void *)radio,
    (void (*)(void *, uint32_t))radio_cpu_monitor_callback);
-  krad_app_server_run(radio->app);
+  kr_app_server_run(radio->app);
   if (radio->log.startup_timer != NULL) {
     kr_timer_finish(radio->log.startup_timer);
   }
@@ -163,7 +163,7 @@ static void radio_exist(kr_radio *radio) {
 static void radio_cpu_monitor_callback(kr_radio *radio, uint32_t usage) {
 
   unsigned char buffer[128];
-  krad_broadcast_msg_t *msg;
+  kr_broadcast_msg *msg;
   kr_ebml2_t ebml;
   kr_address_t address;
   unsigned char *message_loc;
@@ -182,10 +182,10 @@ static void radio_cpu_monitor_callback(kr_radio *radio, uint32_t usage) {
   kr_ebml2_finish_element(&ebml, payload_loc);
   kr_ebml2_finish_element(&ebml, message_loc);
 
-  msg = krad_broadcast_msg_create(radio->system_broadcaster, buffer, ebml.pos);
+  msg = kr_broadcast_msg_create(radio->system_broadcaster, buffer, ebml.pos);
 
   if (msg != NULL) {
-    krad_app_server_broadcaster_broadcast(radio->system_broadcaster, &msg);
+    kr_app_server_broadcaster_broadcast(radio->system_broadcaster, &msg);
   }
 }
 
@@ -245,7 +245,7 @@ int kr_radio_daemon(char *sysname) {
   return 0;
 }
 
-krad_tags *kr_radio_find_tags_for_item(kr_radio *radio, char *item) {
+kr_tags *kr_radio_find_tags_for_item(kr_radio *radio, char *item) {
 /*
   kr_mixer_path *unit;
 

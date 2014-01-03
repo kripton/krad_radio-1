@@ -1,101 +1,83 @@
 #include "krad_app_server.h"
 
-static kr_app_server *krad_app_server_init (char *appname, char *sysname);
-static void *krad_app_server_run_thread (void *arg);
-static int kr_app_servercp_socket_create_and_bind (char *interface, int port);
-static void krad_app_disconnect_client (kr_app_server *krad_app_server, kr_app_server_client *client);
-static void krad_app_server_update_pollfds (kr_app_server *krad_app_server);
-static kr_app_server_client *krad_app_server_accept_client (kr_app_server *krad_app_server, int sd);
+static kr_app_server *kr_app_server_init(char *appname, char *sysname);
+static void *app_server_loop(void *arg);
+static int kr_app_servercp_socket_create_and_bind(char *interface, int port);
+static void disconnect_client(kr_app_server *app_server, kr_app_server_client *client);
+static void kr_app_server_update_pollfds(kr_app_server *app_server);
+static kr_app_server_client *kr_app_server_accept_client(kr_app_server *app_server, int sd);
 
-static krad_app_broadcaster_t *krad_app_server_broadcaster_create ( kr_app_server *app_server );
-static int krad_app_server_broadcaster_destroy ( krad_app_broadcaster_t **broadcaster );
+static kr_app_broadcaster *kr_app_server_broadcaster_create(kr_app_server *app_server);
+static int kr_app_server_broadcaster_destroy(kr_app_broadcaster **broadcaster);
 
-static kr_app_server *krad_app_server_init (char *appname, char *sysname) {
-
-  kr_app_server *krad_app_server;
+static kr_app_server *kr_app_server_init(char *appname, char *sysname) {
+  kr_app_server *server;
   socklen_t socket_sz;
-  krad_app_server = calloc(1, sizeof(kr_app_server));
-
-  if (krad_control_init(&krad_app_server->krad_control)) {
-    free(krad_app_server);
+  server = calloc(1, sizeof(kr_app_server));
+  if (krad_control_init(&server->krad_control)) {
+    free(server);
     return NULL;
   }
-
-  krad_app_server->shutdown = KRAD_APP_STARTING;
-
-  krad_app_server->clients = calloc (KRAD_APP_SERVER_MAX_CLIENTS, sizeof (kr_app_server_client));
-
-  uname (&krad_app_server->unixname);
-  if (strncmp(krad_app_server->unixname.sysname, "Linux", 5) == 0) {
-    krad_app_server->on_linux = 1;
+  server->shutdown = KRAD_APP_STARTING;
+  server->clients = calloc(KRAD_APP_SERVER_MAX_CLIENTS, sizeof(kr_app_server_client));
+  uname(&server->unixname);
+  if (strncmp(server->unixname.sysname, "Linux", 5) == 0) {
+    server->on_linux = 1;
   }
-
-  krad_app_server->sd = socket (AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-
-  if (krad_app_server->sd == -1) {
+  server->sd = socket (AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+  if (server->sd == -1) {
     printke ("Krad APP Server: Socket failed.\n");
-    krad_app_server_destroy (krad_app_server);
+    server_destroy(server);
     return NULL;
   }
-
-  krad_app_server->saddr.sun_family = AF_UNIX;
-
-  if (krad_app_server->on_linux) {
-    snprintf (krad_app_server->saddr.sun_path, sizeof (krad_app_server->saddr.sun_path), "@%s_%s_api", appname, sysname);
-    socket_sz = sizeof(krad_app_server->saddr) - sizeof(krad_app_server->saddr.sun_path) + strlen(krad_app_server->saddr.sun_path);
-    krad_app_server->saddr.sun_path[0] = '\0';
-    if (connect (krad_app_server->sd, (struct sockaddr *) &krad_app_server->saddr, socket_sz) != -1) {
+  server->saddr.sun_family = AF_UNIX;
+  if (server->on_linux) {
+    snprintf(server->saddr.sun_path, sizeof(server->saddr.sun_path), "@%s_%s_api", appname, sysname);
+    socket_sz = sizeof(server->saddr) - sizeof(server->saddr.sun_path) + strlen(server->saddr.sun_path);
+    server->saddr.sun_path[0] = '\0';
+    if (connect(server->sd, (struct sockaddr *)&server->saddr, socket_sz) != -1) {
       /* active socket already exists! */
       printke ("Krad APP Server: Krad APP path in use. (linux abstract)\n");
-      krad_app_server_destroy (krad_app_server);
+      server_destroy(server);
       return NULL;
     }
   } else {
-    snprintf (krad_app_server->saddr.sun_path, sizeof (krad_app_server->saddr.sun_path), "%s/%s_%s_api", "/tmp", appname, sysname);
-    socket_sz = sizeof(krad_app_server->saddr) - sizeof(krad_app_server->saddr.sun_path) + strlen(krad_app_server->saddr.sun_path);
-    if (access (krad_app_server->saddr.sun_path, F_OK) == 0) {
-      if (connect (krad_app_server->sd, (struct sockaddr *) &krad_app_server->saddr, socket_sz) != -1) {
+    snprintf(server->saddr.sun_path, sizeof(server->saddr.sun_path), "%s/%s_%s_api", "/tmp", appname, sysname);
+    socket_sz = sizeof(server->saddr) - sizeof(server->saddr.sun_path) + strlen(server->saddr.sun_path);
+    if (access(server->saddr.sun_path, F_OK) == 0) {
+      if (connect(server->sd, (struct sockaddr *) &server->saddr, socket_sz) != -1) {
         /* active socket already exists! */
         printke ("Krad APP Server: Krad APP path in use.\n");
-        krad_app_server_destroy (krad_app_server);
+        server_destroy(server);
         return NULL;
       }
       /* remove stale socket */
-      unlink (krad_app_server->saddr.sun_path);
+      unlink(server->saddr.sun_path);
     }
   }
-
-  if (bind (krad_app_server->sd, (struct sockaddr *) &krad_app_server->saddr, socket_sz) == -1) {
+  if (bind(server->sd, (struct sockaddr *)&server->saddr, socket_sz) == -1) {
     printke ("Krad APP Server: Can't bind.\n");
-    krad_app_server_destroy (krad_app_server);
+    server_destroy(server);
     return NULL;
   }
-
-  listen (krad_app_server->sd, SOMAXCONN);
-
-  return krad_app_server;
+  listen(server->sd, SOMAXCONN);
+  return server;
 }
 
-static int kr_app_servercp_socket_create_and_bind (char *interface, int port) {
-
+static int kr_app_servercp_socket_create_and_bind(char *interface, int port) {
   char port_string[6];
   struct addrinfo hints;
   struct addrinfo *result, *rp;
   int s;
   int sfd = 0;
   char *interface_actual;
-
   interface_actual = interface;
-
   printk ("Krad APP Server: interface: %s port %d", interface, port);
-
   snprintf (port_string, 6, "%d", port);
-
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_family = AF_UNSPEC;     /* Return IPv4 and IPv6 choices */
   hints.ai_socktype = SOCK_STREAM; /* We want a TCP socket */
   hints.ai_flags = AI_PASSIVE;     /* All interfaces */
-
   if ((strlen(interface) == 7) && (strncmp(interface, "0.0.0.0", 7) == 0)) {
     hints.ai_family = AF_INET;
     interface_actual = NULL;
@@ -104,42 +86,32 @@ static int kr_app_servercp_socket_create_and_bind (char *interface, int port) {
     hints.ai_family = AF_INET6;
     interface_actual = NULL;
   }
-
   s = getaddrinfo (interface_actual, port_string, &hints, &result);
   if (s != 0) {
     printke ("getaddrinfo: %s\n", gai_strerror (s));
     return -1;
   }
-
   for (rp = result; rp != NULL; rp = rp->ai_next) {
-
     sfd = socket (rp->ai_family, rp->ai_socktype, rp->ai_protocol);
-
     if (sfd == -1) {
       continue;
     }
-
     s = bind (sfd, rp->ai_addr, rp->ai_addrlen);
-
     if (s == 0) {
       /* We managed to bind successfully! */
       break;
     }
-
     close (sfd);
   }
-
   if (rp == NULL) {
     printke ("Could not bind %d\n", port);
     return -1;
   }
-
   freeaddrinfo (result);
-
   return sfd;
 }
 
-int krad_app_server_recvfd (kr_app_server_client *client) {
+int kr_app_server_recvfd(kr_app_server_client *client) {
 
   int n;
   int fd;
@@ -173,7 +145,7 @@ int krad_app_server_recvfd (kr_app_server_client *client) {
     if((n=recvmsg(client->sd, &msg, 0)) < 0)
         return -1;
     if(n == 0){
-        printke("krad_app_server_recvfd: unexpected EOF");
+        printke("kr_app_server_recvfd: unexpected EOF");
         return 0;
     }
     cmsg = CMSG_FIRSTHDR(&msg);
@@ -184,9 +156,7 @@ int krad_app_server_recvfd (kr_app_server_client *client) {
   }
 }
 
-int krad_app_server_disable_remote (kr_app_server *app_server,
-                                    char *interface,
-                                    int port) {
+int kr_app_server_disable_remote(kr_app_server *app_server, char *interface, int port) {
 
   //FIXME needs to loop thru clients and disconnect remote ones .. optionally?
 
@@ -222,7 +192,7 @@ int krad_app_server_disable_remote (kr_app_server *app_server,
 }
 
 #ifdef KR_LINUX
-int krad_app_server_enable_remote_on_adapter (kr_app_server *app_server,
+int kr_app_server_enable_remote_on_adapter (kr_app_server *app_server,
                                               char *adapter,
                                               uint16_t port) {
 
@@ -255,7 +225,7 @@ int krad_app_server_enable_remote_on_adapter (kr_app_server *app_server,
         printke ("getnameinfo() failed: %s\n", gai_strerror(s));
         return -1;
       }
-      ret = krad_app_server_enable_remote (app_server, host, port);
+      ret = kr_app_server_enable_remote(app_server, host, port);
       if (ret == 1) {
         ifs++;
       }
@@ -268,9 +238,7 @@ int krad_app_server_enable_remote_on_adapter (kr_app_server *app_server,
 }
 #endif
 
-int krad_app_server_enable_remote (kr_app_server *krad_app_server,
-                                   char *interface,
-                                   uint16_t port) {
+int kr_app_server_enable_remote(kr_app_server *server, char *interface, uint16_t port) {
 
   int r;
   int sd;
@@ -286,7 +254,7 @@ int krad_app_server_enable_remote (kr_app_server *krad_app_server,
     #ifdef KR_LINUX
     if (krad_system_is_adapter (interface)) {
       //printk ("Krad APP Server: its an adapter, we should probably bind to all ips of this adapter");
-      return krad_app_server_enable_remote_on_adapter (krad_app_server, interface, port);
+      return kr_app_server_enable_remote_on_adapter(server, interface, port);
     }
     #else
       return 0;
@@ -294,16 +262,16 @@ int krad_app_server_enable_remote (kr_app_server *krad_app_server,
   }
 
   for (r = 0; r < MAX_REMOTES; r++) {
-    if ((krad_app_server->tcp_sd[r] != 0) && (krad_app_server->tcp_port[r] == port)) {
-      if ((strlen(interface) == strlen(krad_app_server->tcp_interface[r])) &&
-          (strncmp(interface, krad_app_server->tcp_interface[r], strlen(interface)))) {
+    if ((server->tcp_sd[r] != 0) && (server->tcp_port[r] == port)) {
+      if ((strlen(interface) == strlen(server->tcp_interface[r])) &&
+          (strncmp(interface, server->tcp_interface[r], strlen(interface)))) {
         return 0;
       }
     }
   }
 
   for (r = 0; r < MAX_REMOTES; r++) {
-    if ((krad_app_server->tcp_sd[r] == 0) && (krad_app_server->tcp_port[r] == 0)) {
+    if ((server->tcp_sd[r] == 0) && (server->tcp_port[r] == 0)) {
 
       sd = kr_app_servercp_socket_create_and_bind (interface, port);
 
@@ -311,17 +279,17 @@ int krad_app_server_enable_remote (kr_app_server *krad_app_server,
         return 0;
       }
 
-      krad_app_server->tcp_port[r] = port;
-      krad_app_server->tcp_sd[r] = sd;
+      server->tcp_port[r] = port;
+      server->tcp_sd[r] = sd;
 
-      if (krad_app_server->tcp_sd[r] != 0) {
-        listen (krad_app_server->tcp_sd[r], SOMAXCONN);
-        //krad_app_server_update_pollfds (krad_app_server);
-        krad_app_server->tcp_interface[r] = strdup (interface);
+      if (server->tcp_sd[r] != 0) {
+        listen (server->tcp_sd[r], SOMAXCONN);
+        //kr_app_server_update_pollfds (kr_app_server);
+        server->tcp_interface[r] = strdup (interface);
         printk ("Enable remote on interface %s port %d", interface, port);
         return 1;
       } else {
-        krad_app_server->tcp_port[r] = 0;
+        server->tcp_port[r] = 0;
         return 0;
       }
     }
@@ -330,7 +298,7 @@ int krad_app_server_enable_remote (kr_app_server *krad_app_server,
   return 0;
 }
 
-static kr_app_server_client *krad_app_server_accept_client (kr_app_server *krad_app_server, int sd) {
+static kr_app_server_client *kr_app_server_accept_client (kr_app_server *server, int sd) {
 
   kr_app_server_client *client = NULL;
 
@@ -340,8 +308,8 @@ static kr_app_server_client *krad_app_server_accept_client (kr_app_server *krad_
 
   while (client == NULL) {
     for(i = 0; i < KRAD_APP_SERVER_MAX_CLIENTS; i++) {
-      if (krad_app_server->clients[i].sd == 0) {
-        client = &krad_app_server->clients[i];
+      if (server->clients[i].sd == 0) {
+        client = &server->clients[i];
         break;
       }
     }
@@ -355,14 +323,14 @@ static kr_app_server_client *krad_app_server_accept_client (kr_app_server *krad_
   client->sd = accept (sd, (struct sockaddr *)&sin, &sin_len);
 
   if (client->sd > 0) {
-    //krad_app_server_update_pollfds (krad_app_server);
+    //kr_app_server_update_pollfds (kr_app_server);
     krad_system_set_socket_nonblocking(client->sd);
     client->in = kr_io2_create();
     client->out = kr_io2_create();
     kr_io2_set_fd(client->in, client->sd);
     kr_io2_set_fd(client->out, client->sd);
-    client->ptr = krad_app_server->client_create(krad_app_server->pointer);
-    krad_app_server->num_clients++;
+    client->ptr = server->client_create(server->pointer);
+    server->num_clients++;
     //printk ("Krad APP Server: Client accepted!");
     return client;
   } else {
@@ -372,25 +340,24 @@ static kr_app_server_client *krad_app_server_accept_client (kr_app_server *krad_
   return NULL;
 }
 
-static void krad_app_disconnect_client(kr_app_server *krad_app_server, kr_app_server_client *client) {
-
+static void disconnect_client(kr_app_server *app_server, kr_app_server_client *client) {
   close(client->sd);
   client->sd = 0;
   client->broadcasts = 0;
-  krad_app_server->client_destroy(client->ptr);
+  app_server->client_destroy(client->ptr);
   client->ptr = NULL;
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
-  krad_app_server->num_clients--;
-  //krad_app_server_update_pollfds (krad_app_server);
-  //printk ("Krad APP Server: Client Disconnected");
+  app_server->num_clients--;
+  //kr_app_server_update_pollfds(app_server);
+  //printk("Krad APP Server: Client Disconnected");
 }
 
-uint32_t krad_app_server_num_clients(kr_app_server *app_server) {
+uint32_t kr_app_server_num_clients(kr_app_server *app_server) {
   return app_server->num_clients;
 }
 
-static void krad_app_server_update_pollfds (kr_app_server *krad_app_server) {
+static void kr_app_server_update_pollfds(kr_app_server *server) {
 
   int r;
   int b;
@@ -399,63 +366,61 @@ static void krad_app_server_update_pollfds (kr_app_server *krad_app_server) {
 
   s = 0;
 
-  krad_app_server->sockets[s].fd = krad_controller_get_client_fd (&krad_app_server->krad_control);
-  krad_app_server->sockets[s].events = POLLIN;
+  server->sockets[s].fd = krad_controller_get_client_fd(&server->krad_control);
+  server->sockets[s].events = POLLIN;
 
   s++;
 
-  krad_app_server->sockets[s].fd = krad_app_server->sd;
-  krad_app_server->sockets[s].events = POLLIN;
+  server->sockets[s].fd = server->sd;
+  server->sockets[s].events = POLLIN;
 
   s++;
 
   for (r = 0; r < MAX_REMOTES; r++) {
-    if (krad_app_server->tcp_sd[r] != 0) {
-      krad_app_server->sockets[s].fd = krad_app_server->tcp_sd[r];
-      krad_app_server->sockets[s].events = POLLIN;
+    if (server->tcp_sd[r] != 0) {
+      server->sockets[s].fd = server->tcp_sd[r];
+      server->sockets[s].events = POLLIN;
       s++;
     }
   }
 
   for (b = 0; b < MAX_BROADCASTERS + MAX_REMOTES + 2; b++) {
-    krad_app_server->sockets_broadcasters[b] = NULL;
+    server->sockets_broadcasters[b] = NULL;
   }
 
   for (b = 0; b < MAX_BROADCASTERS; b++) {
-    if (krad_app_server->broadcasters[b] != NULL) {
-      krad_app_server->sockets[s].fd = krad_app_server->broadcasters[b]->sockets[1];
-      krad_app_server->sockets[s].events |= POLLIN;
-      krad_app_server->sockets_broadcasters[s] = krad_app_server->broadcasters[b];
+    if (server->broadcasters[b] != NULL) {
+      server->sockets[s].fd = server->broadcasters[b]->sockets[1];
+      server->sockets[s].events |= POLLIN;
+      server->sockets_broadcasters[s] = server->broadcasters[b];
       s++;
     }
   }
 
   for (c = 0; c < KRAD_APP_SERVER_MAX_CLIENTS; c++) {
-    if (krad_app_server->clients[c].sd > 0) {
-      krad_app_server->sockets[s].fd = krad_app_server->clients[c].sd;
-      krad_app_server->sockets[s].events |= POLLIN;
-      if (kr_io2_want_out (krad_app_server->clients[c].out)) {
-        krad_app_server->sockets[s].events |= POLLOUT;
+    if (server->clients[c].sd > 0) {
+      server->sockets[s].fd = server->clients[c].sd;
+      server->sockets[s].events |= POLLIN;
+      if (kr_io2_want_out(server->clients[c].out)) {
+        server->sockets[s].events |= POLLOUT;
       }
-      krad_app_server->sockets_clients[s] = &krad_app_server->clients[c];
+      server->sockets_clients[s] = &server->clients[c];
       s++;
     }
   }
-
-  krad_app_server->socket_count = s;
-
+  server->socket_count = s;
   //printk ("Krad APP Server: sockets rejiggerd!\n");
 }
 
-static krad_app_broadcaster_t *krad_app_server_broadcaster_create ( kr_app_server *app_server ) {
+static kr_app_broadcaster *kr_app_server_broadcaster_create ( kr_app_server *app_server ) {
 
-  krad_app_broadcaster_t *broadcaster;
+  kr_app_broadcaster *broadcaster;
 
   if (app_server == NULL) {
     return NULL;
   }
 
-  broadcaster = calloc (1, sizeof(krad_app_broadcaster_t));
+  broadcaster = calloc (1, sizeof(kr_app_broadcaster));
   broadcaster->app = app_server;
 
   if (socketpair(AF_UNIX, SOCK_STREAM, 0, broadcaster->sockets)) {
@@ -467,12 +432,12 @@ static krad_app_broadcaster_t *krad_app_server_broadcaster_create ( kr_app_serve
   krad_system_set_socket_nonblocking (broadcaster->sockets[0]);
   krad_system_set_socket_nonblocking (broadcaster->sockets[1]);
 
-  broadcaster->msg_ring = krad_ringbuffer_create ( 200 * sizeof(krad_broadcast_msg_t *) );
+  broadcaster->msg_ring = krad_ringbuffer_create ( 200 * sizeof(kr_broadcast_msg *) );
 
   return broadcaster;
 }
 
-static int krad_app_server_broadcaster_destroy ( krad_app_broadcaster_t **broadcaster ) {
+static int kr_app_server_broadcaster_destroy(kr_app_broadcaster **broadcaster) {
   if (*broadcaster != NULL) {
 
     close ((*broadcaster)->sockets[0]);
@@ -489,11 +454,11 @@ static int krad_app_server_broadcaster_destroy ( krad_app_broadcaster_t **broadc
   return -1;
 }
 
-int krad_app_server_broadcaster_unregister ( krad_app_broadcaster_t **broadcaster ) {
+int kr_app_server_broadcaster_unregister(kr_app_broadcaster **broadcaster) {
   return 1;
 }
 
-krad_app_broadcaster_t *krad_app_server_broadcaster_register ( kr_app_server *app_server ) {
+kr_app_broadcaster *kr_app_server_broadcaster_register(kr_app_server *app_server) {
 
   int b;
 
@@ -506,7 +471,7 @@ krad_app_broadcaster_t *krad_app_server_broadcaster_register ( kr_app_server *ap
 
   for (b = 0; b < MAX_BROADCASTERS; b++) {
     if (app_server->broadcasters[b] == NULL) {
-      app_server->broadcasters[b] = krad_app_server_broadcaster_create ( app_server );
+      app_server->broadcasters[b] = kr_app_server_broadcaster_create ( app_server );
       return app_server->broadcasters[b];
     }
   }
@@ -514,7 +479,7 @@ krad_app_broadcaster_t *krad_app_server_broadcaster_register ( kr_app_server *ap
   return NULL;
 }
 
-int krad_broadcast_msg_destroy (krad_broadcast_msg_t **broadcast_msg) {
+int kr_broadcast_msg_destroy(kr_broadcast_msg **broadcast_msg) {
 
   if (*broadcast_msg != NULL) {
     if ((*broadcast_msg)->buffer != NULL) {
@@ -527,15 +492,15 @@ int krad_broadcast_msg_destroy (krad_broadcast_msg_t **broadcast_msg) {
   return -1;
 }
 
-krad_broadcast_msg_t *krad_broadcast_msg_create (krad_app_broadcaster_t *broadcaster, unsigned char *buffer, uint32_t size) {
+kr_broadcast_msg *kr_broadcast_msg_create(kr_app_broadcaster *broadcaster, unsigned char *buffer, uint32_t size) {
 
-  krad_broadcast_msg_t *broadcast_msg;
+  kr_broadcast_msg *broadcast_msg;
 
   if (size < 1) {
     return NULL;
   }
 
-  broadcast_msg = calloc (1, sizeof(krad_broadcast_msg_t));
+  broadcast_msg = calloc(1, sizeof(kr_broadcast_msg));
 
   broadcast_msg->size = size;
   broadcast_msg->buffer = malloc (broadcast_msg->size);
@@ -544,17 +509,17 @@ krad_broadcast_msg_t *krad_broadcast_msg_create (krad_app_broadcaster_t *broadca
   return broadcast_msg;
 }
 
-int krad_app_server_broadcaster_broadcast ( krad_app_broadcaster_t *broadcaster, krad_broadcast_msg_t **broadcast_msg ) {
+int kr_app_server_broadcaster_broadcast(kr_app_broadcaster *broadcaster, kr_broadcast_msg **broadcast_msg ) {
 
   int ret;
 
-  if (krad_ringbuffer_write_space (broadcaster->msg_ring) < sizeof(krad_broadcast_msg_t *)) {
+  if (krad_ringbuffer_write_space (broadcaster->msg_ring) < sizeof(kr_broadcast_msg *)) {
     printke ("ahh fraking out of bradcast space");
     return -1;
   }
 
-  ret = krad_ringbuffer_write ( broadcaster->msg_ring, (char *)broadcast_msg, sizeof(krad_broadcast_msg_t *) );
-  if (ret != sizeof(krad_broadcast_msg_t *)) {
+  ret = krad_ringbuffer_write ( broadcaster->msg_ring, (char *)broadcast_msg, sizeof(kr_broadcast_msg *) );
+  if (ret != sizeof(kr_broadcast_msg *)) {
     printke ("Krad APP Server: invalid broadcast msg write len %d... broadcast ringbuffer full", ret);
     return -1;
   }
@@ -569,7 +534,7 @@ int krad_app_server_broadcaster_broadcast ( krad_app_broadcaster_t *broadcaster,
   return 0;
 }
 
-int krad_app_server_current_client_is_subscriber (kr_app_server *app) {
+int kr_app_server_current_client_is_subscriber (kr_app_server *app) {
 
   if (app->current_client->broadcasts > 0) {
     return 1;
@@ -578,52 +543,43 @@ int krad_app_server_current_client_is_subscriber (kr_app_server *app) {
   return 0;
 }
 
-void krad_app_server_broadcaster_register_broadcast ( krad_app_broadcaster_t *broadcaster, uint32_t broadcast_ebml_id ) {
-
+void kr_app_server_broadcaster_register_broadcast(kr_app_broadcaster *broadcaster, uint32_t broadcast_ebml_id) {
   broadcaster->app->broadcasts[broadcaster->app->broadcasts_count] = broadcast_ebml_id;
   broadcaster->app->broadcasts_count++;
-
 }
 
-void krad_app_server_add_client_to_broadcast ( kr_app_server *krad_app_server, uint32_t broadcast_ebml_id ) {
+void kr_app_server_add_client_to_broadcast(kr_app_server *server, uint32_t broadcast_ebml_id) {
 
   if (broadcast_ebml_id == EBML_ID_KRAD_RADIO_GLOBAL_BROADCAST) {
     printk("client subscribing to global broadcasts");
   }
 
-  krad_app_server->current_client->broadcasts = 1;
+  server->current_client->broadcasts = 1;
 }
 
-int handle_broadcast (krad_app_broadcaster_t *broadcaster) {
-
+int handle_broadcast(kr_app_broadcaster *broadcaster) {
   int item;
   int items;
   int b;
   int c;
   int ret;
   char buf[32];
-  krad_broadcast_msg_t *broadcast_msg;
-
+  kr_broadcast_msg *broadcast_msg;
   b = 0;
-
   items = read (broadcaster->sockets[1], buf, 32);
-
   if (items < 1) {
     printke ("Error handling broadcast");
     return -1;
   }
-
   for (item = 0; item < items; item++) {
-    ret = krad_ringbuffer_read ( broadcaster->msg_ring, (char *)&broadcast_msg, sizeof(krad_broadcast_msg_t *) );
-    if (ret != sizeof(krad_broadcast_msg_t *)) {
+    ret = krad_ringbuffer_read ( broadcaster->msg_ring, (char *)&broadcast_msg, sizeof(kr_broadcast_msg *) );
+    if (ret != sizeof(kr_broadcast_msg *)) {
       printke ("Krad APP Server: invalid broadcast msg read len %d", ret);
       return -1;
     }
-
     //if (broadcast_msg->skip_client != NULL) {
     //  printk ("Goint to skip a client!!\n");
     //}
-
     for (c = 0; c < KRAD_APP_SERVER_MAX_CLIENTS; c++) {
       if (broadcaster->app->clients[c].broadcasts == 1) {
         if (&broadcaster->app->clients[c] != broadcast_msg->skip_client) {
@@ -633,50 +589,44 @@ int handle_broadcast (krad_app_broadcaster_t *broadcaster) {
         }
       }
     }
-
     //printk ("Krad APP Server: Broadcasted to %d", b);
-
-    krad_broadcast_msg_destroy (&broadcast_msg);
+    kr_broadcast_msg_destroy(&broadcast_msg);
   }
-
   return items;
 }
 
-static void *krad_app_server_run_thread (void *arg) {
-
-  kr_app_server *krad_app_server = (kr_app_server *)arg;
+static void *app_server_loop(void *arg) {
+  kr_app_server *server;
+  server = (kr_app_server *)arg;
   kr_app_server_client *client;
   int ret, s, r, read_ret, hret;
   int32_t oret;
-
   krad_system_set_thread_name ("kr_station");
-  krad_app_server->shutdown = KRAD_APP_RUNNING;
-
-  while (!krad_app_server->shutdown) {
-
+  server->shutdown = KRAD_APP_RUNNING;
+  while (!server->shutdown) {
     s = 0;
-    krad_app_server_update_pollfds (krad_app_server);
-    ret = poll (krad_app_server->sockets, krad_app_server->socket_count, -1);
+    kr_app_server_update_pollfds(server);
+    ret = poll (server->sockets, server->socket_count, -1);
 
     if ((ret < 1) ||
-        (krad_app_server->shutdown) ||
-        (krad_app_server->sockets[s].revents)) {
+        (server->shutdown) ||
+        (server->sockets[s].revents)) {
       break;
     }
 
     s++;
     // Unix socket for local connections
-    if (krad_app_server->sockets[s].revents & POLLIN) {
-      krad_app_server_accept_client (krad_app_server, krad_app_server->sd);
+    if (server->sockets[s].revents & POLLIN) {
+      kr_app_server_accept_client(server, server->sd);
       ret--;
     }
 
     s++;
     // TCP Sockets for remote connections
     for (r = 0; r < MAX_REMOTES; r++) {
-      if (krad_app_server->tcp_sd[r] != 0) {
-        if ((krad_app_server->tcp_sd[r] != 0) && (krad_app_server->sockets[s].revents & POLLIN)) {
-          krad_app_server_accept_client (krad_app_server, krad_app_server->tcp_sd[r]);
+      if (server->tcp_sd[r] != 0) {
+        if ((server->tcp_sd[r] != 0) && (server->sockets[s].revents & POLLIN)) {
+          kr_app_server_accept_client(server, server->tcp_sd[r]);
           ret--;
         }
         s++;
@@ -684,150 +634,124 @@ static void *krad_app_server_run_thread (void *arg) {
     }
 
     for (; ret > 0; s++) {
-      if (krad_app_server->sockets[s].revents) {
+      if (server->sockets[s].revents) {
         ret--;
-        if (krad_app_server->sockets_broadcasters[s] != NULL) {
-          handle_broadcast ( krad_app_server->sockets_broadcasters[s] );
+        if (server->sockets_broadcasters[s] != NULL) {
+          handle_broadcast(server->sockets_broadcasters[s]);
         } else {
-          client = krad_app_server->sockets_clients[s];
-          if (krad_app_server->sockets[s].revents & POLLIN) {
+          client = server->sockets_clients[s];
+          if (server->sockets[s].revents & POLLIN) {
             read_ret = kr_io2_read (client->in);
             if (read_ret > 0) {
               //printk ("Krad APP Server %d: Got %d bytes\n", s, read_ret);
-              krad_app_server->current_client = client;
-              hret = krad_app_server->client_handler(client->in, client->out,
+              server->current_client = client;
+              hret = server->client_handler(client->in, client->out,
                client->ptr);
               if (hret != 0) {
-                krad_app_disconnect_client (krad_app_server, client);
+                disconnect_client(server, client);
                 continue;
               } else {
                 if (kr_io2_want_out (client->out)) {
-                  krad_app_server->sockets[s].events |= POLLOUT;
+                  server->sockets[s].events |= POLLOUT;
                 }
               }
             } else {
               if (read_ret == 0) {
                 //printk ("Krad APP Server: Client EOF\n");
-                krad_app_disconnect_client (krad_app_server, client);
+                disconnect_client(server, client);
                 continue;
               }
               if (read_ret == -1) {
                 printke ("Krad APP Server: Client Socket Error");
-                krad_app_disconnect_client (krad_app_server, client);
+                disconnect_client(server, client);
                 continue;
               }
             }
           }
-          if (krad_app_server->sockets[s].revents & POLLOUT) {
+          if (server->sockets[s].revents & POLLOUT) {
             oret = kr_io2_output (client->out);
             if (oret != 0) {
               printke ("Krad APP Server: panic drop");
-              krad_app_disconnect_client (krad_app_server, client);
+              disconnect_client(server, client);
               continue;
             }
             if (!(kr_io2_want_out (client->out))) {
-              krad_app_server->sockets[s].events = POLLIN;
+              server->sockets[s].events = POLLIN;
             }
           } else {
-            if (krad_app_server->sockets[s].revents & POLLHUP) {
+            if (server->sockets[s].revents & POLLHUP) {
               //printk ("Krad APP Server %d : POLLHUP\n", s);
-              krad_app_disconnect_client (krad_app_server, client);
+              disconnect_client(server, client);
               continue;
             }
           }
-          if (krad_app_server->sockets[s].revents & POLLERR) {
+          if (server->sockets[s].revents & POLLERR) {
             printke ("Krad APP Server: POLLERR");
-            krad_app_disconnect_client (krad_app_server, client);
+            disconnect_client(server, client);
             continue;
           }
         }
       }
     }
   }
-
-  krad_app_server->shutdown = KRAD_APP_SHUTINGDOWN;
-
-  krad_controller_client_close (&krad_app_server->krad_control);
-
+  server->shutdown = KRAD_APP_SHUTINGDOWN;
+  krad_controller_client_close(&server->krad_control);
   return NULL;
 }
 
-void krad_app_server_disable (kr_app_server *krad_app_server) {
-
+void kr_app_server_disable(kr_app_server *app_server) {
   printk ("Krad APP Server: Disable Started");
-
-  if (!krad_controller_shutdown (&krad_app_server->krad_control, &krad_app_server->server_thread, 30)) {
-    krad_controller_destroy (&krad_app_server->krad_control, &krad_app_server->server_thread);
+  if (!krad_controller_shutdown(&app_server->krad_control, &app_server->thread, 30)) {
+    krad_controller_destroy(&app_server->krad_control, &app_server->thread);
   }
-
-  krad_app_server_disable_remote (krad_app_server, "", 0);
-
-  if (krad_app_server->sd != 0) {
-    close (krad_app_server->sd);
-    if (!krad_app_server->on_linux) {
-      unlink (krad_app_server->saddr.sun_path);
+  kr_app_server_disable_remote(app_server, "", 0);
+  if (app_server->sd != 0) {
+    close (app_server->sd);
+    if (!app_server->on_linux) {
+      unlink(app_server->saddr.sun_path);
     }
   }
-
   printk ("Krad APP Server: Disable Complete");
 }
 
-void krad_app_server_destroy (kr_app_server *app_server) {
-
+void kr_app_server_destroy(kr_app_server *app_server) {
   int i;
-
   printk ("Krad APP Server: Destroy Started");
-
   if (app_server->shutdown != KRAD_APP_SHUTINGDOWN) {
-    krad_app_server_disable (app_server);
+    kr_app_server_disable(app_server);
   }
-
   for (i = 0; i < KRAD_APP_SERVER_MAX_CLIENTS; i++) {
     if (app_server->clients[i].sd > 0) {
-      krad_app_disconnect_client (app_server, &app_server->clients[i]);
+      disconnect_client(app_server, &app_server->clients[i]);
     }
   }
-
   for (i = 0; i < MAX_BROADCASTERS; i++) {
     if (app_server->broadcasters[i] != NULL) {
-      krad_app_server_broadcaster_destroy ( &app_server->broadcasters[i] );
+      kr_app_server_broadcaster_destroy(&app_server->broadcasters[i]);
     }
   }
-
-  free (app_server->clients);
-  free (app_server);
-
+  free(app_server->clients);
+  free(app_server);
   printk ("Krad APP Server: Destroy Completed");
 }
 
-void krad_app_server_run (kr_app_server *krad_app_server) {
-  krad_app_server->app_broadcaster = krad_app_server_broadcaster_register ( krad_app_server );
-  pthread_create (&krad_app_server->server_thread, NULL, krad_app_server_run_thread, (void *)krad_app_server);
+void kr_app_server_run(kr_app_server *as) {
+  as->app_broadcaster = kr_app_server_broadcaster_register(as);
+  pthread_create(&as->thread, NULL, app_server_loop, (void *)as);
 }
 
-kr_app_server *
-krad_app_server_create (char *appname, char *sysname,
-                        void *client_create (void *),
-                        void client_destroy (void *),
-                        int client_handler (kr_io2_t *in,
-                                            kr_io2_t *out,
-                                            void *),
-                        void *pointer) {
-
-  kr_app_server *krad_app_server;
-
-  krad_app_server = krad_app_server_init (appname, sysname);
-
-  if (krad_app_server == NULL) {
+kr_app_server *kr_app_server_create(char *appname, char *sysname,
+ void *client_create(void *), void client_destroy(void *),
+ int client_handler(kr_io2_t *in, kr_io2_t *out, void *), void *app) {
+  kr_app_server *app_server;
+  app_server = kr_app_server_init(appname, sysname);
+  if (app_server == NULL) {
     return NULL;
   }
-
-  krad_app_server->client_create = client_create;
-  krad_app_server->client_destroy = client_destroy;
-  krad_app_server->client_handler = client_handler;
-
-  krad_app_server->pointer = pointer;
-
-  return krad_app_server;
+  app_server->client_create = client_create;
+  app_server->client_destroy = client_destroy;
+  app_server->client_handler = client_handler;
+  app_server->pointer = app;
+  return app_server;
 }
 

@@ -49,10 +49,10 @@ struct krad_xmms_St {
   char title[512];
   char artist[512];
 
-  krad_tags_t *krad_tags;
+  kr_tags *tags;
 };
 
 void krad_xmms_playback_cmd (krad_xmms_t *krad_xmms, krad_xmms_playback_cmd_t cmd);
 void krad_xmms_destroy (krad_xmms_t *krad_xmms);
-krad_xmms_t *krad_xmms_create (char *name, char *ipc_path, krad_tags_t *krad_tags);
+krad_xmms_t *krad_xmms_create (char *name, char *ipc_path, kr_tags *tags);
 
