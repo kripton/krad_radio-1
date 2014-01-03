@@ -27,7 +27,7 @@ static kr_app_server *kr_app_server_init(char *appname, char *sysname) {
   server->sd = socket (AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
   if (server->sd == -1) {
     printke ("Krad APP Server: Socket failed.\n");
-    server_destroy(server);
+    kr_app_server_destroy(server);
     return NULL;
   }
   server->saddr.sun_family = AF_UNIX;
@@ -38,7 +38,7 @@ static kr_app_server *kr_app_server_init(char *appname, char *sysname) {
     if (connect(server->sd, (struct sockaddr *)&server->saddr, socket_sz) != -1) {
       /* active socket already exists! */
       printke ("Krad APP Server: Krad APP path in use. (linux abstract)\n");
-      server_destroy(server);
+      kr_app_server_destroy(server);
       return NULL;
     }
   } else {
@@ -48,7 +48,7 @@ static kr_app_server *kr_app_server_init(char *appname, char *sysname) {
       if (connect(server->sd, (struct sockaddr *) &server->saddr, socket_sz) != -1) {
         /* active socket already exists! */
         printke ("Krad APP Server: Krad APP path in use.\n");
-        server_destroy(server);
+        kr_app_server_destroy(server);
         return NULL;
       }
       /* remove stale socket */
@@ -57,7 +57,7 @@ static kr_app_server *kr_app_server_init(char *appname, char *sysname) {
   }
   if (bind(server->sd, (struct sockaddr *)&server->saddr, socket_sz) == -1) {
     printke ("Krad APP Server: Can't bind.\n");
-    server_destroy(server);
+    kr_app_server_destroy(server);
     return NULL;
   }
   listen(server->sd, SOMAXCONN);
