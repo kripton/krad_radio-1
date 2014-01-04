@@ -1,3 +1,38 @@
+static int json_to_crate(kr_iws_client_t *client, char *json) {
+  kr_adapter_path_info pinfo;
+  int res;
+  char *json_payload = "\"payload\":";
+  char js[2048];
+  char *p;
+  char *payload_pos;
+
+  memset(js,0,sizeof(js));
+
+  p = strchr(json,'"');
+
+  if (!p) {
+    return -1;
+  }
+
+  p[0] = '\0';
+
+  if (!strncmp(json,"add_adapter",11)) {
+    p[0] = '"';
+    json[strlen(json)-1] = '\0';
+    payload_pos = strstr(json,json_payload);
+    if (payload_pos) {
+      memset(&pinfo,0,sizeof(pinfo));
+      //res = kr_adapter_path_info_fr_json();
+      sprintf(js,"%s",&payload_pos[strlen(payload_pos)]);
+      interweb_ws_pack(client, (uint8_t *)js, sizeof(js));
+    }
+  }
+  
+  p[0] = '"';
+  
+  return 0;
+}
+
 static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
 
   int pos;
@@ -46,6 +81,9 @@ static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
   }
   cmplen = strlen(json_pre);
   if (strncmp(json, json_pre, cmplen) == 0) {
+
+    json_to_crate(client,json + cmplen);
+
     memset (&uc, 0, sizeof (uc));
     pos = cmplen;
     addr_len = strcspn(json + pos, " ");
@@ -206,7 +244,6 @@ static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
   return 0;
 }
 
-
 void krad_websocket_remove_portgroup (kr_iws_client_t *client,
  kr_address_t *address) {
 
@@ -312,73 +349,6 @@ void krad_websocket_set_cpu_usage (kr_iws_client_t *client, int usage) {
    "\"ctrl\":\"cpu\",\"system_cpu_usage\":\"%d\"}]",
    usage);
 
-  interweb_ws_pack(client, (uint8_t *)json, strlen(json));
-}
-
-void krad_websocket_add_comp_subunit(kr_iws_client_t *client,
- kr_crate_t *crate) {
-
-  int pos;
-  char json[2048];
-  kr_address_t *address;
-  kr_compositor_controls controls;
-
-  address = crate->addr;
-  pos = 0;
-
-  pos += snprintf(json, sizeof(json), "[{\"com\":\"kradcompositor\","
-   "\"ctrl\":\"add_subunit\",\"subunit_type\":\"%s\","
-   "\"subunit_id\":%d,",
-   kr_comp_strfsubtype(address->path.subunit.compositor_subunit),
-   address->id.number);
-
-  switch (address->path.subunit.compositor_subunit) {
-    case KR_SPRITE:
-      controls = crate->inside.sprite->controls;
-      pos += snprintf(json + pos, sizeof(json) - pos,
-       "\"filename\":\"%s\",\"rate\":%d,",
-       crate->inside.sprite->filename, crate->inside.sprite->rate);
-      break;
-    case KR_TEXT:
-      controls = crate->inside.text->controls;
-      pos += snprintf(json + pos, sizeof(json) - pos,
-       "\"text\":\"%s\",\"font\":\"%s\",",
-       crate->inside.text->string, crate->inside.text->font);
-      pos += snprintf(json + pos, sizeof(json) - pos,
-       "\"red\":%g,\"green\":%g,\"blue\":%g,",
-       crate->inside.text->red, crate->inside.text->green,
-       crate->inside.text->blue);
-      break;
-    case KR_VIDEOPORT:
-      controls = crate->inside.videoport->controls;
-      if (crate->inside.videoport->type == KR_CMP_OUTPUT) {
-        pos += snprintf(json + pos, sizeof(json) - pos,
-         "\"port_name\":\"%s\",\"direction\":\"%s\",",
-         crate->inside.videoport->name, "output");
-      } else {
-        pos += snprintf(json + pos, sizeof(json) - pos,
-         "\"port_name\":\"%s\",\"direction\":\"%s\",",
-         crate->inside.videoport->name, "input");
-      }
-      break;
-    case KR_VECTOR:
-      controls = crate->inside.vector->controls;
-      pos += snprintf(json + pos, sizeof(json) - pos,
-       "\"type\":\"%s\",",
-       kr_vector_type_to_string(crate->inside.vector->type));
-      break;
-    default:
-      memset(&controls, 0, sizeof(kr_compositor_controls));
-      break;
-  }
-
-  pos += snprintf(json + pos, sizeof(json) - pos,
-   "\"x\":%d,\"y\":%d,"
-   "\"z\":%d,\"r\":%g,\"o\":%g,\"width\":%d,\"height\":%d",
-   controls.x, controls.y, controls.z,
-   controls.rotation, controls.opacity, controls.w, controls.h);
-
-  pos += snprintf(json + pos, sizeof(json) - pos, "}]");
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
 }
 
