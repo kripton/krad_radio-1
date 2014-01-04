@@ -1,49 +1,11 @@
 #ifndef KRAD_CLIENT_H
 #define KRAD_CLIENT_H
 
-/**
- * @file krad_radio_client.h
- * @brief Krad Radio Client API
- */
-
-/**
- * @mainpage Krad Radio Client API
- *
- * These documents contain all types and functions needed to to
- * API conmmunication to manage, control and modify krad radio stations.
- *
- * Sections:
- * @li @ref krad_radio_client_ctl
- * @li @ref krad_radio_client
- * @li @ref krad_mixer_client
- * @li @ref krad_compositor_client
- * @li @ref krad_transponder_client
- *
- */
-
 #include <inttypes.h>
 
 #define ALL_BROADCASTS 1
 
-/** @defgroup krad_radio_client Krad Radio Client API
- * @brief Get and Manage general client functions like API-connection,
- * API-responses, system information, uptime, enable or disbale remote
- * control and list / manage tags for one station
- * @{
- */
-
-/** @name General Functions
- * General functions for connection handling
- * @{
- */
-
-/** Krad Radio Client connection handle.
-  * @brief Type to identify a single API-connection to a station
-  * @see kr_connect,kr_disconnect
-  */
-
-typedef struct kr_client_St kr_client_t;
-typedef struct kr_client_St kr_client;
+typedef struct kr_client kr_client;
 
 #include "krad_easing_common.h"
 #include "krad_mixer_common.h"
@@ -51,17 +13,8 @@ typedef struct kr_client_St kr_client;
 #include "krad_radio_common.h"
 #include "krad_tags.h"
 
-//typedef void (*rep_callback_t)( void *, void * );
-
-/** Shared memory buffer.
- * @brief Variable sized buffer used to get data in and out of local A/V ports
- * @see kr_shm_create,kr_shm_destroy
- */
 typedef struct kr_shm_St kr_shm_t;
-
-typedef struct kr_crate_St kr_response_t;
-typedef struct kr_crate_St kr_crate_t;
-
+typedef struct kr_crate kr_crate;
 typedef struct kr_unit_path_St kr_unit_path_t;
 typedef struct kr_unit_control_St kr_unit_control_t;
 
@@ -190,7 +143,6 @@ typedef union {
   kr_compositor_path_info *videoport;
 } kr_rep_ptr_t;
 
-
 typedef union {
   char actual;
   kr_tag tag;
@@ -205,8 +157,8 @@ typedef union {
   kr_radio_t radio;
 } kr_rep_actual_t;
 
-struct kr_crate_St {
-  kr_client_t *client;
+struct kr_crate {
+  kr_client *client;
   kr_address_t *addr;
   kr_address_t address;
   kr_rep_ptr_t inside;
@@ -224,304 +176,81 @@ struct kr_crate_St {
 
 int32_t kr_address_has_control (kr_address_t *address);
 int kr_unit_control_data_type_from_address (kr_address_t *address, kr_unit_control_data_t *data_type);
-uint32_t kr_response_get_event (kr_response_t *response);
+uint32_t kr_crate_notice(kr_crate *crate);
 int kr_string_to_address (char *string, kr_address_t *addr);
-int kr_unit_control_set (kr_client_t *client, kr_unit_control_t *uc);
-int kr_unit_control_get (kr_client_t *client, kr_unit_control_t *uc);
-void kr_unit_destroy (kr_client_t *client, kr_address_t *address);
-void kr_unit_info (kr_client_t *client, kr_address_t *address);
+int kr_unit_control_set (kr_client *client, kr_unit_control_t *uc);
+int kr_unit_control_get (kr_client *client, kr_unit_control_t *uc);
+void kr_unit_destroy (kr_client *client, kr_address_t *address);
+void kr_unit_info (kr_client *client, kr_address_t *address);
 int krad_radio_address_to_ebml2 (kr_ebml2_t *ebml2, unsigned char **element_loc, kr_address_t *address);
-
-kr_client_t *kr_client_create (char *client_name);
-
-void kr_delivery_recv (kr_client_t *client);
-
-/**
- * @brief connect to a krad radio daemon identified by sysname
- * @param sysname of local station or ip:port remote station
- * @return connection handle or NULL on error
- */
-int kr_connect (kr_client_t *client, char *sysname);
-int kr_connect_full (kr_client_t *client, char *sysname, int timeout_ms);
-
-int kr_connect_remote (kr_client_t *client, char *host, int port, int timeout_ms);
-
-
-int kr_connected (kr_client_t *client);
-
-/**
- * @brief disconnect an open API-connection
- * @param kr_client pointer to handle of the connection to be closed
- */
-int kr_disconnect (kr_client_t *client);
-
-
-int kr_client_destroy (kr_client_t **client);
-
-/**
- * @brief determines if a connection is local or remote
- * @param kr_client handle of the API-connection to the station
- * @return 1 if local, 0 otherwise
- */
-int kr_client_local (kr_client_t *client);
-
-
-int kr_client_get_fd (kr_client_t *client);
-
-
-int kr_client_sync (kr_client_t *client);
-int kr_client_push (kr_client_t *client);
-int kr_client_want_out (kr_client_t *client);
-
-/**
- * @brief subscribe to broadcast messages of a specific type on one station
- * @param kr_client handle of the API-connection to the station
- * @param broadcast_id type of the broadcast messages
- * @see kr_poll
- */
-void kr_subscribe (kr_client_t *client, uint32_t broadcast_id);
-
-void kr_subscribe_all (kr_client_t *client);
-
-
-/**
- * @brief check for new broadcast messages after having subscribed to them
- * @param kr_client handle of the API-connection to the station
- * @param timeout_ms timeout on checking
- * @return > 0 if there are new messages, 0 otherwise
- * @see kr_broadcast_subscribe
- */
-
-int kr_poll (kr_client_t *client, uint32_t timeout_ms);
-int kr_crate_addr_path_match (kr_crate_t *crate, int unit, int subunit);
-void kr_crate_recycle (kr_crate_t **crate);
-int kr_crate_to_string (kr_crate_t *crate, char **string);
-int kr_crate_to_int (kr_crate_t *crate, int *number);
-int kr_crate_to_float (kr_crate_t *crate, float *number);
-char *kr_response_alloc_string (int length);
-void kr_response_free_string (char **string);
-int kr_uncrate_rep (kr_crate_t *crate);
-void kr_response_address (kr_response_t *response, kr_address_t **address);
+kr_client *kr_client_create (char *client_name);
+void kr_delivery_recv (kr_client *client);
+int kr_connect (kr_client *client, char *sysname);
+int kr_connect_full (kr_client *client, char *sysname, int timeout_ms);
+int kr_connect_remote (kr_client *client, char *host, int port, int timeout_ms);
+int kr_connected (kr_client *client);
+int kr_disconnect (kr_client *client);
+int kr_client_destroy (kr_client **client);
+int kr_client_local (kr_client *client);
+int kr_client_get_fd (kr_client *client);
+int kr_client_sync (kr_client *client);
+int kr_client_push (kr_client *client);
+int kr_client_want_out (kr_client *client);
+void kr_subscribe (kr_client *client, uint32_t broadcast_id);
+void kr_subscribe_all (kr_client *client);
+int kr_poll (kr_client *client, uint32_t timeout_ms);
+int kr_crate_addr_path_match (kr_crate *crate, int unit, int subunit);
+void kr_crate_recycle (kr_crate **crate);
+int kr_crateo_string (kr_crate *crate, char **string);
+int kr_crateo_int (kr_crate *crate, int *number);
+int kr_crateo_float (kr_crate *crate, float *number);
+char *kr_crate_alloc_string (int length);
+void kr_crate_free_string (char **string);
+int kr_uncrate_rep (kr_crate *crate);
+void kr_crate_address_get(kr_crate *crate, kr_address_t **address);
 void kr_address_debug_print (kr_address_t *addr);
 int krad_read_address_from_ebml (kr_ebml2_t *ebml, kr_address_t *address);
 int krad_message_notice_has_payload (uint32_t type);
-uint32_t kr_response_size (kr_response_t *kr_response);
-void kr_client_response_wait_print (kr_client_t *client);
-
-
-/**
- * @brief get a response
- * @param kr_client handle of the API-connection to the station
- */
-int kr_delivery_get (kr_client_t *client, kr_crate_t **crate);
+void kr_delivery_accept_and_report(kr_client *client);
+int kr_delivery_get (kr_client *client, kr_crate **crate);
 #define kr_crate_loaded kr_uncrate_rep
-int kr_crate_loaded (kr_crate_t *crate);
-int kr_crate_has_int (kr_crate_t *crate);
-int kr_crate_has_float (kr_crate_t *crate);
+int kr_crate_loaded (kr_crate *crate);
+int kr_crate_has_int (kr_crate *crate);
+int kr_crate_has_float (kr_crate *crate);
 #define kr_crate_contains_float kr_crate_has_float
 #define kr_crate_contains_int kr_crate_has_int
 #define kr_crate_contains_integer kr_crate_has_int
-#define kr_delivery_accept_and_report kr_client_response_wait_print
 #define kr_delivery_wait kr_poll
 #define kr_wait kr_poll
-#define kr_crate_address_get kr_response_address
-#define kr_address_get kr_response_address
-#define kr_uncrate_string kr_crate_to_string
-#define kr_uncrate_to_string kr_crate_to_string
-
-#define kr_crate_notice kr_response_get_event
-
-#define kr_uncrate_int kr_crate_to_int
+#define kr_address_get kr_crate_address
+#define kr_uncrate_string kr_crateo_string
+#define kr_uncrate_to_string kr_crateo_string
+#define kr_uncrate_int kr_crateo_int
 #define kr_uncrate kr_uncrate_rep
-
-#define kr_uncrate_float kr_crate_to_float
-
-#define kr_string_release kr_response_free_string
-#define kr_string_recycle kr_response_free_string
-#define kr_string_goodbye kr_response_free_string
-
-
-
-
-
-
+#define kr_uncrate_float kr_crateo_float
+#define kr_string_release kr_crate_free_string
+#define kr_string_recycle kr_crate_free_string
+#define kr_string_goodbye kr_crate_free_string
 #define kr_mixer_portgroups_list kr_mixer_portgroup_list
 #define kr_mixer_portgroups kr_mixer_portgroup_list
 #define kr_compositor_subunits kr_compositor_subunit_list
-
-int kr_delivery_get_until_final (kr_client_t *client, kr_crate_t **crate, uint32_t timeout_ms);
-int kr_delivery_final (kr_client_t *client);
-
-/**
- * @brief waits for a response
- * @param kr_client handle of the API-connection to the station
- */
-void kr_client_response_wait (kr_client_t *client, kr_response_t **kr_response);
-
-
-/** @} */
-
-/** @name Shared Memory Functions
- * Functions for managing the shared memory buffer for local A/V ports
- * @{
- */
-
-/**
- * @brief creates and allocates a shared memory buffer
- * @param client handle of the API-connection to the station
- * @return handle for the shared memory buffer, NULL on error
- * @todo currently, this size is fixed for resolution 960x540. this needs to be changed!
- */
-kr_shm_t *kr_shm_create (kr_client_t *client);
-
-/**
- * @brief destroys and frees an allocated shared memory buffer
- * @param kr_shm handle of the buffer to be destroyed
- */
+int kr_delivery_get_until_final (kr_client *client, kr_crate **crate, uint32_t timeout_ms);
+int kr_delivery_final (kr_client *client);
+void kr_client_crate_wait(kr_client *client, kr_crate **crate);
+kr_shm_t *kr_shm_create (kr_client *client);
 void kr_shm_destroy (kr_shm_t *kr_shm);
-
-/** @} */
-
-/** @name Information Functions
- * Functions for to query information from a station
- * @{
- */
-
-/**
- * @brief Prints out the uptime of the station
- * @param client handle of the API-connection to the station
- */
-//void kr_uptime (kr_client_t *client);
-
-/**
- * @brief Prints out system information (hostname, architecture and kernel
- * version) from where the station is running on
- * @param client handle of the API-connection to the station
- */
-void kr_system_info (kr_client_t *client);
-
-/**
- * @brief Prints out the current CPU usage of the station
- * @param client handle of the API-connection to the station
- */
-//void kr_system_cpu_usage (kr_client_t *client);
-
-/**
- * @brief Sets the "working directory" for the station where logfiles and
- * snaphots are stored. The directory must exist, it will not be created
- * for you!
- * @param client handle of the API-connection to the station
- * @param dir
- */
-void kr_set_dir (kr_client_t *client, char *dir);
-
-/**
- * @brief Prints out the currently used logfile of the station
- * @param client handle of the API-connection to the station
- */
-//void kr_logname (kr_client_t *client);
-
-/** @} */
-
-/** @name Remote Control Functions
- * Functions to enable or disable remote control interfaces
- * @{
- */
-
-void kr_remote_list (kr_client_t *client);
-
-/**
- * @brief Enable API remote control on a specifed port. You can use
- * "hostname:port" as sysname to specify this station from another machine.
- * This can only be enabled once per station.
- * @param client handle of the API-connection to the station
- * @param port TCP-port on which to listen for incoming connections
- */
-int kr_remote_on (kr_client_t *client, char *interface, int port);
-
-/**
- * @brief Disable the previously enabled API remote control
- * @param client handle of the API-connection to the station
- */
-int kr_remote_off (kr_client_t *client, char *interface, int port);
-
-/**
- * @brief Enable web UI remote control on a specifed port. This can only be
- * enabled once per station.
- * @param client handle of the API-connection to the station
- * @param http_port port on which to listen for incoming HTTP-connections
- * @param websocket_port port used for communication between the web-page
- * and the station. Must not be the same as http_port!
- * @param headcode override the header delivered to HTTP-clients
- * @param header override the header delivered to HTTP-clients
- * @param footer override the footer delivered to HTTP-clients
- */
-void kr_web_enable (kr_client_t *client, uint32_t port,
+void kr_system_info (kr_client *client);
+void kr_set_dir (kr_client *client, char *dir);
+void kr_remote_list (kr_client *client);
+int kr_remote_on (kr_client *client, char *interface, int port);
+int kr_remote_off (kr_client *client, char *interface, int port);
+void kr_web_enable (kr_client *client, uint32_t port,
                     char *headcode, char *header, char *footer);
-
-/**
- * @brief Disable the previously enabled web UI remote control
- * @param client handle of the API-connection to the station
- */
-void kr_web_disable (kr_client_t *client);
-
-/**
- * @brief Enable Open Sound Control (OSC) remote control on a specifed port.
- * This can only be enabled once per station.
- * @param client handle of the API-connection to the station
- * @param port port on which to listen for incoming connections
- */
-void kr_osc_enable (kr_client_t *client, int port);
-
-/**
- * @brief Disable the previously enabled OSC remote control
- * @param client handle of the API-connection to the station
- */
-void kr_osc_disable (kr_client_t *client);
-
-/** @} */
-
-/** @name Tag Control Functions
- * Functions to set and read tags
- * @{
- */
-
-/**
- * @todo oneman document this! kripton has no clue here!
- * @brief kr_read_tag_inner
- * @param client
- * @param tag_item
- * @param tag_name
- * @param tag_value
- */
-
-
-/**
- * @brief prints out a list of all tags in a group
- * @param client handle of the API-connection to the station
- * @param item item to print the tags of
- */
-void kr_get_tags(kr_client_t *client, char *item);
-
-/**
- * @brief prints out the value of one specified tag
- * @param client handle of the API-connection to the station
- * @param item item the tag is grouped under
- * @param tag_name name of the tag to be printed
- */
-void kr_get_tag(kr_client_t *client, char *item, char *tag_name);
-
-/**
- * @brief sets the value for a specified tag
- * @param client handle of the API-connection to the station
- * @param item item the tag is grouped under
- * @param tag_name name of the tag to be set
- * @param tag_value value to set the tag to
- */
-void kr_set_tag(kr_client_t *client, char *item, char *tag_name, char *tag_value);
-
-/** @} */
-
-/** @} */
+void kr_web_disable (kr_client *client);
+void kr_osc_enable (kr_client *client, int port);
+void kr_osc_disable (kr_client *client);
+void kr_get_tags(kr_client *client, char *item);
+void kr_get_tag(kr_client *client, char *item, char *tag_name);
+void kr_set_tag(kr_client *client, char *item, char *tag_name, char *tag_value);
 
 #endif

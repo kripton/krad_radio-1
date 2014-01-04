@@ -10,9 +10,9 @@ void krad_radio_command_help () {
   printf ("comp res fps snap jsnap play record capture\n");
 }
 
-int get_logname (kr_client_t *client, char *logname, int max) {
+int get_logname(kr_client *client, char *logname, int max) {
 
-  kr_crate_t *crate;
+  kr_crate *crate;
   crate = NULL;
   int wait_ms;
   int ret;
@@ -42,7 +42,7 @@ int get_logname (kr_client_t *client, char *logname, int max) {
   return ret;
 }
 
-void print_logname (kr_client_t *client) {
+void print_logname (kr_client *client) {
 
   char logname[256];
 
@@ -51,7 +51,7 @@ void print_logname (kr_client_t *client) {
   }
 }
 
-void tail_log (kr_client_t *client, int lines, int dofollow) {
+void tail_log (kr_client *client, int lines, int dofollow) {
 
   int ret;
   char logname[256];
@@ -87,7 +87,7 @@ void tail_log (kr_client_t *client, int lines, int dofollow) {
 
 int main (int argc, char *argv[]) {
 
-  kr_client_t *client;
+  kr_client *client;
   char *sysname;
   int ret;
   kr_unit_control_t uc;

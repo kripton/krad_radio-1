@@ -3,11 +3,11 @@
 
 #include "krad_transponder_common.h"
 
-void kr_transponder_response_print(kr_response_t *kr_response);
-int kr_transponder_crate_to_string(kr_crate_t *crate, char **string);
+void kr_transponder_crate_print(kr_crate *crate);
+int kr_transponder_crate_to_string(kr_crate *crate, char **string);
 
-void kr_transponder_info_get(kr_client_t *client);
-void kr_transponder_adapters(kr_client_t *client);
+void kr_transponder_info_get(kr_client *client);
+void kr_transponder_adapters(kr_client *client);
 
 int kr_transponder_transmitter_enable(kr_client *client, int port);
 void kr_transponder_transmitter_disable(kr_client *client);

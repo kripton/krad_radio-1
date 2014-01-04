@@ -316,7 +316,7 @@ void krad_websocket_set_cpu_usage (kr_web_client *client, int usage) {
 }
 
 void krad_websocket_add_comp_subunit(kr_web_client *client,
- kr_crate_t *crate) {
+ kr_crate *crate) {
 
   int pos;
   char json[2048];
@@ -383,7 +383,7 @@ void krad_websocket_add_comp_subunit(kr_web_client *client,
 }
 
 void krad_websocket_update_subunit(kr_web_client *client,
- kr_crate_t *crate) {
+ kr_crate *crate) {
 
   int pos;
   char json[2048];
@@ -417,7 +417,7 @@ void krad_websocket_update_subunit(kr_web_client *client,
   }
 }
 
-static int crate_to_json(kr_web_client *client, kr_crate_t *crate) {
+static int crate_to_json(kr_web_client *client, kr_crate *crate) {
 
   uber_St uber;
   char json[2048];
@@ -460,7 +460,7 @@ static int crate_to_json(kr_web_client *client, kr_crate_t *crate) {
       uber.actual = crate->inside.text;
       uber.type = JSON_KR_TEXT_INFO;
       com = "kradcompositor";
-      ctrl = "add_text";          
+      ctrl = "add_text";
       break;
     case KR_VIDEOPORT:
       uber.actual = crate->inside.text;
@@ -486,7 +486,7 @@ static int crate_to_json(kr_web_client *client, kr_crate_t *crate) {
 
 static int krad_delivery_handler(kr_web_client *client) {
 
-  kr_crate_t *crate;
+  kr_crate *crate;
   char *string;
 
   string = NULL;

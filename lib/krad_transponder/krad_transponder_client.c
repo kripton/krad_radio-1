@@ -6,7 +6,7 @@ static int kr_transponder_get_string_from_muxer (kr_muxer_t *muxer, char *string
 //static int kr_transponder_get_string_from_demuxer (kr_demuxer_t *demuxer, char *string, int maxlen);
 static int kr_transponder_get_string_from_encoder (kr_encoder_t *encoder, char *string, int maxlen);
 //static int kr_transponder_get_string_from_decoder (kr_decoder_t *decoder, char *string, int maxlen);
-static int kr_transponder_crate_get_string_from_adapter (kr_crate_t *crate, char **string, int maxlen);
+static int kr_transponder_crate_get_string_from_adapter (kr_crate *crate, char **string, int maxlen);
 
 int kr_xpdr_mkpath(kr_client *client, kr_transponder_path_info *info) {
 
@@ -219,7 +219,7 @@ void kr_transponder_subunit_create(kr_client *client, char *mode, char *option) 
   kr_client_push (client);
 }
 
-static int kr_transponder_crate_get_string_from_adapter (kr_crate_t *crate, char **string, int maxlen) {
+static int kr_transponder_crate_get_string_from_adapter (kr_crate *crate, char **string, int maxlen) {
 
   int len;
 
@@ -235,7 +235,7 @@ static void kr_transponder_info_from_ebml(kr_ebml *ebml, kr_xpdr_info *info) {
   kr_ebml2_unpack_element_uint32(ebml, NULL, &info->active_paths);
 }
 
-static int kr_transponder_crate_get_string_from_transponder(kr_crate_t *crate, char **string, int maxlen) {
+static int kr_transponder_crate_get_string_from_transponder(kr_crate *crate, char **string, int maxlen) {
 
   kr_xpdr_info info;
   int len;
@@ -346,7 +346,7 @@ static int kr_transponder_get_string_from_encoder (kr_encoder_t *encoder, char *
   return len;
 }
 
-static int kr_transponder_crate_get_string_from_subunit (kr_crate_t *crate, char **string, int maxlen) {
+static int kr_transponder_crate_get_string_from_subunit (kr_crate *crate, char **string, int maxlen) {
 
   kr_transponder_subunit_t transponder_subunit;
   int len;
@@ -376,16 +376,16 @@ static int kr_transponder_crate_get_string_from_subunit (kr_crate_t *crate, char
   return len;
 }
 
-int kr_transponder_crate_to_string (kr_crate_t *crate, char **string) {
+int kr_transponder_crate_to_string (kr_crate *crate, char **string) {
 
   if (crate->notice == EBML_ID_KRAD_UNIT_INFO) {
-    *string = kr_response_alloc_string (crate->size * 16);
+    *string = kr_crate_alloc_string (crate->size * 16);
     return kr_transponder_crate_get_string_from_transponder (crate, string, crate->size * 16);
   }
 
   switch ( crate->address.path.subunit.transponder_subunit ) {
     case KR_ADAPTER:
-      *string = kr_response_alloc_string (crate->size * 8);
+      *string = kr_crate_alloc_string (crate->size * 8);
       return kr_transponder_crate_get_string_from_adapter (crate, string, crate->size * 8);
     case KR_TRANSMITTER:
     case KR_RECEIVER:
@@ -395,7 +395,7 @@ int kr_transponder_crate_to_string (kr_crate_t *crate, char **string) {
     case KR_MUXER:
     case KR_ENCODER:
     case KR_DECODER:
-      *string = kr_response_alloc_string (crate->size * 16);
+      *string = kr_crate_alloc_string (crate->size * 16);
       return kr_transponder_crate_get_string_from_subunit (crate, string, crate->size * 16);
   }
 

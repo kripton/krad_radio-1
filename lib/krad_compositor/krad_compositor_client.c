@@ -2,7 +2,7 @@
 #include "krad_radio_client_internal.h"
 #include "krad_compositor_common.h"
 
-static int kr_compositor_crate_get_string_from_subunit(kr_crate_t *crate, char **string);
+static int kr_compositor_crate_get_string_from_subunit(kr_crate *crate, char **string);
 
 typedef struct kr_videoport_St kr_videoport_t;
 
@@ -10,7 +10,7 @@ struct kr_videoport_St {
   int width;
   int height;
   kr_shm_t *kr_shm;
-  kr_client_t *client;
+  kr_client *client;
   int sd;
 
   int (*callback)(void *, void *);
@@ -21,7 +21,7 @@ struct kr_videoport_St {
   pthread_t process_thread;
 };
 
-void kr_compositor_set_frame_rate(kr_client_t *client, int numerator, int denominator) {
+void kr_compositor_set_frame_rate(kr_client *client, int numerator, int denominator) {
 
   unsigned char *compositor_command;
   unsigned char *set_frame_rate;
@@ -38,7 +38,7 @@ void kr_compositor_set_frame_rate(kr_client_t *client, int numerator, int denomi
   kr_client_push (client);
 }
 
-int kr_compositor_set_resolution (kr_client_t *client, uint32_t width, uint32_t height) {
+int kr_compositor_set_resolution (kr_client *client, uint32_t width, uint32_t height) {
 
   unsigned char *compositor_command;
   unsigned char *set_resolution;
@@ -61,7 +61,7 @@ int kr_compositor_set_resolution (kr_client_t *client, uint32_t width, uint32_t 
   return 0;
 }
 
-void kr_compositor_info_request(kr_client_t *client) {
+void kr_compositor_info_request(kr_client *client) {
 
   unsigned char *command;
   unsigned char *info_command;
@@ -74,7 +74,7 @@ void kr_compositor_info_request(kr_client_t *client) {
   kr_client_push (client);
 }
 
-int kr_compositor_crate_to_string_from_compositor(kr_crate_t *crate,
+int kr_compositor_crate_to_string_from_compositor(kr_crate *crate,
  char **string) {
 
   int pos;
@@ -96,7 +96,7 @@ int kr_compositor_crate_to_string_from_compositor(kr_crate_t *crate,
   return pos;
 }
 
-int kr_compositor_crate_to_string_from_sprite (kr_crate_t *crate, char **string) {
+int kr_compositor_crate_to_string_from_sprite (kr_crate *crate, char **string) {
 
   int pos;
   kr_sprite_info sprite;
@@ -117,7 +117,7 @@ int kr_compositor_crate_to_string_from_sprite (kr_crate_t *crate, char **string)
   return pos;
 }
 
-int kr_compositor_crate_to_string_from_text(kr_crate_t *crate, char **string) {
+int kr_compositor_crate_to_string_from_text(kr_crate *crate, char **string) {
 
   int pos;
   kr_text_info text;
@@ -140,7 +140,7 @@ int kr_compositor_crate_to_string_from_text(kr_crate_t *crate, char **string) {
   return pos;
 }
 
-int kr_compositor_crate_to_string_from_vector (kr_crate_t *crate, char **string) {
+int kr_compositor_crate_to_string_from_vector (kr_crate *crate, char **string) {
 
   int pos;
   kr_vector_info vector;
@@ -160,7 +160,7 @@ int kr_compositor_crate_to_string_from_vector (kr_crate_t *crate, char **string)
   return pos;
 }
 
-int kr_compositor_crate_to_string_from_videoport (kr_crate_t *crate, char **string) {
+int kr_compositor_crate_to_string_from_videoport (kr_crate *crate, char **string) {
 
   int pos;
   kr_compositor_path_info port;
@@ -200,7 +200,7 @@ int kr_compositor_crate_to_string_from_videoport (kr_crate_t *crate, char **stri
   return pos;
 }
 
-static int kr_compositor_crate_get_string_from_subunit (kr_crate_t *crate, char **string) {
+static int kr_compositor_crate_get_string_from_subunit (kr_crate *crate, char **string) {
 
   switch ( crate->address.path.subunit.compositor_subunit ) {
     case KR_SPRITE:
@@ -216,7 +216,7 @@ static int kr_compositor_crate_get_string_from_subunit (kr_crate_t *crate, char 
   return 0;
 }
 
-int kr_compositor_crate_to_info (kr_crate_t *crate) {
+int kr_compositor_crate_to_info (kr_crate *crate) {
   if ((crate->address.path.unit == KR_COMPOSITOR) && (crate->address.path.subunit.zero == KR_UNIT) &&
       (crate->notice == EBML_ID_KRAD_UNIT_INFO)) {
     crate->contains = KR_COMPOSITOR;
@@ -255,23 +255,23 @@ int kr_compositor_crate_to_info (kr_crate_t *crate) {
   return 0;
 }
 
-int kr_compositor_crate_to_string (kr_crate_t *crate, char **string) {
+int kr_compositor_crate_to_string (kr_crate *crate, char **string) {
 
   switch ( crate->notice ) {
     case EBML_ID_KRAD_UNIT_INFO:
-      *string = kr_response_alloc_string (crate->size * 4);
+      *string = kr_crate_alloc_string (crate->size * 4);
       return kr_compositor_crate_to_string_from_compositor (crate, string);
     case EBML_ID_KRAD_SUBUNIT_INFO:
-      *string = kr_response_alloc_string (crate->size * 6);
+      *string = kr_crate_alloc_string (crate->size * 6);
       return kr_compositor_crate_get_string_from_subunit (crate, string);
     case EBML_ID_KRAD_SUBUNIT_CREATED:
-      *string = kr_response_alloc_string (crate->size * 4);
+      *string = kr_crate_alloc_string (crate->size * 4);
       return kr_compositor_crate_get_string_from_subunit (crate, string);
   }
   return 0;
 }
 
-int kr_compositor_subunit_create (kr_client_t *client,
+int kr_compositor_subunit_create (kr_client *client,
                                   kr_compositor_subunit_type type,
                                   char *option,
                                   char *option2) {
@@ -312,7 +312,7 @@ int kr_compositor_subunit_create (kr_client_t *client,
   return 1;
 }
 
-void kr_compositor_subunit_list (kr_client_t *client) {
+void kr_compositor_subunit_list (kr_client *client) {
 
   unsigned char *command;
   unsigned char *list;
@@ -325,7 +325,7 @@ void kr_compositor_subunit_list (kr_client_t *client) {
   kr_client_push (client);
 }
 
-void kr_compositor_subunit_info (kr_client_t *client, kr_address_t *address) {
+void kr_compositor_subunit_info (kr_client *client, kr_address_t *address) {
 
   unsigned char *command;
   unsigned char *getinfo;
@@ -340,7 +340,7 @@ void kr_compositor_subunit_info (kr_client_t *client, kr_address_t *address) {
   kr_client_push (client);
 }
 
-void kr_compositor_subunit_destroy (kr_client_t *client, kr_address_t *address) {
+void kr_compositor_subunit_destroy (kr_client *client, kr_address_t *address) {
 
   unsigned char *command;
   unsigned char *destroy;
@@ -355,7 +355,7 @@ void kr_compositor_subunit_destroy (kr_client_t *client, kr_address_t *address) 
   kr_client_push (client);
 }
 
-void kr_videoport_destroy_cmd (kr_client_t *client) {
+void kr_videoport_destroy_cmd (kr_client *client) {
 
   unsigned char *compositor_command;
   unsigned char *destroy_videoport;
@@ -370,7 +370,7 @@ void kr_videoport_destroy_cmd (kr_client_t *client) {
   kr_client_push (client);
 }
 
-void kr_videoport_create_cmd (kr_client_t *client, int32_t type) {
+void kr_videoport_create_cmd (kr_client *client, int32_t type) {
 
   unsigned char *compositor_command;
   unsigned char *create_videoport;
@@ -506,7 +506,7 @@ int kr_videoport_error (kr_videoport_t *videoport) {
   return -1;
 }
 
-kr_videoport_t *kr_videoport_create (kr_client_t *client, int32_t type) {
+kr_videoport_t *kr_videoport_create (kr_client *client, int32_t type) {
 
   kr_videoport_t *videoport;
   int sockets[2];
@@ -575,7 +575,7 @@ void kr_videoport_destroy (kr_videoport_t *kr_videoport) {
   }
 }
 
-int kr_compositor_get_info_wait(kr_client_t *client,
+int kr_compositor_get_info_wait(kr_client *client,
                             uint32_t *width,
                             uint32_t *height,
                             uint32_t *fps_num,
@@ -583,7 +583,7 @@ int kr_compositor_get_info_wait(kr_client_t *client,
 
   int wait_ms;
   int ret;
-  kr_crate_t *crate;
+  kr_crate *crate;
 
   ret = 0;
   crate = NULL;

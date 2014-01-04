@@ -8,13 +8,13 @@
  * but we need to rename the client on the server
  * side and in all the clients then..
  */
-struct kr_client_St {
+struct kr_client {
   kr_app_client *krad_app_client;
   char *name;
   int autosync;
   int subscriber;
   int last_delivery_was_final;
-  kr_crate_t *re_crate;
+  kr_crate *re_crate;
   kr_ebml2_t *ebml2;
   kr_io2_t *io;
   kr_ebml2_t *ebml_in;
@@ -41,7 +41,7 @@ struct kr_shm_St {
 typedef int (*rep_to_string_t)( unsigned char *, uint64_t, char ** );
 
 
-int kr_send_fd (kr_client_t *client, int fd);
+int kr_send_fd(kr_client *client, int fd);
 
 
 //#endif

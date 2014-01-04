@@ -150,7 +150,7 @@ struct kr_websocket_client {
   uint32_t shaked;
   char key[96];
   char proto[96];
-  kr_client_t *krclient;
+  kr_client *krclient;
 };
 
 struct kr_web_client {

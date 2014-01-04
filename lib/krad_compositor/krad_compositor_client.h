@@ -15,29 +15,29 @@
 
 typedef struct kr_videoport_St kr_videoport_t;
 
-int kr_compositor_crate_to_info (kr_crate_t *crate);
-int kr_compositor_crate_to_string (kr_crate_t *crate, char **string);
+int kr_compositor_crate_to_info (kr_crate *crate);
+int kr_compositor_crate_to_string (kr_crate *crate, char **string);
 
 // Public
 
-void kr_compositor_subunit_list (kr_client_t *client);
-int kr_compositor_subunit_create (kr_client_t *client,
+void kr_compositor_subunit_list (kr_client *client);
+int kr_compositor_subunit_create (kr_client *client,
                                   kr_compositor_subunit_type type,
                                   char *option,
                                   char *option2);
-void kr_compositor_subunit_destroy (kr_client_t *client, kr_address_t *address);
-void kr_compositor_subunit_info (kr_client_t *client, kr_address_t *address);
-void kr_compositor_info_request(kr_client_t *client);
-void kr_compositor_set_frame_rate (kr_client_t *client, int numerator, int denominator);
-int kr_compositor_set_resolution (kr_client_t *client, uint32_t width, uint32_t height);
+void kr_compositor_subunit_destroy (kr_client *client, kr_address_t *address);
+void kr_compositor_subunit_info (kr_client *client, kr_address_t *address);
+void kr_compositor_info_request(kr_client *client);
+void kr_compositor_set_frame_rate (kr_client *client, int numerator, int denominator);
+int kr_compositor_set_resolution (kr_client *client, uint32_t width, uint32_t height);
 
-void kr_compositor_close_display (kr_client_t *client);
-void kr_compositor_open_display (kr_client_t *client, int width, int height);
+void kr_compositor_close_display (kr_client *client);
+void kr_compositor_open_display (kr_client *client, int width, int height);
 
-void kr_compositor_snapshot(kr_client_t *client);
-void kr_compositor_snapshot_jpeg(kr_client_t *client);
+void kr_compositor_snapshot(kr_client *client);
+void kr_compositor_snapshot_jpeg(kr_client *client);
 
-int kr_compositor_get_info_wait(kr_client_t *client,
+int kr_compositor_get_info_wait(kr_client *client,
                             uint32_t *width,
                             uint32_t *height,
                             uint32_t *fps_num,
@@ -48,7 +48,7 @@ int kr_videoport_error (kr_videoport_t *videoport);
 void kr_videoport_set_callback (kr_videoport_t *kr_videoport, int callback (void *, void *), void *pointer);
 void kr_videoport_activate (kr_videoport_t *kr_videoport);
 void kr_videoport_deactivate (kr_videoport_t *kr_videoport);
-kr_videoport_t *kr_videoport_create (kr_client_t *client, int32_t direction);
+kr_videoport_t *kr_videoport_create (kr_client *client, int32_t direction);
 void kr_videoport_destroy (kr_videoport_t *kr_videoport);
 
 /**@}*/

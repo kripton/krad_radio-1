@@ -6,7 +6,7 @@ typedef struct kr_snapshot {
   uint32_t height;
   uint8_t *rgba;
   kr_videoport_t *videoport;
-  kr_client_t *client;
+  kr_client *client;
   int sd[2];
   int got_frame;
 } kr_snapshot;

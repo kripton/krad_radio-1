@@ -2,9 +2,9 @@
 #include "krad_radio_client_internal.h"
 #include "krad_mixer_common.h"
 
-static int kr_mixer_response_get_string_from_mixer (kr_crate_t *crate, char **string);
-static int kr_mixer_response_get_string_from_portgroup (kr_crate_t *crate, char **string);
-static int kr_mixer_response_get_string_from_subunit_control (kr_crate_t *crate, char **string);
+static int kr_mixer_crate_get_string_from_mixer (kr_crate *crate, char **string);
+static int kr_mixer_crate_get_string_from_portgroup (kr_crate *crate, char **string);
+static int kr_mixer_crate_get_string_from_subunit_control (kr_crate *crate, char **string);
 
 //static void kr_ebml_to_mixer_rep(kr_ebml2_t *ebml, kr_mixer_info *mixer_rep);
 /* static int kr_ebml_to_mixer_portgroup_rep(kr_ebml2_t *ebml,
@@ -17,7 +17,7 @@ struct kr_audioport_St {
 
   int samplerate;
   kr_shm_t *kr_shm;
-  kr_client_t *client;
+  kr_client *client;
   int sd;
 
   int direction;
@@ -32,7 +32,7 @@ struct kr_audioport_St {
 
 };
 
-void kr_mixer_portgroup_list (kr_client_t *client) {
+void kr_mixer_portgroup_list (kr_client *client) {
 
   unsigned char *mixer_command;
   unsigned char *get_portgroups;
@@ -161,7 +161,7 @@ int kr_audioport_error (kr_audioport_t *audioport) {
   return -1;
 }
 
-kr_audioport_t *kr_audioport_create(kr_client_t *client, char *name,
+kr_audioport_t *kr_audioport_create(kr_client *client, char *name,
  int direction) {
 
   kr_audioport_t *audioport;
@@ -231,7 +231,7 @@ void kr_audioport_destroy(kr_audioport_t *audioport) {
   }
 }
 
-void kr_mixer_portgroup_xmms2_cmd (kr_client_t *client, char *portgroupname, char *xmms2_cmd) {
+void kr_mixer_portgroup_xmms2_cmd (kr_client *client, char *portgroupname, char *xmms2_cmd) {
 
   unsigned char *mixer_command;
   unsigned char *bind;
@@ -246,7 +246,7 @@ void kr_mixer_portgroup_xmms2_cmd (kr_client_t *client, char *portgroupname, cha
   kr_client_push (client);
 }
 
-void kr_mixer_bind_portgroup_xmms2 (kr_client_t *client, char *portgroupname, char *ipc_path) {
+void kr_mixer_bind_portgroup_xmms2 (kr_client *client, char *portgroupname, char *ipc_path) {
 
   unsigned char *mixer_command;
   unsigned char *bind;
@@ -261,7 +261,7 @@ void kr_mixer_bind_portgroup_xmms2 (kr_client_t *client, char *portgroupname, ch
   kr_client_push (client);
 }
 
-void kr_mixer_unbind_portgroup_xmms2 (kr_client_t *client, char *portgroupname) {
+void kr_mixer_unbind_portgroup_xmms2 (kr_client *client, char *portgroupname) {
 
   unsigned char *mixer_command;
   unsigned char *unbind;
@@ -275,7 +275,7 @@ void kr_mixer_unbind_portgroup_xmms2 (kr_client_t *client, char *portgroupname) 
   kr_client_push (client);
 }
 
-void kr_mixer_set_sample_rate (kr_client_t *client, int sample_rate) {
+void kr_mixer_set_sample_rate (kr_client *client, int sample_rate) {
 
   unsigned char *mixer_command;
   unsigned char *set_sample_rate;
@@ -291,7 +291,7 @@ void kr_mixer_set_sample_rate (kr_client_t *client, int sample_rate) {
   kr_client_push (client);
 }
 
-void kr_mixer_info_get(kr_client_t *client) {
+void kr_mixer_info_get(kr_client *client) {
 
   unsigned char *mixer_command;
   unsigned char *get_info;
@@ -304,13 +304,13 @@ void kr_mixer_info_get(kr_client_t *client) {
   kr_client_push (client);
 }
 
-int kr_mixer_get_info_wait (kr_client_t *client,
+int kr_mixer_get_info_wait (kr_client *client,
                             uint32_t *sample_rate,
                             uint32_t *period_size) {
 
   int wait_ms;
   int ret;
-  kr_crate_t *crate;
+  kr_crate *crate;
 
   ret = 0;
   crate = NULL;
@@ -338,7 +338,7 @@ int kr_mixer_get_info_wait (kr_client_t *client,
   return ret;
 }
 
-void kr_mixer_plug_portgroup (kr_client_t *client, char *name, char *remote_name) {
+void kr_mixer_plug_portgroup (kr_client *client, char *name, char *remote_name) {
 
   unsigned char *command;
   unsigned char *plug;
@@ -354,7 +354,7 @@ void kr_mixer_plug_portgroup (kr_client_t *client, char *name, char *remote_name
   kr_client_push (client);
 }
 
-void kr_mixer_unplug_portgroup (kr_client_t *client, char *name, char *remote_name) {
+void kr_mixer_unplug_portgroup (kr_client *client, char *name, char *remote_name) {
 
   unsigned char *command;
   unsigned char *unplug;
@@ -370,7 +370,7 @@ void kr_mixer_unplug_portgroup (kr_client_t *client, char *name, char *remote_na
   kr_client_push (client);
 }
 
-void kr_mixer_create_portgroup(kr_client_t *client, char *name, char *type,
+void kr_mixer_create_portgroup(kr_client *client, char *name, char *type,
  char *direction, int channels) {
 
   unsigned char *command;
@@ -390,7 +390,7 @@ void kr_mixer_create_portgroup(kr_client_t *client, char *name, char *type,
 }
 
 
-void kr_mixer_push_tone (kr_client_t *client, int8_t tone) {
+void kr_mixer_push_tone (kr_client *client, int8_t tone) {
 
   unsigned char *command;
   unsigned char *push;
@@ -406,7 +406,7 @@ void kr_mixer_push_tone (kr_client_t *client, int8_t tone) {
   kr_client_push (client);
 }
 
-void kr_mixer_update_portgroup_map_channel (kr_client_t *client, char *portgroupname, int in_channel, int out_channel) {
+void kr_mixer_update_portgroup_map_channel (kr_client *client, char *portgroupname, int in_channel, int out_channel) {
 
   unsigned char *command;
   unsigned char *update;
@@ -428,7 +428,7 @@ void kr_mixer_update_portgroup_map_channel (kr_client_t *client, char *portgroup
   kr_client_push (client);
 }
 
-void kr_mixer_update_portgroup_mixmap_channel (kr_client_t *client, char *portgroupname, int in_channel, int out_channel) {
+void kr_mixer_update_portgroup_mixmap_channel (kr_client *client, char *portgroupname, int in_channel, int out_channel) {
 
   unsigned char *command;
   unsigned char *update;
@@ -451,7 +451,7 @@ void kr_mixer_update_portgroup_mixmap_channel (kr_client_t *client, char *portgr
 }
 
 
-void kr_mixer_set_portgroup_crossfade_group (kr_client_t *client, char *portgroupname, char *crossfade_group) {
+void kr_mixer_set_portgroup_crossfade_group (kr_client *client, char *portgroupname, char *crossfade_group) {
 
   unsigned char *command;
   unsigned char *update;
@@ -468,7 +468,7 @@ void kr_mixer_set_portgroup_crossfade_group (kr_client_t *client, char *portgrou
   kr_client_push (client);
 }
 
-void kr_mixer_portgroup_info (kr_client_t *client, char *portgroupname) {
+void kr_mixer_portgroup_info (kr_client *client, char *portgroupname) {
 
   unsigned char *command;
   unsigned char *info;
@@ -484,7 +484,7 @@ void kr_mixer_portgroup_info (kr_client_t *client, char *portgroupname) {
   kr_client_push (client);
 }
 
-void kr_mixer_remove_portgroup (kr_client_t *client, char *name) {
+void kr_mixer_remove_portgroup (kr_client *client, char *name) {
 
   unsigned char *command;
   unsigned char *destroy;
@@ -500,7 +500,7 @@ void kr_mixer_remove_portgroup (kr_client_t *client, char *name) {
   kr_client_push (client);
 }
 
-void kr_mixer_set_effect_control(kr_client_t *client, char *portgroup_name, int effect_num,
+void kr_mixer_set_effect_control(kr_client *client, char *portgroup_name, int effect_num,
                                  int control_id, char *control_name, float control_value, int duration,
                                  kr_easing easing) {
 
@@ -522,7 +522,7 @@ void kr_mixer_set_effect_control(kr_client_t *client, char *portgroup_name, int 
   kr_client_push (client);
 }
 
-void kr_mixer_set_control (kr_client_t *client, char *portgroup_name, char *control_name, float control_value, uint32_t duration) {
+void kr_mixer_set_control (kr_client *client, char *portgroup_name, char *control_name, float control_value, uint32_t duration) {
 
   unsigned char *mixer_command;
   unsigned char *set_control;
@@ -581,7 +581,7 @@ void kr_mixer_set_control (kr_client_t *client, char *portgroup_name, char *cont
    sizeof(mixer->clock));
 }*/
 
-static int kr_mixer_response_get_string_from_subunit_control (kr_crate_t *crate, char **string) {
+static int kr_mixer_crate_get_string_from_subunit_control (kr_crate *crate, char **string) {
 
   int len;
   float real;
@@ -608,7 +608,7 @@ static int kr_mixer_response_get_string_from_subunit_control (kr_crate_t *crate,
   return len;
 }
 
-static int kr_mixer_response_get_string_from_mixer (kr_crate_t *crate, char **string) {
+static int kr_mixer_crate_get_string_from_mixer (kr_crate *crate, char **string) {
 
   int pos;
   kr_mixer_info mixer;
@@ -629,7 +629,7 @@ static int kr_mixer_response_get_string_from_mixer (kr_crate_t *crate, char **st
   return pos;
 }
 
-static int kr_mixer_response_get_string_from_portgroup (kr_crate_t *crate, char **string) {
+static int kr_mixer_crate_get_string_from_portgroup (kr_crate *crate, char **string) {
 
   int pos;
   int c;
@@ -733,27 +733,27 @@ static int kr_mixer_response_get_string_from_portgroup (kr_crate_t *crate, char 
   return pos;
 }
 
-int kr_mixer_crate_to_string (kr_crate_t *crate, char **string) {
+int kr_mixer_crate_to_string (kr_crate *crate, char **string) {
 
   switch ( crate->notice ) {
     case EBML_ID_KRAD_SUBUNIT_CONTROL:
-      *string = kr_response_alloc_string (crate->size * 4);
-      return kr_mixer_response_get_string_from_subunit_control (crate, string);
+      *string = kr_crate_alloc_string (crate->size * 4);
+      return kr_mixer_crate_get_string_from_subunit_control (crate, string);
     case EBML_ID_KRAD_UNIT_INFO:
-      *string = kr_response_alloc_string (crate->size * 4);
-      return kr_mixer_response_get_string_from_mixer (crate, string);
+      *string = kr_crate_alloc_string (crate->size * 4);
+      return kr_mixer_crate_get_string_from_mixer (crate, string);
     case EBML_ID_KRAD_SUBUNIT_INFO:
-      *string = kr_response_alloc_string (crate->size * 4);
-      return kr_mixer_response_get_string_from_portgroup (crate, string);
+      *string = kr_crate_alloc_string (crate->size * 4);
+      return kr_mixer_crate_get_string_from_portgroup (crate, string);
     case EBML_ID_KRAD_SUBUNIT_CREATED:
-      *string = kr_response_alloc_string (crate->size * 4);
-      return kr_mixer_response_get_string_from_portgroup (crate, string);
+      *string = kr_crate_alloc_string (crate->size * 4);
+      return kr_mixer_crate_get_string_from_portgroup (crate, string);
   }
 
   return 0;
 }
 
-int kr_mixer_crate_to_rep (kr_crate_t *crate) {
+int kr_mixer_crate_to_rep (kr_crate *crate) {
 
   if ((crate->address.path.subunit.mixer_subunit != KR_PORTGROUP) &&
       (crate->notice == EBML_ID_KRAD_UNIT_INFO)) {
