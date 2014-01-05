@@ -433,7 +433,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       printk ("command remote status");
       address.path.unit = KR_STATION;
       address.path.subunit.station_subunit = KR_REMOTE;
-      for (i = 0; i < MAX_REMOTES; i++) {
+/*      for (i = 0; i < MAX_REMOTES; i++) {
         if (app->tcp_port[i]) {
           address.id.number = i;
           krad_radio_address_to_ebml2 (&ebml_out, &response, &address);
@@ -447,11 +447,13 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
           kr_ebml2_finish_element (&ebml_out, response);
         }
       }
+*/
       break;
     case EBML_ID_KRAD_RADIO_CMD_REMOTE_ENABLE:
       printk ("command remote enable");
       kr_ebml2_unpack_element_string(&ebml_in, &element, remote.interface, sizeof(string1));
       kr_ebml2_unpack_element_uint16(&ebml_in, &element, &remote.port);
+/*
       if (kr_app_server_enable_remote(app, remote.interface, remote.port)) {
         //FIXME this is wrong in the case of adapter based matches with multiple ips
         // perhaps switch to callback based create broadcast?
@@ -465,6 +467,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
         }
         kr_radio_broadcast_subunit_created(app->app_broadcaster, &address, (void *)&remote);
       }
+*/
       break;
     case EBML_ID_KRAD_RADIO_CMD_REMOTE_DISABLE:
       printk ("command remote disable");
@@ -478,7 +481,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
         address.path.unit = KR_STATION;
         address.path.subunit.station_subunit = KR_REMOTE;
         address.id.number = i;
-        kr_radio_broadcast_subunit_destroyed(app->app_broadcaster, &address);
+ //       kr_radio_broadcast_subunit_destroyed(app->app_broadcaster, &address);
       }
       break;
     case EBML_ID_KRAD_RADIO_CMD_WEB_ENABLE:

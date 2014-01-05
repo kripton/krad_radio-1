@@ -93,35 +93,6 @@ struct kr_app_broadcaster {
   int sockets[2];
 };
 
-struct kr_app_server {
-  struct sockaddr_un saddr;
-  struct utsname unixname;
-  int on_linux;
-  int sd;
-  int tcp_sd[MAX_REMOTES];
-  uint16_t tcp_port[MAX_REMOTES];
-  char *tcp_interface[MAX_REMOTES];
-  int shutdown;
-  int socket_count;
-  krad_control_t krad_control;
-  uint32_t num_clients;
-  kr_app_server_client *clients;
-  kr_app_server_client *current_client;
-  void *(*client_create)(void *);
-  void (*client_destroy)(void *);
-  int (*client_handler)(kr_io2_t *in, kr_io2_t *out, void *);
-  void *pointer;
-  pthread_t thread;
-  struct pollfd sockets[KRAD_APP_SERVER_MAX_CLIENTS + MAX_BROADCASTERS + MAX_REMOTES + 2];
-  kr_app_server_client *sockets_clients[KRAD_APP_SERVER_MAX_CLIENTS + MAX_BROADCASTERS + MAX_REMOTES + 2];
-  kr_app_broadcaster *sockets_broadcasters[MAX_BROADCASTERS + MAX_REMOTES + 2];
-  kr_app_broadcaster *broadcasters[MAX_BROADCASTERS];
-  int broadcasters_count;
-  uint32_t broadcasts[MAX_BROADCASTS];
-  int broadcasts_count;
-  kr_app_broadcaster *app_broadcaster;
-};
-
 struct kr_app_server_client {
   int sd;
   void *ptr;

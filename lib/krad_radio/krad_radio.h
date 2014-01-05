@@ -16,14 +16,8 @@
 #ifndef KRAD_RADIO_H
 #define KRAD_RADIO_H
 
-/*
- * Here we are dealing with Krad Radio the application server
- * in specific, such as it is and as it does.
- */
-
 typedef struct kr_radio kr_radio;
 typedef struct kr_log kr_log;
-typedef struct kr_remote_control kr_remote_control;
 
 #include "krad_radio_version.h"
 #include "krad_system.h"

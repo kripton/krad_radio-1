@@ -3,12 +3,40 @@
 static kr_app_server *kr_app_server_init(char *appname, char *sysname);
 static void *app_server_loop(void *arg);
 static int kr_app_servercp_socket_create_and_bind(char *interface, int port);
-static void disconnect_client(kr_app_server *app_server, kr_app_server_client *client);
+static void disconnect_client(kr_app_server *app, kr_app_server_client *client);
 static void kr_app_server_update_pollfds(kr_app_server *app_server);
-static kr_app_server_client *kr_app_server_accept_client(kr_app_server *app_server, int sd);
-
-static kr_app_broadcaster *kr_app_server_broadcaster_create(kr_app_server *app_server);
+static kr_app_server_client *kr_app_server_accept_client(kr_app_server *app, int sd);
+static kr_app_broadcaster *kr_app_server_broadcaster_create(kr_app_server *app);
 static int kr_app_server_broadcaster_destroy(kr_app_broadcaster **broadcaster);
+
+struct kr_app_server {
+  struct sockaddr_un saddr;
+  struct utsname unixname;
+  int on_linux;
+  int sd;
+  int tcp_sd[MAX_REMOTES];
+  uint16_t tcp_port[MAX_REMOTES];
+  char *tcp_interface[MAX_REMOTES];
+  int shutdown;
+  int socket_count;
+  krad_control_t krad_control;
+  uint32_t num_clients;
+  kr_app_server_client *clients;
+  kr_app_server_client *current_client;
+  kr_app_server_client_create_cb *client_create;
+  kr_app_server_client_destroy_cb *client_destroy;
+  kr_app_server_client_handler_cb *client_handler;
+  void *pointer;
+  pthread_t thread;
+  struct pollfd sockets[KRAD_APP_SERVER_MAX_CLIENTS + MAX_BROADCASTERS + MAX_REMOTES + 2];
+  kr_app_server_client *sockets_clients[KRAD_APP_SERVER_MAX_CLIENTS + MAX_BROADCASTERS + MAX_REMOTES + 2];
+  kr_app_broadcaster *sockets_broadcasters[MAX_BROADCASTERS + MAX_REMOTES + 2];
+  kr_app_broadcaster *broadcasters[MAX_BROADCASTERS];
+  int broadcasters_count;
+  uint32_t broadcasts[MAX_BROADCASTS];
+  int broadcasts_count;
+  kr_app_broadcaster *app_broadcaster;
+};
 
 static kr_app_server *kr_app_server_init(char *appname, char *sysname) {
   kr_app_server *server;

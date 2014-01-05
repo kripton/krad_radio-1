@@ -143,7 +143,7 @@ int kr_mixer_command(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       kr_ebml2_unpack_element_uint32(&ebml_in, &element, &numbers[0]);
       duration = numbers[0];
       if ((duration == 0) && (kr_app_server_current_client_is_subscriber(as))) {
-        ptr = as->current_client;
+//        ptr = as->current_client;
       }
       path = path_find(mixer, name);
       if (path) {
@@ -162,7 +162,7 @@ int kr_mixer_command(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       if (path) {
         duration = numbers[6];
         if ((duration == 0) && (kr_app_server_current_client_is_subscriber(as))) {
-          ptr = as->current_client;
+//          ptr = as->current_client;
         }
         sfx = kr_mixer_path_sfx_kludge(path);
         if (sfx) {
