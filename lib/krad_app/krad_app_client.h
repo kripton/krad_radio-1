@@ -38,23 +38,12 @@
 #define KRAD_APP_DOCTYPE_READ_VERSION KR_VERSION
 #define EBML_ID_KRAD_APP_CMD 0x4444
 
-typedef struct kr_app_client krad_app_client_t;
 typedef struct kr_app_client kr_app_client;
 
-struct kr_app_client {
-  char sysname[64];
-  int sd;
-  int tcp_port;
-  char host[256];
-  char api_path[256];
-  int api_path_pos;
-  int on_linux;
-  struct stat info;
-  struct utsname unixname;
-};
-
-krad_app_client_t *krad_app_connect(char *sysname, int timeout_ms);
-void krad_app_disconnect(krad_app_client_t *client);
-int krad_app_client_send_fd(krad_app_client_t *client, int fd);
+int kr_app_client_local(kr_app_client *client);
+int kr_app_client_get_fd(kr_app_client *client);
+kr_app_client *kr_app_connect(char *sysname, int timeout_ms);
+void kr_app_disconnect(kr_app_client *client);
+int kr_app_client_send_fd(kr_app_client *client, int fd);
 
 #endif

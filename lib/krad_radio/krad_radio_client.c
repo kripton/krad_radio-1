@@ -44,7 +44,7 @@ int kr_poll_out (kr_client *client, uint32_t timeout_ms) {
   int ret;
   struct pollfd pollfds[1];
 
-  pollfds[0].fd = client->krad_app_client->sd;
+  pollfds[0].fd = kr_app_client_get_fd(client->krad_app_client);
   pollfds[0].events = POLLOUT;
 
   ret = poll (pollfds, 1, timeout_ms);
@@ -153,50 +153,50 @@ int kr_connect (kr_client *client, char *sysname) {
 }
 
 int kr_connect_full (kr_client *client, char *sysname, int timeout_ms) {
-
+  int fd;
   if (client == NULL) {
     return 0;
   }
-  if (kr_connected (client)) {
-    kr_disconnect (client);
+  if (kr_connected(client)) {
+    kr_disconnect(client);
   }
-  client->krad_app_client = krad_app_connect (sysname, timeout_ms);
+  client->krad_app_client = kr_app_connect(sysname, timeout_ms);
   if (client->krad_app_client != NULL) {
 
-
+    fd = kr_app_client_get_fd(client->krad_app_client);
     client->io = kr_io2_create ();
     client->ebml2 = kr_ebml2_create ();
 
-    kr_io2_set_fd ( client->io, client->krad_app_client->sd );
+    kr_io2_set_fd ( client->io, fd );
     kr_ebml2_set_buffer ( client->ebml2, client->io->buf, client->io->space );
 
     client->io_in = kr_io2_create ();
     client->ebml_in = kr_ebml2_create ();
 
-    kr_io2_set_fd ( client->io_in, client->krad_app_client->sd );
+    kr_io2_set_fd ( client->io_in, fd );
     kr_ebml2_set_buffer ( client->ebml_in, client->io_in->buf, client->io_in->space );
 
     if (kr_check_connection (client) > 0) {
       return 1;
     } else {
-      kr_disconnect (client);
+      kr_disconnect(client);
     }
   }
 
   return 0;
 }
 
-int kr_connected (kr_client *client) {
+int kr_connected(kr_client *client) {
   if (client->krad_app_client != NULL) {
     return 1;
   }
   return 0;
 }
 
-int kr_disconnect (kr_client *client) {
+int kr_disconnect(kr_client *client) {
   if (client != NULL) {
     if (kr_connected (client)) {
-      krad_app_disconnect (client->krad_app_client);
+      kr_app_disconnect(client->krad_app_client);
       client->krad_app_client = NULL;
       if (client->io != NULL) {
         kr_io2_destroy (&client->io);
@@ -240,19 +240,16 @@ int kr_client_destroy (kr_client **client) {
 int kr_client_local (kr_client *client) {
   if (client != NULL) {
     if (kr_connected (client)) {
-      if (client->krad_app_client->tcp_port == 0) {
-        return 1;
-      }
-      return 0;
+      return kr_app_client_local(client->krad_app_client);
     }
   }
   return -1;
 }
 
-int kr_client_get_fd (kr_client *client) {
+int kr_client_get_fd(kr_client *client) {
   if (client != NULL) {
     if (kr_connected (client)) {
-      return client->krad_app_client->sd;
+      return kr_app_client_get_fd(client->krad_app_client);
     }
   }
   return -1;
@@ -330,8 +327,8 @@ kr_shm_t *kr_shm_create (kr_client *client) {
   return kr_shm;
 }
 
-int kr_send_fd (kr_client *client, int fd) {
-  return krad_app_client_send_fd (client->krad_app_client, fd);
+int kr_send_fd(kr_client *client, int fd) {
+  return kr_app_client_send_fd(client->krad_app_client, fd);
 }
 
 void kr_crate_free_string (char **string) {
@@ -347,7 +344,7 @@ int kr_poll (kr_client *client, uint32_t timeout_ms) {
   int ret;
   struct pollfd pollfds[1];
 
-  pollfds[0].fd = client->krad_app_client->sd;
+  pollfds[0].fd = kr_app_client_get_fd(client->krad_app_client);
 
   if ((kr_client_want_out (client)) && (client->autosync == 1)) {
     pollfds[0].events = POLLIN | POLLOUT;

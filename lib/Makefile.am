@@ -131,13 +131,13 @@ krad_radio_libkradclient_la_LDFLAGS = -shared -no-undefined \
  -version-info @KR_LT_CURRENT@:@KR_LT_REVISION@:@KR_LT_AGE@
 krad_radio_libkradclient_la_LDFLAGS +=
 krad_radio_libkradclient_la_SOURCES = \
+krad_io/krad_io.c \
 krad_ebml/krad_ebml.c \
 krad_ebml/krad_ebmlx.c \
-krad_io/krad_io.c \
 krad_system/krad_system.c \
 krad_app/krad_app_client.c \
-krad_radio/krad_radio_client.c \
 krad_radio/krad_radio_client_ctl.c \
+krad_radio/krad_radio_client.c \
 krad_mixer/krad_mixer_client.c \
 krad_compositor/krad_compositor_client.c \
 krad_transponder/krad_transponder_client.c \

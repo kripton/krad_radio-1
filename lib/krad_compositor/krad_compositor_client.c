@@ -509,6 +509,7 @@ int kr_videoport_error (kr_videoport_t *videoport) {
 kr_videoport_t *kr_videoport_create (kr_client *client, int32_t type) {
 
   kr_videoport_t *videoport;
+  int fd;
   int sockets[2];
 
   if (!kr_client_local (client)) {
@@ -544,12 +545,13 @@ kr_videoport_t *kr_videoport_create (kr_client *client, int32_t type) {
   //printf ("sockets %d and %d\n", sockets[0], sockets[1]);
   krad_system_set_socket_nonblocking (videoport->sd);
 
-  krad_system_set_socket_blocking (videoport->client->krad_app_client->sd);
+  fd = kr_client_get_fd(videoport->client);
+  krad_system_set_socket_blocking(fd);
   kr_videoport_create_cmd (videoport->client, type);
   usleep (5000);
   kr_send_fd (videoport->client, videoport->kr_shm->fd);
   kr_send_fd (videoport->client, sockets[1]);
-  krad_system_set_socket_nonblocking (videoport->client->krad_app_client->sd);
+  krad_system_set_socket_nonblocking(fd);
 
   return videoport;
 }
