@@ -19,7 +19,6 @@ struct kr_client {
   kr_io2_t *io;
   kr_ebml2_t *ebml_in;
   kr_io2_t *io_in;
-
   /* The below should be replaced with a
    * proper kr_****_info cache
    */
@@ -29,7 +28,6 @@ struct kr_client {
   uint32_t height;
   uint32_t fps_num;
   uint32_t fps_den;
-
 };
 
 struct kr_shm_St {
@@ -38,10 +36,7 @@ struct kr_shm_St {
   uint64_t size;
 };
 
-typedef int (*rep_to_string_t)( unsigned char *, uint64_t, char ** );
-
-
+typedef int (*rep_to_string_t)(unsigned char *, uint64_t, char **);
 int kr_send_fd(kr_client *client, int fd);
-
 
 //#endif

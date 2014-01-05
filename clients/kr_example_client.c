@@ -1,6 +1,6 @@
 #include "kr_client.h"
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   kr_client *client;
   char *sysname;
   sysname = NULL;
