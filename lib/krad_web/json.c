@@ -22,7 +22,8 @@ static int json_to_crate(kr_iws_client_t *client, char *json) {
     payload_pos = strstr(json,json_payload);
     if (payload_pos) {
       memset(&pinfo,0,sizeof(pinfo));
-      //res = kr_adapter_path_info_fr_json();
+      /* TO DO */
+      /*res = kr_adapter_path_info_fr_json();*/ 
       sprintf(js,"%s",&payload_pos[strlen(payload_pos)]);
       interweb_ws_pack(client, (uint8_t *)js, sizeof(js));
     }
