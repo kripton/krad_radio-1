@@ -1,6 +1,6 @@
 #include "kr_x11_stream.h"
 #include "gen/kr_x11_stream_config.c"
-#include "krad_debug.c"
+#include "kr_debug.c"
 
 typedef struct kr_x11_stream kr_x11_stream;
 typedef struct kr_x11_stream_params kr_x11_stream_params;
@@ -126,7 +126,7 @@ void kr_x11_stream_activate(kr_x11_stream_params *params) {
 int main(int argc, char *argv[]) {
   int ret;
   kr_x11_stream_params params;
-  krad_debug_init("v4l2_stream");
+  kr_debug_init("v4l2_stream");
   memset(&params, 0, sizeof(kr_x11_stream_params));
   ret = handle_config(&params, argv[1]);
   if (ret != 0) {

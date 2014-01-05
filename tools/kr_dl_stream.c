@@ -2,7 +2,7 @@
 #define IMAGE_BUFFER_COUNT 64
 #include "gen/kr_dl_stream_config.c"
 
-#include "krad_debug.c"
+#include "kr_debug.c"
 
 typedef struct kr_dlstream kr_dlstream;
 
@@ -256,7 +256,7 @@ int main (int argc, char *argv[]) {
   kr_dlstream_params params;
   int ret;
 
-  krad_debug_init("dl_stream");
+  kr_debug_init("dl_stream");
   kr_dlstream_check();
   memset(&params, 0, sizeof(kr_dlstream_params));
 

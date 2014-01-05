@@ -10,7 +10,7 @@
 #include <krad_vorbis.h>
 #include <krad_flac.h>
 
-#include "krad_debug.c"
+#include "kr_debug.c"
 
 #define VIDEO_TRACK 1
 #define AUDIO_TRACK 2
@@ -193,7 +193,7 @@ void krad_muxponder_test (int port, char *filename1, char *filename2) {
 
 int main (int argc, char *argv[]) {
 
-  krad_debug_init ("kr_mkv_txmtr");
+  kr_debug_init("mkv_txmtr");
 
   if (argc > 1) {
     if (argc == 2) {

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
- 
+
 #include <krad_mkv_demux.h>
 
 #include <krad_vorbis.h>
@@ -8,7 +8,7 @@
 
 #include <krad_vpx.h>
 
-#include "krad_debug.c"
+#include "kr_debug.c"
 
 #define VIDEO_TRACK 1
 #define AUDIO_TRACK 2
@@ -30,7 +30,7 @@ void vpxtest () {
 
   medium = kr_medium_kludge_create ();
   codeme = kr_codeme_kludge_create ();
-  
+
   ret = kr_vpx_encode (vpx_enc, codeme, medium);
   printf ("Vpx test enc ret was %d", ret);
 
@@ -62,14 +62,14 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
   krad_vpx_decoder_t *vpx_dec;
   krad_vpx_encoder_t *vpx_enc;
   kr_codec_hdr_t header;
-  
+
   kr_medium_t *medium;
   kr_codeme_t *codeme;
   krad_vorbis_t *vorbis_dec;
   krad_vorbis_t *vorbis_enc;
 
   packets = 0;
-  
+
   //vpxtest ();
 
   buffer = malloc (20000000);
@@ -121,7 +121,7 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
   printf ("\n");
 
   while ((bytes_read = kr_mkv_read_packet (mkv, &track, &timecode, &flags, buffer)) > 0) {
-    
+
     printk ("Read packet %d track %d %d bytes", packets++, track, bytes_read);
     //fflush (stdout);
 
@@ -153,9 +153,9 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
       kr_codeme_kludge_destroy (&codeme);
     */
       kr_mkv_add_video (new_mkv, out_track, buffer, bytes_read, keyframe);
-      
+
    }
-    
+
     if (track == 2) {
 
       medium = kr_medium_kludge_create ();
@@ -164,7 +164,7 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
       memcpy (codeme->data, buffer, codeme->sz);
       kr_vorbis_decode (vorbis_dec, medium, codeme);
       kr_codeme_kludge_destroy (&codeme);
-      
+
       if (medium->a.count > 0) {
         do {
           codeme = kr_codeme_kludge_create ();
@@ -178,9 +178,9 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
       }
     //}
     }
-    
+
   }
-  
+
 
 
 
@@ -188,14 +188,14 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
 
 
 
-  krad_vorbis_decoder_destroy (&vorbis_dec);  
+  krad_vorbis_decoder_destroy (&vorbis_dec);
 
   //new_mkv->tracks[VIDEO_TRACK].fps_numerator = 30000;
 
   kr_mkv_destroy (&mkv);
   mkv = kr_mkv_open_file (file2);
-  
-  printf ("FPS %d/%d RES: %dx%d\n", 
+
+  printf ("FPS %d/%d RES: %dx%d\n",
           mkv->tracks[VIDEO_TRACK].fps_numerator,
           mkv->tracks[VIDEO_TRACK].fps_denominator,
           mkv->tracks[VIDEO_TRACK].width,
@@ -219,7 +219,7 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
 
 
   while ((bytes_read = kr_mkv_read_packet (mkv, &track, &timecode, &flags, buffer)) > 0) {
-    
+
     printk ("Read packet %d track %d %d bytes", packets++, track, bytes_read);
     //fflush (stdout);
 
@@ -251,9 +251,9 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
       kr_codeme_kludge_destroy (&codeme);
     */
       kr_mkv_add_video (new_mkv, out_track, buffer, bytes_read, keyframe);
-      
+
    }
-    
+
     if (track == 2) {
 
       medium = kr_medium_kludge_create ();
@@ -262,7 +262,7 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
       memcpy (codeme->data, buffer, codeme->sz);
       kr_vorbis_decode (vorbis_dec, medium, codeme);
       kr_codeme_kludge_destroy (&codeme);
-      
+
       if (medium->a.count > 0) {
         do {
           codeme = kr_codeme_kludge_create ();
@@ -276,9 +276,9 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
       }
     //}
     }
-    
+
   }
-  
+
   medium = kr_medium_kludge_create ();
   codeme = kr_codeme_kludge_create ();
   ret = kr_vorbis_encode (vorbis_enc, codeme, medium);
@@ -298,19 +298,19 @@ static void remuxcode (kr_mkv_t *mkv, char *file, char *file2) {
     }
     kr_codeme_kludge_destroy (&codeme);
   } while (ret == 1);
-  
-  
+
+
 //----------------------------
 
 
   printf ("\nDone.\n");
 
-  krad_vpx_encoder_destroy (&vpx_enc);  
+  krad_vpx_encoder_destroy (&vpx_enc);
   krad_vpx_decoder_destroy (&vpx_dec);
-  krad_vorbis_decoder_destroy (&vorbis_dec);  
+  krad_vorbis_decoder_destroy (&vorbis_dec);
   krad_vorbis_encoder_destroy (&vorbis_enc);
   kr_mkv_destroy (&new_mkv);
-  kr_mkv_destroy (&mkv);  
+  kr_mkv_destroy (&mkv);
   free (buffer);
   free (vbuffer);
   free (vbuffer2);
@@ -327,11 +327,11 @@ static void remux (kr_mkv_t *mkv, char *file) {
   int keyframe;
   uint8_t flags;
   int packets;
-  
+
   packets = 0;
 
   buffer = malloc (10000000);
- 
+
   new_mkv = kr_mkv_create_file (file);
 
   if (new_mkv == NULL) {
@@ -352,7 +352,7 @@ static void remux (kr_mkv_t *mkv, char *file) {
   printf ("\n");
 
   while ((bytes_read = kr_mkv_read_packet (mkv, &track, &timecode, &flags, buffer)) > 0) {
-    
+
     printf ("\rRead packet %d track %d %d bytes\t\t", packets++, track, bytes_read);
     fflush (stdout);
 
@@ -386,22 +386,22 @@ static void splice (char *file1, char *file2, char *fileout) {
   int keyframe;
   uint8_t flags;
   int packets;
-  
+
   packets = 0;
 
   buffer = malloc (10000000);
-  
+
   for (i = 0; i < 2; i++) {
-  
+
     if (i == 0) {
       in[i] = kr_mkv_open_file (file1);
     } else {
       in[i] = kr_mkv_open_file (file2);
     }
 
-    
+
     printf ("File %d: FPS %d/%d RES %dx%d\n",
-            i, 
+            i,
             in[i]->tracks[VIDEO_TRACK].fps_numerator,
             in[i]->tracks[VIDEO_TRACK].fps_denominator,
             in[i]->tracks[VIDEO_TRACK].width,
@@ -412,16 +412,16 @@ static void splice (char *file1, char *file2, char *fileout) {
       exit (1);
     }
   }
- 
- 
+
+
   if ((in[0]->tracks[VIDEO_TRACK].width != in[0]->tracks[VIDEO_TRACK].width) ||
       (in[1]->tracks[VIDEO_TRACK].height != in[1]->tracks[VIDEO_TRACK].height)) {
 
     fprintf (stderr, "Resolutions are not equal\n");
     exit (1);
   }
- 
- 
+
+
   out = kr_mkv_create_file (fileout);
 
   if (out == NULL) {
@@ -438,10 +438,10 @@ static void splice (char *file1, char *file2, char *fileout) {
                                      in[0]->tracks[VIDEO_TRACK].height);
 
   printf ("Added new track: %d\n", out_track);
-  
+
   for (i = 0; i < 2; i++) {
     while ((bytes_read = kr_mkv_read_packet (in[i], &track, &timecode, &flags, buffer)) > 0) {
-      
+
       printf ("\rRead file %d packet %d track %d %d bytes\t\t",
               i, packets++, track, bytes_read);
       fflush (stdout);
@@ -457,12 +457,12 @@ static void splice (char *file1, char *file2, char *fileout) {
       }
     }
   }
-  
-  printf ("\nDone.\n");  
-  
+
+  printf ("\nDone.\n");
+
   free (buffer);
   kr_mkv_destroy (&in[0]);
-  kr_mkv_destroy (&in[1]);  
+  kr_mkv_destroy (&in[1]);
   kr_mkv_destroy (&out);
 
 }
@@ -481,9 +481,9 @@ static void kraise_splice (char *file1, char *file2, char *fileout) {
   uint8_t flags;
   int packets;
   int have_buffer[2];
-  int have_buffer_bytes[2];  
+  int have_buffer_bytes[2];
   int inframes;
-  
+
   have_buffer_bytes[0] = 0;
   have_buffer_bytes[1] = 0;
   have_buffer[1] = 0;
@@ -494,18 +494,18 @@ static void kraise_splice (char *file1, char *file2, char *fileout) {
 
   buffer[0] = malloc (10000000);
   buffer[1] = malloc (10000000);
-  
+
   for (i = 0; i < 2; i++) {
-  
+
     if (i == 0) {
       in[i] = kr_mkv_open_file (file1);
     } else {
       in[i] = kr_mkv_open_file (file2);
     }
 
-    
+
     printf ("File %d: FPS %d/%d RES %dx%d\n",
-            i, 
+            i,
             in[i]->tracks[VIDEO_TRACK].fps_numerator,
             in[i]->tracks[VIDEO_TRACK].fps_denominator,
             in[i]->tracks[VIDEO_TRACK].width,
@@ -516,16 +516,16 @@ static void kraise_splice (char *file1, char *file2, char *fileout) {
       exit (1);
     }
   }
- 
- 
+
+
   if ((in[0]->tracks[VIDEO_TRACK].width != in[0]->tracks[VIDEO_TRACK].width) ||
       (in[1]->tracks[VIDEO_TRACK].height != in[1]->tracks[VIDEO_TRACK].height)) {
 
     fprintf (stderr, "Resolutions are not equal\n");
     exit (1);
   }
- 
- 
+
+
   out = kr_mkv_create_file (fileout);
 
   if (out == NULL) {
@@ -547,9 +547,9 @@ static void kraise_splice (char *file1, char *file2, char *fileout) {
 
 
   while ((bytes_read = kr_mkv_read_packet (in[0], &track, &timecode, &flags, buffer[0])) > 0) {
-    
+
     have_buffer_bytes[0] = bytes_read;
-    
+
     printf ("Read file %d packet %d track %d %d bytes\n",
             1, packets++, track, bytes_read);
     fflush (stdout);
@@ -562,9 +562,9 @@ static void kraise_splice (char *file1, char *file2, char *fileout) {
 
     if (keyframe == 1) {
       inframes = 0;
-      while ((have_buffer[1] == 1) || 
+      while ((have_buffer[1] == 1) ||
              (((bytes_read = kr_mkv_read_packet (in[1], &track, &timecode, &flags, buffer[1])) > 0))) {
-        
+
         if (have_buffer[1] == 1) {
           keyframe = 1;
           have_buffer[1] = 0;
@@ -578,9 +578,9 @@ static void kraise_splice (char *file1, char *file2, char *fileout) {
           } else {
             keyframe = 0;
           }
-          
+
           have_buffer_bytes[1] = bytes_read;
-          
+
           if ((keyframe == 1) && (inframes > 0)) {
             have_buffer[1] = 1;
             break;
@@ -599,11 +599,11 @@ static void kraise_splice (char *file1, char *file2, char *fileout) {
   }
 
   printf ("\nDone.\n");
-  
+
   free (buffer[0]);
   free (buffer[1]);
   kr_mkv_destroy (&in[0]);
-  kr_mkv_destroy (&in[1]);  
+  kr_mkv_destroy (&in[1]);
   kr_mkv_destroy (&out);
 
 }
@@ -613,8 +613,8 @@ static void other_thing (char *file1, char *file2, char *file3) {
   kr_mkv_t *mkv;
 
   mkv = kr_mkv_open_file (file1);
-  
-  printf ("FPS %d/%d RES: %dx%d\n", 
+
+  printf ("FPS %d/%d RES: %dx%d\n",
           mkv->tracks[VIDEO_TRACK].fps_numerator,
           mkv->tracks[VIDEO_TRACK].fps_denominator,
           mkv->tracks[VIDEO_TRACK].width,
@@ -624,7 +624,7 @@ static void other_thing (char *file1, char *file2, char *file3) {
     fprintf (stderr, "Could not open %s\n", file1);
     exit (1);
   }
-  
+
   if (0) {
     remux (mkv, file2);
   }
@@ -633,10 +633,10 @@ static void other_thing (char *file1, char *file2, char *file3) {
 
 
 }
- 
-int main (int argc, char *argv[])  {
 
-  krad_debug_init ("sigmamkv");
+int main(int argc, char *argv[])  {
+
+  kr_debug_init("sigmamkv");
 
   if (argc == 4) {
     other_thing (argv[1], argv[2], argv[3]);
@@ -651,6 +651,6 @@ int main (int argc, char *argv[])  {
       }
     }
   }
-  
+
   return 0;
 }

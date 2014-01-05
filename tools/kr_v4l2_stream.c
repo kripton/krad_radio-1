@@ -1,5 +1,5 @@
 #include "kr_v4l2_stream.h"
-#include "krad_debug.c"
+#include "kr_debug.c"
 #include "gen/kr_v4l2_stream_config.c"
 
 typedef struct {
@@ -117,7 +117,7 @@ int main (int argc, char *argv[]) {
   int ret;
   kr_v4l2s *v4l2s;
   kr_v4l2s_params params;
-  krad_debug_init("v4l2_stream");
+  kr_debug_init("v4l2_stream");
   memset(&params, 0, sizeof(kr_v4l2s_params));
   ret = handle_config(&params, argv[1]);
   if (ret != 0) {

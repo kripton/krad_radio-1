@@ -14,7 +14,7 @@
 #include "krad_system.h"
 #include "krad_encoder_machine.h"
 
-#include "krad_debug.c"
+#include "kr_debug.c"
 
 typedef struct kr_test_machine_St kr_test_machine_t;
 
@@ -43,7 +43,7 @@ int encoded_callback (kr_encoder_machine_t *encoder_machine, kr_em_sector_t *sec
 
 int main (int argc, char *argv[]) {
 
-//  krad_debug_init ("machine_test");
+  kr_debug_init ("machine_test");
 
   kr_test_machine_t *test_machine;
   kr_encoder_machine_t *encoder_machine;

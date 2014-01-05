@@ -1,6 +1,6 @@
 #include "krad_pool.h"
 
-#include "../tools/krad_debug.c"
+#include "../tools/kr_debug.c"
 
 int main(int argc, char *argv[]) {
 
@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
   void *slice[128];
   void *aslice;
 
-  krad_debug_init("kr_pool_test");
+  kr_debug_init("pool_test");
 
   aslice = NULL;
   memset(&slice, 0, sizeof(slice));

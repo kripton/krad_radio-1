@@ -3,7 +3,7 @@
 
 #include <krad_mkv_demux.h>
 
-#include "krad_debug.c"
+#include "kr_debug.c"
 
 void mkv_frames_print (kr_mkv_t *mkv) {
 
@@ -53,7 +53,7 @@ int main (int argc, char *argv[]) {
   int32_t ret;
   kr_mkv_t *mkv;
 
-  krad_debug_init ("mkvinfo");
+  kr_debug_init ("mkvinfo");
 
   mkv = kr_mkv_open_file (argv[1]);
 

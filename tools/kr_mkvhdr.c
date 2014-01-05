@@ -10,7 +10,7 @@
 #include <krad_flac.h>
 #include <krad_opus.h>
 
-#include "krad_debug.c"
+#include "kr_debug.c"
 
 void mkv_header_test(kr_mkv_t *mkv) {
 
@@ -161,7 +161,7 @@ int main (int argc, char *argv[]) {
   int32_t ret;
   kr_mkv_t *mkv;
 
-  krad_debug_init ("mkvhdrtest");
+  kr_debug_init("mkvhdrtest");
 
   mkv = kr_mkv_open_file (argv[1]);
 

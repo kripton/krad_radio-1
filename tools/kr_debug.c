@@ -1,6 +1,6 @@
 static char logfile[256];
 
-void show_log() {
+static void show_log() {
   int ret;
   char *args[3];
   args[0] = "cat";
@@ -12,17 +12,17 @@ void show_log() {
   }
 }
 
-static void krad_debug_shutdown() {
+static void debug_shutdown() {
   krad_system_log_off();
   printf("\nDebug log: %s\n\n", logfile);
   show_log();
 }
 
-void krad_debug_init(char *name) {
+void kr_debug_init(char *name) {
   krad_system_init();
   snprintf(logfile, sizeof(logfile), "%s/kr_%s_%"PRIu64".log",
-   getenv("HOME"), name, krad_unixtime());
+   getenv("PWD"), name, krad_unixtime());
   krad_system_log_on(logfile);
   printf("Logging to: %s\n", logfile);
-  atexit(krad_debug_shutdown);
+  atexit(debug_shutdown);
 }
