@@ -94,6 +94,7 @@ static void kr_mixer_masterbus_setup(kr_radio *radio, kr_mixer *mixer) {
 
 static kr_radio *radio_create(char *sysname) {
   kr_radio *radio;
+  kr_app_server_setup app_setup;
   kr_mixer_setup mixer_setup;
   kr_compositor_setup compositor_setup;
   kr_transponder_setup transponder_setup;
@@ -106,9 +107,13 @@ static kr_radio *radio_create(char *sysname) {
     radio_shutdown(radio);
     return NULL;
   }
-  radio->app = kr_app_server_create("krad_radio", radio->sysname,
-   kr_radio_client_create, kr_radio_client_destroy, kr_radio_client_handler,
-   radio);
+  strncpy(app_setup.appname, "krad_radio", sizeof(app_setup.appname));
+  strncpy(app_setup.sysname, radio->sysname, sizeof(app_setup.sysname));
+  app_setup.app = radio;
+  app_setup.client_create = kr_radio_client_create;
+  app_setup.client_destroy = kr_radio_client_destroy;
+  app_setup.client_handler = kr_radio_client_handler;
+  radio->app = kr_app_server_create(&app_setup);
   if (radio->app == NULL) {
     radio_shutdown(radio);
     return NULL;

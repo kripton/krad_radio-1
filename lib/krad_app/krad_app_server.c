@@ -740,18 +740,15 @@ void kr_app_server_run(kr_app_server *as) {
   pthread_create(&as->thread, NULL, app_server_loop, (void *)as);
 }
 
-kr_app_server *kr_app_server_create(char *appname, char *sysname,
- void *client_create(void *), void client_destroy(void *),
- int client_handler(kr_io2_t *in, kr_io2_t *out, void *), void *app) {
+kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   kr_app_server *app_server;
-  app_server = kr_app_server_init(appname, sysname);
+  app_server = kr_app_server_init(setup->appname, setup->sysname);
   if (app_server == NULL) {
     return NULL;
   }
-  app_server->client_create = client_create;
-  app_server->client_destroy = client_destroy;
-  app_server->client_handler = client_handler;
-  app_server->pointer = app;
+  app_server->client_create = setup->client_create;
+  app_server->client_destroy = setup->client_destroy;
+  app_server->client_handler = setup->client_handler;
+  app_server->pointer = setup->app;
   return app_server;
 }
-

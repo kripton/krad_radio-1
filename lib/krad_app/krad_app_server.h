@@ -66,6 +66,21 @@ typedef struct kr_app_server_client kr_app_server_client;
 typedef struct kr_app_broadcaster kr_app_broadcaster;
 typedef struct kr_broadcast_msg kr_broadcast_msg;
 
+typedef struct kr_app_server_setup kr_app_server_setup;
+
+typedef void *(kr_app_server_client_create_cb)(void *);
+typedef void (kr_app_server_client_destroy_cb)(void *);
+typedef int (kr_app_server_client_handler_cb)(kr_io2_t *in, kr_io2_t *out, void *);
+
+struct kr_app_server_setup {
+  char appname[32];
+  char sysname[64];
+  kr_app_server_client_create_cb *client_create;
+  kr_app_server_client_destroy_cb *client_destroy;
+  kr_app_server_client_handler_cb *client_handler;
+  void *app;
+};
+
 struct kr_broadcast_msg {
   unsigned char *buffer;
   uint32_t size;
@@ -130,8 +145,5 @@ uint32_t kr_app_server_num_clients(kr_app_server *app_server);
 void kr_app_server_disable(kr_app_server *kr_app_server);
 void kr_app_server_destroy(kr_app_server *app_server);
 void kr_app_server_run(kr_app_server *kr_app_server);
-kr_app_server *kr_app_server_create(char *appname, char *sysname,
- void *client_create(void *), void client_destroy(void *),
- int client_handler(kr_io2_t *in, kr_io2_t *out, void *), void *app);
-
+kr_app_server *kr_app_server_create(kr_app_server_setup *setup);
 #endif
