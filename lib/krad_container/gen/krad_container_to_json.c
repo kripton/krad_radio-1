@@ -12,7 +12,7 @@ int krad_codec_t_to_json(char *json, void *st, int32_t max) {
 
   actual = (krad_codec_t *)st;
 
-  res += snprintf(&json[res],max-res,"%u",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_krad_codec_t(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int krad_container_type_t_to_json(char *json, void *st, int32_t max) {
 
   actual = (krad_container_type_t *)st;
 
-  res += snprintf(&json[res],max-res,"%u",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_krad_container_type_t(*actual));
 
   return res;
 }

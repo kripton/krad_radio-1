@@ -178,6 +178,14 @@ void files_gen(header_data *hdata,
         if (hdata[i].targets[l].type == FR_JSON) {
           fprintf(header,"#include \"jsmn.h\"\n");
         }
+
+        if (hdata[i].targets[l].type == TO_JSON) {
+          pp = strrchr(hdata[i].path,'/');
+          pp[0] = '\0';
+          fprintf(header,"#include \"%s_helpers.h\"\n",basename(hdata[i].path));
+          pp[0] = '/';
+        }
+
         codegen(hdata[i].defs,hdata[i].def_count,prefix,suffix,"includes",header);
         fclose(header);
       }

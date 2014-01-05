@@ -38,6 +38,51 @@ int kr_strto_kr_compositor_path_type(char *string) {
   return -1;
 }
 
+int kr_compositor_subunit_type_to_index(int val) {
+  switch (val) {
+    case KR_VIDEOPORT:
+      return 0;
+    case KR_SPRITE:
+      return 1;
+    case KR_TEXT:
+      return 2;
+    case KR_VECTOR:
+      return 3;
+  }
+  return -1;
+}
+
+char *kr_strfr_kr_compositor_subunit_type(int val) {
+  switch (val) {
+    case KR_VIDEOPORT:
+      return "kr_videoport";
+    case KR_SPRITE:
+      return "kr_sprite";
+    case KR_TEXT:
+      return "kr_text";
+    case KR_VECTOR:
+      return "kr_vector";
+  }
+  return NULL;
+}
+
+int kr_strto_kr_compositor_subunit_type(char *string) {
+  if (!strcmp(string,"kr_videoport")) {
+    return KR_VIDEOPORT;
+  }
+  if (!strcmp(string,"kr_sprite")) {
+    return KR_SPRITE;
+  }
+  if (!strcmp(string,"kr_text")) {
+    return KR_TEXT;
+  }
+  if (!strcmp(string,"kr_vector")) {
+    return KR_VECTOR;
+  }
+
+  return -1;
+}
+
 int kr_vector_type_to_index(int val) {
   switch (val) {
     case NOTHING:
@@ -134,6 +179,198 @@ int kr_strto_kr_vector_type(char *string) {
   }
   if (!strcmp(string,"shadow")) {
     return SHADOW;
+  }
+
+  return -1;
+}
+
+int kr_compositor_control_to_index(int val) {
+  switch (val) {
+    case KR_NO:
+      return 0;
+    case KR_X:
+      return 1;
+    case KR_Y:
+      return 2;
+    case KR_Z:
+      return 3;
+    case KR_WIDTH:
+      return 4;
+    case KR_HEIGHT:
+      return 5;
+    case KR_ROTATION:
+      return 6;
+    case KR_OPACITY:
+      return 7;
+    case KR_RED:
+      return 8;
+    case KR_GREEN:
+      return 9;
+    case KR_BLUE:
+      return 10;
+    case KR_ALPHA:
+      return 11;
+    case KR_TICKRATE:
+      return 12;
+    case KR_CROP_X:
+      return 13;
+    case KR_CROP_Y:
+      return 14;
+    case KR_CROP_W:
+      return 15;
+    case KR_CROP_H:
+      return 16;
+    case KR_VIEW_TL_X:
+      return 17;
+    case KR_VIEW_TL_Y:
+      return 18;
+    case KR_VIEW_TR_X:
+      return 19;
+    case KR_VIEW_TR_Y:
+      return 20;
+    case KR_VIEW_BL_X:
+      return 21;
+    case KR_VIEW_BL_Y:
+      return 22;
+    case KR_VIEW_BR_X:
+      return 23;
+    case KR_VIEW_BR_Y:
+      return 24;
+  }
+  return -1;
+}
+
+char *kr_strfr_kr_compositor_control(int val) {
+  switch (val) {
+    case KR_NO:
+      return "kr_no";
+    case KR_X:
+      return "kr_x";
+    case KR_Y:
+      return "kr_y";
+    case KR_Z:
+      return "kr_z";
+    case KR_WIDTH:
+      return "kr_width";
+    case KR_HEIGHT:
+      return "kr_height";
+    case KR_ROTATION:
+      return "kr_rotation";
+    case KR_OPACITY:
+      return "kr_opacity";
+    case KR_RED:
+      return "kr_red";
+    case KR_GREEN:
+      return "kr_green";
+    case KR_BLUE:
+      return "kr_blue";
+    case KR_ALPHA:
+      return "kr_alpha";
+    case KR_TICKRATE:
+      return "kr_tickrate";
+    case KR_CROP_X:
+      return "kr_crop_x";
+    case KR_CROP_Y:
+      return "kr_crop_y";
+    case KR_CROP_W:
+      return "kr_crop_w";
+    case KR_CROP_H:
+      return "kr_crop_h";
+    case KR_VIEW_TL_X:
+      return "kr_view_tl_x";
+    case KR_VIEW_TL_Y:
+      return "kr_view_tl_y";
+    case KR_VIEW_TR_X:
+      return "kr_view_tr_x";
+    case KR_VIEW_TR_Y:
+      return "kr_view_tr_y";
+    case KR_VIEW_BL_X:
+      return "kr_view_bl_x";
+    case KR_VIEW_BL_Y:
+      return "kr_view_bl_y";
+    case KR_VIEW_BR_X:
+      return "kr_view_br_x";
+    case KR_VIEW_BR_Y:
+      return "kr_view_br_y";
+  }
+  return NULL;
+}
+
+int kr_strto_kr_compositor_control(char *string) {
+  if (!strcmp(string,"kr_no")) {
+    return KR_NO;
+  }
+  if (!strcmp(string,"kr_x")) {
+    return KR_X;
+  }
+  if (!strcmp(string,"kr_y")) {
+    return KR_Y;
+  }
+  if (!strcmp(string,"kr_z")) {
+    return KR_Z;
+  }
+  if (!strcmp(string,"kr_width")) {
+    return KR_WIDTH;
+  }
+  if (!strcmp(string,"kr_height")) {
+    return KR_HEIGHT;
+  }
+  if (!strcmp(string,"kr_rotation")) {
+    return KR_ROTATION;
+  }
+  if (!strcmp(string,"kr_opacity")) {
+    return KR_OPACITY;
+  }
+  if (!strcmp(string,"kr_red")) {
+    return KR_RED;
+  }
+  if (!strcmp(string,"kr_green")) {
+    return KR_GREEN;
+  }
+  if (!strcmp(string,"kr_blue")) {
+    return KR_BLUE;
+  }
+  if (!strcmp(string,"kr_alpha")) {
+    return KR_ALPHA;
+  }
+  if (!strcmp(string,"kr_tickrate")) {
+    return KR_TICKRATE;
+  }
+  if (!strcmp(string,"kr_crop_x")) {
+    return KR_CROP_X;
+  }
+  if (!strcmp(string,"kr_crop_y")) {
+    return KR_CROP_Y;
+  }
+  if (!strcmp(string,"kr_crop_w")) {
+    return KR_CROP_W;
+  }
+  if (!strcmp(string,"kr_crop_h")) {
+    return KR_CROP_H;
+  }
+  if (!strcmp(string,"kr_view_tl_x")) {
+    return KR_VIEW_TL_X;
+  }
+  if (!strcmp(string,"kr_view_tl_y")) {
+    return KR_VIEW_TL_Y;
+  }
+  if (!strcmp(string,"kr_view_tr_x")) {
+    return KR_VIEW_TR_X;
+  }
+  if (!strcmp(string,"kr_view_tr_y")) {
+    return KR_VIEW_TR_Y;
+  }
+  if (!strcmp(string,"kr_view_bl_x")) {
+    return KR_VIEW_BL_X;
+  }
+  if (!strcmp(string,"kr_view_bl_y")) {
+    return KR_VIEW_BL_Y;
+  }
+  if (!strcmp(string,"kr_view_br_x")) {
+    return KR_VIEW_BR_X;
+  }
+  if (!strcmp(string,"kr_view_br_y")) {
+    return KR_VIEW_BR_Y;
   }
 
   return -1;

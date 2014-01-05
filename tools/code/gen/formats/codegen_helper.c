@@ -503,22 +503,14 @@ static void codegen_helper_valid_func(struct_data *def, FILE *out,
 static void codegen_enum_protos(struct_data *defs, int ndefs, 
   char *prefix, char *suffix, FILE *out) {
   int i;
-  int j;
-  int l;
   int n;
   struct_data *filtered_defs[ndefs];
 
-  for (j = n = 0; j < ndefs; j++) {
-    if (defs[j].info.type == ST_ENUM) {
-      for (i = 0; i < ndefs; i++) {
-        if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
-          for (l = 0; l < defs[i].info.member_count; l++) {
-            if (!strcmp(defs[i].info.members[l].type_info.substruct_info.type_name,defs[j].info.name)) {
-              filtered_defs[n] = &defs[j];
-              n++;
-            }
-          }
-        }
+  for (i = n = 0; i < ndefs; i++) {
+    if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
+      if (defs[i].info.type == ST_ENUM) {
+         filtered_defs[n] = &defs[i];
+         n++;
       }
     }
   }
@@ -600,40 +592,14 @@ int codegen_enum_util_functions(struct_data *defs, int ndefs,
   char *prefix, char *suffix, FILE *out) {
 
   int i;
-  int j;
-  int l;
-  int k;
   int n;
   struct_data *filtered_defs[ndefs];
-  char *enums[ndefs];
-
-
- for (i = l = 0; i < ndefs; i++) {
-    if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
-      for (j = 0; j < defs[i].info.member_count; j++) {
-        if (memb_struct_check(&defs[i].info.members[j]) && 
-          codegen_is_enum(defs[i].info.members[j].type_info.substruct_info.type_name)) {
-          for (k = 0; k < l; k++) {
-            if (!strcmp(enums[k],defs[i].info.members[j].type_info.substruct_info.type_name)) {
-              break;
-            } 
-          }
-          if (k == l) {
-            enums[l] = defs[i].info.members[j].type_info.substruct_info.type_name;
-            l++;
-          }
-        }
-      }
-    }
-  }
 
   for (i = n = 0; i < ndefs; i++) {
-    if (defs[i].info.type == ST_ENUM) {
-      for (k = 0; k < l; k++) {
-        if (!strcmp(enums[k],defs[i].info.name)) {
-          filtered_defs[n] = &defs[i];
-          n++;
-        }
+    if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
+      if (defs[i].info.type == ST_ENUM) {
+         filtered_defs[n] = &defs[i];
+         n++;
       }
     }
   }

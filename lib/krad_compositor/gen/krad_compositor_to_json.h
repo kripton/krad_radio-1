@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "gen.h"
+#include "krad_compositor_helpers.h"
 #include "krad_compositor_common.h"
 int kr_compositor_path_type_to_json(char *json, void *st, int32_t max);
 int kr_compositor_subunit_type_to_json(char *json, void *st, int32_t max);

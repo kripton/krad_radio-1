@@ -12,7 +12,7 @@ int kr_v4l2_state_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_v4l2_state *)st;
 
-  res += snprintf(&json[res],max-res,"%u",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_v4l2_state(*actual));
 
   return res;
 }

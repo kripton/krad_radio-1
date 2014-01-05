@@ -16,6 +16,13 @@ static int json_to_crate(kr_iws_client_t *client, char *json) {
 
   p[0] = '\0';
 
+  pinfo.dir = 1;
+  pinfo.api = KR_ADP_JACK;
+  res = kr_adapter_path_info_to_json(js,&pinfo,sizeof(js));
+  if (res > 0) {
+    interweb_ws_pack(client, (uint8_t *)js, res);
+  }
+
   if (!strncmp(json,"add_adapter",11)) {
     p[0] = '"';
     json[strlen(json)-1] = '\0';
