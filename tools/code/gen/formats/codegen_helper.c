@@ -51,7 +51,8 @@ static void codegen_helper_init_func(struct_data *def, FILE *out,
   }
 
   for (i = 0; i < def->info.member_count; i++) {
-    if (def->info.members[i].arr || def->info.members[i].len_def[0]) {
+    if ((def->info.members[i].arr || def->info.members[i].len_def[0])
+     && def->info.members[i].type != T_CHAR) {
       fprintf(out,"  int i;\n\n");
       break;
     }
@@ -87,7 +88,7 @@ static void codegen_helper_init_func(struct_data *def, FILE *out,
       indent[0] = '\0';
     }
 
-    if (memb->arr) {
+    if (memb->arr && memb->type != T_CHAR) {
       fprintf(out,"  for (i = 0; i < %d; i++) {\n",memb->arr);
     }
     else if (memb->len_def[0]) {
@@ -153,7 +154,7 @@ static void codegen_helper_init_func(struct_data *def, FILE *out,
       }
     }
 
-    if (memb->arr || memb->len_def[0]) {
+    if ((memb->arr || memb->len_def[0]) && memb->type != T_CHAR) {
       fprintf(out,"  }\n");
     } 
 

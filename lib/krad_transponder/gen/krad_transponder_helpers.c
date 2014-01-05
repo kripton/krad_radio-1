@@ -374,16 +374,12 @@ int kr_adapter_info_random(void *st) {
 int kr_adapter_path_info_init(void *st) {
   struct kr_adapter_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_adapter_path_info *)st;
   memset(actual, 0, sizeof(struct kr_adapter_path_info));
-  for (i = 0; i < 64; i++) {
-  }
   kr_adapter_api_path_info_init(&actual->info,kr_adapter_api_to_index(actual->api));
 
   return 0;
@@ -785,16 +781,12 @@ int kr_transponder_path_io_info_random(void *st) {
 int kr_transponder_path_info_init(void *st) {
   struct kr_transponder_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_transponder_path_info *)st;
   memset(actual, 0, sizeof(struct kr_transponder_path_info));
-  for (i = 0; i < 128; i++) {
-  }
   kr_transponder_path_io_info_init(&actual->input);
   kr_transponder_path_io_info_init(&actual->output);
 

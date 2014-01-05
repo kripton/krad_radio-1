@@ -3,16 +3,12 @@
 int kr_x11_info_init(void *st) {
   struct kr_x11_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_x11_info *)st;
   memset(actual, 0, sizeof(struct kr_x11_info));
-  for (i = 0; i < 64; i++) {
-  }
 
   return 0;
 }
@@ -69,16 +65,12 @@ int kr_x11_info_random(void *st) {
 int kr_x11_path_info_init(void *st) {
   struct kr_x11_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_x11_path_info *)st;
   memset(actual, 0, sizeof(struct kr_x11_path_info));
-  for (i = 0; i < 64; i++) {
-  }
 
   return 0;
 }

@@ -410,16 +410,12 @@ int kr_compositor_controls_random(void *st) {
 int kr_sprite_info_init(void *st) {
   struct kr_sprite_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_sprite_info *)st;
   memset(actual, 0, sizeof(struct kr_sprite_info));
-  for (i = 0; i < 256; i++) {
-  }
   kr_compositor_controls_init(&actual->controls);
 
   return 0;
@@ -479,18 +475,12 @@ int kr_sprite_info_random(void *st) {
 int kr_text_info_init(void *st) {
   struct kr_text_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_text_info *)st;
   memset(actual, 0, sizeof(struct kr_text_info));
-  for (i = 0; i < 512; i++) {
-  }
-  for (i = 0; i < 256; i++) {
-  }
   kr_compositor_controls_init(&actual->controls);
 
   return 0;
@@ -606,16 +596,12 @@ int kr_vector_info_random(void *st) {
 int kr_compositor_path_info_init(void *st) {
   struct kr_compositor_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_compositor_path_info *)st;
   memset(actual, 0, sizeof(struct kr_compositor_path_info));
-  for (i = 0; i < 128; i++) {
-  }
   kr_perspective_view_init(&actual->view);
   kr_compositor_controls_init(&actual->controls);
 
@@ -684,13 +670,61 @@ int kr_compositor_info_init(void *st) {
 
   actual = (struct kr_compositor_info *)st;
   memset(actual, 0, sizeof(struct kr_compositor_info));
+  actual->width = 640;
+  actual->height = 360;
+  actual->fps_numerator = 30;
+  actual->fps_denominator = 1;
+  actual->sprites = 0;
+  actual->vectors = 0;
+  actual->texts = 0;
+  actual->inputs = 0;
+  actual->outputs = 0;
 
   return 0;
 }
 
 int kr_compositor_info_valid(void *st) {
+  struct kr_compositor_info *actual;
+
   if (st == NULL) {
     return -1;
+  }
+
+  actual = (struct kr_compositor_info *)st;
+  if ( (actual->width < 320) || (actual->width > 1920) ) {
+    return -2;
+  }
+
+  if ( (actual->height < 240) || (actual->height > 1080) ) {
+    return -3;
+  }
+
+  if ( (actual->fps_numerator < 20) || (actual->fps_numerator > 120) ) {
+    return -4;
+  }
+
+  if ( (actual->fps_denominator < 1) || (actual->fps_denominator > 1) ) {
+    return -5;
+  }
+
+  if ( (actual->sprites < 0) || (actual->sprites > 128) ) {
+    return -6;
+  }
+
+  if ( (actual->vectors < 0) || (actual->vectors > 128) ) {
+    return -7;
+  }
+
+  if ( (actual->texts < 0) || (actual->texts > 128) ) {
+    return -8;
+  }
+
+  if ( (actual->inputs < 0) || (actual->inputs > 32) ) {
+    return -9;
+  }
+
+  if ( (actual->outputs < 0) || (actual->outputs > 32) ) {
+    return -10;
   }
 
 
@@ -698,10 +732,38 @@ int kr_compositor_info_valid(void *st) {
 }
 
 int kr_compositor_info_random(void *st) {
+  struct kr_compositor_info *actual;
+
+  struct timeval tv;
+  double scale;
+
+  gettimeofday(&tv, NULL);
+  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
+
   if (st == NULL) {
     return -1;
   }
 
+  actual = (struct kr_compositor_info *)st;
+  memset(st, 0, sizeof(struct kr_compositor_info));
+  scale = (double)1600 / RAND_MAX;
+  actual->width = 320 + floor(rand() * scale);
+  scale = (double)840 / RAND_MAX;
+  actual->height = 240 + floor(rand() * scale);
+  scale = (double)100 / RAND_MAX;
+  actual->fps_numerator = 20 + floor(rand() * scale);
+  scale = (double)0 / RAND_MAX;
+  actual->fps_denominator = 1 + floor(rand() * scale);
+  scale = (double)128 / RAND_MAX;
+  actual->sprites = 0 + floor(rand() * scale);
+  scale = (double)128 / RAND_MAX;
+  actual->vectors = 0 + floor(rand() * scale);
+  scale = (double)128 / RAND_MAX;
+  actual->texts = 0 + floor(rand() * scale);
+  scale = (double)32 / RAND_MAX;
+  actual->inputs = 0 + floor(rand() * scale);
+  scale = (double)32 / RAND_MAX;
+  actual->outputs = 0 + floor(rand() * scale);
 
   return 0;
 }

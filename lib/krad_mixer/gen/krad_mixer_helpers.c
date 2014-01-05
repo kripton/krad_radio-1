@@ -204,16 +204,17 @@ int kr_strto_kr_mixer_adv_ctl(char *string) {
 int kr_mixer_info_init(void *st) {
   struct kr_mixer_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_mixer_info *)st;
   memset(actual, 0, sizeof(struct kr_mixer_info));
-  for (i = 0; i < 32; i++) {
-  }
+  actual->period_size = 1024;
+  actual->sample_rate = 44100;
+  actual->inputs = 0;
+  actual->buses = 0;
+  actual->outputs = 0;
 
   return 0;
 }
@@ -228,6 +229,26 @@ int kr_mixer_info_valid(void *st) {
   }
 
   actual = (struct kr_mixer_info *)st;
+  if ( (actual->period_size < 32) || (actual->period_size > 4096) ) {
+    return -2;
+  }
+
+  if ( (actual->sample_rate < 8000) || (actual->sample_rate > 192000) ) {
+    return -3;
+  }
+
+  if ( (actual->inputs < 0) || (actual->inputs > 32) ) {
+    return -4;
+  }
+
+  if ( (actual->buses < 0) || (actual->buses > 64) ) {
+    return -5;
+  }
+
+  if ( (actual->outputs < 0) || (actual->outputs > 32) ) {
+    return -6;
+  }
+
   for (i = 0; i < 32; i++) {
     if (!actual->clock[i]) {
       break;
@@ -256,6 +277,16 @@ int kr_mixer_info_random(void *st) {
 
   actual = (struct kr_mixer_info *)st;
   memset(st, 0, sizeof(struct kr_mixer_info));
+  scale = (double)4064 / RAND_MAX;
+  actual->period_size = 32 + floor(rand() * scale);
+  scale = (double)184000 / RAND_MAX;
+  actual->sample_rate = 8000 + floor(rand() * scale);
+  scale = (double)32 / RAND_MAX;
+  actual->inputs = 0 + floor(rand() * scale);
+  scale = (double)64 / RAND_MAX;
+  actual->buses = 0 + floor(rand() * scale);
+  scale = (double)32 / RAND_MAX;
+  actual->outputs = 0 + floor(rand() * scale);
   for (i = 0; i < 32; i++) {
     scale = (double)25 / RAND_MAX;
     actual->clock[i] = 97 + floor(rand() * scale);
@@ -278,12 +309,6 @@ int kr_mixer_path_info_init(void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
   memset(actual, 0, sizeof(struct kr_mixer_path_info));
-  for (i = 0; i < 64; i++) {
-  }
-  for (i = 0; i < 64; i++) {
-  }
-  for (i = 0; i < 64; i++) {
-  }
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
   }
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {

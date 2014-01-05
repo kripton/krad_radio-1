@@ -6,7 +6,7 @@ if HAVE_WAYLAND
   bin_PROGRAMS += kr_wayland_test
 endif
 
-bin_PROGRAMS += kr_v4l2_test kr_alsa_test
+bin_PROGRAMS += kr_v4l2_test kr_alsa_test kr_helpers_test
 
 kr_cbor_test_SOURCES = kr_cbor_test.c
 kr_cbor_test_SOURCES += ../lib/krad_cbor/krad_cbor.c
@@ -32,5 +32,10 @@ kr_wayland_test_SOURCES = kr_wayland_test.c
 kr_wayland_test_SOURCES += ../lib/krad_wayland/krad_wayland.c
 kr_wayland_test_CFLAGS =
 kr_wayland_test_LDFLAGS = $(WAYLAND_LIBS) $(XKBCOMMON_LIBS)
+
+kr_helpers_test_SOURCES = kr_helpers_test.c
+kr_helpers_test_CFLAGS = $(OPUS_CFLAGS)
+kr_helpers_test_CFLAGS += -DKR_GIT_VERSION=\"$(KR_GIT_VERSION)\"
+kr_helpers_test_LDFLAGS = ../lib/krad_radio/libkradclient.la
 
 .PHONY: all

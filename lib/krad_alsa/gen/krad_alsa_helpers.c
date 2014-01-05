@@ -3,16 +3,12 @@
 int kr_alsa_info_init(void *st) {
   struct kr_alsa_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_alsa_info *)st;
   memset(actual, 0, sizeof(struct kr_alsa_info));
-  for (i = 0; i < 40; i++) {
-  }
 
   return 0;
 }

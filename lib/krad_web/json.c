@@ -16,13 +16,6 @@ static int json_to_crate(kr_iws_client_t *client, char *json) {
 
   p[0] = '\0';
 
-  pinfo.dir = 1;
-  pinfo.api = KR_ADP_JACK;
-  res = kr_adapter_path_info_to_json(js,&pinfo,sizeof(js));
-  if (res > 0) {
-    interweb_ws_pack(client, (uint8_t *)js, res);
-  }
-
   if (!strncmp(json,"add_adapter",11)) {
     p[0] = '"';
     json[strlen(json)-1] = '\0';
@@ -31,8 +24,8 @@ static int json_to_crate(kr_iws_client_t *client, char *json) {
       memset(&pinfo,0,sizeof(pinfo));
       /* TO DO */
       /*res = kr_adapter_path_info_fr_json();*/ 
-      sprintf(js,"%s",&payload_pos[strlen(payload_pos)]);
-      interweb_ws_pack(client, (uint8_t *)js, sizeof(js));
+      //sprintf(js,"%s",&payload_pos[strlen(payload_pos)]);
+      //interweb_ws_pack(client, (uint8_t *)js, sizeof(js));
     }
   }
   
@@ -90,7 +83,7 @@ static int handle_json(kr_iws_client_t *client, char *json, size_t len) {
   cmplen = strlen(json_pre);
   if (strncmp(json, json_pre, cmplen) == 0) {
 
-    json_to_crate(client,json + cmplen);
+    //json_to_crate(client,json + cmplen);
 
     memset (&uc, 0, sizeof (uc));
     pos = cmplen;
