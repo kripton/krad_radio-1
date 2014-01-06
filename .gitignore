@@ -1,3 +1,4 @@
+daemon/krad_radio
 build/
 m4/
 release/
@@ -12,10 +13,8 @@ krad_gui_test
 kr_v4l2_test
 krad_vpx_test
 krad_v4l2_vpx_test
-
 krad_v4l2_vpx_ebml_test
 krad_ebml_creator_cmd
-
 krad_ebml_video_sdl_overlay
 krad_sdl_opengl_display_test
 krad_ebml_video_sdl_opengl
@@ -32,17 +31,9 @@ krad_vsync_test
 krad_jitter_test
 krad_sdl_overlay_display_test
 krad_vsync_test_overlay
-waf
-.waf*
-.lock*
 *.webm*
 *.mkv*
-tools/krad_decklink/krad_decklink_capture.a
 krad_ebml_header_test
-krad_apps/krad_radio
-krad_apps/krad_radio_cmd
-krad_apps/krad_radio_gtk
-debian/kradradio*
 tests/krad_cpu_local_test_x11
 tests/krad_cpu_local_test_wayland
 tests/krad_wayland_test
@@ -59,19 +50,6 @@ tests/krad_dockpanel_test_wayland
 tests/krad_easing_test
 tests/krad_webm_dash_vod_test
 tests/krad_webm_extract
-
-doc/html
-doc/latex
-
-## Files created by QtCreator
-krad_radio.config
-krad_radio.creator
-krad_radio.creator.user
-krad_radio.files
-krad_radio.includes
-krad_radio.update-filelist.sh
-
-scripts/kradradio_client.pyc
 clients/rust/krad_radio
 tests/krad_pipe
 tests/krad_udp_test
@@ -114,7 +92,6 @@ tests/cairo_stride
 *.*.swp
 *.swp
 kr
-krad_radio
 tests/dir
 tools/code/hextool/hextool
 tools/code/analysis/gather_structs/gather_tool
