@@ -27,29 +27,29 @@ static void handle_device(kr_adapter_monitor *m, struct udev_device *dev) {
   if ((subsys_len == 5) && (name_len > 4)
    && (memcmp(subsys, "sound", 5) == 0)
    && (memcmp(name, "card", 4) == 0)) {
-    printk("Got ALSA device\n");
+    printk("Got ALSA device");
   } else {
     if ((subsys_len == 4) && (name_len > 10)
      && (memcmp(subsys, "misc", 4) == 0)
      && (memcmp(name, "blackmagic", 10) == 0)) {
-      printk("Got Blackmagic device\n");
+      printk("Got Blackmagic device");
     } else {
       if ((subsys_len == 11) && (name_len > 5)
        && (memcmp(subsys, "video4linux", 4) == 0)
        && (memcmp(name, "video", 5) == 0)) {
-        printk("Got V4L2 device\n");
+        printk("Got V4L2 device");
       } else {
         return;
       }
     }
   }
   action = udev_device_get_action(dev);
-  printk("   syspath: %s\n", udev_device_get_syspath(dev));
-  printk("   sysname: %s\n", udev_device_get_sysname(dev));
-  printk("   sysnum: %s\n", udev_device_get_sysnum(dev));
-  printk("   Node: %s\n", udev_device_get_devnode(dev));
-  printk("   Subsystem: %s\n", udev_device_get_subsystem(dev));
-  printk("   Action: %s\n", udev_device_get_action(dev));
+  printk("   syspath: %s", udev_device_get_syspath(dev));
+  printk("   sysname: %s", udev_device_get_sysname(dev));
+  printk("   sysnum: %s", udev_device_get_sysnum(dev));
+  printk("   Node: %s", udev_device_get_devnode(dev));
+  printk("   Subsystem: %s", udev_device_get_subsystem(dev));
+  printk("   Action: %s", udev_device_get_action(dev));
   if (!((action == NULL) || ((strlen(action) == 3)
    && (memcmp(action, "add", 3) == 0))))  {
     return;
@@ -57,17 +57,17 @@ static void handle_device(kr_adapter_monitor *m, struct udev_device *dev) {
   parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
    "usb_device");
   if (parent) {
-    printk("  VID/PID: %s %s\n",
+    printk("  VID/PID: %s %s",
      udev_device_get_sysattr_value(parent,"idVendor"),
      udev_device_get_sysattr_value(parent, "idProduct"));
-    printk("  serial: %s\n",
+    printk("  serial: %s",
      udev_device_get_sysattr_value(parent, "serial"));
   } else {
     parent = udev_device_get_parent_with_subsystem_devtype(dev, "pci", NULL);
     if (parent) {
-      printk("  vendor: %s\n",
+      printk("  vendor: %s",
        udev_device_get_sysattr_value(parent, "vendor"));
-      printk("  device: %s\n",
+      printk("  device: %s",
        udev_device_get_sysattr_value(parent, "device"));
     }
   }

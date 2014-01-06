@@ -803,7 +803,6 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   pool_setup.shared = 0;
   pool_setup.overlay_sz = 0;
   app_server->mappers = kr_pool_create(&pool_setup);
-  kr_pool_debug(app_server->mappers);
   return app_server;
 }
 
@@ -903,7 +902,6 @@ int kr_app_server_add_mapper(kr_app_server *app, kr_app_address_mapper *mapper) 
   void *slice;
   slice = kr_pool_slice(app->mappers);
   memcpy(slice, mapper, sizeof(kr_app_address_mapper));
-  printk("Added mapper: %s", mapper->prefix);
-  kr_pool_debug(app->mappers);
+  printk("Added mapper for: %s", mapper->prefix);
   return 0;
 }

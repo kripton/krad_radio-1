@@ -55,6 +55,7 @@ int kr_radio_destroy(kr_radio *radio) {
   printk("Krad Radio exited cleanly");
   return 0;
 }
+
 static void router_test(kr_radio *radio) {
   kr_crate2 crate;
   memset(&crate, 0, sizeof(kr_crate2));
