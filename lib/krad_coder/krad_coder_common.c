@@ -39,3 +39,35 @@ int32_t kr_medium_kludge_destroy (kr_medium_t **medium) {
   }
   return -1;
 }
+
+int kr_codec_is_audio(kr_codec codec) {
+  switch (codec) {
+    case VORBIS:
+      return 1;
+    case FLAC:
+      return 1;
+    case OPUS:
+      return 1;
+    default:
+      return 0;
+  }
+  return 0;
+}
+
+int kr_codec_is_video(kr_codec codec) {
+  switch (codec) {
+    case VP8:
+      return 1;
+    case THEORA:
+      return 1;
+    case Y4M:
+      return 1;
+    case MJPEG:
+      return 1;
+    case DAALA:
+      return 1;
+    default:
+      return 0;
+  }
+  return 0;
+}

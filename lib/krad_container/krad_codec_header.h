@@ -20,6 +20,7 @@ typedef enum {
 } krad_codec_t;
 
 typedef krad_codec_t kr_codec_t;
+typedef krad_codec_t kr_codec;
 
 #define KRAD_CODEC_T 1
 #endif

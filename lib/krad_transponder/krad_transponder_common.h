@@ -171,7 +171,7 @@ struct kr_audio_encoder_St {
   int channels;
   uint64_t bytes;
   uint64_t frames;
-  kr_audio_codec_t codec; 
+  kr_audio_codec_t codec;
 }; /* do not generate */
 
 struct kr_video_decoder_St {
@@ -331,30 +331,5 @@ struct kr_transponder_path_info {
 #include "gen/krad_transponder_to_text.h"
 #include "gen/krad_transponder_to_json.h"
 #include "gen/krad_transponder_helpers.h"
-
-char *krad_opus_signal_to_nice_string (int signal);
-char *krad_opus_bandwidth_to_nice_string (int bandwidth);
-int krad_opus_string_to_bandwidth (char *string);
-int krad_opus_string_to_signal (char *string);
-char *krad_opus_bandwidth_to_string (int bandwidth);
-char *krad_opus_signal_to_string (int signal);
-char *kr_color_depth_to_string (int depth);
-char *kr_container_type_to_string (kr_container_type_t type);
-char *krad_link_transport_mode_to_string (krad_link_transport_mode_t transport_mode);
-char *krad_link_video_source_to_string (krad_link_video_source_t video_source);
-krad_link_transport_mode_t krad_link_string_to_transport_mode (char *string);
-krad_link_video_source_t krad_link_string_to_video_source (char *string);
-char *kr_txpdr_subunit_type_to_string (kr_txpdr_su_type_t type);
-kr_txpdr_su_type_t kr_txpdr_string_to_subunit_type (char *string);
-char *krad_link_av_mode_to_string (krad_link_av_mode_t av_mode);
-krad_link_av_mode_t krad_link_string_to_av_mode (char *string);
-char *krad_codec_to_string (krad_codec_t codec);
-krad_codec_t krad_string_to_codec (char *string);
-krad_codec_t krad_string_to_audio_codec (char *string);
-krad_codec_t krad_string_to_video_codec (char *string);
-krad_codec_t krad_string_to_codec_full (char *string, krad_link_av_mode_t av_mode);
-
-int krad_codec_is_video(krad_codec_t codec);
-int krad_codec_is_audio(krad_codec_t codec);
 
 #endif

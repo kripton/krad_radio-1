@@ -16,7 +16,7 @@ uint32_t krad_ogg_track_count (krad_ogg_t *krad_ogg) {
   return count;
 }
 
-krad_codec_t krad_ogg_track_codec (krad_ogg_t *krad_ogg, uint32_t track) {
+kr_codec krad_ogg_track_codec (krad_ogg_t *krad_ogg, uint32_t track) {
 
   if ((krad_ogg->tracks[track].serial != KRAD_OGG_NO_SERIAL) &&
       (krad_ogg->tracks[track].ready == 1)) {
@@ -80,7 +80,7 @@ int krad_ogg_track_changed (krad_ogg_t *krad_ogg, uint32_t track) {
 float krad_ogg_vorbis_sample_rate(ogg_packet *packet) {
 
   float sample_rate;
-  
+
   vorbis_info v_info;
   vorbis_comment v_comment;
 
@@ -101,7 +101,7 @@ float krad_ogg_vorbis_sample_rate(ogg_packet *packet) {
 int krad_ogg_theora_frame_rate (ogg_packet *packet) {
 
   int frame_rate;
-  
+
   theora_comment t_comment;
   theora_info t_info;
 
@@ -122,7 +122,7 @@ int krad_ogg_theora_frame_rate (ogg_packet *packet) {
 int krad_ogg_theora_keyframe_shift (ogg_packet *packet) {
 
   int keyframe_shift;
-  
+
   theora_comment t_comment;
   th_info t_info;
 
@@ -140,24 +140,24 @@ int krad_ogg_theora_keyframe_shift (ogg_packet *packet) {
   return keyframe_shift;
 }
 
-krad_codec_t krad_ogg_get_codec (ogg_packet *packet) {
+kr_codec krad_ogg_get_codec (ogg_packet *packet) {
 
-  krad_codec_t codec;
+  kr_codec codec;
   theora_comment t_comment;
   theora_info t_info;
-   
+
   codec = NOCODEC;
 
   if (memcmp(packet->packet, "fishead\0", 8) == 0) {
         printkd ("found skeleton");
     return SKELETON;
   }
-   
+
   if (memcmp (packet->packet + 1, "FLAC", 4) == 0) {
         printkd ("found flac");
     return FLAC;
   }
-  
+
   if (memcmp (packet->packet, "Opus", 4) == 0) {
         printkd ("found opus");
     return OPUS;
@@ -167,11 +167,11 @@ krad_codec_t krad_ogg_get_codec (ogg_packet *packet) {
         printkd ("found vorbis");
         codec = VORBIS;
     }
-    
+
     if (codec != NOCODEC) {
       return codec;
     }
-    
+
   theora_info_init (&t_info);
   theora_comment_init (&t_comment);
 
@@ -179,17 +179,17 @@ krad_codec_t krad_ogg_get_codec (ogg_packet *packet) {
         printkd ("found theora");
         codec = THEORA;
     }
-    
+
   theora_info_clear (&t_info);
   theora_comment_clear (&t_comment);
-    
+
     if (codec != NOCODEC) {
       return codec;
     }
- 
+
    printke ("sucky");
- 
-  return NOCODEC;  
+
+  return NOCODEC;
 }
 
 int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
@@ -198,55 +198,55 @@ int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
   int t;
   int ret;
   ogg_packet packet;
-  
+
   while (1) {
-  
+
     for (t = 0; t < KRAD_OGG_MAX_TRACKS; t++) {
       if ((krad_ogg->tracks[t].serial != KRAD_OGG_NO_SERIAL) && (krad_ogg->tracks[t].ready == 0)) {
         while (krad_ogg->tracks[t].ready == 0) {
           ret = ogg_stream_packetout(&krad_ogg->tracks[t].stream_state, &packet);
-          
+
           if ((krad_ogg->tracks[t].codec == SKELETON) || (krad_ogg->tracks[t].codec == NOCODEC)) {
             // just toss the skeleton
             while (ogg_stream_packetout(&krad_ogg->tracks[t].stream_state, &packet));
-            
+
             ret = 0;
           }
-          
+
           if (ret == 1) {
-          
+
             krad_ogg->tracks[t].header_len[krad_ogg->tracks[t].header_count] = packet.bytes;
-          
+
             krad_ogg->tracks[t].header[krad_ogg->tracks[t].header_count] = malloc(packet.bytes);
             memcpy (krad_ogg->tracks[t].header[krad_ogg->tracks[t].header_count],
                 packet.packet,
                 packet.bytes);
-          
+
             if (krad_ogg->tracks[t].header_count == 0) {
-          
+
               krad_ogg->tracks[t].codec = krad_ogg_get_codec(&packet);
               if (krad_ogg->tracks[t].codec == VORBIS) {
                 krad_ogg->tracks[t].sample_rate = krad_ogg_vorbis_sample_rate(&packet);
               }
-              
+
               if (krad_ogg->tracks[t].codec == THEORA) {
                 krad_ogg->tracks[t].frame_rate = krad_ogg_theora_frame_rate(&packet);
                 krad_ogg->tracks[t].keyframe_shift = krad_ogg_theora_keyframe_shift (&packet);
               }
-              
+
             }
 
             krad_ogg->tracks[t].header_count++;
             if ((krad_ogg->tracks[t].header_count == 3) &&
               ((krad_ogg->tracks[t].codec == VORBIS) || (krad_ogg->tracks[t].codec == THEORA))) {
-              
+
               krad_ogg->tracks[t].ready = 1;
             }
             if ((krad_ogg->tracks[t].header_count == 2) &&
               ((krad_ogg->tracks[t].codec == OPUS) || (krad_ogg->tracks[t].codec == FLAC))) {
-              
+
               krad_ogg->tracks[t].header_count = 1;
-              
+
               if (krad_ogg->tracks[t].codec == FLAC) {
                 // remove oggflac extra stuff
                 memmove (krad_ogg->tracks[t].header[0],
@@ -257,8 +257,8 @@ int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
                   printkd ("ruh oh! our oggflac expectations where not met, problem likely!");
                 }
               }
-              
-              
+
+
               krad_ogg->tracks[t].ready = 1;
             }
           } else {
@@ -267,7 +267,7 @@ int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
         }
       }
     }
-  
+
     for (t = 0; t < KRAD_OGG_MAX_TRACKS; t++) {
       if ((krad_ogg->tracks[t].serial != KRAD_OGG_NO_SERIAL) && (krad_ogg->tracks[t].ready == 1)) {
         ret = ogg_stream_packetout(&krad_ogg->tracks[t].stream_state, &packet);
@@ -275,7 +275,7 @@ int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
         if (ret == 1) {
           memcpy(buffer, packet.packet, packet.bytes);
           *track = t;
-        
+
           if (packet.e_o_s) {
             ogg_stream_clear(&krad_ogg->tracks[t].stream_state);
             krad_ogg->tracks[t].serial = KRAD_OGG_NO_SERIAL;
@@ -293,7 +293,7 @@ int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
               krad_ogg->tracks[t].last_granulepos =
                 (packet.granulepos / krad_ogg->tracks[t].sample_rate) * 1000.0;
             }
-            
+
             if (krad_ogg->tracks[t].codec == THEORA) {
               ogg_int64_t iframe;
               ogg_int64_t pframe;
@@ -309,10 +309,10 @@ int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
         }
       }
     }
-  
+
     //FIXME
     //ret = kr_io_read (krad_ogg->io, krad_ogg->input_buffer, 4096);
-    
+
     if (ret > 0) {
       krad_ogg_write (krad_ogg, krad_ogg->input_buffer, ret);
     } else {
@@ -330,13 +330,13 @@ void krad_ogg_process (krad_ogg_t *krad_ogg) {
   ogg_page page;
   int serial;
   int t;
-  
+
   while (ogg_sync_pageout(&krad_ogg->sync_state, &page) == 1) {
-    
+
     serial = ogg_page_serialno(&page);
-    
+
     if (ogg_page_bos(&page)) {
-    
+
       for (t = 0; t < KRAD_OGG_MAX_TRACKS; t++) {
         if (krad_ogg->tracks[t].serial == KRAD_OGG_NO_SERIAL) {
           break;
@@ -346,10 +346,10 @@ void krad_ogg_process (krad_ogg_t *krad_ogg) {
       krad_ogg->tracks[t].serial = serial;
       ogg_stream_init(&krad_ogg->tracks[t].stream_state, serial);
       ogg_stream_pagein(&krad_ogg->tracks[t].stream_state, &page);
-      
+
       continue;
     }
-    
+
     for (t = 0; t < KRAD_OGG_MAX_TRACKS; t++) {
       if (krad_ogg->tracks[t].serial == serial) {
         break;
@@ -366,7 +366,7 @@ int krad_ogg_write (krad_ogg_t *krad_ogg, uint8_t *buffer, uint32_t length) {
 
     char* input_buffer;
     int ret;
-    
+
   input_buffer = ogg_sync_buffer (&krad_ogg->sync_state, length);
     memcpy (input_buffer, buffer, length);
     ret = ogg_sync_wrote (&krad_ogg->sync_state, length);
@@ -382,19 +382,19 @@ int krad_ogg_write (krad_ogg_t *krad_ogg, uint8_t *buffer, uint32_t length) {
 }
 
 void krad_ogg_destroy (krad_ogg_t *krad_ogg) {
-  
+
   int t;
-  
+
   //FIXME KLUDGE
   for (t = 0; t < krad_ogg->track_count; t++) {
-    if (krad_codec_is_video(krad_ogg->tracks[t].codec)) {
-    krad_ogg_add_video (krad_ogg, 
+    if (kr_codec_is_video(krad_ogg->tracks[t].codec)) {
+    krad_ogg_add_video (krad_ogg,
                               t,
                               NULL,
                               0,
                               -1);
     } else {
-      if (krad_codec_is_audio(krad_ogg->tracks[t].codec)) {
+      if (kr_codec_is_audio(krad_ogg->tracks[t].codec)) {
         krad_ogg_add_audio (krad_ogg,
                                   t,
                                   NULL,
@@ -403,27 +403,27 @@ void krad_ogg_destroy (krad_ogg_t *krad_ogg) {
      }
     }
   }
-  
-  
+
+
   ogg_sync_clear (&krad_ogg->sync_state);
 
   for (t = 0; t < krad_ogg->track_count; t++) {
-    ogg_stream_clear (&krad_ogg->tracks[t].stream_state);  
+    ogg_stream_clear (&krad_ogg->tracks[t].stream_state);
     while (krad_ogg->tracks[t].header_count) {
       free (krad_ogg->tracks[t].header[krad_ogg->tracks[t].header_count - 1]);
       krad_ogg->tracks[t].header[krad_ogg->tracks[t].header_count - 1] = NULL;
       krad_ogg->tracks[t].header_count--;
     }
   }
-  
+
   free (krad_ogg->tracks);
-  
+
   free (krad_ogg->input_buffer);
-  
+
   if (krad_ogg->io) {
     kr_io2_destroy (&krad_ogg->io);
   }
-  
+
   free (krad_ogg);
 }
 
@@ -431,9 +431,9 @@ krad_ogg_t *krad_ogg_create () {
 
   failfast ("Ogg is disabled for the moment");
 
-  int t;  
+  int t;
   krad_ogg_t *krad_ogg;
-  
+
   krad_ogg = calloc (1, sizeof(krad_ogg_t));
 
   krad_ogg->tracks = calloc (KRAD_OGG_MAX_TRACKS, sizeof(krad_ogg_track_t));
@@ -454,16 +454,16 @@ krad_ogg_t *krad_ogg_open_file (char *filename, krad_io_mode_t mode) {
 
   failfast ("Ogg is disabled for the moment");
   krad_ogg_t *ogg;
-  
+
   ogg = krad_ogg_create ();
-  
+
   if (mode == KRAD_IO_WRITEONLY) {
     //ogg->io = kr_file_create (filename);
   }
   if (mode == KRAD_IO_READONLY) {
     //ogg->io = kr_file_open (filename);
   }
-  
+
   return ogg;
 }
 
@@ -475,9 +475,9 @@ krad_ogg_t *krad_ogg_open_stream (char *host, uint32_t port,
   /*
   krad_ogg_t *ogg;
   kr_io2_t *io;
-  
+
   printk ("Krad Ogg: %s %d %s %s", host, port, mount, password);
-  
+
   //io = kr_stream (host, port, mount, password);
 
   printk ("Krad Ogg: fd %d", io->fd);
@@ -485,9 +485,9 @@ krad_ogg_t *krad_ogg_open_stream (char *host, uint32_t port,
   if (io == NULL) {
     return NULL;
   }
-    
+
   ogg = krad_ogg_create ();
-  
+
   ogg->io = io;
 
   return ogg;
@@ -499,15 +499,15 @@ krad_ogg_t *krad_ogg_open_transmission (krad_transmission_t *krad_transmission) 
   krad_ogg_t *krad_ogg;
 
   krad_ogg = krad_ogg_create ();
-  
+
   krad_ogg->krad_transmission = krad_transmission;
-  
+
   return krad_ogg;
 }
 
 void krad_ogg_set_max_packets_per_page (krad_ogg_t *krad_ogg, int max_packets) {
 
-  int t;  
+  int t;
 
   for (t = 0; t < KRAD_OGG_MAX_TRACKS; t++ ) {
     krad_ogg->tracks[t].max_packets_per_page = max_packets;
@@ -520,7 +520,7 @@ int krad_ogg_output_aux_headers (krad_ogg_t *krad_ogg) {
   int t;
   ogg_packet packet;
   ogg_page page;
-  
+
   for (t = 0; t < krad_ogg->track_count; t++) {
     if (krad_ogg->tracks[t].header_count > 1) {
       for (h = 1; h < krad_ogg->tracks[t].header_count; h++) {
@@ -551,7 +551,7 @@ int krad_ogg_output_aux_headers (krad_ogg_t *krad_ogg) {
                                                     page.body,
                                                     page.body_len);
         }
-        printk ("Krad Ogg Track %d created aux page %d sized %lu", 
+        printk ("Krad Ogg Track %d created aux page %d sized %lu",
                 t, h, page.header_len + page.body_len);
       }
     }
@@ -562,7 +562,7 @@ int krad_ogg_output_aux_headers (krad_ogg_t *krad_ogg) {
   return 0;
 }
 
-int krad_ogg_add_video_track (krad_ogg_t *krad_ogg, krad_codec_t codec,
+int krad_ogg_add_video_track (krad_ogg_t *krad_ogg, kr_codec codec,
                               int fps_numerator, int fps_denominator,
                               int width, int height) {
 
@@ -572,52 +572,52 @@ int krad_ogg_add_video_track (krad_ogg_t *krad_ogg, krad_codec_t codec,
 }
 
 int krad_ogg_add_video_track_with_private_data (krad_ogg_t *krad_ogg,
-                        krad_codec_t codec, int fps_numerator,
+                        kr_codec codec, int fps_numerator,
                         int fps_denominator, int width, int height,
                         uint8_t *header[],
                         uint32_t header_size[], uint32_t header_count) {
 
   int track;
-  
+
   track = krad_ogg_add_track (krad_ogg, codec, header, header_size, header_count);
-  
+
   krad_ogg->tracks[track].width = width;
   krad_ogg->tracks[track].height = height;
   krad_ogg->tracks[track].fps_numerator = fps_numerator;
   krad_ogg->tracks[track].fps_denominator = fps_denominator;
-  
-  
+
+
   if (codec == THEORA) {
     // FIXME but, probably safeish
     krad_ogg->tracks[track].keyframe_shift = 6;
   }
-  
+
   return track;
 }
 
-int krad_ogg_add_audio_track (krad_ogg_t *krad_ogg, krad_codec_t codec,
-                int sample_rate, int channels, 
+int krad_ogg_add_audio_track (krad_ogg_t *krad_ogg, kr_codec codec,
+                int sample_rate, int channels,
                 uint8_t *header[], uint32_t header_size[], uint32_t header_count) {
 
   int track;
-  
+
   track = krad_ogg_add_track (krad_ogg, codec, header, header_size, header_count);
-  
+
   krad_ogg->tracks[track].sample_rate = sample_rate;
   krad_ogg->tracks[track].channels = channels;
-  
+
   return track;
 }
 
-int krad_ogg_add_track (krad_ogg_t *krad_ogg, krad_codec_t codec, 
-            uint8_t *header[], uint32_t header_size[], uint32_t header_count) { 
+int krad_ogg_add_track (krad_ogg_t *krad_ogg, kr_codec codec,
+            uint8_t *header[], uint32_t header_size[], uint32_t header_count) {
 
   int h;
   int track;
   uint8_t *temp_header;
   ogg_packet packet;
   ogg_page page;
-  
+
   track = krad_ogg->track_count;
   krad_ogg->track_count++;
 
@@ -626,7 +626,7 @@ int krad_ogg_add_track (krad_ogg_t *krad_ogg, krad_codec_t codec,
   krad_ogg->tracks[track].codec = codec;
   krad_ogg->tracks[track].serial = rand();
   krad_ogg->tracks[track].packet_num = 0;
-  
+
   krad_ogg->tracks[track].max_packets_per_page = KRAD_OGG_DEFAULT_MAX_PACKETS_PER_PAGE;
   krad_ogg->tracks[track].packets_on_current_page = 0;
 
@@ -639,23 +639,23 @@ int krad_ogg_add_track (krad_ogg_t *krad_ogg, krad_codec_t codec,
     memcpy (temp_header, "\x7F\x46\x4C\x41\x43\x01\x00\x00\x01", 9);
     memcpy (temp_header + 9, header[0], 42);
   }
-  
+
   if (header_count) {
-  
-    krad_ogg->tracks[track].header_len[0] = header_size[0];    
+
+    krad_ogg->tracks[track].header_len[0] = header_size[0];
     krad_ogg->tracks[track].header[0] = malloc (header_size[0]);
     memcpy (krad_ogg->tracks[track].header[0], header[0], header_size[0]);
     krad_ogg->tracks[track].header_count++;
-  
+
     if (codec == FLAC) {
       packet.packet = temp_header;
-      packet.bytes = 9 + 42;  
+      packet.bytes = 9 + 42;
     } else {
       printkd ("Krad Ogg: Add Track %d Header packet %d sized %d",
-                track, 0, header_size[0]);    
+                track, 0, header_size[0]);
       packet.packet = header[0];
       packet.bytes = header_size[0];
-    }  
+    }
     packet.b_o_s = 0;
     packet.e_o_s = 0;
     packet.granulepos = 0;
@@ -665,7 +665,7 @@ int krad_ogg_add_track (krad_ogg_t *krad_ogg, krad_codec_t codec,
     }
     krad_ogg->tracks[track].packet_num++;
     ogg_stream_packetin (&krad_ogg->tracks[track].stream_state, &packet);
-  
+
     while (ogg_stream_flush(&krad_ogg->tracks[track].stream_state, &page) != 0) {
       if (krad_ogg->io) {
         kr_io2_pack (krad_ogg->io, page.header, page.header_len);
@@ -686,13 +686,13 @@ int krad_ogg_add_track (krad_ogg_t *krad_ogg, krad_codec_t codec,
   }
 
   for (h = 1; h < header_count; h++) {
-    krad_ogg->tracks[track].header_len[h] = header_size[h];  
+    krad_ogg->tracks[track].header_len[h] = header_size[h];
     krad_ogg->tracks[track].header[h] = malloc (krad_ogg->tracks[track].header_len[h]);
     memcpy (krad_ogg->tracks[track].header[h], header[h], krad_ogg->tracks[track].header_len[h]);
     krad_ogg->tracks[track].header_count++;
-  }  
+  }
 
-  return track;                
+  return track;
 }
 
 void krad_ogg_add_video (krad_ogg_t *krad_ogg, int track,
@@ -701,11 +701,11 @@ void krad_ogg_add_video (krad_ogg_t *krad_ogg, int track,
 
   ogg_packet packet;
   ogg_page page;
-  
+
   if (krad_ogg->output_aux_headers == 0) {
     krad_ogg_output_aux_headers (krad_ogg);
   }
-  
+
   if (krad_ogg->tracks[track].seen_keyframe != 1) {
     if (keyframe == 1) {
       krad_ogg->tracks[track].seen_keyframe = 1;
@@ -713,37 +713,37 @@ void krad_ogg_add_video (krad_ogg_t *krad_ogg, int track,
       return;
     }
   }
-  
+
   packet.packet = buffer;
   packet.bytes = buffer_size;
   packet.b_o_s = 0;
   packet.e_o_s = 0;
   packet.granulepos = 0;
-  
+
   if (keyframe == 1) {
     //printk ("Krad Ogg: Add video got a keyframe at %d", krad_ogg->tracks[track].frames);
     krad_ogg->tracks[track].frames_since_keyframe = 0;
   } else {
     krad_ogg->tracks[track].frames_since_keyframe++;
   }
-  
+
   if (keyframe == -1) {
     packet.e_o_s = 1;
-  }  
-  
+  }
+
   if (keyframe == 1) {
     packet.granulepos = (krad_ogg->tracks[track].frames + 1) << krad_ogg->tracks[track].keyframe_shift;
   } else {
-    packet.granulepos = (((krad_ogg->tracks[track].frames + 1) - krad_ogg->tracks[track].frames_since_keyframe) << 
+    packet.granulepos = (((krad_ogg->tracks[track].frames + 1) - krad_ogg->tracks[track].frames_since_keyframe) <<
                 krad_ogg->tracks[track].keyframe_shift) + krad_ogg->tracks[track].frames_since_keyframe;
   }
 
   krad_ogg->tracks[track].frames += 1;
-  
+
   packet.packetno = krad_ogg->tracks[track].packet_num;
   ogg_stream_packetin (&krad_ogg->tracks[track].stream_state, &packet);
 
-  krad_ogg->tracks[track].packet_num++;  
+  krad_ogg->tracks[track].packet_num++;
   krad_ogg->tracks[track].packets_on_current_page++;
 
   while (ogg_stream_flush (&krad_ogg->tracks[track].stream_state, &page) != 0) {
@@ -774,27 +774,27 @@ void krad_ogg_add_audio (krad_ogg_t *krad_ogg, int track,
 
   ogg_packet packet;
   ogg_page page;
-  
+
   if (krad_ogg->output_aux_headers == 0) {
     krad_ogg_output_aux_headers (krad_ogg);
   }
-  
+
   packet.packet = buffer;
   packet.bytes = buffer_size;
   packet.b_o_s = 0;
   packet.e_o_s = 0;
   if (frames == -1) {
     packet.e_o_s = 1;
-  }  
+  }
   packet.granulepos = krad_ogg->tracks[track].last_granulepos;
   packet.packetno = krad_ogg->tracks[track].packet_num;
   ogg_stream_packetin (&krad_ogg->tracks[track].stream_state, &packet);
 
   krad_ogg->tracks[track].packet_num++;
   krad_ogg->tracks[track].last_granulepos += frames;
-  
+
   krad_ogg->tracks[track].packets_on_current_page++;
-  
+
   while (ogg_stream_flush (&krad_ogg->tracks[track].stream_state, &page) != 0) {
     if (krad_ogg->io) {
       kr_io2_pack (krad_ogg->io, page.header, page.header_len);

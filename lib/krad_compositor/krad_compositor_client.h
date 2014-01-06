@@ -1,24 +1,12 @@
-/**
- * @file krad_compositor_client.h
- * @brief Krad Radio Compositor Controller API
- */
-
-#include "krad_compositor_common.h"
-
 #ifndef KRAD_COMPOSITOR_CLIENT_H
 #define KRAD_COMPOSITOR_CLIENT_H
 
-
-/** @defgroup krad_compositor_client Krad Radio Compositor Control
-  @{
-  */
+#include "krad_compositor_common.h"
 
 typedef struct kr_videoport_St kr_videoport_t;
 
 int kr_compositor_crate_to_info (kr_crate *crate);
 int kr_compositor_crate_to_string (kr_crate *crate, char **string);
-
-// Public
 
 void kr_compositor_subunit_list (kr_client *client);
 int kr_compositor_subunit_create (kr_client *client,
@@ -51,5 +39,4 @@ void kr_videoport_deactivate (kr_videoport_t *kr_videoport);
 kr_videoport_t *kr_videoport_create (kr_client *client, int32_t direction);
 void kr_videoport_destroy (kr_videoport_t *kr_videoport);
 
-/**@}*/
 #endif

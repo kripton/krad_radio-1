@@ -71,4 +71,7 @@ int32_t kr_medium_kludge_destroy (kr_medium_t **medium);
 kr_medium_t *kr_medium_kludge_create ();
 kr_codeme_t *kr_codeme_kludge_create ();
 
+int kr_codec_is_video(kr_codec codec);
+int kr_codec_is_audio(kr_codec codec);
+
 #endif

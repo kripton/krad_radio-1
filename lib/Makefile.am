@@ -143,7 +143,6 @@ krad_transponder/krad_transponder_client.c \
 krad_radio/krad_radio_common.c \
 krad_mixer/krad_mixer_common.c \
 krad_compositor/krad_compositor_common.c \
-krad_transponder/krad_transponder_common.c \
 krad_sfx/krad_sfx_common.c \
 gen/gen.c
 
