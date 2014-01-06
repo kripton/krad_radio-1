@@ -1,8 +1,5 @@
 #include "gen.h"
 #include "krad_ebmlx.h"
-int info_pack_to_ebml(kr_ebml *ebml, uber_St *uber);
-typedef int (*info_pack_to_ebml_func)(kr_ebml *ebml, void *st);
-
 int info_pack_to_ebml(kr_ebml *ebml, uber_St *uber) {
   const info_pack_to_ebml_func to_ebml_functions[62] = {kr_alsa_info_to_ebml,
   kr_alsa_path_info_to_ebml,kr_compositor_path_type_to_ebml,

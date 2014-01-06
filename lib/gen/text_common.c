@@ -1,7 +1,4 @@
 #include "gen.h"
-int info_pack_to_text(char *text, uber_St *uber, int32_t max);
-typedef int (*info_pack_to_text_func)(char *text, void *st, int max);
-
 int info_pack_to_text(char *text, uber_St *uber, int32_t max) {
   const info_pack_to_text_func to_text_functions[60] = {kr_alsa_info_to_text,
   kr_alsa_path_info_to_text,kr_compositor_path_type_to_text,
