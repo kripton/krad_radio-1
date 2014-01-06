@@ -1,5 +1,14 @@
 #include "krad_radio_server.h"
 
+typedef struct kr_radio_client kr_radio_client;
+
+struct kr_radio_client {
+  kr_radio *radio;
+  int valid;
+};
+
+void krad_radio_pack_shipment_terminator(kr_ebml2_t *ebml);
+
 void krad_radio_pack_shipment_terminator(kr_ebml2_t *ebml) {
 /*  kr_address_t address;
   unsigned char *response;
@@ -66,30 +75,31 @@ int validate_client(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   if (ret > 0) {
     client->valid = 1;
     pack_client_header(out);
+    printk("Valid client!");
     return 1;
   } else {
-    printke ("Invalid client!");
+    printke("Invalid client!");
     return -1;
   }
 }
 
-uint32_t full_command(kr_io2_t *in) {
+uint32_t full_crate(kr_io2_t *in) {
   kr_ebml2_t ebml;
   uint32_t element;
   uint64_t size;
   int ret;
-  if (!(kr_io2_has_in (in))) {
+  if (!(kr_io2_has_in(in))) {
     return 0;
   }
   kr_ebml2_set_buffer(&ebml, in->rd_buf, in->len);
   ret = kr_ebml2_unpack_id(&ebml, &element, &size);
   if (ret < 0) {
-    printke ("full_command EBML ID Not found");
+    printke("full crate EBML ID Not found");
     return 0;
   }
   size += ebml.pos;
   if (in->len < size) {
-    printke ("full_command Not Enough bytes..");
+    printke("Crate not full...");
     return 0;
   }
   return element;
@@ -192,11 +202,11 @@ int kr_radio_server_handle(kr_app_server_request *request) {
     }
   }
   for (;;) {
-    command = full_command(in);
+    command = full_crate(in);
     if (command == 0) {
       return 0;
     }
-    //printk ("we have a full command la de da its %zu bytes", in->len);
+    printk ("we have a full crate la de da its %zu bytes", in->len);
 /*
     switch (command) {
       case EBML_ID_KRAD_MIXER_CMD:

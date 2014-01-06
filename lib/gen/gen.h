@@ -21,6 +21,8 @@ typedef int (*info_unpack_fr_ebml_func)(kr_ebml *ebml, void *st);
 typedef enum {
   TEXT_KR_ALSA_INFO = 1,
   TEXT_KR_ALSA_PATH_INFO,
+  TEXT_KR_APP_METHOD,
+  TEXT_KR_CRATE2,
   TEXT_KR_COMPOSITOR_PATH_TYPE,
   TEXT_KR_COMPOSITOR_SUBUNIT_TYPE,
   TEXT_KR_VECTOR_TYPE,
@@ -82,7 +84,7 @@ typedef enum {
 } text_enum;
 
 enum {
-  TEXT_ENUM_LAST = 60
+  TEXT_ENUM_LAST = 62
 };
 
 typedef enum {
@@ -324,6 +326,8 @@ enum {
 typedef enum {
   HELPERS_KR_ALSA_INFO = 1,
   HELPERS_KR_ALSA_PATH_INFO,
+  HELPERS_KR_APP_METHOD,
+  HELPERS_KR_CRATE2,
   HELPERS_KR_COMPOSITOR_PATH_TYPE,
   HELPERS_KR_COMPOSITOR_SUBUNIT_TYPE,
   HELPERS_KR_VECTOR_TYPE,
@@ -385,7 +389,7 @@ typedef enum {
 } helpers_enum;
 
 enum {
-  HELPERS_ENUM_LAST = 60
+  HELPERS_ENUM_LAST = 62
 };
 
 
