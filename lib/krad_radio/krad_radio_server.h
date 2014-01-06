@@ -14,11 +14,6 @@ struct kr_radio_client {
   int valid;
 };
 
-typedef union {
-  kr_mixer_path_info *portgroup;
-  kr_remote_t *remote;
-} krad_subunit_ptr_t;
-
 void krad_radio_pack_shipment_terminator(kr_ebml2_t *ebml);
 
 void *kr_radio_client_create(void *ptr);

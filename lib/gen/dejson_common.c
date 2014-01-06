@@ -3,7 +3,8 @@ int info_unpack_fr_json(char *json, uber_St *uber);
 typedef int (*info_unpack_fr_json_func)(char *json, void *st);
 
 int info_unpack_fr_json(char *json, uber_St *uber) {
-  const info_unpack_fr_json_func fr_json_functions[18] = {kr_mixer_channels_fr_json,
+  const info_unpack_fr_json_func fr_json_functions[20] = {kr_app_method_fr_json,
+  kr_crate2_fr_json,kr_mixer_channels_fr_json,
   kr_mixer_control_fr_json,kr_mixer_path_type_fr_json,
   kr_mixer_adv_ctl_fr_json,kr_mixer_info_fr_json,
   kr_mixer_path_info_fr_json,kr_sfx_control_fr_json,

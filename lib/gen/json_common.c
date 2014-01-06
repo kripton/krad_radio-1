@@ -3,8 +3,9 @@ int info_pack_to_json(char *json, uber_St *uber, int32_t max);
 typedef int (*info_pack_to_json_func)(char *json, void *st, int max);
 
 int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
-  const info_pack_to_json_func to_json_functions[60] = {kr_alsa_info_to_json,
-  kr_alsa_path_info_to_json,kr_compositor_path_type_to_json,
+  const info_pack_to_json_func to_json_functions[62] = {kr_alsa_info_to_json,
+  kr_alsa_path_info_to_json,kr_app_method_to_json,
+  kr_crate2_to_json,kr_compositor_path_type_to_json,
   kr_compositor_subunit_type_to_json,kr_vector_type_to_json,
   kr_compositor_control_to_json,kr_compositor_controls_to_json,
   kr_sprite_info_to_json,kr_text_info_to_json,

@@ -7,6 +7,11 @@
 #define KR_EID_PAYLOAD 0xB9
 #define KR_EID_TERMINATOR 0xE2
 
+#include "gen/krad_app_common_to_json.h"
+#include "gen/krad_app_common_from_json.h"
+#include "gen/krad_app_common_to_ebml.h"
+#include "gen/krad_app_common_from_ebml.h"
+
 typedef struct kr_crate2 kr_crate2;
 
 typedef enum {
@@ -20,7 +25,6 @@ typedef enum {
 struct kr_crate2 {
   char address[64];
   kr_app_method method;
-  void *payload;
 };
 
 #endif
