@@ -96,15 +96,12 @@ static int test_v4l2_input_create(kr_client *client, int dev) {
 static int test_x11_input_create(kr_client *client, int dev) {
   int ret;
   kr_xpdr_path_info info;
-  int device_num;
   char *test_name;
   int width;
   int height;
   int num;
   int den;
   test_name = "X11 Test";
-  device_num = 0;
-  device_num = dev;
   width = 640;
   height = 360;
   num = 30;

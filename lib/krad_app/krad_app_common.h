@@ -7,13 +7,23 @@
 #define KR_EID_PAYLOAD 0xB9
 #define KR_EID_TERMINATOR 0xE2
 
-#include "gen/krad_app_common_to_ebml.h"
-#include "gen/krad_app_common_from_ebml.h"
-#include "gen/krad_app_common_to_text.h"
-#include "gen/krad_app_common_helpers.h"
+#include "gen/krad_app_to_ebml.h"
+#include "gen/krad_app_from_ebml.h"
+#include "gen/krad_app_to_text.h"
+#include "gen/krad_app_helpers.h"
 
-/* kludge */
-#include "krad_transponder_common.h"
+/* here is were we link our payload */
+#include "krad_radio_payload.h"
+
+typedef enum {
+  PL_KR_TRANSPONDER_PATH_INFO,
+  PL_KR_MIXER_PATH_INFO
+} kr_radio_payload_type;
+
+typedef union {
+  kr_transponder_path_info transponder_path_info;
+  kr_mixer_path_info mixer_path_info;
+} kr_radio_payload;
 
 typedef struct kr_crate2 kr_crate2;
 
@@ -28,7 +38,8 @@ typedef enum {
 struct kr_crate2 {
   char address[64];
   kr_app_method method;
-  kr_transponder_path_info info;
+  kr_radio_payload_type payload_type;
+  kr_radio_payload payload;
 };
 
 #endif
