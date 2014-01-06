@@ -2,8 +2,6 @@
 #define IMAGE_BUFFER_COUNT 64
 #include "gen/kr_dl_stream_config.c"
 
-#include "kr_debug.c"
-
 typedef struct kr_dlstream kr_dlstream;
 
 struct kr_dlstream {
@@ -99,6 +97,7 @@ int kr_dlstream_destroy(kr_dlstream **dlstream) {
   }
   kr_image_convert_clear(&(*dlstream)->converter);
   free(*dlstream);
+  printf("\nStream shutdown\n");
   *dlstream = NULL;
   return 0;
 }
@@ -179,7 +178,7 @@ void kr_dlstream_run(kr_dlstream *dlstream) {
   kr_decklink_start(dlstream->decklink);
   while (!destruct) {
     printf("\rKrad Decklink Stream Frame# %12"PRIu64" Samples: %12"PRIu64" "
-     "Logjam: %8d Dropped: %6"PRIu64"", dlstream->frames, dlstream->samples,
+     "Logjam: %8d Dropped: %6"PRIu64" ", dlstream->frames, dlstream->samples,
      frames, dlstream->droppedframes);
     fflush(stdout);
     while(krad_ringbuffer_read_space(dlstream->audio_ring[1]) >= 1024 * 4) {
@@ -256,7 +255,6 @@ int main (int argc, char *argv[]) {
   kr_dlstream_params params;
   int ret;
 
-  kr_debug_init("dl_stream");
   kr_dlstream_check();
   memset(&params, 0, sizeof(kr_dlstream_params));
 
@@ -284,5 +282,6 @@ int main (int argc, char *argv[]) {
     kr_dlstream_run(dlstream);
     kr_dlstream_destroy(&dlstream);
   }
+  printf("\n");
   return 0;
 }

@@ -2,6 +2,7 @@
 
 int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
 
+/*
   kr_unit_control_t unit_control;
   kr_compositor_info info;
   int i;
@@ -84,7 +85,7 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
         setting.easing = EASEINOUTSINE;
         kr_compositor_path_ctl(path, &setting);
       }
-      /*
+      *//*
       if (unit_control.data_type == KR_FLOAT) {
         krad_radio_broadcast_subunit_update(app->app_broadcaster,
          &unit_control.address, unit_control.address.control.compositor_control,
@@ -95,7 +96,7 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
          &unit_control.address, unit_control.address.control.compositor_control,
          unit_control.data_type, (void *)&unit_control.value.integer, app->current_client);
       }
-      */
+      *//*
       break;
     case EBML_ID_KRAD_COMPOSITOR_CMD_REMOVE_SUBUNIT:
       address.path.unit = KR_COMPOSITOR;
@@ -103,16 +104,16 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       address.path.subunit.compositor_subunit = numbers[0];
       kr_ebml2_unpack_element_uint32 (&ebml_in, &element, &numbers[0]);
       address.id.number = numbers[0];
-      /*if(krad_compositor_subunit_destroy(compositor, &address)) {
+     */ /*if(krad_compositor_subunit_destroy(compositor, &address)) {
         krad_radio_broadcast_subunit_destroyed(app->app_broadcaster, &address);
-      }*/
+      }*//*
       break;
     case EBML_ID_KRAD_COMPOSITOR_CMD_ADD_SUBUNIT:
       kr_ebml2_unpack_element_uint32(&ebml_in, &element, &numbers[0]);
       //type = numbers[0];
       kr_ebml2_unpack_element_string(&ebml_in, &element, string, sizeof(string));
       kr_ebml2_unpack_element_string(&ebml_in, &element, string2, sizeof(string2));
-      /*s = krad_compositor_subunit_create(compositor, type, string,
+*/      /*s = krad_compositor_subunit_create(compositor, type, string,
        * string2); */
 /*
       if (s > -1) {
@@ -132,10 +133,10 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
                                                (void *)&compositor->vector[s]);
         }
       }
-*/
+*//*
       break;
     case EBML_ID_KRAD_COMPOSITOR_CMD_LIST_SUBUNITS:
-/*
+*//*
       for (s = 0; s < KC_MAX_SPRITES; s++) {
         if(compositor->sprite[s].subunit.active == 1) {
           krad_radio_address_to_ebml2(&ebml_out, &response, &compositor->sprite[s].subunit.address);
@@ -166,7 +167,7 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
           kr_ebml2_finish_element(&ebml_out, response);
         }
       }
-*/
+*//*
       address.path.subunit.compositor_subunit = KR_VIDEOPORT;
       i = 0;
       while ((path = kr_pool_iterate_active(compositor->path_pool, &i))) {
@@ -186,7 +187,7 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       address.path.subunit.compositor_subunit = numbers[0];
       kr_ebml2_unpack_element_uint32(&ebml_in, &element, &numbers[0]);
       address.id.number = numbers[0];
-/*
+*//*
       s = address.id.number;
       switch (address.path.subunit.compositor_subunit) {
         case KR_VIDEOPORT:
@@ -230,7 +231,7 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
           }
           break;
       }
-*/
+*//*
       break;
     case EBML_ID_KRAD_COMPOSITOR_CMD_INFO:
       address.path.unit = KR_COMPOSITOR;
@@ -256,6 +257,6 @@ int kr_compositor_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
 
   kr_io2_pulled(in, ebml_in.pos);
   kr_io2_advance(out, ebml_out.pos);
-
+*/
   return 0;
 }

@@ -9,8 +9,6 @@
 #include <krad_vorbis.h>
 #include <krad_flac.h>
 
-#include "kr_debug.c"
-
 #define VIDEO_TRACK 1
 #define AUDIO_TRACK 2
 
@@ -145,9 +143,6 @@ void krad_transmitter_mkv_test2 (int port, char *filename1, char *filename2) {
 }
 
 int main (int argc, char *argv[]) {
-
-  kr_debug_init ("kr_mkv_txmtr");
-
   if (argc > 1) {
     if (argc == 2) {
       printf ("Need filename\n");

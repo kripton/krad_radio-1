@@ -30,6 +30,11 @@ void test_function(kr_transponder *xpdr, kr_transponder_path_info *info) {
   kr_transponder_mkpath(xpdr,&setup);
 }
 
+
+int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
+  return 0;
+}
+/*
 int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   kr_radio *radio;
   kr_transponder *transponder;
@@ -95,7 +100,7 @@ int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       }
       break;
 
-  /*
+*/  /*
     case EBML_ID_KRAD_TRANSPONDER_CMD_SUBUNIT_LIST:
       num = kr_xpdr_count (krad_transponder->xpdr);
       for (i = 0; i < KRAD_TRANSPONDER_MAX_SUBUNITS; i++) {
@@ -116,11 +121,11 @@ int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
     case EBML_ID_KRAD_TRANSPONDER_CMD_SUBUNIT_UPDATE:
       break;
     case EBML_ID_KRAD_TRANSPONDER_CMD_SUBUNIT_CREATE:
-*/
+*//*
     case EBML_ID_KRAD_TRANSPONDER_CMD_LIST_ADAPTERS:
       address.path.unit = KR_TRANSPONDER;
       address.path.subunit.transponder_subunit = KR_ADAPTER;
-      /*
+    */  /*
 #ifdef KR_LINUX
       devices = krad_v4l2_detect_devices();
       for (i = 0; i < devices; i++) {
@@ -153,7 +158,7 @@ int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
           kr_ebml2_finish_element(&ebml_out, response);
         }
       }
-      */
+      *//*
       break;
     default:
       return -1;
@@ -168,3 +173,4 @@ int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   kr_io2_advance(out, ebml_out.pos);
   return 0;
 }
+*/

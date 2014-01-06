@@ -44,7 +44,6 @@ kr_app_client *kr_app_connect(char *sysname, int timeout_ms) {
     failfast("Krad APP Client mem alloc fail");
     return NULL;
   }
-  krad_system_init ();
   uname (&client->unixname);
   if (krad_valid_host_and_port (sysname)) {
     krad_get_host_and_port (sysname, client->host, &client->tcp_port);

@@ -65,7 +65,7 @@ static int krad_radio_pid(char *sysname) {
   int pid;
   static const char *daemon_name = "krad_radio";
   int daemon_name_len;
-  if (!(krad_valid_sysname(sysname))) {
+  if (!(kr_sysname_valid(sysname))) {
     return 0;
   }
   daemon_name_len = strlen(daemon_name);

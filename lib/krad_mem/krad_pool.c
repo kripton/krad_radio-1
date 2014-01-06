@@ -15,9 +15,7 @@ struct kr_pool {
   uint64_t use;
   /*uint8_t type[KR_POOL_MAX];
   uint8_t state[KR_POOL_MAX];*/
-  int type[KR_POOL_MAX];
-  int state[KR_POOL_MAX];
-  int ref[KR_POOL_MAX];
+  uint8_t ref[KR_POOL_MAX];
   size_t overlay_sz;
   size_t overlay_actual_sz;
   void *overlay;
@@ -99,6 +97,21 @@ int kr_pool_get_overlay(kr_pool *pool, void *overlay) {
 }
 
 int kr_pool_recycle(kr_pool *pool, void *slice) {
+  uint64_t mask;
+  size_t num;
+  if ((pool == NULL) || (slice == NULL)) return -2;
+  num = (slice - pool->data) / pool->slice_size;
+  mask = 1 + num;
+  if (((pool->use & mask) != 0)
+   && (slice == (pool->data + (pool->slice_size * num)))) {
+      pool->use = pool->use ^ mask;
+      pool->active--;
+      return 0;
+  }
+  return -1;
+}
+
+int kr_pool_recycle_old(kr_pool *pool, void *slice) {
 
   int i;
   uint64_t mask;
@@ -168,6 +181,7 @@ void kr_pool_debug(kr_pool *pool) {
   printk("pool overlay size: %zu", pool->overlay_sz);
   printk("pool overlay act size: %zu", pool->overlay_actual_sz);
   printk("pool slice size: %zu", pool->slice_size);
+  printk("pool slices size: %zu", pool->slice_size * pool->slices);
   printk("pool total size: %zu\n", pool->total_size);
 }
 
@@ -198,10 +212,15 @@ kr_pool *kr_pool_create(kr_pool_setup *setup) {
     pool.overlay_actual_sz += KR_CACHELINE - (pool.overlay_sz % KR_CACHELINE);
   }
   pool.slices = setup->slices;
-  pool.slice_size = setup->size + (KR_CACHELINE % setup->size);
+  pool.slice_size = setup->size;
+  if (pool.slice_size % KR_CACHELINE) {
+    pool.slice_size += KR_CACHELINE - (pool.slice_size % KR_CACHELINE);
+  }
   pool.total_size = (pool.slices * pool.slice_size) + pool.info_size;
-  pool.total_size = pool.total_size + pool.overlay_actual_sz;
-  pool.total_size = pool.total_size + (KR_PAGESIZE % pool.total_size);
+  pool.total_size += pool.overlay_actual_sz;
+  if (pool.total_size % KR_PAGESIZE) {
+    pool.total_size += KR_PAGESIZE - (pool.total_size % KR_PAGESIZE);
+  }
   if (setup->shared != 0) {
     pool.shared = 1;
     flags = MAP_SHARED;

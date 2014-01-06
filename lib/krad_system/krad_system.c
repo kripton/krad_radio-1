@@ -1,7 +1,7 @@
 #include "krad_system.h"
 
-static int krad_system_initialized;
-static krad_system_t krad_system;
+static int print_lock;
+static kr_system krad_system;
 
 float kr_round2(float f) {
   f = rintf(f * 100.0);
@@ -144,36 +144,6 @@ void krad_system_monitor_cpu_off () {
   }
 }
 
-void krad_system_log_on (char *filename) {
-
-  if (krad_system.log_fd > 0) {
-    krad_system_log_off ();
-  }
-
-  while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 0, 1 ));
-  krad_system.log_fd = open (filename,
-                             O_WRONLY | O_CREAT | O_EXCL,
-                             S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-  if (krad_system.log_fd > 0) {
-    dprintf (krad_system.log_fd, "Log %d started\n", krad_system.lognum);
-  } else {
-    failfast ("frak");
-  }
-  while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 1, 0 ));
-}
-
-void krad_system_log_off () {
-
-  while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 0, 1 ));
-  if (krad_system.log_fd > 0) {
-    dprintf (krad_system.log_fd, "Log %d ended\n", krad_system.lognum++);
-    fsync (krad_system.log_fd);
-    close (krad_system.log_fd);
-    krad_system.log_fd = 0;
-  }
-  while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 1, 0 ));
-}
-
 void *krad_system_monitor_cpu_thread (void *arg) {
 
   krad_system_cpu_monitor_t *kcm;
@@ -274,6 +244,8 @@ void krad_system_set_monitor_cpu_callback (void *callback_pointer,
   kcm->cpu_monitor_callback = cpu_monitor_callback;
 }
 
+/*
+
 char *krad_system_info () {
   return krad_system.info_string;
 }
@@ -296,170 +268,39 @@ void krad_system_info_collect () {
                       "System: %s %s (%s)", krad_system.unix_info.machine,
                       krad_system.unix_info.sysname, krad_system.unix_info.release);
 }
-
-uint64_t krad_system_daemon_uptime () {
-
-  uint64_t now;
-
-  now = time (NULL);
-  krad_system.uptime = now - krad_system.krad_start_time;
-
-  return krad_system.uptime;
-}
-
-void krad_system_daemon_wait () {
-
-  int signal_caught;
-
-  signal_caught = 0;
-
-  while (1) {
-
-    if (sigwait (&krad_system.signal_mask, &signal_caught) != 0) {
-      failfast ("Krad Radio: Error on sigwait!");
-    }
-    switch (signal_caught) {
-      case SIGHUP:
-        printk ("Got HANGUP Signal!");
-        break;
-      case SIGINT:
-        printk ("Got INT Signal!");
-        printk ("Krad Radio: Shutting down");
-        return;
-      case SIGTERM:
-        printk ("Got TERM Signal!");
-        printk ("Krad Radio: Shutting down");
-        return;
-      default:
-        printk ("Krad Radio: Got Signal %d", signal_caught);
-    }
-  }
-}
+*/
 
 void failfast (char* format, ...) {
-
   va_list args;
-  if (krad_system.log_fd > 0) {
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 0, 1 ));
-    dprintf (krad_system.log_fd, "\n***ERROR! FAILURE!\n");
-    va_start(args, format);
-    vdprintf(krad_system.log_fd, format, args);
-    va_end(args);
-    dprintf (krad_system.log_fd, "\n");
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 1, 0 ));
-    krad_system_log_off ();
-  }
-  exit (133);
+  while (!__sync_bool_compare_and_swap(&print_lock, 0, 1));
+  fprintf(stderr, "***FAILURE!: ");
+  va_start(args, format);
+  vfprintf(stderr, format, args);
+  va_end(args);
+  fprintf(stderr, "\nError TS: %"PRIu64"\n", krad_unixtime());
+  while (!__sync_bool_compare_and_swap(&print_lock, 1, 0));
+  exit(2);
 }
 
-void printke (char* format, ...) {
-
+void printke(char* format, ...) {
   va_list args;
-
-  if (krad_system.log_fd > 0) {
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 0, 1 ));
-    dprintf (krad_system.log_fd, "***ERROR!: ");
-    va_start(args, format);
-    vdprintf(krad_system.log_fd, format, args);
-    va_end(args);
-    dprintf(krad_system.log_fd, "\nError TS: %"PRIu64"\n", krad_unixtime());
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 1, 0 ));
-  }
+  while (!__sync_bool_compare_and_swap(&print_lock, 0, 1));
+  fprintf(stderr, "***ERROR!: ");
+  va_start(args, format);
+  vfprintf(stderr, format, args);
+  va_end(args);
+  fprintf(stderr, "\nError TS: %"PRIu64"\n", krad_unixtime());
+  while (!__sync_bool_compare_and_swap(&print_lock, 1, 0));
 }
 
-void printkd (char* format, ...) {
-
+void printk(char* format, ...) {
   va_list args;
-
-  if (krad_system.log_fd > 0) {
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 0, 1 ));
-    va_start(args, format);
-    vdprintf(krad_system.log_fd, format, args);
-    va_end(args);
-    dprintf (krad_system.log_fd, "\n");
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 1, 0 ));
-  }
-}
-
-void printk (char* format, ...) {
-
-  va_list args;
-
-  if (krad_system.log_fd > 0) {
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 0, 1 ));
-    va_start(args, format);
-    vdprintf(krad_system.log_fd, format, args);
-    va_end(args);
-    dprintf (krad_system.log_fd, "\n");
-    while (!__sync_bool_compare_and_swap( &krad_system.log_in_use, 1, 0 ));
-  }
-}
-
-int krad_checkroot () {
-  return (getuid () == 0 || geteuid () == 0);
-}
-
-void krad_system_init () {
-
-  if (krad_checkroot ()) {
-    fprintf (stderr, "No Krad System should be run as root!\n");
-    exit (1);
-  }
-
-  if (krad_system_initialized != 31337) {
-    krad_system_initialized = 31337;
-    krad_system.log_in_use = 0;
-    krad_system.kcm.interval = KRAD_CPU_MONITOR_INTERVAL;
-    krad_system_info_collect ();
-    srand (time(NULL));
-  }
-}
-
-void krad_system_daemonize () {
-
-  pid_t pid, sid;
-  FILE *refp;
-
-  pid = fork();
-
-  if (pid < 0) {
-    exit (EXIT_FAILURE);
-  }
-
-  if (pid > 0) {
-    exit (EXIT_SUCCESS);
-  }
-
-  refp = freopen("/dev/null", "r", stdin);
-  if (refp == NULL) {
-    exit (EXIT_FAILURE);
-  }
-  refp = freopen("/dev/null", "w", stdout);
-  if (refp == NULL) {
-    exit (EXIT_FAILURE);
-  }
-  refp = freopen("/dev/null", "w", stderr);
-  if (refp == NULL) {
-    exit (EXIT_FAILURE);
-  }
-
-  umask (0);
-
-  sid = setsid();
-
-  if (sid < 0) {
-    exit (EXIT_FAILURE);
-  }
-
-  if ((chdir("/")) < 0) {
-    exit (EXIT_FAILURE);
-  }
-
-  sigemptyset (&krad_system.signal_mask);
-  sigfillset (&krad_system.signal_mask);
-  if (pthread_sigmask (SIG_BLOCK, &krad_system.signal_mask, NULL) != 0) {
-    failfast ("Could not set signal mask!");
-  }
+  while (!__sync_bool_compare_and_swap(&print_lock, 0, 1));
+  va_start(args, format);
+  vfprintf(stdout, format, args);
+  va_end(args);
+  printf("\n");
+  while (!__sync_bool_compare_and_swap(&print_lock, 1, 0));
 }
 
 void kr_systm_get_thread_name(char *name) {
@@ -571,7 +412,7 @@ int krad_system_set_socket_blocking (int sd) {
   return sd;
 }
 
-int krad_valid_sysname (char *sysname) {
+int kr_sysname_valid(char *sysname) {
 
   int i = 0;
   char j;

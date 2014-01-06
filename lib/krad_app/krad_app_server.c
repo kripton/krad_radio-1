@@ -15,6 +15,7 @@ struct kr_app_server {
   int on_linux;
   int sd;
   int tcp_sd[MAX_REMOTES];
+  uint64_t start_time;
   uint16_t tcp_port[MAX_REMOTES];
   char *tcp_interface[MAX_REMOTES];
   int shutdown;
@@ -36,6 +37,7 @@ struct kr_app_server {
   uint32_t broadcasts[MAX_BROADCASTS];
   int broadcasts_count;
   kr_app_broadcaster *app_broadcaster;
+  kr_pool *mappers;
 };
 
 static kr_app_server *kr_app_server_init(char *appname, char *sysname) {
@@ -623,6 +625,13 @@ int handle_broadcast(kr_app_broadcaster *broadcaster) {
   return items;
 }
 
+uint64_t kr_app_server_uptime(kr_app_server *server) {
+  uint64_t now;
+  if ((!server) || (server->shutdown != KRAD_APP_RUNNING)) return 0;
+  now = time(NULL);
+  return now - server->start_time;
+}
+
 static void *app_server_loop(void *arg) {
   kr_app_server *server;
   server = (kr_app_server *)arg;
@@ -631,6 +640,7 @@ static void *app_server_loop(void *arg) {
   int32_t oret;
   krad_system_set_thread_name ("kr_station");
   server->shutdown = KRAD_APP_RUNNING;
+  server->start_time = time(NULL);
   while (!server->shutdown) {
     s = 0;
     kr_app_server_update_pollfds(server);
@@ -673,8 +683,14 @@ static void *app_server_loop(void *arg) {
             if (read_ret > 0) {
               //printk ("Krad APP Server %d: Got %d bytes\n", s, read_ret);
               server->current_client = client;
-              hret = server->client_handler(client->in, client->out,
-               client->ptr);
+              kr_app_server_request request;
+              request.ptr = client->ptr;
+              request.in = client->in;
+              request.out = client->out;
+              request.app = server;
+              hret = server->client_handler(&request);
+//            hret = server->client_handler(client->in, client->out,
+//             client->ptr);
               if (hret != 0) {
                 disconnect_client(server, client);
                 continue;
@@ -723,6 +739,7 @@ static void *app_server_loop(void *arg) {
     }
   }
   server->shutdown = KRAD_APP_SHUTINGDOWN;
+  server->start_time = 0;
   krad_controller_client_close(&server->krad_control);
   return NULL;
 }
@@ -758,6 +775,7 @@ void kr_app_server_destroy(kr_app_server *app_server) {
       kr_app_server_broadcaster_destroy(&app_server->broadcasters[i]);
     }
   }
+  kr_pool_destroy(app_server->mappers);
   free(app_server->clients);
   free(app_server);
   printk ("Krad APP Server: Destroy Completed");
@@ -778,5 +796,70 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   app_server->client_destroy = setup->client_destroy;
   app_server->client_handler = setup->client_handler;
   app_server->pointer = setup->app;
+  /* doing this here so its nearby... */
+  kr_pool_setup pool_setup;
+  pool_setup.size = sizeof(kr_app_address_mapper);
+  pool_setup.slices = 8;
+  pool_setup.shared = 0;
+  pool_setup.overlay_sz = 0;
+  app_server->mappers = kr_pool_create(&pool_setup);
+  kr_pool_debug(app_server->mappers);
   return app_server;
+}
+
+void kr_app_server_slice_address(kr_app_address_sliced *sliced, char *addr) {
+  char *slice;
+  memset(sliced, 0, sizeof(kr_app_address_sliced));
+  slice = addr;
+  while ((slice = strchr(slice, '/'))) {
+    sliced->slice[sliced->slices] = slice + 1;
+    sliced->slices++;
+    slice[0] = '\0';
+    slice += 1;
+    if (sliced->slices == 3) break;
+  }
+}
+
+void kr_app_server_address_slices_print(kr_app_address_sliced *sliced) {
+  int i;
+  printk("%zu slices", sliced->slices);
+  for (i = 0; i < sliced->slices; i++) {
+    printk("Slice %d: %s", i, sliced->slice[i]);
+  }
+}
+
+int kr_app_server_route(kr_app_server *app, kr_crate2 *crate) {
+  int i;
+  kr_app_address_sliced sliced_address;
+  if ((app == NULL) || (crate == NULL)) return -1;
+  kr_app_address_mapper *mapper;
+  i = 0;
+  printk("Routing: %s", crate->address);
+  kr_app_server_slice_address(&sliced_address, crate->address);
+  kr_app_server_address_slices_print(&sliced_address);
+  if (sliced_address.slices < 1) return -1;
+  if (sliced_address.slices > 2) return -2;
+  if ((sliced_address.slices == 1) && (crate->method != KR_GET)) return -3;
+  printk("method and slice count compatible");
+  while ((mapper = kr_pool_iterate_active(app->mappers, &i))) {
+    //do we match stuff?
+    printk("Mapper Prefix: %s Crate Address: %s", mapper->prefix,
+     crate->address);
+
+    // get == slices = 1(list) or 2(read)
+    // put/post/patch/delete = 2
+  }
+  kr_pool_debug(app->mappers);
+  return 0;
+}
+
+int kr_app_server_add_mapper(kr_app_server *app, kr_app_address_mapper *mapper) {
+  if ((app == NULL) || (mapper == NULL)) return -1;
+  //check all for null basically
+  void *slice;
+  slice = kr_pool_slice(app->mappers);
+  memcpy(slice, mapper, sizeof(kr_app_address_mapper));
+  printk("Added mapper: %s", mapper->prefix);
+  kr_pool_debug(app->mappers);
+  return 0;
 }

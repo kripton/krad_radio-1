@@ -23,6 +23,7 @@
 #include "krad_system.h"
 #include "krad_ring.h"
 #include "krad_io.h"
+#include "krad_pool.h"
 #include "krad_radio_ipc.h"
 
 #include "krad_radio_client.h"
@@ -67,10 +68,35 @@ typedef struct kr_app_broadcaster kr_app_broadcaster;
 typedef struct kr_broadcast_msg kr_broadcast_msg;
 
 typedef struct kr_app_server_setup kr_app_server_setup;
+typedef struct kr_app_server_request kr_app_server_request;
 
 typedef void *(kr_app_server_client_create_cb)(void *);
 typedef void (kr_app_server_client_destroy_cb)(void *);
-typedef int (kr_app_server_client_handler_cb)(kr_io2_t *in, kr_io2_t *out, void *);
+//typedef int (kr_app_server_client_handler_cb)(kr_io2_t *in, kr_io2_t *out, void *);
+typedef int (kr_app_server_client_handler_cb)(kr_app_server_request *);
+
+struct kr_app_server_request {
+  kr_io2_t *in;
+  kr_io2_t *out;
+  void *ptr;
+  kr_app_server *app;
+};
+
+typedef enum {
+  KR_GET = 1,
+  KR_PUT,
+  KR_POST,
+  KR_PATCH,
+  KR_DELETE
+} kr_app_method;
+
+typedef struct kr_crate2 kr_crate2;
+
+struct kr_crate2 {
+  char address[64];
+  kr_app_method method;
+  void *payload;
+};
 
 struct kr_app_server_setup {
   char appname[32];
@@ -100,6 +126,36 @@ struct kr_app_server_client {
   kr_io2_t *in;
   kr_io2_t *out;
 };
+
+typedef void *(kr_app_server_create_handler)(void *, void *);
+typedef int (kr_app_server_patch_handler)(void *, void *);
+typedef int (kr_app_server_destroy_handler)(void *);
+
+typedef struct kr_app_address_mapping kr_app_address_mapping;
+typedef struct kr_app_address_mapper kr_app_address_mapper;
+typedef struct kr_app_address_sliced kr_app_address_sliced;
+
+struct kr_app_address_sliced {
+  char *slice[4];
+  size_t slices;
+};
+
+struct kr_app_address_mapping {
+  char name[48];
+  void *ptr;
+  kr_app_address_mapper *mapper;
+};
+
+struct kr_app_address_mapper {
+  char prefix[32];
+  void *ptr; /* for create */
+  kr_app_server_create_handler *create;
+  kr_app_server_patch_handler *patch;
+  kr_app_server_destroy_handler *destroy;
+};
+
+int kr_app_server_route(kr_app_server *app, kr_crate2 *crate);
+int kr_app_server_add_mapper(kr_app_server *app, kr_app_address_mapper *mapper);
 
 void kr_app_server_add_client_to_broadcast(kr_app_server *app, uint32_t broadcast_ebml_id);
 int kr_broadcast_msg_destroy(kr_broadcast_msg **broadcast_msg);

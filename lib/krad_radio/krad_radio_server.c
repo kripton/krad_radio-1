@@ -1,5 +1,4 @@
 #include "krad_radio_server.h"
-#include "krad_radio_internal.h"
 
 static void krad_radio_remote_rep_to_ebml(kr_remote_t *remote, kr_ebml2_t *ebml);
 
@@ -273,16 +272,35 @@ uint32_t full_command (kr_io2_t *in) {
 }
 
 void krad_radio_to_ebml(kr_ebml2_t *ebml, kr_radio *radio) {
-  kr_ebml_pack_string(ebml, EBML_ID_KRAD_RADIO_SYSTEM_INFO, krad_system_info());
-  kr_ebml_pack_string(ebml, EBML_ID_KRAD_RADIO_LOGNAME, radio->log.filename);
+/*  kr_ebml_pack_string(ebml, EBML_ID_KRAD_RADIO_SYSTEM_INFO, krad_system_info());
+  kr_ebml_pack_string(ebml, EBML_ID_KRAD_RADIO_LOGNAME, "fake");
   kr_ebml_pack_uint64(ebml, EBML_ID_KRAD_RADIO_UPTIME, krad_system_daemon_uptime());
   kr_ebml_pack_uint32(ebml, EBML_ID_KRAD_RADIO_UPTIME, kr_app_server_num_clients(radio->app));
   kr_ebml_pack_uint32(ebml, EBML_ID_KRAD_RADIO_SYSTEM_CPU_USAGE, krad_system_get_cpu_usage());
+  */
 }
 
-int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
+/*
+//int kr_radio_server_handle(kr_radio_server *server, kr_radio_server_cmd *cmd) {
+int kr_radio_server_handle(kr_io2_t *in, kr_io2_t *out, void *ptr) {
+  return 0;
+}
+
+int kr_radio_server_handle(kr_radio_server *server, kr_radio_server_cmd *cmd) {
+*/
+
+int kr_radio_cmd(kr_app_server_request *request) {
+
+  kr_io2_t *in;
+  kr_io2_t *out;
+  kr_radio_client *client;
+  in = request->in;
+  out = request->out;
+//  client = request->client;
 
   kr_radio *radio;
+  radio = (kr_radio *)request->ptr;
+
   kr_address_t address;
   unsigned char *response;
   unsigned char *payload;
@@ -311,8 +329,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   string2[0] = '\0';
   string3[0] = '\0';
 
-  radio = client->radio;
-  app = radio->app;
+  app = request->app;
 
   if (!(kr_io2_has_in (in))) {
     return 0;
@@ -348,6 +365,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       kr_ebml2_finish_element(&ebml_out, payload);
       kr_ebml2_finish_element(&ebml_out, response);
       break;
+/*
     case EBML_ID_KRAD_RADIO_CMD_LIST_TAGS:
       kr_ebml2_unpack_element_string(&ebml_in, &element, string1, sizeof(string1));
       if (strncmp("station", string1, 7) == 0) {
@@ -433,7 +451,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       printk ("command remote status");
       address.path.unit = KR_STATION;
       address.path.subunit.station_subunit = KR_REMOTE;
-/*      for (i = 0; i < MAX_REMOTES; i++) {
+*//*      for (i = 0; i < MAX_REMOTES; i++) {
         if (app->tcp_port[i]) {
           address.id.number = i;
           krad_radio_address_to_ebml2 (&ebml_out, &response, &address);
@@ -447,13 +465,13 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
           kr_ebml2_finish_element (&ebml_out, response);
         }
       }
-*/
+*//*
       break;
     case EBML_ID_KRAD_RADIO_CMD_REMOTE_ENABLE:
       printk ("command remote enable");
       kr_ebml2_unpack_element_string(&ebml_in, &element, remote.interface, sizeof(string1));
       kr_ebml2_unpack_element_uint16(&ebml_in, &element, &remote.port);
-/*
+*//*
       if (kr_app_server_enable_remote(app, remote.interface, remote.port)) {
         //FIXME this is wrong in the case of adapter based matches with multiple ips
         // perhaps switch to callback based create broadcast?
@@ -467,7 +485,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
         }
         kr_radio_broadcast_subunit_created(app->app_broadcaster, &address, (void *)&remote);
       }
-*/
+*//*
       break;
     case EBML_ID_KRAD_RADIO_CMD_REMOTE_DISABLE:
       printk ("command remote disable");
@@ -510,6 +528,7 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
       kr_ebml2_unpack_element_uint32(&ebml_in, &element, &numbers[0]);
       kr_app_server_add_client_to_broadcast(app, numbers[0]);
       break;
+*/
     default:
       printke ("Krad Radio Command Unknown! %u", command);
       return -1;
@@ -525,7 +544,17 @@ int kr_radio_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
   return 0;
 }
 
-int kr_radio_client_handler(kr_io2_t *in, kr_io2_t *out, void *ptr) {
+//int kr_radio_server_handle(kr_io2_t *in, kr_io2_t *out, void *ptr) {
+int kr_radio_server_handle(kr_app_server_request *request) {
+
+  kr_io2_t *in;
+  kr_io2_t *out;
+  void *ptr;
+  ptr = request->ptr;
+  in = request->in;
+  out = request->out;
+
+
   kr_radio_client *client;
   int ret;
   uint32_t command;
@@ -556,7 +585,7 @@ int kr_radio_client_handler(kr_io2_t *in, kr_io2_t *out, void *ptr) {
     //printk ("we have a full command la de da its %zu bytes", in->len);
     switch (command) {
       case EBML_ID_KRAD_MIXER_CMD:
-        ret = kr_mixer_command(in, out, client);
+        ret = kr_mixer_server_handle(request);
         break;
       case EBML_ID_KRAD_COMPOSITOR_CMD:
         ret = kr_compositor_cmd(in, out, client);
@@ -565,7 +594,7 @@ int kr_radio_client_handler(kr_io2_t *in, kr_io2_t *out, void *ptr) {
         ret = kr_transponder_cmd(in, out, client);
         break;
       case EBML_ID_KRAD_RADIO_CMD:
-        ret = kr_radio_cmd(in, out, client);
+        ret = kr_radio_cmd(request);
         break;
       default:
         ret = -1;
@@ -575,6 +604,5 @@ int kr_radio_client_handler(kr_io2_t *in, kr_io2_t *out, void *ptr) {
       return -1;
     }
   }
-
   return 0;
 }

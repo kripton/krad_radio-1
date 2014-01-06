@@ -1,6 +1,5 @@
 #include "kr_x11_stream.h"
 #include "gen/kr_x11_stream_config.c"
-#include "kr_debug.c"
 
 typedef struct kr_x11_stream kr_x11_stream;
 typedef struct kr_x11_stream_params kr_x11_stream_params;
@@ -126,7 +125,6 @@ void kr_x11_stream_activate(kr_x11_stream_params *params) {
 int main(int argc, char *argv[]) {
   int ret;
   kr_x11_stream_params params;
-  kr_debug_init("v4l2_stream");
   memset(&params, 0, sizeof(kr_x11_stream_params));
   ret = handle_config(&params, argv[1]);
   if (ret != 0) {
@@ -138,5 +136,6 @@ int main(int argc, char *argv[]) {
   printf("To: %s:%u%s\n", params.host, params.port, params.mount);
   printf("VP8 Bitrate: %uk\n", params.bitrate);
   kr_x11_stream_activate(&params);
+  printf("\n");
   return 0;
 }

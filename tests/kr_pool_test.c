@@ -1,9 +1,15 @@
 #include "krad_pool.h"
 
-#include "../tools/kr_debug.c"
+static int slice_check(void *slice) {
+  printf("slice addres: %p\n", slice);
+  if ((uint64_t)slice % KR_CACHELINE) {
+    fprintf(stderr, "Unaligned slice!\n");
+    exit(1);
+  }
+  return 0;
+}
 
-int main(int argc, char *argv[]) {
-
+static int pool_test(int sz, int len) {
   int i;
   int ret;
   kr_pool *pool;
@@ -11,15 +17,13 @@ int main(int argc, char *argv[]) {
   void *slice[128];
   void *aslice;
 
-  kr_debug_init("pool_test");
-
   aslice = NULL;
   memset(&slice, 0, sizeof(slice));
   memset(&pool_setup, 0, sizeof(kr_pool_setup));
 
   pool_setup.shared = 1;
-  pool_setup.size = 33;
-  pool_setup.slices = 44;
+  pool_setup.size = sz;
+  pool_setup.slices = len;
 
   pool = kr_pool_create(&pool_setup);
 
@@ -35,12 +39,14 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "failed to get slice\n");
     return 1;
   }
+  slice_check(slice[0]);
   kr_pool_debug(pool);
   slice[1] = kr_pool_slice(pool);
   if (slice[1] == NULL) {
     fprintf(stderr, "failed to get slice\n");
     return 1;
   }
+  slice_check(slice[1]);
   kr_pool_debug(pool);
 
   i = 0;
@@ -70,4 +76,20 @@ int main(int argc, char *argv[]) {
 
   kr_pool_destroy(pool);
   return 0;
+}
+
+int main(int argc, char *argv[]) {
+  int ret;
+  int slices;
+  int slice_sz;
+  int i;
+  ret = 0;
+  srand(time(NULL));
+  for (i = 0; i < 4; i++) {
+    slices = rand() % 64;
+    slice_sz = rand() % (5 * 1000 * 1000);
+    ret = pool_test(slice_sz, slices);
+    if (ret) break;
+  }
+  return ret;
 }

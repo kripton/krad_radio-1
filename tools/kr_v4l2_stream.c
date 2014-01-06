@@ -1,5 +1,4 @@
 #include "kr_v4l2_stream.h"
-#include "kr_debug.c"
 #include "gen/kr_v4l2_stream_config.c"
 
 typedef struct {
@@ -30,6 +29,7 @@ int kr_v4l2s_destroy(kr_v4l2s **v4l2s) {
   kr_mkv_destroy(&(*v4l2s)->mkv);
   free(*v4l2s);
   *v4l2s = NULL;
+  printf("\nstream shutdown\n");
   return 0;
 }
 
@@ -104,7 +104,7 @@ void kr_v4l2s_run(kr_v4l2s *v4l2s) {
       kr_mkv_add_video_tc(v4l2s->mkv, 1, vcodeme->data, vcodeme->sz,
        vcodeme->key, vcodeme->tc);
     }
-    printf("\rKrad V4L2 Stream Frame# %12"PRIu64"", v4l2s->frames++);
+    printf("\rKrad V4L2 Stream Frame# %12"PRIu64" ", v4l2s->frames++);
     fflush(stdout);
   }
   kr_codeme_kludge_destroy(&vcodeme);
@@ -117,7 +117,6 @@ int main (int argc, char *argv[]) {
   int ret;
   kr_v4l2s *v4l2s;
   kr_v4l2s_params params;
-  kr_debug_init("v4l2_stream");
   memset(&params, 0, sizeof(kr_v4l2s_params));
   ret = handle_config(&params, argv[1]);
   if (ret != 0) {

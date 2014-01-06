@@ -1,7 +1,5 @@
 #include "krad_alsa.h"
 
-#include "../tools/kr_debug.c"
-
 static int test_alsa_card(int card_num) {
   kr_alsa *alsa;
   kr_alsa_info info;
@@ -26,7 +24,6 @@ static int test_alsa_card(int card_num) {
 int main(int argc, char *argv[]) {
   int ret;
   int card_num;
-  kr_debug_init("alsa_test");
   card_num = 0;
   if (argc == 2) {
     card_num = atoi(argv[1]);

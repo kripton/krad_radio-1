@@ -10,8 +10,6 @@
 #include <krad_flac.h>
 #include <krad_opus.h>
 
-#include "kr_debug.c"
-
 void mkv_header_test(kr_mkv_t *mkv) {
 
   int ret;
@@ -161,8 +159,6 @@ int main (int argc, char *argv[]) {
   int32_t ret;
   kr_mkv_t *mkv;
 
-  kr_debug_init("mkvhdrtest");
-
   mkv = kr_mkv_open_file (argv[1]);
 
   if (mkv == NULL) {
@@ -178,6 +174,5 @@ int main (int argc, char *argv[]) {
       printf ("Error closing %s\n", argv[1]);
     }
   }
-
   return 0;
 }
