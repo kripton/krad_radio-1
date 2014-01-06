@@ -663,7 +663,6 @@ int kr_crateo_string (kr_crate *crate, char **string) {
     case KR_COMPOSITOR:
       return kr_compositor_crate_to_string (crate, string);
     case KR_TRANSPONDER:
-      return kr_transponder_crate_to_string (crate, string);
       break;
   }
   return 0;
@@ -1795,7 +1794,6 @@ void kr_unit_destroy (kr_client *client, kr_address_t *address) {
     kr_mixer_remove_portgroup (client, address->id.name);
   }
   if (address->path.unit == KR_TRANSPONDER) {
-    kr_transponder_subunit_destroy (client, address->id.number);
   }
 }
 
