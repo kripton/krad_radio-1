@@ -55,18 +55,44 @@ int kr_radio_destroy(kr_radio *radio) {
   printk("Krad Radio exited cleanly");
   return 0;
 }
-
-static void mapping_test(kr_radio *radio) {
-  kr_app_address_mapper mapper;
+static void router_test(kr_radio *radio) {
   kr_crate2 crate;
-  memset(&mapper, 0, sizeof(kr_app_address_mapper));
   memset(&crate, 0, sizeof(kr_crate2));
-  strcpy(mapper.prefix, "/mixer");
+
   strcpy(crate.address, "/mixer/Music3");
   crate.method = KR_PUT;
-  kr_app_server_add_mapper(radio->app, &mapper);
   kr_app_server_route(radio->app, &crate);
-  printk("hello!");
+
+  strcpy(crate.address, "/mixer/Music3");
+  crate.method = KR_GET;
+  kr_app_server_route(radio->app, &crate);
+
+  strcpy(crate.address, "/mixer");
+  crate.method = KR_GET;
+  kr_app_server_route(radio->app, &crate);
+
+  strcpy(crate.address, "/mixer");
+  crate.method = KR_PUT;
+  kr_app_server_route(radio->app, &crate);
+
+  strcpy(crate.address, "/mixer/Music3");
+  crate.method = KR_DELETE;
+  kr_app_server_route(radio->app, &crate);
+
+  strcpy(crate.address, "/mixer");
+  crate.method = KR_PUT;
+  kr_app_server_route(radio->app, &crate);
+}
+
+static void mapper_test(kr_radio *radio) {
+  kr_app_address_mapper mapper;
+  memset(&mapper, 0, sizeof(kr_app_address_mapper));
+  strcpy(mapper.prefix, "/mixer");
+  mapper.ptr = radio->mixer;
+  mapper.create = kr_mixer_mkpath;
+  mapper.patch = kr_mixer_path_ctl;
+  mapper.destroy = kr_mixer_unlink;
+  kr_app_server_add_mapper(radio->app, &mapper);
 }
 
 kr_radio *kr_radio_create(char *sysname) {
@@ -95,7 +121,8 @@ kr_radio *kr_radio_create(char *sysname) {
         transponder_setup.mixer = radio->mixer;
         transponder_setup.compositor = radio->compositor;
         radio->transponder = kr_transponder_create(&transponder_setup);
-        mapping_test(radio);
+        mapper_test(radio);
+        router_test(radio);
         kr_app_server_run(radio->app);
         return radio;
       }

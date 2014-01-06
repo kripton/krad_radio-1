@@ -816,6 +816,11 @@ void kr_app_server_slice_address(kr_app_address_sliced *sliced, char *addr) {
     sliced->slices++;
     slice[0] = '\0';
     slice += 1;
+    if (!strlen(slice)) {
+      sliced->slices = 0;
+      printke("zero length address slice");
+      return;
+    }
     if (sliced->slices == 3) break;
   }
 }
@@ -830,27 +835,66 @@ void kr_app_server_address_slices_print(kr_app_address_sliced *sliced) {
 
 int kr_app_server_route(kr_app_server *app, kr_crate2 *crate) {
   int i;
-  kr_app_address_sliced sliced_address;
+  int len;
+  kr_app_address_sliced sliced;
   if ((app == NULL) || (crate == NULL)) return -1;
   kr_app_address_mapper *mapper;
   i = 0;
   printk("Routing: %s", crate->address);
-  kr_app_server_slice_address(&sliced_address, crate->address);
-  kr_app_server_address_slices_print(&sliced_address);
-  if (sliced_address.slices < 1) return -1;
-  if (sliced_address.slices > 2) return -2;
-  if ((sliced_address.slices == 1) && (crate->method != KR_GET)) return -3;
-  printk("method and slice count compatible");
-  while ((mapper = kr_pool_iterate_active(app->mappers, &i))) {
-    //do we match stuff?
-    printk("Mapper Prefix: %s Crate Address: %s", mapper->prefix,
-     crate->address);
-
-    // get == slices = 1(list) or 2(read)
-    // put/post/patch/delete = 2
+  kr_app_server_slice_address(&sliced, crate->address);
+  if (sliced.slices < 1) return -1;
+  if (sliced.slices > 2) {
+    printke("to many slices in address");
+    return -2;
   }
-  kr_pool_debug(app->mappers);
-  return 0;
+  if ((sliced.slices == 1) && (crate->method != KR_GET)) {
+    printk("incompatible slice count and method");
+    return -3;
+  }
+  //printk("method and slice count compatible");
+  while ((mapper = kr_pool_iterate_active(app->mappers, &i))) {
+    //printk("Checking Mapper Prefix: %s", mapper->prefix);
+    len = strlen(mapper->prefix + 1);
+    if (((strlen(sliced.slice[0])) == len)
+     && (memcmp(mapper->prefix + 1, sliced.slice[0], len) == 0)) {
+      /*
+      if ((crate->method == KR_POST) && (sliced.slices == 1)) {
+        printk("Found route! Its a post to %s!", sliced.slice[0]);
+        return 0;
+      }
+      */
+      if ((crate->method == KR_GET) && (sliced.slices == 1)) {
+        printk("Found route! GET list of %s!", sliced.slice[0]);
+        return 0;
+      }
+      if ((crate->method == KR_GET) && (sliced.slices == 2)) {
+        printk("Found route! GET %s from %s!", sliced.slice[1],
+         sliced.slice[0]);
+        return 0;
+      }
+      if ((crate->method == KR_PATCH) && (sliced.slices == 2)) {
+        printk("Found route! PATCH for %s on %s!", sliced.slice[1],
+         sliced.slice[0]);
+        return 0;
+      }
+      if ((crate->method == KR_DELETE) && (sliced.slices == 2)) {
+        printk("Found route! DELETE %s from %s!", sliced.slice[1],
+         sliced.slice[0]);
+        return 0;
+      }
+      if ((crate->method == KR_PUT) && (sliced.slices == 2)) {
+        printk("Found route! PUT %s in %s!", sliced.slice[1],
+         sliced.slice[0]);
+        printk("I should call %p with %p!", mapper->create, mapper->ptr);
+        return 0;
+      }
+      printke("hrm wtf!");
+      return -4;
+    }
+  }
+  printke("Route not found :/");
+  kr_app_server_address_slices_print(&sliced);
+  return -5;
 }
 
 int kr_app_server_add_mapper(kr_app_server *app, kr_app_address_mapper *mapper) {
