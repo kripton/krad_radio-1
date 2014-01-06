@@ -163,7 +163,7 @@ static void kr_osc_parse_message(kr_osc *osc, unsigned char *message, int size) 
     address_handler ((char *)message, address);
 
     printk ("Krad OSC: %s%s", address, debugmsg);
-
+/*
     memset (&uc, 0, sizeof (uc));
     if (kr_string_to_address (address, &uc.address)) {
       kr_unit_control_data_type_from_address (&uc.address, &uc.data_type);
@@ -183,6 +183,7 @@ static void kr_osc_parse_message(kr_osc *osc, unsigned char *message, int size) 
         kr_unit_control_set(osc->client, &uc);
       }
     }
+    */
   }
 }
 
