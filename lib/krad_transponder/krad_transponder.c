@@ -61,10 +61,10 @@ static void xpdr_adapter_event_cb(kr_adapter_event_cb_arg *arg) {
     }
     if (info.api == KR_ADP_JACK) {
       ret = kr_mixer_process(xpdr->mixer);
-    }
-    if (ret > 0) {
-      /* printk("mixed %u frames", ret); */
-      /* number of frames mixed, so time can be dealt with */
+      if (ret > 0) {
+        /* printk("mixed %u frames", ret); */
+        /* number of frames mixed, so time can be dealt with */
+      }
     }
   }
 }

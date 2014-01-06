@@ -2,7 +2,6 @@
 #include "gen/kr_x11_stream_config.c"
 
 typedef struct kr_x11_stream kr_x11_stream;
-typedef struct kr_x11_stream_params kr_x11_stream_params;
 
 struct kr_x11_stream {
   kr_x11_stream_params *params;
