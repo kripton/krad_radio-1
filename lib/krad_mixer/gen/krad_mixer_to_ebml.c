@@ -12,7 +12,7 @@ int kr_mixer_channels_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_mixer_channels *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_mixer_control_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_mixer_control *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -46,7 +46,7 @@ int kr_mixer_path_type_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_mixer_path_type *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -63,7 +63,7 @@ int kr_mixer_adv_ctl_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_mixer_adv_ctl *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }

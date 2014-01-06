@@ -12,7 +12,7 @@ int kr_v4l2_state_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_v4l2_state *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }

@@ -12,7 +12,7 @@ int kr_adapter_path_direction_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_adapter_path_direction *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_adapter_api_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_adapter_api *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -228,7 +228,7 @@ int krad_link_av_mode_t_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (krad_link_av_mode_t *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -245,7 +245,7 @@ int kr_txpdr_su_type_t_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_txpdr_su_type_t *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -262,7 +262,7 @@ int krad_link_transport_mode_t_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (krad_link_transport_mode_t *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
@@ -279,7 +279,7 @@ int kr_transponder_path_io_type_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (kr_transponder_path_io_type *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
