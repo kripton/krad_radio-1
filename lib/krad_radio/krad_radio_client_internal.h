@@ -19,21 +19,6 @@ struct kr_client {
   kr_io2_t *io;
   kr_ebml2_t *ebml_in;
   kr_io2_t *io_in;
-  /* The below should be replaced with a
-   * proper kr_****_info cache
-   */
-  uint32_t period_size;
-  uint32_t sample_rate;
-  uint32_t width;
-  uint32_t height;
-  uint32_t fps_num;
-  uint32_t fps_den;
-};
-
-struct kr_shm_St {
-  int fd;
-  char *buffer;
-  uint64_t size;
 };
 
 typedef int (*rep_to_string_t)(unsigned char *, uint64_t, char **);

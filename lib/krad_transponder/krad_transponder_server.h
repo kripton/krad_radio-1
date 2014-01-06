@@ -6,6 +6,4 @@
 #include "krad_transponder_common.h"
 #include "krad_radio_server.h"
 
-int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client);
-
 #endif

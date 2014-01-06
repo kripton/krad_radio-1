@@ -6,6 +6,5 @@
 #include "krad_radio_server.h"
 
 void kr_mixer_server_info_cb(kr_mixer_info_cb_arg *arg);
-int kr_mixer_server_handle(kr_app_server_request *request);
 
 #endif

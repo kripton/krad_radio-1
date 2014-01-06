@@ -246,21 +246,21 @@ void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len) {
 
 int32_t interweb_ws_kr_client_connect(kr_web_client *client) {
 
-  client->ws.krclient = kr_client_create ("websocket client");
+  client->ws.krclient = kr_client_create("websocket client");
 
   if (client->ws.krclient == NULL) {
     return -1;
   }
 
-  if (!kr_connect (client->ws.krclient, client->server->sysname)) {
-    kr_client_destroy (&client->ws.krclient);
+  if (!kr_connect(client->ws.krclient, client->server->sysname)) {
+    kr_client_destroy(&client->ws.krclient);
     return -1;
   }
 
-  kr_mixer_info_get(client->ws.krclient);
-  kr_mixer_portgroup_list (client->ws.krclient);
-  kr_compositor_subunit_list (client->ws.krclient);
-  kr_subscribe_all (client->ws.krclient);
+  //kr_mixer_info_get(client->ws.krclient);
+  //kr_mixer_portgroup_list (client->ws.krclient);
+  //kr_compositor_subunit_list (client->ws.krclient);
+  kr_subscribe_all(client->ws.krclient);
 
   //printk("interweb_ws_kr_client_connect happens");
 

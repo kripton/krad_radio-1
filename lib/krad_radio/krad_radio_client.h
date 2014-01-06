@@ -231,26 +231,7 @@ int kr_crate_has_float (kr_crate *crate);
 #define kr_string_release kr_crate_free_string
 #define kr_string_recycle kr_crate_free_string
 #define kr_string_goodbye kr_crate_free_string
-#define kr_mixer_portgroups_list kr_mixer_portgroup_list
-#define kr_mixer_portgroups kr_mixer_portgroup_list
-#define kr_compositor_subunits kr_compositor_subunit_list
 int kr_delivery_get_until_final (kr_client *client, kr_crate **crate, uint32_t timeout_ms);
 int kr_delivery_final (kr_client *client);
 void kr_client_crate_wait(kr_client *client, kr_crate **crate);
-kr_shm_t *kr_shm_create (kr_client *client);
-void kr_shm_destroy (kr_shm_t *kr_shm);
-void kr_system_info (kr_client *client);
-void kr_set_dir (kr_client *client, char *dir);
-void kr_remote_list (kr_client *client);
-int kr_remote_on (kr_client *client, char *interface, int port);
-int kr_remote_off (kr_client *client, char *interface, int port);
-void kr_web_enable (kr_client *client, uint32_t port,
-                    char *headcode, char *header, char *footer);
-void kr_web_disable (kr_client *client);
-void kr_osc_enable (kr_client *client, int port);
-void kr_osc_disable (kr_client *client);
-void kr_get_tags(kr_client *client, char *item);
-void kr_get_tag(kr_client *client, char *item, char *tag_name);
-void kr_set_tag(kr_client *client, char *item, char *tag_name, char *tag_value);
-
 #endif

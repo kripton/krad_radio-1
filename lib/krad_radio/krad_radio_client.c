@@ -275,58 +275,6 @@ void kr_subscribe (kr_client *client, uint32_t broadcast_id) {
   client->subscriber = 1;
 }
 
-void kr_shm_destroy (kr_shm_t *kr_shm) {
-
-  if (kr_shm != NULL) {
-    if (kr_shm->buffer != NULL) {
-      munmap (kr_shm->buffer, kr_shm->size);
-      kr_shm->buffer = NULL;
-    }
-    if (kr_shm->fd != 0) {
-      close (kr_shm->fd);
-    }
-    free(kr_shm);
-  }
-}
-
-kr_shm_t *kr_shm_create (kr_client *client) {
-
-  char filename[] = "/tmp/krad-shm-XXXXXX";
-  kr_shm_t *kr_shm;
-
-  kr_shm = calloc (1, sizeof(kr_shm_t));
-
-  if (kr_shm == NULL) {
-    return NULL;
-  }
-
-  kr_shm->size = 1920 * 1080 * 4 * 2;
-
-  kr_shm->fd = mkstemp (filename);
-  if (kr_shm->fd < 0) {
-    fprintf(stderr, "open %s failed: %m\n", filename);
-    kr_shm_destroy (kr_shm);
-    return NULL;
-  }
-
-  if (ftruncate (kr_shm->fd, kr_shm->size) < 0) {
-    fprintf (stderr, "ftruncate failed: %m\n");
-    kr_shm_destroy (kr_shm);
-    return NULL;
-  }
-
-  kr_shm->buffer = mmap (NULL, kr_shm->size, PROT_READ | PROT_WRITE, MAP_SHARED, kr_shm->fd, 0);
-  unlink (filename);
-
-  if (kr_shm->buffer == MAP_FAILED) {
-    fprintf (stderr, "mmap failed: %m\n");
-    kr_shm_destroy (kr_shm);
-    return NULL;
-  }
-
-  return kr_shm;
-}
-
 int kr_send_fd(kr_client *client, int fd) {
   return kr_app_client_send_fd(client->krad_app_client, fd);
 }
@@ -634,9 +582,9 @@ int kr_crateo_float (kr_crate *crate, float *number) {
     case KR_STATION:
       break;
     case KR_MIXER:
-      return kr_mixer_crate_to_float (crate, number);
+      //return kr_mixer_crate_to_float (crate, number);
     case KR_COMPOSITOR:
-      return kr_compositor_crate_to_float (crate, number);
+      //return kr_compositor_crate_to_float (crate, number);
     case KR_TRANSPONDER:
       break;
   }
@@ -657,11 +605,11 @@ int kr_crateo_string (kr_crate *crate, char **string) {
 
   switch ( crate->address.path.unit ) {
     case KR_STATION:
-      return kr_radio_crate_to_string (crate, string);
+      //return kr_radio_crate_to_string (crate, string);
     case KR_MIXER:
-      return kr_mixer_crate_to_string (crate, string);
+      //return kr_mixer_crate_to_string (crate, string);
     case KR_COMPOSITOR:
-      return kr_compositor_crate_to_string (crate, string);
+      //return kr_compositor_crate_to_string (crate, string);
     case KR_TRANSPONDER:
       break;
   }
@@ -731,13 +679,13 @@ int kr_uncrate_rep (kr_crate *crate) {
 
   switch ( crate->address.path.unit ) {
     case KR_STATION:
-      kr_radio_crate_to_rep (crate);
+      //kr_radio_crate_to_rep (crate);
       return 1;
     case KR_MIXER:
-      kr_mixer_crate_to_rep (crate);
+      //kr_mixer_crate_to_rep (crate);
       return 1;
     case KR_COMPOSITOR:
-      kr_compositor_crate_to_info(crate);
+      //kr_compositor_crate_to_info(crate);
       return 1;
     case KR_TRANSPONDER:
       break;
@@ -1788,10 +1736,10 @@ void kr_unit_destroy (kr_client *client, kr_address_t *address) {
     return;
   }
   if (address->path.unit == KR_COMPOSITOR) {
-    kr_compositor_subunit_destroy (client, address);
+    //kr_compositor_subunit_destroy (client, address);
   }
   if (address->path.unit == KR_MIXER) {
-    kr_mixer_remove_portgroup (client, address->id.name);
+    //kr_mixer_remove_portgroup (client, address->id.name);
   }
   if (address->path.unit == KR_TRANSPONDER) {
   }
@@ -1859,10 +1807,10 @@ void kr_unit_info (kr_client *client, kr_address_t *address) {
     return;
   }
   if (address->path.unit == KR_COMPOSITOR) {
-    kr_compositor_subunit_info (client, address);
+    //kr_compositor_subunit_info (client, address);
   }
   if (address->path.unit == KR_MIXER) {
-    kr_mixer_portgroup_info (client, address->id.name);
+    //kr_mixer_portgroup_info (client, address->id.name);
   }
 }
 
@@ -1886,10 +1834,10 @@ int kr_unit_control_set (kr_client *client, kr_unit_control_t *uc) {
       switch (uc->address.path.subunit.mixer_subunit) {
         case KR_PORTGROUP:
           if (uc->address.control.portgroup_control == KR_VOLUME) {
-            kr_mixer_set_control (client, uc->address.id.name, "volume", uc->value.real, uc->duration);
+            //kr_mixer_set_control (client, uc->address.id.name, "volume", uc->value.real, uc->duration);
           } else {
             if (uc->address.control.portgroup_control == KR_CROSSFADE) {
-              kr_mixer_set_control (client, uc->address.id.name, "crossfade", uc->value.real, uc->duration);
+              //kr_mixer_set_control (client, uc->address.id.name, "crossfade", uc->value.real, uc->duration);
             } else {
               //FIXME
               //if (uc->address.control.portgroup_control == KR_DTMF) {
@@ -1899,9 +1847,9 @@ int kr_unit_control_set (kr_client *client, kr_unit_control_t *uc) {
           }
           break;
         case KR_EFFECT:
-          kr_mixer_set_effect_control(client, uc->address.id.name, uc->address.sub_id, uc->address.sub_id2,
-                                      kr_strsfxeftctl(uc->address.control.effect_control),
-                                      uc->value.real, uc->duration, EASEINOUTSINE);
+          //kr_mixer_set_effect_control(client, uc->address.id.name, uc->address.sub_id, uc->address.sub_id2,
+          //                            kr_strsfxeftctl(uc->address.control.effect_control),
+          //                            uc->value.real, uc->duration, EASEINOUTSINE);
           break;
       }
       break;

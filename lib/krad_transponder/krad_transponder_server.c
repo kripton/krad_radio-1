@@ -22,8 +22,3 @@ void test_function(kr_transponder *xpdr, kr_transponder_path_info *info) {
   setup.user = xpdr;
   kr_transponder_mkpath(xpdr,&setup);
 }
-
-
-int kr_transponder_cmd(kr_io2_t *in, kr_io2_t *out, kr_radio_client *client) {
-  return 0;
-}

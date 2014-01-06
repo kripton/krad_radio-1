@@ -95,6 +95,5 @@ struct kr_mixer_path_info {
 char *kr_mixer_channeltostr(int channel);
 char *kr_mixer_ctltostr(kr_mixer_control control);
 char *kr_mixer_pathtypetostr(kr_mixer_path_type type);
-//void kr_mixer_path_info_to_ebml(kr_mixer_path_info *pi, kr_ebml *ebml);
 
 #endif
