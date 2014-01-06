@@ -65,6 +65,7 @@ int kr_crate2_init(void *st) {
   memset(actual, 0, sizeof(struct kr_crate2));
   for (i = 0; i < 64; i++) {
   }
+  kr_transponder_path_info_init(&actual->info);
 
   return 0;
 }
@@ -87,6 +88,7 @@ int kr_crate2_valid(void *st) {
       return -2;
     }
   }
+  kr_transponder_path_info_valid(&actual->info);
 
   return 0;
 }
@@ -114,6 +116,7 @@ int kr_crate2_random(void *st) {
       actual->address[63] = '\0';
     }
   }
+  kr_transponder_path_info_random(&actual->info);
 
   return 0;
 }

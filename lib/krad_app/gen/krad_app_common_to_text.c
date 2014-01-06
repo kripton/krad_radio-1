@@ -34,6 +34,9 @@ int kr_crate2_to_text(char *text, void *st, int32_t max) {
   uber.actual = &(actual->method);
   uber.type = TEXT_KR_APP_METHOD;
   res += info_pack_to_text(&text[res],&uber,max-res);
+  uber.actual = &(actual->info);
+  uber.type = TEXT_KR_TRANSPONDER_PATH_INFO;
+  res += info_pack_to_text(&text[res],&uber,max-res);
 
   return res;
 }

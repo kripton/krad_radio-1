@@ -7,21 +7,6 @@ struct kr_radio_client {
   int valid;
 };
 
-void krad_radio_pack_shipment_terminator(kr_ebml2_t *ebml);
-
-void krad_radio_pack_shipment_terminator(kr_ebml2_t *ebml) {
-/*  kr_address_t address;
-  unsigned char *response;
-  memset(&address, 0, sizeof (kr_address_t));
-  address.path.unit = KR_STATION;
-  address.path.subunit.station_subunit = KR_STATION_UNIT;
-  krad_radio_address_to_ebml2(ebml, &response, &address);
-  kr_ebml_pack_uint32(ebml, EBML_ID_KRAD_RADIO_MESSAGE_TYPE,
-   EBML_ID_KRAD_SHIPMENT_TERMINATOR);
-  kr_ebml2_finish_element(ebml, response);
-*/
-}
-
 void *kr_radio_client_create(void *ptr) {
   kr_radio *radio;
   kr_radio_client *client;
@@ -101,6 +86,17 @@ uint32_t full_crate(kr_io2_t *in) {
   if (in->len < size) {
     printke("Crate not full...");
     return 0;
+  }
+  if (element == KR_EID_CRATE) {
+    kr_crate2 crate;
+    ret = kr_crate2_fr_ebml(&ebml, &crate);
+    if (ret == 0) {
+      char string[8192];
+      ret = kr_crate2_to_text(string, &crate, sizeof(string));
+      if (ret > 0) {
+        printk("%"PRIu64" Byte Crate: \n%s\n", size, string);
+      }
+    }
   }
   return element;
 }
@@ -206,7 +202,6 @@ int kr_radio_server_handle(kr_app_server_request *request) {
     if (command == 0) {
       return 0;
     }
-    printk ("we have a full crate la de da its %zu bytes", in->len);
 /*
     switch (command) {
       case EBML_ID_KRAD_MIXER_CMD:

@@ -3,9 +3,8 @@ int info_pack_to_json(char *json, uber_St *uber, int32_t max);
 typedef int (*info_pack_to_json_func)(char *json, void *st, int max);
 
 int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
-  const info_pack_to_json_func to_json_functions[62] = {kr_alsa_info_to_json,
-  kr_alsa_path_info_to_json,kr_app_method_to_json,
-  kr_crate2_to_json,kr_compositor_path_type_to_json,
+  const info_pack_to_json_func to_json_functions[52] = {kr_alsa_info_to_json,
+  kr_alsa_path_info_to_json,kr_compositor_path_type_to_json,
   kr_compositor_subunit_type_to_json,kr_vector_type_to_json,
   kr_compositor_control_to_json,kr_compositor_controls_to_json,
   kr_sprite_info_to_json,kr_text_info_to_json,
@@ -26,11 +25,7 @@ int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
   kr_analog_info_to_json,kr_adapter_path_direction_to_json,
   kr_adapter_api_to_json,kr_adapter_api_info_to_json,
   kr_adapter_api_path_info_to_json,kr_adapter_info_to_json,
-  kr_adapter_path_info_to_json,krad_link_av_mode_t_to_json,
-  kr_txpdr_su_type_t_to_json,krad_link_transport_mode_t_to_json,
-  kr_transponder_path_io_type_to_json,kr_transponder_info_to_json,
-  kr_transponder_path_io_path_info_to_json,kr_transponder_path_io_info_to_json,
-  kr_transponder_path_info_to_json,kr_v4l2_state_to_json,
+  kr_adapter_path_info_to_json,kr_v4l2_state_to_json,
   kr_v4l2_mode_to_json,kr_v4l2_info_to_json,
   kr_v4l2_open_info_to_json,kr_wayland_info_to_json,
   kr_wayland_path_info_to_json,kr_x11_info_to_json,

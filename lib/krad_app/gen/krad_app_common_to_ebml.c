@@ -34,6 +34,9 @@ int kr_crate2_to_ebml(kr_ebml *ebml, void *st) {
   uber.actual = &(actual->method);
   uber.type = EBML_KR_APP_METHOD;
   res += info_pack_to_ebml(&ebml[res],&uber);
+  uber.actual = &(actual->info);
+  uber.type = EBML_KR_TRANSPONDER_PATH_INFO;
+  res += info_pack_to_ebml(&ebml[res],&uber);
 
   return res;
 }
