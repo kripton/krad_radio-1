@@ -41,6 +41,7 @@ typedef struct krad_ogg_track_St krad_ogg_track_t;
 #include "krad_io.h"
 #include "krad_system.h"
 #include "krad_codec_header.h"
+#include "krad_coder_common.h"
 #include "krad_transmitter.h"
 #include "krad_transponder_common.h"
 

@@ -96,6 +96,7 @@ uint32_t full_command(kr_io2_t *in) {
 }
 
 int kr_radio_cmd(kr_app_server_request *request) {
+/*
   kr_io2_t *in;
   kr_io2_t *out;
   kr_radio_client *client;
@@ -157,6 +158,7 @@ int kr_radio_cmd(kr_app_server_request *request) {
   }
   kr_io2_pulled(in, ebml_in.pos);
   kr_io2_advance(out, ebml_out.pos);
+*/
   return 0;
 }
 
@@ -195,6 +197,7 @@ int kr_radio_server_handle(kr_app_server_request *request) {
       return 0;
     }
     //printk ("we have a full command la de da its %zu bytes", in->len);
+/*
     switch (command) {
       case EBML_ID_KRAD_MIXER_CMD:
         //ret = kr_mixer_server_handle(request);
@@ -212,6 +215,7 @@ int kr_radio_server_handle(kr_app_server_request *request) {
         ret = -1;
         break;
     }
+*/
     if (ret != 0) {
       return -1;
     }

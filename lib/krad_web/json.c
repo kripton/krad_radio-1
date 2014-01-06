@@ -65,8 +65,6 @@ static int crate_to_json(kr_web_client *client, kr_crate *crate) {
 
 static int krad_delivery_handler(kr_web_client *client) {
   kr_crate *crate;
-  char *string;
-  string = NULL;
   crate = NULL;
   kr_delivery_recv(client->ws.krclient);
   while ((kr_delivery_get(client->ws.krclient, &crate) > 0)

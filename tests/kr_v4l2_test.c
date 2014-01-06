@@ -3,7 +3,7 @@
 int test_v4l2_device(int dev_num) {
 
   kr_v4l2 *v4l2;
-  kr_v4l2_info *info;
+//  kr_v4l2_info *info;
   kr_v4l2_mode mode;
   int ret;
   kr_v4l2_setup setup;
@@ -11,7 +11,7 @@ int test_v4l2_device(int dev_num) {
 
   ret = 0;
   v4l2 = NULL;
-  info = NULL;
+//  info = NULL;
   memset(&mode, 0, sizeof(mode));
 
   snprintf(device, sizeof(device), "/dev/video%d", dev_num);

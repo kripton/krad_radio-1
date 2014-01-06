@@ -106,7 +106,7 @@ static void kr_osc_parse_message(kr_osc *osc, unsigned char *message, int size) 
 
   char debugmsg[128];
   int dpos;
-  kr_unit_control_t uc;
+//  kr_unit_control_t uc;
   char address[64];
 
   if (message[0] == '#') {

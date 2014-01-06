@@ -24,7 +24,7 @@
 #include "krad_ring.h"
 #include "krad_io.h"
 #include "krad_pool.h"
-#include "krad_radio_ipc.h"
+#include "krad_app_common.h"
 
 #include "krad_radio_client.h"
 
@@ -80,22 +80,6 @@ struct kr_app_server_request {
   kr_io2_t *out;
   void *ptr;
   kr_app_server *app;
-};
-
-typedef enum {
-  KR_GET = 1,
-  KR_PUT,
-  KR_POST,
-  KR_PATCH,
-  KR_DELETE
-} kr_app_method;
-
-typedef struct kr_crate2 kr_crate2;
-
-struct kr_crate2 {
-  char address[64];
-  kr_app_method method;
-  void *payload;
 };
 
 struct kr_app_server_setup {

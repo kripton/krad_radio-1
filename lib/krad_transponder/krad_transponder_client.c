@@ -15,6 +15,8 @@ int kr_xpdr_mkpath(kr_client *client, kr_transponder_path_info *info) {
   if (kr_transponder_path_info_valid(info) < 0) {
    return -1;
   }
+
+/*
   unsigned char *command;
   unsigned char *test_command;
   unsigned char *payload;
@@ -25,7 +27,7 @@ int kr_xpdr_mkpath(kr_client *client, kr_transponder_path_info *info) {
   kr_transponder_path_info_to_ebml(client->ebml2,info);
   kr_ebml2_finish_element(client->ebml2, test_command);
   kr_ebml2_finish_element(client->ebml2, command);
-
+*/
   kr_client_push(client);
   return 0;
 }

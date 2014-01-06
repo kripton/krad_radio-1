@@ -4,6 +4,7 @@ void kr_mixer_server_info_cb(kr_mixer_info_cb_arg *arg) {
   printk("got a mixer info cb");
 }
 
+/*
 static void bus_info_cb(kr_mixer_path_info_cb_arg *arg) {
   printk("got a mixer bus info cb");
 }
@@ -24,3 +25,4 @@ static void masterbus_setup(kr_mixer *mixer) {
     printke("radio couldn't create mixer master bus");
   }
 }
+*/

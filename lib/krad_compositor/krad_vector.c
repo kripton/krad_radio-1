@@ -53,7 +53,7 @@ int kr_vector_init(kr_vector *vector, char *type) {
   if ((vector == NULL) || (type == NULL)) return -1;
   memset(vector, 0, sizeof(kr_vector));
   vector->info.controls.opacity = 1.0f;
-  vector->type = kr_string_to_vector_type(type);
+  vector->type = kr_strto_kr_vector_type(type);
   vector->info.controls.w = 96;
   vector->info.controls.h = 96;
   switch (vector->type) {

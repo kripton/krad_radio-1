@@ -279,9 +279,7 @@ static void kr_crate_payload_ebml_reset (kr_crate *crate) {
 
 int kr_uncrate_rep (kr_crate *crate) {
 
-  if (!((crate->notice == EBML_ID_KRAD_SUBUNIT_CREATED) ||
-      (crate->notice == EBML_ID_KRAD_SUBUNIT_INFO) ||
-      (crate->notice == EBML_ID_KRAD_UNIT_INFO))) {
+  if (!(crate->notice == KR_GET)) {
     return 0;
   }
 
@@ -426,7 +424,7 @@ int kr_delivery_get(kr_client *client, kr_crate **crate) {
     response->addr = &response->address;
 
     if (!client->subscriber) {
-      if (response->notice == EBML_ID_KRAD_SHIPMENT_TERMINATOR) {
+      if (response->notice == KR_EID_TERMINATOR) {
         client->last_delivery_was_final = 1;
       } else {
         client->last_delivery_was_final = 0;
@@ -438,7 +436,7 @@ int kr_delivery_get(kr_client *client, kr_crate **crate) {
 
     //if (krad_message_notice_has_payload (response->notice)) {
     //FIXME
-    if (response->notice !=EBML_ID_KRAD_RADIO_UNIT_DESTROYED) {
+    if (response->notice != KR_EID_TERMINATOR) {
       kr_ebml2_unpack_id (client->ebml_in, &ebml_id, &ebml_data_size);
       if (ebml_data_size > 0) {
         //printf ("KR Client Response payload size: %"PRIu64"\n", ebml_data_size);

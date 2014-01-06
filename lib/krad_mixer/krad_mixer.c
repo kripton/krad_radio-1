@@ -81,10 +81,10 @@ static void path_release(kr_mixer_path *path);
 
 #include "metering.c"
 
-static void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *l, kr_mixer_path *r);
+//static void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *l, kr_mixer_path *r);
 static void kr_mixer_xf_decouple(kr_mixer *mixer, kr_mixer_crossfader *crossfader);
-static void kr_mixer_channel_copy(kr_mixer_path *path, int in_chan, int out_chan);
-static void kr_mixer_channel_move(kr_mixer_path *path, int in_chan, int out_chan);
+//static void kr_mixer_channel_copy(kr_mixer_path *path, int in_chan, int out_chan);
+//static void kr_mixer_channel_move(kr_mixer_path *path, int in_chan, int out_chan);
 
 kr_sfx *kr_mixer_path_sfx_kludge(kr_mixer_path *path) {
   if (path == NULL) return NULL;
@@ -520,6 +520,7 @@ static uint32_t ms_to_cycles(kr_mixer *mixer, int ms) {
   return cycles;
 }
 
+/*
 void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *path1,
  kr_mixer_path *path2) {
   int i;
@@ -556,12 +557,13 @@ void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *path1,
   crossfader->path[1] = path2;
   path1->crossfader = crossfader;
   path2->crossfader = crossfader;
-/*
- * krad_radio_broadcast_subpath_update(mixer->as->app_broadcaster,
- * &path1->address, KR_CROSSFADE_GROUP, KR_STRING, path2->ame, NULL);
- */
+
+  //krad_radio_broadcast_subpath_update(mixer->as->app_broadcaster,
+  // &path1->address, KR_CROSSFADE_GROUP, KR_STRING, path2->ame, NULL);
+
   kr_mixer_path_ctl(path1, "crossfade", -100.0f, 0, NULL);
 }
+*/
 
 void kr_mixer_xf_decouple(kr_mixer *mixer, kr_mixer_crossfader *crossfader) {
   kr_mixer_path *path[2];
@@ -747,6 +749,7 @@ int kr_mixer_path_ctl(kr_mixer_path *path, char *ctl, float value, int ms, void 
   return -2;
 }
 
+/*
 void kr_mixer_channel_move(kr_mixer_path *path, int in_chan, int out_chan) {
   path->map[in_chan] = out_chan;
   path->mapped_samples[in_chan] = &path->samples[out_chan];
@@ -755,6 +758,7 @@ void kr_mixer_channel_move(kr_mixer_path *path, int in_chan, int out_chan) {
 void kr_mixer_channel_copy(kr_mixer_path *path, int in_chan, int out_chan) {
   path->mixmap[out_chan] = in_chan;
 }
+*/
 
 uint32_t kr_mixer_period(kr_mixer *mixer) {
   return mixer->period_size;

@@ -3,7 +3,6 @@
 
 #define KRAD_COMPOSITOR_SUBUNIT_DEFAULT_TICKRATE 4
 
-#include "krad_radio_ipc.h"
 #include "krad_system.h"
 #include "krad_perspective.h"
 
@@ -137,15 +136,6 @@ struct kr_compositor_info {
   uint64_t timecode;
 };
 
-void kr_aspect_upscale(int srcw, int srch, int dstw, int dsth, int *w, int *h);
-
-char *kr_compositor_control_to_string(kr_compositor_control control);
-char *kr_compositor_subunit_type_to_string(kr_compositor_subunit_type type);
-char *kr_vector_type_to_string(kr_vector_type type);
-kr_vector_type kr_string_to_vector_type(char *string);
-kr_compositor_control kr_string_to_compositor_control(char *string);
-kr_compositor_subunit_type kr_string_to_subunit_type(char *string);
-
-#define kr_comp_strfsubtype kr_compositor_subunit_type_to_string
+void kr_aspect_scale(int srcw, int srch, int dstw, int dsth, int *w, int *h);
 
 #endif

@@ -580,7 +580,7 @@ void kr_app_server_broadcaster_register_broadcast(kr_app_broadcaster *broadcaste
 
 void kr_app_server_add_client_to_broadcast(kr_app_server *server, uint32_t broadcast_ebml_id) {
 
-  if (broadcast_ebml_id == EBML_ID_KRAD_RADIO_GLOBAL_BROADCAST) {
+  if (broadcast_ebml_id == 666) {
     printk("client subscribing to global broadcasts");
   }
 

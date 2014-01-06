@@ -9,7 +9,6 @@ int main (int argc, char *argv[]) {
   kr_client *client;
   char *sysname;
   int ret;
-  kr_unit_control_t uc;
   sysname = NULL;
   client = NULL;
   ret = 0;
