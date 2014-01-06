@@ -13,7 +13,6 @@
 #include <krad_decklink.h>
 #include <krad_decklink_capture.h>
 #include <krad_ring.h>
-#include <krad_framepool.h>
 #include <krad_av.h>
 #include <krad_image_pool.h>
 #include <krad_convert.h>

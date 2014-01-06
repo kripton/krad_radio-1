@@ -12,7 +12,6 @@
 #include <krad_vorbis.h>
 #include <krad_v4l2.h>
 #include <krad_ring.h>
-#include <krad_framepool.h>
 #include <krad_timer.h>
 #include <krad_av.h>
 #include <krad_convert.h>

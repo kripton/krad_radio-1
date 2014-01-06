@@ -18,13 +18,13 @@ struct kr_compositor_control_easers {
 };
 
 #include "krad_pool.h"
+#include "krad_image_pool.h"
 #include "krad_easing.h"
 #include "krad_compositor_common.h"
 #include "krad_compositor_path.h"
 #include "krad_text.h"
 #include "krad_sprite.h"
 #include "krad_vector.h"
-#include "krad_framepool.h"
 
 #define KR_COMPOSITOR_WIDTH_DEF 640
 #define KR_COMPOSITOR_HEIGHT_DEF 360
@@ -59,8 +59,9 @@ struct kr_compositor_setup {
 
 struct kr_compositor {
   cairo_t *cr;
-  krad_frame_t *frame;
-  krad_framepool_t *framepool;
+  cairo_surface_t *cst;
+  kr_image image;
+  kr_image_pool *image_pool;
   kr_compositor_info info;
   kr_pool *sprite_pool;
   kr_pool *text_pool;

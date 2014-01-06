@@ -1,10 +1,11 @@
 #ifndef KRAD_COMPOSITOR_PATH_H
 #define KRAD_COMPOSITOR_PATH_H
 
+#include <cairo.h>
+
 #include "krad_av.h"
 #include "krad_convert.h"
 #include "krad_perspective.h"
-#include "krad_framepool.h"
 #include "krad_ring.h"
 
 typedef enum {

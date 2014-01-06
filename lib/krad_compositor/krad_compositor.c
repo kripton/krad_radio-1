@@ -45,14 +45,14 @@ static void tick(kr_compositor *com) {
 
 static void setup(kr_compositor *compositor) {
   tick(compositor);
-  while (compositor->frame == NULL) {
-    compositor->frame = krad_framepool_getframe(compositor->framepool);
-    if (compositor->frame == NULL) {
-      printke("Compositor wanted a frame but could not get one right away!");
-      usleep(1000);
-    }
+  while (!kr_image_pool_getimage(compositor->image_pool, &compositor->image)) {
+    printke("Compositor wanted a frame but could not get one right away!");
+    usleep(5000);
   }
-  compositor->cr = cairo_create(compositor->frame->cst);
+  compositor->cst = cairo_image_surface_create_for_data(compositor->image.px,
+   CAIRO_FORMAT_ARGB32, compositor->image.w, compositor->image.h, compositor->image.pps[0]);
+  compositor->cr = cairo_create(compositor->cst);
+  cairo_surface_destroy(compositor->cst);
 }
 
 static void composite(kr_compositor *com) {
@@ -69,15 +69,7 @@ static void composite(kr_compositor *com) {
   }
   while ((path = kr_pool_iterate_active(com->path_pool, &i))) {
     if (path_type_get(path) == KR_CMP_INPUT) {
-      kr_image image;
-      memset(&image, 0, sizeof(kr_image));
-      image.px = (uint8_t *)com->frame->pixels;
-      image.ppx[0] = image.px;
-      image.w = com->frame->width;
-      image.h = com->frame->height;
-      image.pps[0] = com->frame->width * 4;
-      image.fmt = PIX_FMT_RGB32;
-      path_render(path, &image, com->cr);
+      path_render(path, &com->image, com->cr);
     }
   }
   while ((overlay = kr_pool_iterate_active(com->sprite_pool, &i))) {
@@ -100,14 +92,13 @@ static void output(kr_compositor *compositor) {
 
   while ((path = kr_pool_iterate_active(compositor->path_pool, &i))) {
     if (path->info.type == KR_CMP_OUTPUT) {
-      path_output(path, compositor->frame);
+      path_output(path, &compositor->image);
     }
   }
 }
 
 static void cleanup(kr_compositor *compositor) {
-  krad_framepool_unref_frame(compositor->frame);
-  compositor->frame = NULL;
+  kr_pool_recycle(compositor->image_pool, compositor->image.px);
   cairo_destroy(compositor->cr);
   subunits_state_update(compositor);
 }
@@ -255,7 +246,7 @@ int kr_compositor_destroy(kr_compositor *com) {
   printk("Krad Compositor: Destroy Started");
   subunits_free(com);
   FT_Done_FreeType(com->ftlib);
-  krad_framepool_destroy(&com->framepool);
+  kr_pool_destroy(com->image_pool);
   free(com);
   printk("Krad Compositor: Destroy Complete");
   return 0;
@@ -269,8 +260,11 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   frame_rate_set(com, setup->fps_num, setup->fps_den);
   FT_Init_FreeType(&com->ftlib);
   subunits_create(com);
-  com->framepool = krad_framepool_create(com->info.width, com->info.height,
-   DEFAULT_COMPOSITOR_BUFFER_FRAMES);
+  com->image.w = com->info.width;
+  com->image.h = com->info.height;
+  com->image.pps[0] = com->image.w * 4;
+  com->image.fmt = PIX_FMT_RGB32;
+  com->image_pool = kr_image_pool_create(&com->image, DEFAULT_COMPOSITOR_BUFFER_FRAMES);
   return com;
 }
 

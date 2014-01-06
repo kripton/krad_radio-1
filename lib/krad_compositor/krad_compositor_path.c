@@ -4,7 +4,6 @@ struct kr_compositor_path {
   void *user;
   kr_compositor_path_frame_cb *frame_cb;
   kr_compositor *compositor;
-  krad_frame_t *frame;
   kr_easer crop_x_easer;
   kr_easer crop_y_easer;
   kr_easer crop_width_easer;
@@ -67,11 +66,11 @@ static void path_tick(kr_compositor_path *path) {
   }
 }
 
-void path_output(kr_compositor_path *path, krad_frame_t *frame) {
+void path_output(kr_compositor_path *path, kr_image *image) {
   kr_compositor_path_frame_cb_arg cb_arg;
   cb_arg.user = path->user;
   path->frame_cb(&cb_arg);
-  memcpy(cb_arg.image.px, frame->pixels, frame->width * frame->height * 4);
+  memcpy(cb_arg.image.px, image->px, image->w * image->h * 4);
 }
 
 int path_render(kr_compositor_path *path, kr_image *dst, cairo_t *cr) {
