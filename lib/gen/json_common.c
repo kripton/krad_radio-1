@@ -1,7 +1,4 @@
 #include "gen.h"
-int info_pack_to_json(char *json, uber_St *uber, int32_t max);
-typedef int (*info_pack_to_json_func)(char *json, void *st, int max);
-
 int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
   const info_pack_to_json_func to_json_functions[52] = {kr_alsa_info_to_json,
   kr_alsa_path_info_to_json,kr_compositor_path_type_to_json,

@@ -3,16 +3,12 @@
 int kr_alsa_info_init(void *st) {
   struct kr_alsa_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_alsa_info *)st;
   memset(actual, 0, sizeof(struct kr_alsa_info));
-  for (i = 0; i < 40; i++) {
-  }
 
   return 0;
 }
@@ -43,6 +39,7 @@ int kr_alsa_info_random(void *st) {
   struct kr_alsa_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -54,7 +51,7 @@ int kr_alsa_info_random(void *st) {
   }
 
   actual = (struct kr_alsa_info *)st;
-  memset(st, 0, sizeof(struct kr_alsa_info));
+  memset(actual, 0, sizeof(struct kr_alsa_info));
   for (i = 0; i < 40; i++) {
     scale = (double)25 / RAND_MAX;
     actual->name[i] = 97 + floor(rand() * scale);
@@ -67,14 +64,10 @@ int kr_alsa_info_random(void *st) {
 }
 
 int kr_alsa_path_info_init(void *st) {
-  struct kr_alsa_path_info *actual;
-
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_alsa_path_info *)st;
-  memset(actual, 0, sizeof(struct kr_alsa_path_info));
 
   return 0;
 }

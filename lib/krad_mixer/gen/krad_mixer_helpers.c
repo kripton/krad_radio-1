@@ -80,6 +80,51 @@ int kr_strto_kr_mixer_channels(char *string) {
   return -1;
 }
 
+int kr_mixer_control_to_index(int val) {
+  switch (val) {
+    case KR_VOLUME:
+      return 0;
+    case KR_CROSSFADE:
+      return 1;
+    case KR_PEAK:
+      return 2;
+    case KR_CROSSFADE_GROUP:
+      return 3;
+  }
+  return -1;
+}
+
+char *kr_strfr_kr_mixer_control(int val) {
+  switch (val) {
+    case KR_VOLUME:
+      return "kr_volume";
+    case KR_CROSSFADE:
+      return "kr_crossfade";
+    case KR_PEAK:
+      return "kr_peak";
+    case KR_CROSSFADE_GROUP:
+      return "kr_crossfade_group";
+  }
+  return NULL;
+}
+
+int kr_strto_kr_mixer_control(char *string) {
+  if (!strcmp(string,"kr_volume")) {
+    return KR_VOLUME;
+  }
+  if (!strcmp(string,"kr_crossfade")) {
+    return KR_CROSSFADE;
+  }
+  if (!strcmp(string,"kr_peak")) {
+    return KR_PEAK;
+  }
+  if (!strcmp(string,"kr_crossfade_group")) {
+    return KR_CROSSFADE_GROUP;
+  }
+
+  return -1;
+}
+
 int kr_mixer_path_type_to_index(int val) {
   switch (val) {
     case KR_MXR_INPUT:
@@ -118,10 +163,46 @@ int kr_strto_kr_mixer_path_type(char *string) {
   return -1;
 }
 
+int kr_mixer_adv_ctl_to_index(int val) {
+  switch (val) {
+    case KR_MXR_SAMPLERATE_SET:
+      return 0;
+    case KR_MXR_PERIOD_SIZE_SET:
+      return 1;
+    case KR_MXR_CLOCK_SET:
+      return 2;
+  }
+  return -1;
+}
+
+char *kr_strfr_kr_mixer_adv_ctl(int val) {
+  switch (val) {
+    case KR_MXR_SAMPLERATE_SET:
+      return "kr_mxr_samplerate_set";
+    case KR_MXR_PERIOD_SIZE_SET:
+      return "kr_mxr_period_size_set";
+    case KR_MXR_CLOCK_SET:
+      return "kr_mxr_clock_set";
+  }
+  return NULL;
+}
+
+int kr_strto_kr_mixer_adv_ctl(char *string) {
+  if (!strcmp(string,"kr_mxr_samplerate_set")) {
+    return KR_MXR_SAMPLERATE_SET;
+  }
+  if (!strcmp(string,"kr_mxr_period_size_set")) {
+    return KR_MXR_PERIOD_SIZE_SET;
+  }
+  if (!strcmp(string,"kr_mxr_clock_set")) {
+    return KR_MXR_CLOCK_SET;
+  }
+
+  return -1;
+}
+
 int kr_mixer_info_init(void *st) {
   struct kr_mixer_info *actual;
-
-  int i;
 
   if (st == NULL) {
     return -1;
@@ -129,8 +210,11 @@ int kr_mixer_info_init(void *st) {
 
   actual = (struct kr_mixer_info *)st;
   memset(actual, 0, sizeof(struct kr_mixer_info));
-  for (i = 0; i < 32; i++) {
-  }
+  actual->period_size = 1024;
+  actual->sample_rate = 44100;
+  actual->inputs = 0;
+  actual->buses = 0;
+  actual->outputs = 0;
 
   return 0;
 }
@@ -145,6 +229,26 @@ int kr_mixer_info_valid(void *st) {
   }
 
   actual = (struct kr_mixer_info *)st;
+  if ( (actual->period_size < 32) || (actual->period_size > 4096) ) {
+    return -2;
+  }
+
+  if ( (actual->sample_rate < 8000) || (actual->sample_rate > 192000) ) {
+    return -3;
+  }
+
+  if ( (actual->inputs < 0) || (actual->inputs > 32) ) {
+    return -4;
+  }
+
+  if ( (actual->buses < 0) || (actual->buses > 64) ) {
+    return -5;
+  }
+
+  if ( (actual->outputs < 0) || (actual->outputs > 32) ) {
+    return -6;
+  }
+
   for (i = 0; i < 32; i++) {
     if (!actual->clock[i]) {
       break;
@@ -161,6 +265,7 @@ int kr_mixer_info_random(void *st) {
   struct kr_mixer_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -172,7 +277,17 @@ int kr_mixer_info_random(void *st) {
   }
 
   actual = (struct kr_mixer_info *)st;
-  memset(st, 0, sizeof(struct kr_mixer_info));
+  memset(actual, 0, sizeof(struct kr_mixer_info));
+  scale = (double)4064 / RAND_MAX;
+  actual->period_size = 32 + floor(rand() * scale);
+  scale = (double)184000 / RAND_MAX;
+  actual->sample_rate = 8000 + floor(rand() * scale);
+  scale = (double)32 / RAND_MAX;
+  actual->inputs = 0 + floor(rand() * scale);
+  scale = (double)64 / RAND_MAX;
+  actual->buses = 0 + floor(rand() * scale);
+  scale = (double)32 / RAND_MAX;
+  actual->outputs = 0 + floor(rand() * scale);
   for (i = 0; i < 32; i++) {
     scale = (double)25 / RAND_MAX;
     actual->clock[i] = 97 + floor(rand() * scale);
@@ -195,12 +310,6 @@ int kr_mixer_path_info_init(void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
   memset(actual, 0, sizeof(struct kr_mixer_path_info));
-  for (i = 0; i < 64; i++) {
-  }
-  for (i = 0; i < 64; i++) {
-  }
-  for (i = 0; i < 64; i++) {
-  }
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
   }
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
@@ -275,6 +384,7 @@ int kr_mixer_path_info_random(void *st) {
   struct kr_mixer_path_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -286,7 +396,7 @@ int kr_mixer_path_info_random(void *st) {
   }
 
   actual = (struct kr_mixer_path_info *)st;
-  memset(st, 0, sizeof(struct kr_mixer_path_info));
+  memset(actual, 0, sizeof(struct kr_mixer_path_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
     actual->name[i] = 97 + floor(rand() * scale);

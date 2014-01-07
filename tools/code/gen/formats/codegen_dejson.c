@@ -139,9 +139,9 @@ void codegen_dejson(struct_data *def, char *type, FILE *out) {
       if ((!memb->arr && !memb->len_def[0]) || memb->type == T_CHAR) {
 
         if ((memb->type == T_STRUCT) && codegen_is_enum(memb->type_info.substruct_info.type_name)) {
-          fprintf(out,"  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {\n    return -%d;\n  }\n",i+1);
+          fprintf(out,"  if (ntokens > k && tokens[k].type != JSMN_STRING) {\n    return -%d;\n  }\n",i+1);
           fprintf(out,"  json[tokens[k].end] = '\\0';\n");
-          fprintf(out,"  actual->%s = atoi(&json[tokens[k].start]);\n",memb->name);
+          fprintf(out,"  actual->%s = kr_strto_%s(&json[tokens[k].start]);\n",memb->name,memb->type_info.substruct_info.type_name);
         } else {
           fprintf(out,"  if (ntokens > k && tokens[k].type != %s) {\n    return -%d;\n  }\n\n",
             format,i+1);

@@ -12,7 +12,7 @@ int kr_jack_direction_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_jack_direction *)st;
 
-  res += snprintf(&json[res],max-res,"\"%u\"",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_jack_direction(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_jack_state_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_jack_state *)st;
 
-  res += snprintf(&json[res],max-res,"\"%u\"",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_jack_state(*actual));
 
   return res;
 }

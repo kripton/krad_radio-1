@@ -15,16 +15,6 @@
 /* here is were we link our payload */
 #include "krad_radio_payload.h"
 
-typedef enum {
-  PL_KR_TRANSPONDER_PATH_INFO,
-  PL_KR_MIXER_PATH_INFO
-} kr_radio_payload_type;
-
-typedef union {
-  kr_transponder_path_info transponder_path_info;
-  kr_mixer_path_info mixer_path_info;
-} kr_radio_payload;
-
 typedef struct kr_crate2 kr_crate2;
 
 typedef enum {

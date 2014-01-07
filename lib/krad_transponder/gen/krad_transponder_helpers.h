@@ -20,6 +20,3 @@ char *kr_strfr_kr_adapter_path_direction(int val);
 int kr_adapter_api_to_index(int val);
 int kr_strto_kr_adapter_api(char *string);
 char *kr_strfr_kr_adapter_api(int val);
-int kr_adapter_api_to_index(int val);
-int kr_strto_kr_adapter_api(char *string);
-char *kr_strfr_kr_adapter_api(int val);

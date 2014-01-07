@@ -74,7 +74,6 @@ void type_common_gen(header_data *hdata, int n, char *prefix,
   FILE *tcommons[TARGET_TYPES-2];
   char *format;
   gen_format gf;
-  char gformat[256];
   char outfilen[256];
 
   for (i = 1; i < TARGET_TYPES - 1; i++) {
@@ -111,9 +110,6 @@ void type_common_gen(header_data *hdata, int n, char *prefix,
       case FR_EBML: format = "debml"; gf = DEBML; break;
     }
 
-    sprintf(gformat,"%s/typedef",format);
-    codegen(hdata[0].defs,hdata[0].def_count,prefix,suffix,gformat,tcommons[i-1]);
-    fprintf(tcommons[i-1],"\n");
     codegen_array_func(hdata,n,prefix,suffix,format,gf,tcommons[i-1]);
     fprintf(tcommons[i-1],"\n");
 
@@ -178,6 +174,14 @@ void files_gen(header_data *hdata,
         if (hdata[i].targets[l].type == FR_JSON) {
           fprintf(header,"#include \"jsmn.h\"\n");
         }
+
+        if (hdata[i].targets[l].type == TO_JSON) {
+          pp = strrchr(hdata[i].path,'/');
+          pp[0] = '\0';
+          fprintf(header,"#include \"%s_helpers.h\"\n",basename(hdata[i].path));
+          pp[0] = '/';
+        }
+
         codegen(hdata[i].defs,hdata[i].def_count,prefix,suffix,"includes",header);
         fclose(header);
       }

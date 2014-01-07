@@ -1,14 +1,10 @@
 #include "krad_perspective_helpers.h"
 
 int kr_pos_init(void *st) {
-  struct kr_pos *actual;
-
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_pos *)st;
-  memset(actual, 0, sizeof(struct kr_pos));
 
   return 0;
 }
@@ -72,7 +68,7 @@ int kr_perspective_view_random(void *st) {
   }
 
   actual = (struct kr_perspective_view *)st;
-  memset(st, 0, sizeof(struct kr_perspective_view));
+  memset(actual, 0, sizeof(struct kr_perspective_view));
   kr_pos_random(&actual->top_left);
   kr_pos_random(&actual->top_right);
   kr_pos_random(&actual->bottom_left);
@@ -116,7 +112,7 @@ int kr_perspective_random(void *st) {
   }
 
   actual = (struct kr_perspective *)st;
-  memset(st, 0, sizeof(struct kr_perspective));
+  memset(actual, 0, sizeof(struct kr_perspective));
   kr_perspective_view_random(&actual->view);
 
   return 0;

@@ -123,17 +123,17 @@ struct kr_compositor_path_info {
 };
 
 struct kr_compositor_info {
-  uint32_t width;
-  uint32_t height;
-  uint32_t fps_numerator;
-  uint32_t fps_denominator;
-  uint32_t sprites;
-  uint32_t vectors;
-  uint32_t texts;
-  uint32_t inputs;
-  uint32_t outputs;
+  uint32_t width; /* 640, 320, 1920 */
+  uint32_t height; /* 360, 240, 1080 */
+  uint32_t fps_numerator; /* 30, 20, 120 */
+  uint32_t fps_denominator; /* 1, 1, 1 */
+  uint32_t sprites; /* 0, 0, 128 */
+  uint32_t vectors; /* 0, 0, 128 */
+  uint32_t texts; /* 0, 0, 128 */
+  uint32_t inputs; /* 0, 0, 32 */
+  uint32_t outputs; /* 0, 0, 32 */
   uint64_t frames;
-  uint64_t timecode;
+  uint64_t timecode; 
 };
 
 void kr_aspect_scale(int srcw, int srch, int dstw, int dsth, int *w, int *h);

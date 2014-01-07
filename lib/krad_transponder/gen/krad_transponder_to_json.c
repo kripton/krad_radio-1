@@ -12,7 +12,7 @@ int kr_adapter_path_direction_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_adapter_path_direction *)st;
 
-  res += snprintf(&json[res],max-res,"\"%u\"",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_adapter_path_direction(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_adapter_api_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_adapter_api *)st;
 
-  res += snprintf(&json[res],max-res,"\"%u\"",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_adapter_api(*actual));
 
   return res;
 }
@@ -182,6 +182,7 @@ int kr_adapter_info_to_json(char *json, void *st, int32_t max) {
   uber_sub.actual = &(actual->api_info);
   uber.actual = &(uber_sub);
   uber.type = JSON_KR_ADAPTER_API_INFO;
+  res += snprintf(&json[res],max-res,"\"api_info\": ");
   res += info_pack_to_json(&json[res],&uber,max-res);
   res += snprintf(&json[res],max-res,"}");
 
@@ -220,6 +221,7 @@ int kr_adapter_path_info_to_json(char *json, void *st, int32_t max) {
   uber_sub.actual = &(actual->info);
   uber.actual = &(uber_sub);
   uber.type = JSON_KR_ADAPTER_API_PATH_INFO;
+  res += snprintf(&json[res],max-res,"\"info\": ");
   res += info_pack_to_json(&json[res],&uber,max-res);
   res += snprintf(&json[res],max-res,"}");
 

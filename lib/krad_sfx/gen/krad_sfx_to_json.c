@@ -12,7 +12,7 @@ int kr_sfx_control_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_sfx_control *)st;
 
-  res += snprintf(&json[res],max-res,"\"%u\"",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_sfx_control(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_sfx_effect_type_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_sfx_effect_type *)st;
 
-  res += snprintf(&json[res],max-res,"\"%u\"",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_sfx_effect_type(*actual));
 
   return res;
 }
@@ -46,7 +46,7 @@ int kr_sfx_effect_control_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_sfx_effect_control *)st;
 
-  res += snprintf(&json[res],max-res,"\"%u\"",*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_sfx_effect_control(*actual));
 
   return res;
 }

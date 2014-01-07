@@ -2,15 +2,9 @@
 #include <stdint.h>
 #include "gen.h"
 #include "krad_app_common.h"
-int kr_radio_payload_init(void *st, int idx);
-int kr_radio_payload_valid(void *st, int idx);
-int kr_radio_payload_random(void *st, int idx);
 int kr_crate2_init(void *st);
 int kr_crate2_valid(void *st);
 int kr_crate2_random(void *st);
-int kr_radio_payload_type_to_index(int val);
-int kr_strto_kr_radio_payload_type(char *string);
-char *kr_strfr_kr_radio_payload_type(int val);
 int kr_app_method_to_index(int val);
 int kr_strto_kr_app_method(char *string);
 char *kr_strfr_kr_app_method(int val);

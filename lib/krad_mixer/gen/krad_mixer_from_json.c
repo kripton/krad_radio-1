@@ -413,11 +413,11 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
 
   k++;
 
-  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
     return -4;
   }
   json[tokens[k].end] = '\0';
-  actual->channels = atoi(&json[tokens[k].start]);
+  actual->channels = kr_strto_kr_mixer_channels(&json[tokens[k].start]);
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -430,11 +430,11 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
 
   k++;
 
-  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
     return -5;
   }
   json[tokens[k].end] = '\0';
-  actual->type = atoi(&json[tokens[k].start]);
+  actual->type = kr_strto_kr_mixer_path_type(&json[tokens[k].start]);
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {

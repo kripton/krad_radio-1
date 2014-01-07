@@ -3,16 +3,12 @@
 int kr_decklink_info_init(void *st) {
   struct kr_decklink_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_decklink_info *)st;
   memset(actual, 0, sizeof(struct kr_decklink_info));
-  for (i = 0; i < 64; i++) {
-  }
 
   return 0;
 }
@@ -43,6 +39,7 @@ int kr_decklink_info_random(void *st) {
   struct kr_decklink_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -54,7 +51,7 @@ int kr_decklink_info_random(void *st) {
   }
 
   actual = (struct kr_decklink_info *)st;
-  memset(st, 0, sizeof(struct kr_decklink_info));
+  memset(actual, 0, sizeof(struct kr_decklink_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
     actual->device[i] = 97 + floor(rand() * scale);
@@ -69,20 +66,12 @@ int kr_decklink_info_random(void *st) {
 int kr_decklink_path_info_init(void *st) {
   struct kr_decklink_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_decklink_path_info *)st;
   memset(actual, 0, sizeof(struct kr_decklink_path_info));
-  for (i = 0; i < 64; i++) {
-  }
-  for (i = 0; i < 64; i++) {
-  }
-  for (i = 0; i < 64; i++) {
-  }
 
   return 0;
 }
@@ -129,6 +118,7 @@ int kr_decklink_path_info_random(void *st) {
   struct kr_decklink_path_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -140,7 +130,7 @@ int kr_decklink_path_info_random(void *st) {
   }
 
   actual = (struct kr_decklink_path_info *)st;
-  memset(st, 0, sizeof(struct kr_decklink_path_info));
+  memset(actual, 0, sizeof(struct kr_decklink_path_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
     actual->device[i] = 97 + floor(rand() * scale);

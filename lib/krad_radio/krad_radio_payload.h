@@ -11,7 +11,6 @@
 #include "gen/krad_radio_payload_to_text.h"
 #include "gen/krad_radio_payload_helpers.h"
 
-/*
 typedef enum {
   PL_KR_TRANSPONDER_PATH_INFO,
   PL_KR_MIXER_PATH_INFO
@@ -21,6 +20,5 @@ typedef union {
   kr_transponder_path_info transponder_path_info;
   kr_mixer_path_info mixer_path_info;
 } kr_radio_payload;
-*/
 
 #endif

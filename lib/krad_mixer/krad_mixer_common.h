@@ -62,11 +62,11 @@ typedef enum {
 } kr_mixer_adv_ctl;
 
 struct kr_mixer_info {
-  uint32_t period_size;
-  uint32_t sample_rate;
-  uint32_t inputs;
-  uint32_t buses;
-  uint32_t outputs;
+  uint32_t period_size; /* 1024, 32, 4096 */
+  uint32_t sample_rate; /* 44100, 8000, 192000 */
+  uint32_t inputs; /* 0, 0, 32 */
+  uint32_t buses; /* 0, 0, 64 */
+  uint32_t outputs; /* 0, 0, 32 */
   uint64_t frames;
   uint64_t timecode;
   char clock[32];

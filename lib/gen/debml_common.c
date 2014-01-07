@@ -1,12 +1,8 @@
 #include "gen.h"
 #include "krad_ebmlx.h"
-int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber);
-typedef int (*info_unpack_fr_ebml_func)(kr_ebml *ebml, void *st);
-
 int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber) {
   const info_unpack_fr_ebml_func fr_ebml_functions[64] = {kr_alsa_info_fr_ebml,
-  kr_alsa_path_info_fr_ebml,kr_radio_payload_type_fr_ebml,
-  kr_radio_payload_fr_ebml,kr_app_method_fr_ebml,
+  kr_alsa_path_info_fr_ebml,kr_app_method_fr_ebml,
   kr_crate2_fr_ebml,kr_compositor_path_type_fr_ebml,
   kr_compositor_subunit_type_fr_ebml,kr_vector_type_fr_ebml,
   kr_compositor_control_fr_ebml,kr_compositor_controls_fr_ebml,
@@ -21,7 +17,8 @@ int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber) {
   kr_jack_path_info_fr_ebml,kr_mixer_channels_fr_ebml,
   kr_mixer_control_fr_ebml,kr_mixer_path_type_fr_ebml,
   kr_mixer_adv_ctl_fr_ebml,kr_mixer_info_fr_ebml,
-  kr_mixer_path_info_fr_ebml,kr_sfx_control_fr_ebml,
+  kr_mixer_path_info_fr_ebml,kr_radio_payload_type_fr_ebml,
+  kr_radio_payload_fr_ebml,kr_sfx_control_fr_ebml,
   kr_sfx_effect_type_fr_ebml,kr_sfx_effect_control_fr_ebml,
   kr_eq_band_info_fr_ebml,kr_eq_info_fr_ebml,
   kr_lowpass_info_fr_ebml,kr_highpass_info_fr_ebml,

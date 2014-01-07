@@ -35,9 +35,9 @@ void codegen_json(struct_data *def, char *type, FILE *out) {
   } 
 
   if (def->info.type == ST_ENUM) {
-    fprintf(out,"  res += snprintf(&%s[res],max-res,\"\\\"%%u\\\"",
+    fprintf(out,"  res += snprintf(&%s[res],max-res,\"\\\"%%s\\\"\"",
       type);
-    fprintf(out,"\",*actual);\n");
+    fprintf(out,",kr_strfr_%s(*actual));\n",def->info.name);
     return;
   }
 
@@ -115,6 +115,9 @@ void codegen_json(struct_data *def, char *type, FILE *out) {
 
       fprintf(out,"  uber.actual = &(uber_sub);\n  uber.type = JSON_%s;\n",
        uppercased);
+
+      fprintf(out,"  res += snprintf(&%s[res],max-res,\"\\\"%s\\\": \");\n",
+          type,members[i]->name);
       fprintf(out,"  res += info_pack_to_%s(&%s[res],&uber,max-res);\n",type,type);
 
 

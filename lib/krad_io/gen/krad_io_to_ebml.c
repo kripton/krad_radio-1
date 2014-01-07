@@ -12,7 +12,7 @@ int krad_io_mode_t_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (krad_io_mode_t *)st;
 
-  res += kr_ebml_pack_int32(ebml, 0xe1, *actual);
+  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
