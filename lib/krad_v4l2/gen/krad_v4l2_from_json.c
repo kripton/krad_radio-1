@@ -241,11 +241,11 @@ int kr_v4l2_info_fr_json(char *json, void *st) {
 
   k++;
 
-  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
     return -3;
   }
   json[tokens[k].end] = '\0';
-  actual->state = atoi(&json[tokens[k].start]);
+  actual->state = kr_strto_kr_v4l2_state(&json[tokens[k].start]);
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
