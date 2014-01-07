@@ -39,14 +39,10 @@ int kr_strto_kr_v4l2_state(char *string) {
 }
 
 int kr_v4l2_mode_init(void *st) {
-  struct kr_v4l2_mode *actual;
-
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_v4l2_mode *)st;
-  memset(actual, 0, sizeof(struct kr_v4l2_mode));
 
   return 0;
 }
@@ -104,7 +100,7 @@ int kr_v4l2_info_random(void *st) {
   }
 
   actual = (struct kr_v4l2_info *)st;
-  memset(st, 0, sizeof(struct kr_v4l2_info));
+  memset(actual, 0, sizeof(struct kr_v4l2_info));
   kr_v4l2_mode_random(&actual->mode);
 
   return 0;
@@ -145,7 +141,7 @@ int kr_v4l2_open_info_random(void *st) {
   }
 
   actual = (struct kr_v4l2_open_info *)st;
-  memset(st, 0, sizeof(struct kr_v4l2_open_info));
+  memset(actual, 0, sizeof(struct kr_v4l2_open_info));
   kr_v4l2_mode_random(&actual->mode);
 
   return 0;

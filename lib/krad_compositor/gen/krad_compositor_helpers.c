@@ -377,14 +377,10 @@ int kr_strto_kr_compositor_control(char *string) {
 }
 
 int kr_compositor_controls_init(void *st) {
-  struct kr_compositor_controls *actual;
-
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_compositor_controls *)st;
-  memset(actual, 0, sizeof(struct kr_compositor_controls));
 
   return 0;
 }
@@ -448,6 +444,7 @@ int kr_sprite_info_random(void *st) {
   struct kr_sprite_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -459,7 +456,7 @@ int kr_sprite_info_random(void *st) {
   }
 
   actual = (struct kr_sprite_info *)st;
-  memset(st, 0, sizeof(struct kr_sprite_info));
+  memset(actual, 0, sizeof(struct kr_sprite_info));
   for (i = 0; i < 256; i++) {
     scale = (double)25 / RAND_MAX;
     actual->filename[i] = 97 + floor(rand() * scale);
@@ -521,6 +518,7 @@ int kr_text_info_random(void *st) {
   struct kr_text_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -532,7 +530,7 @@ int kr_text_info_random(void *st) {
   }
 
   actual = (struct kr_text_info *)st;
-  memset(st, 0, sizeof(struct kr_text_info));
+  memset(actual, 0, sizeof(struct kr_text_info));
   for (i = 0; i < 512; i++) {
     scale = (double)25 / RAND_MAX;
     actual->string[i] = 97 + floor(rand() * scale);
@@ -587,7 +585,7 @@ int kr_vector_info_random(void *st) {
   }
 
   actual = (struct kr_vector_info *)st;
-  memset(st, 0, sizeof(struct kr_vector_info));
+  memset(actual, 0, sizeof(struct kr_vector_info));
   kr_compositor_controls_random(&actual->controls);
 
   return 0;
@@ -636,6 +634,7 @@ int kr_compositor_path_info_random(void *st) {
   struct kr_compositor_path_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -647,7 +646,7 @@ int kr_compositor_path_info_random(void *st) {
   }
 
   actual = (struct kr_compositor_path_info *)st;
-  memset(st, 0, sizeof(struct kr_compositor_path_info));
+  memset(actual, 0, sizeof(struct kr_compositor_path_info));
   for (i = 0; i < 128; i++) {
     scale = (double)25 / RAND_MAX;
     actual->name[i] = 97 + floor(rand() * scale);
@@ -745,7 +744,7 @@ int kr_compositor_info_random(void *st) {
   }
 
   actual = (struct kr_compositor_info *)st;
-  memset(st, 0, sizeof(struct kr_compositor_info));
+  memset(actual, 0, sizeof(struct kr_compositor_info));
   scale = (double)1600 / RAND_MAX;
   actual->width = 320 + floor(rand() * scale);
   scale = (double)840 / RAND_MAX;

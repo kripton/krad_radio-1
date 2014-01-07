@@ -265,6 +265,7 @@ int kr_mixer_info_random(void *st) {
   struct kr_mixer_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -276,7 +277,7 @@ int kr_mixer_info_random(void *st) {
   }
 
   actual = (struct kr_mixer_info *)st;
-  memset(st, 0, sizeof(struct kr_mixer_info));
+  memset(actual, 0, sizeof(struct kr_mixer_info));
   scale = (double)4064 / RAND_MAX;
   actual->period_size = 32 + floor(rand() * scale);
   scale = (double)184000 / RAND_MAX;
@@ -383,6 +384,7 @@ int kr_mixer_path_info_random(void *st) {
   struct kr_mixer_path_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -394,7 +396,7 @@ int kr_mixer_path_info_random(void *st) {
   }
 
   actual = (struct kr_mixer_path_info *)st;
-  memset(st, 0, sizeof(struct kr_mixer_path_info));
+  memset(actual, 0, sizeof(struct kr_mixer_path_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
     actual->name[i] = 97 + floor(rand() * scale);

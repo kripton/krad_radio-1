@@ -12,6 +12,12 @@ typedef enum {
 } gen_format;
 
 typedef enum {
+  H_INIT = 1,
+  H_RANDOM,
+  H_VALID
+} helper_type;
+
+typedef enum {
   EBML_UNPACK = 0,
   EBML_PACK = 1
 } ebml_ftype;

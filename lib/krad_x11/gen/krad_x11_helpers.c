@@ -39,6 +39,7 @@ int kr_x11_info_random(void *st) {
   struct kr_x11_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -50,7 +51,7 @@ int kr_x11_info_random(void *st) {
   }
 
   actual = (struct kr_x11_info *)st;
-  memset(st, 0, sizeof(struct kr_x11_info));
+  memset(actual, 0, sizeof(struct kr_x11_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
     actual->display[i] = 97 + floor(rand() * scale);
@@ -101,6 +102,7 @@ int kr_x11_path_info_random(void *st) {
   struct kr_x11_path_info *actual;
 
   int i;
+
   struct timeval tv;
   double scale;
 
@@ -112,7 +114,7 @@ int kr_x11_path_info_random(void *st) {
   }
 
   actual = (struct kr_x11_path_info *)st;
-  memset(st, 0, sizeof(struct kr_x11_path_info));
+  memset(actual, 0, sizeof(struct kr_x11_path_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
     actual->display[i] = 97 + floor(rand() * scale);
