@@ -47,6 +47,10 @@ kr_router *kr_router_create(kr_router_setup *setup) {
   pool_setup.shared = 0;
   pool_setup.overlay_sz = 0;
   router->maps = kr_pool_create(&pool_setup);
+  if (router->maps == NULL) {
+    free(router);
+    router = NULL;
+  }
   return router;
 }
 
@@ -76,7 +80,7 @@ void address_slices_print(address_sliced *sliced) {
   }
 }
 
-int kr_router_route(kr_router *router, kr_crate2 *crate) {
+int kr_router_handle(kr_router *router, kr_crate2 *crate) {
   int i;
   int len;
   address_sliced sliced;
@@ -128,7 +132,8 @@ int kr_router_route(kr_router *router, kr_crate2 *crate) {
       if ((crate->method == KR_PUT) && (sliced.slices == 2)) {
         printk("Found route! PUT %s in %s!", sliced.slice[1],
          sliced.slice[0]);
-        printk("I should call %p with %p!", map->create, map->ptr);
+        printk("I will call %p with %p!", map->create, map->ptr);
+        map->create(map->ptr, (void *)&crate->payload);
         return 0;
       }
       printke("hrm wtf!");
@@ -140,6 +145,7 @@ int kr_router_route(kr_router *router, kr_crate2 *crate) {
   return -5;
 }
 
+/*
 static void router_test(kr_router *router) {
   kr_crate2 crate;
   memset(&crate, 0, sizeof(kr_crate2));
@@ -168,9 +174,13 @@ static void router_test(kr_router *router) {
   crate.method = KR_PUT;
   kr_router_route(router, &crate);
 }
+*/
 
 int kr_router_map_destroy(kr_router *router, kr_router_map *map) {
-  return -1;
+  int ret;
+  if ((router) || (map == NULL)) return -1;
+  ret = kr_pool_recycle(router->maps, map);
+  return ret;
 }
 
 kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setup) {
@@ -180,7 +190,7 @@ kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setu
   slice = kr_pool_slice(router->maps);
   if (slice == NULL) return NULL;
   memcpy(slice, setup, sizeof(kr_router_map));
-  printk("Added mapper for: %s", setup->prefix);
-  router_test(router);
-  return NULL;
+  printk("Krad Router: Added map for: %s", setup->prefix);
+  //router_test(router);
+  return slice;
 }

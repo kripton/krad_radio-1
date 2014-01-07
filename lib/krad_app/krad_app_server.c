@@ -24,11 +24,11 @@
 #include "krad_app_server.h"
 
 static kr_app_server *server_init(char *appname, char *sysname);
-static void update_pollfds(kr_app_server *app_server);
+static void update_pollfds(kr_app_server *server);
 static void *server_loop(void *arg);
-static int  handle_client(kr_app_server_client *client);
-static void disconnect_client(kr_app_server *app, kr_app_server_client *client);
-static kr_app_server_client *accept_client(kr_app_server *app, int sd);
+static int  handle_client(kr_app_server *server, kr_app_server_client *client);
+static void disconnect_client(kr_app_server *server, kr_app_server_client *client);
+static kr_app_server_client *accept_client(kr_app_server *server, int sd);
 
 typedef enum {
   KR_APP_STARTING = -1,
@@ -150,7 +150,7 @@ int validate_client(kr_app_server_client *client) {
   }
 }
 
-uint32_t full_crate(kr_io2_t *in) {
+int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
   kr_ebml2_t ebml;
   uint32_t element;
   uint64_t size;
@@ -170,17 +170,18 @@ uint32_t full_crate(kr_io2_t *in) {
     return 0;
   }
   if (element == KR_EID_CRATE) {
-    kr_crate2 crate;
-    ret = kr_crate2_fr_ebml(&ebml, &crate);
+    ret = kr_crate2_fr_ebml(&ebml, crate);
     if (ret == 0) {
       char string[8192];
-      ret = kr_crate2_to_text(string, &crate, sizeof(string));
+      ret = kr_crate2_to_text(string, crate, sizeof(string));
       if (ret > 0) {
         printk("%"PRIu64" Byte Crate: \n%s\n", size, string);
       }
+      kr_io2_pulled(in, ebml.pos);
+      return 1;
     }
   }
-  return element;
+  return 0;
 }
 
 static kr_app_server_client *accept_client(kr_app_server *server, int sd) {
@@ -271,18 +272,19 @@ int kr_app_server_client_destroy(kr_app_server_client *client) {
 }
 */
 
-static int handle_client(kr_app_server_client *client) {
+static int handle_client(kr_app_server *server, kr_app_server_client *client) {
   int ret;
-  if (!client->valid) {
-    ret = validate_client(client);
-    if (ret != 1) {
-      return 1;
-    }
-  } else {
-    while (full_crate(client->in)) {
-      printk("we got a full crate! and we should deal with it!");
-      printk("but we weill disconnnect instead lol");
-      return 1;
+  kr_crate2 crate;
+  if (client->local) {
+    if (!client->valid) {
+      ret = validate_client(client);
+      if (ret != 1) {
+        return 1;
+      }
+    } else {
+      while (local_client_get_crate(&crate, client->in)) {
+        kr_router_handle(server->router, &crate);
+      }
     }
   }
   return 0;
@@ -323,7 +325,7 @@ static void *server_loop(void *arg) {
             if (read_ret > 0) {
               printk("Krad App Server fd %d: Got %d bytes", s, read_ret);
               server->current_client = client;
-              hret = handle_client(client);
+              hret = handle_client(server, client);
               if (hret != 0) {
                 disconnect_client(server, client);
                 continue;
@@ -352,7 +354,7 @@ static void *server_loop(void *arg) {
               disconnect_client(server, client);
               continue;
             }
-            if (!(kr_io2_want_out (client->out))) {
+            if (!(kr_io2_want_out(client->out))) {
               server->sockets[s].events = POLLIN;
             }
           } else {
@@ -445,8 +447,8 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   if (server == NULL) {
     return NULL;
   }
-  router_setup.routes_max = 256;
-  router_setup.maps_max = 256;
+  router_setup.routes_max = 64;
+  router_setup.maps_max = 64;
   server->router = kr_router_create(&router_setup);
   return server;
 }

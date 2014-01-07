@@ -687,10 +687,12 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
 }
 
 kr_mixer_path *kr_mixer_mkpath(kr_mixer *mixer, kr_mixer_path_setup *setup) {
+  int ret;
   kr_mixer_path *path;
   if ((mixer == NULL) || (setup == NULL)) return NULL;
-  if (path_setup_check(setup)) {
-    printke("mixer mkpath failed setup check");
+  ret = path_setup_check(setup);
+  if (ret) {
+    printke("mixer mkpath failed setup check: %d", ret);
     return NULL;
   }
   path = kr_pool_slice(mixer->path_pool);

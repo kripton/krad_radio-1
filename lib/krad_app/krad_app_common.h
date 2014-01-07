@@ -12,12 +12,12 @@
 #include "gen/krad_app_to_text.h"
 #include "gen/krad_app_helpers.h"
 
-#include "krad_router.h"
-
 /* here is were we link our payload */
 #include "krad_radio_payload.h"
 
 typedef struct kr_crate2 kr_crate2;
+
+#include "krad_router.h"
 
 typedef enum {
   KR_GET = 1,

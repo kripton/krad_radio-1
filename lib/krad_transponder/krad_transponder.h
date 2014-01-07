@@ -51,7 +51,6 @@ struct kr_transponder_path_setup {
 };
 
 int kr_transponder_get_info(kr_transponder *xpdr, kr_xpdr_info *info);
-
 kr_xpdr_path *kr_transponder_mkpath(kr_xpdr *xpdr, kr_xpdr_path_setup *setup);
 int kr_transponder_unlink(kr_xpdr_path *path);
 kr_transponder *kr_transponder_create(kr_transponder_setup *setup);

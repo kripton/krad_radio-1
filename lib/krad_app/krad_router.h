@@ -37,6 +37,7 @@ struct kr_router_setup {
   int maps_max;
 };
 
+int kr_router_handle(kr_router *router, kr_crate2 *crate);
 int kr_router_map_destroy(kr_router *router, kr_router_map *map);
 kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setup);
 int kr_router_info_get(kr_router *router, kr_router_info *info);

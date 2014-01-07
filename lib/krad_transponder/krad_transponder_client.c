@@ -11,7 +11,7 @@ int kr_xpdr_mkpath(kr_client *client, kr_transponder_path_info *info) {
   uint8_t *ebml_crate;
   kr_crate2 crate;
   strcpy(crate.address, "/transponder/bongo");
-  crate.method = KR_GET;
+  crate.method = KR_PUT;
   crate.payload_type = PL_KR_TRANSPONDER_PATH_INFO;
   memcpy(&crate.payload.transponder_path_info, info,
    sizeof(kr_transponder_path_info));

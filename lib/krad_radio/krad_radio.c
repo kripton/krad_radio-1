@@ -59,14 +59,28 @@ int kr_radio_destroy(kr_radio *radio) {
 }
 
 static void setup_maps(kr_radio *radio) {
-  kr_router_map_setup map;
-  memset(&map, 0, sizeof(kr_router_map_setup));
-  strcpy(map.prefix, "/mixer");
-  map.ptr = radio->mixer;
-  map.create = kr_mixer_mkpath;
-  map.patch = kr_mixer_path_ctl;
-  map.destroy = kr_mixer_unlink;
-  kr_app_server_map_create(radio->app, &map);
+  void *map;
+  kr_router_map_setup setup;
+  memset(&setup, 0, sizeof(kr_router_map_setup));
+  strcpy(setup.prefix, "/mixer");
+  setup.ptr = radio->mixer;
+  setup.create = kr_mixer_mkpath;
+  setup.patch = kr_mixer_path_ctl;
+  setup.destroy = kr_mixer_unlink;
+  map = kr_app_server_map_create(radio->app, &setup);
+  if (map == NULL) {
+    printke("map was null");
+  }
+  memset(&setup, 0, sizeof(kr_router_map_setup));
+  strcpy(setup.prefix, "/transponder");
+  setup.ptr = radio->transponder;
+  setup.create = kr_transponder_mkpath;
+  //setup.patch = kr_mixer_path_ctl;
+  setup.destroy = kr_transponder_unlink;
+  map = kr_app_server_map_create(radio->app, &setup);
+  if (map == NULL) {
+    printke("map was null");
+  }
 }
 
 kr_radio *kr_radio_create(char *sysname) {
