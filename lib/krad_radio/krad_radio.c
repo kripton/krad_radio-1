@@ -59,8 +59,8 @@ int kr_radio_destroy(kr_radio *radio) {
 }
 
 static void setup_maps(kr_radio *radio) {
-  kr_app_server_map_setup map;
-  memset(&map, 0, sizeof(kr_app_server_map_setup));
+  kr_router_map_setup map;
+  memset(&map, 0, sizeof(kr_router_map_setup));
   strcpy(map.prefix, "/mixer");
   map.ptr = radio->mixer;
   map.create = kr_mixer_mkpath;

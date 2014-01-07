@@ -49,15 +49,10 @@
 typedef struct kr_app_server_setup kr_app_server_setup;
 typedef struct kr_app_server_info kr_app_server_info;
 //typedef struct kr_app_server_client_setup kr_app_server_client_setup;
-typedef struct kr_app_server_map_setup kr_app_server_map_setup;
 typedef struct kr_app_server kr_app_server;
 typedef struct kr_app_server_client kr_app_server_client;
-typedef struct kr_app_server_map kr_app_server_map;
 
 //typedef void (kr_app_server_client_destroy_cb)(void *);
-typedef void *(kr_app_server_map_create_handler)(void *, void *);
-typedef int (kr_app_server_map_patch_handler)(void *, void *);
-typedef int (kr_app_server_map_destroy_handler)(void *);
 
 struct kr_app_server_setup {
   char appname[32];
@@ -69,20 +64,12 @@ struct kr_app_server_info {
   uint64_t uptime;
 };
 
-struct kr_app_server_map_setup {
-  char prefix[32];
-  void *ptr; /* for create */
-  kr_app_server_map_create_handler *create;
-  kr_app_server_map_patch_handler *patch;
-  kr_app_server_map_destroy_handler *destroy;
-};
-
 /*
 kr_app_server_client *kr_app_server_client_create(kr_app_server_client_setup *s);
 int kr_app_server_client_destroy(kr_app_server_client *client);
 */
-int kr_app_server_map_destroy(kr_app_server_map *map);
-kr_app_server_map *kr_app_server_map_create(kr_app_server *server, kr_app_server_map_setup *setup);
+int kr_app_server_map_destroy(kr_app_server *server, kr_router_map *map);
+kr_router_map *kr_app_server_map_create(kr_app_server *server, kr_router_map_setup *setup);
 int kr_app_server_info_get(kr_app_server *server, kr_app_server_info *info);
 int kr_app_server_disable(kr_app_server *server);
 int kr_app_server_enable(kr_app_server *server);

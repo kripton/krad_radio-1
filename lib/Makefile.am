@@ -17,7 +17,6 @@ krad_radio_libkradradio_la_LDFLAGS = -shared -no-undefined \
 krad_radio_libkradradio_la_LDFLAGS +=
 krad_radio_libkradradio_la_SOURCES = \
 krad_calc/krad_base64.c \
-krad_mem/krad_pool.c \
 krad_container/krad_container.c \
 krad_radio/krad_radio.c \
 krad_transponder/krad_adapter.c \
@@ -127,9 +126,11 @@ krad_radio_libkradclient_la_LDFLAGS = -shared -no-undefined \
 krad_radio_libkradclient_la_LDFLAGS +=
 krad_radio_libkradclient_la_SOURCES = \
 krad_io/krad_io.c \
+krad_mem/krad_pool.c \
 krad_ebml/krad_ebml.c \
 krad_ebml/krad_ebmlx.c \
 krad_system/krad_system.c \
+krad_app/krad_router.c \
 krad_app/krad_app_client.c \
 krad_radio/krad_radio_client_ctl.c \
 krad_radio/krad_radio_client.c \

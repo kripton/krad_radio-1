@@ -14,9 +14,6 @@ typedef enum {
   KR_APP_SHUTINGDOWN,
 } app_state;
 
-//typedef struct kr_app_address_route kr_app_address_route;
-typedef struct kr_app_address_sliced kr_app_address_sliced;
-
 struct kr_app_server {
   struct sockaddr_un saddr;
   int sd;
@@ -30,7 +27,7 @@ struct kr_app_server {
   pthread_t thread;
   struct pollfd sockets[KR_APP_SERVER_CLIENTS_MAX + 2];
   kr_app_server_client *sockets_clients[KR_APP_SERVER_CLIENTS_MAX + 2];
-  kr_pool *maps;
+  kr_router *router;
 };
 
 struct kr_app_server_client {
@@ -48,27 +45,6 @@ struct kr_app_server_client {
   int coconut;
 };
 */
-
-struct kr_app_address_sliced {
-  char *slice[4];
-  size_t slices;
-};
-
-/*
-  struct kr_app_address_route {
-  char name[48];
-  void *ptr;
-  kr_app_address_mapper *mapper;
-};
-*/
-
-struct kr_app_server_map {
-  char prefix[32];
-  void *ptr; /* for create */
-  kr_app_server_map_create_handler *create;
-  kr_app_server_map_patch_handler *patch;
-  kr_app_server_map_destroy_handler *destroy;
-};
 
 static kr_app_server *server_init(char *appname, char *sysname) {
   kr_app_server *server;
@@ -434,6 +410,16 @@ static void *server_loop(void *arg) {
   return NULL;
 }
 
+int kr_app_server_map_destroy(kr_app_server *server, kr_router_map *map) {
+  if (server == NULL) return -1;
+  return kr_router_map_destroy(server->router, map);
+}
+
+kr_router_map *kr_app_server_map_create(kr_app_server *server, kr_router_map_setup *setup) {
+  if (server == NULL) return NULL;
+  return kr_router_map_create(server->router, setup);
+}
+
 int kr_app_server_disable(kr_app_server *server) {
   if (server == NULL) return -1;
   printk("Krad APP Server: Disabling");
@@ -473,7 +459,7 @@ int kr_app_server_destroy(kr_app_server *server) {
       disconnect_client(server, &server->clients[i]);
     }
   }
-  kr_pool_destroy(server->maps);
+  kr_router_destroy(server->router);
   free(server->clients);
   free(server);
   printk("Krad App Server: Destroyed");
@@ -488,150 +474,13 @@ int kr_app_server_enable(kr_app_server *server) {
 
 kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   kr_app_server *server;
+  kr_router_setup router_setup;
   server = server_init(setup->appname, setup->sysname);
   if (server == NULL) {
     return NULL;
   }
-  kr_pool_setup pool_setup;
-  pool_setup.size = sizeof(kr_app_server_map);
-  pool_setup.slices = 8;
-  pool_setup.shared = 0;
-  pool_setup.overlay_sz = 0;
-  server->maps = kr_pool_create(&pool_setup);
+  router_setup.routes_max = 256;
+  router_setup.maps_max = 256;
+  server->router = kr_router_create(&router_setup);
   return server;
-}
-
-void kr_app_server_slice_address(kr_app_address_sliced *sliced, char *addr) {
-  char *slice;
-  memset(sliced, 0, sizeof(kr_app_address_sliced));
-  slice = addr;
-  while ((slice = strchr(slice, '/'))) {
-    sliced->slice[sliced->slices] = slice + 1;
-    sliced->slices++;
-    slice[0] = '\0';
-    slice += 1;
-    if (!strlen(slice)) {
-      sliced->slices = 0;
-      printke("zero length address slice");
-      return;
-    }
-    if (sliced->slices == 3) break;
-  }
-}
-
-void kr_app_server_address_slices_print(kr_app_address_sliced *sliced) {
-  int i;
-  printk("%zu slices", sliced->slices);
-  for (i = 0; i < sliced->slices; i++) {
-    printk("Slice %d: %s", i, sliced->slice[i]);
-  }
-}
-
-int kr_app_server_route(kr_app_server *app, kr_crate2 *crate) {
-  int i;
-  int len;
-  kr_app_address_sliced sliced;
-  kr_app_server_map *map;
-  if ((app == NULL) || (crate == NULL)) return -1;
-  i = 0;
-  printk("Routing: %s", crate->address);
-  kr_app_server_slice_address(&sliced, crate->address);
-  if (sliced.slices < 1) return -1;
-  if (sliced.slices > 2) {
-    printke("to many slices in address");
-    return -2;
-  }
-  if ((sliced.slices == 1) && (crate->method != KR_GET)) {
-    printk("incompatible slice count and method");
-    return -3;
-  }
-  //printk("method and slice count compatible");
-  while ((map = kr_pool_iterate_active(app->maps, &i))) {
-    //printk("Checking Mapper Prefix: %s", mapper->prefix);
-    len = strlen(map->prefix + 1);
-    if (((strlen(sliced.slice[0])) == len)
-     && (memcmp(map->prefix + 1, sliced.slice[0], len) == 0)) {
-      /*
-      if ((crate->method == KR_POST) && (sliced.slices == 1)) {
-        printk("Found route! Its a post to %s!", sliced.slice[0]);
-        return 0;
-      }
-      */
-      if ((crate->method == KR_GET) && (sliced.slices == 1)) {
-        printk("Found route! GET list of %s!", sliced.slice[0]);
-        return 0;
-      }
-      if ((crate->method == KR_GET) && (sliced.slices == 2)) {
-        printk("Found route! GET %s from %s!", sliced.slice[1],
-         sliced.slice[0]);
-        return 0;
-      }
-      if ((crate->method == KR_PATCH) && (sliced.slices == 2)) {
-        printk("Found route! PATCH for %s on %s!", sliced.slice[1],
-         sliced.slice[0]);
-        return 0;
-      }
-      if ((crate->method == KR_DELETE) && (sliced.slices == 2)) {
-        printk("Found route! DELETE %s from %s!", sliced.slice[1],
-         sliced.slice[0]);
-        return 0;
-      }
-      if ((crate->method == KR_PUT) && (sliced.slices == 2)) {
-        printk("Found route! PUT %s in %s!", sliced.slice[1],
-         sliced.slice[0]);
-        printk("I should call %p with %p!", map->create, map->ptr);
-        return 0;
-      }
-      printke("hrm wtf!");
-      return -4;
-    }
-  }
-  printke("Route not found :/");
-  kr_app_server_address_slices_print(&sliced);
-  return -5;
-}
-
-static void router_test(kr_app_server *server) {
-  kr_crate2 crate;
-  memset(&crate, 0, sizeof(kr_crate2));
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_PUT;
-  kr_app_server_route(server, &crate);
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_GET;
-  kr_app_server_route(server, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_GET;
-  kr_app_server_route(server, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_PUT;
-  kr_app_server_route(server, &crate);
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_DELETE;
-  kr_app_server_route(server, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_PUT;
-  kr_app_server_route(server, &crate);
-}
-
-int kr_app_server_map_destroy(kr_app_server_map *map) {
-  return -1;
-}
-
-kr_app_server_map *kr_app_server_map_create(kr_app_server *server, kr_app_server_map_setup *setup) {
-  if ((server == NULL) || (setup == NULL)) return NULL;
-  //check all for null basically
-  void *slice;
-  slice = kr_pool_slice(server->maps);
-  if (slice == NULL) return NULL;
-  memcpy(slice, setup, sizeof(kr_app_server_map));
-  printk("Added mapper for: %s", setup->prefix);
-  router_test(server);
-  return NULL;
 }
