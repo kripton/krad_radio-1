@@ -2,7 +2,6 @@
 #define KRAD_TRANSPONDER_COMMON_H
 
 #include <string.h>
-#include <opus_defines.h>
 #include "krad_ebml.h"
 #include "krad_codec_header.h"
 #include "krad_mixer_common.h"
