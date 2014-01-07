@@ -19,7 +19,6 @@ krad_radio_libkradradio_la_SOURCES = \
 krad_calc/krad_base64.c \
 krad_mem/krad_pool.c \
 krad_container/krad_container.c \
-krad_radio/krad_radio_server.c \
 krad_radio/krad_radio.c \
 krad_transponder/krad_adapter.c \
 krad_transponder/krad_slice.c \
@@ -33,7 +32,6 @@ krad_mkv/krad_mkv_demux.c \
 krad_io/krad_stream.c \
 krad_io/krad_file.c \
 krad_compositor/krad_convert.c \
-krad_compositor/krad_compositor_server.c \
 krad_compositor/krad_vector.c \
 krad_compositor/krad_sprite.c \
 krad_compositor/krad_text.c \
@@ -51,7 +49,6 @@ krad_sfx/krad_sfx_common.c \
 krad_sfx/krad_sfx.c \
 krad_app/krad_app_server.c \
 krad_tags/krad_tags.c \
-krad_mixer/krad_mixer_server.c \
 krad_mixer/krad_mixer.c \
 krad_sfx/krad_tone.c \
 krad_ring/krad_resample_ring.c \
@@ -62,7 +59,6 @@ krad_flac/krad_flac.c \
 krad_opus/krad_opus.c \
 krad_opus/opus_header.c \
 krad_ring/krad_ring.c \
-krad_transponder/krad_transponder_server.c \
 krad_transponder/krad_transponder.c \
 krad_web/krad_interweb.c \
 krad_transmitter/krad_transmitter.c \

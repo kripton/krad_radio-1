@@ -1,8 +1,10 @@
 #include "krad_radio.h"
-#include "krad_mixer_server.h"
-#include "krad_compositor_server.h"
-#include "krad_transponder_server.h"
-#include "krad_radio_server.h"
+#include "krad_mixer.h"
+#include "krad_compositor.h"
+#include "krad_transponder.h"
+#include "krad_interweb.h"
+#include "krad_app_server.h"
+#include "krad_timer.h"
 
 struct kr_radio {
   kr_mixer *mixer;
@@ -106,14 +108,11 @@ kr_radio *kr_radio_create(char *sysname) {
   strncpy(app_setup.appname, "krad_radio", sizeof(app_setup.appname));
   strncpy(app_setup.sysname, sysname, sizeof(app_setup.sysname));
   app_setup.app = radio;
-  app_setup.client_create = kr_radio_client_create;
-  app_setup.client_destroy = kr_radio_client_destroy;
-  app_setup.client_handler = kr_radio_server_handle;
   radio->app = kr_app_server_create(&app_setup);
   if (radio->app) {
     kr_mixer_setup_init(&mixer_setup);
     mixer_setup.user = radio;
-    mixer_setup.cb = kr_mixer_server_info_cb;
+    //mixer_setup.cb = kr_mixer_server_info_cb;
     radio->mixer = kr_mixer_create(&mixer_setup);
     if (radio->mixer) {
       kr_compositor_setup_init(&compositor_setup);

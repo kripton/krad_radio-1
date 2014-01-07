@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include "krad_system.h"
 #include "krad_radio.h"
 
 static int launched_by_systemd() {
