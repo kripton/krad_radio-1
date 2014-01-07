@@ -1,25 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/utsname.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <ctype.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <errno.h>
-#include <poll.h>
-#include <pthread.h>
-#include <ifaddrs.h>
-
 #include "krad_radio_version.h"
 #include "krad_system.h"
 #include "krad_ring.h"

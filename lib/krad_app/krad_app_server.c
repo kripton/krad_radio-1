@@ -1,11 +1,34 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <signal.h>
+#include <time.h>
+#include <sys/utsname.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <ctype.h>
+#include <sys/stat.h>
+#include <sys/un.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <errno.h>
+#include <poll.h>
+#include <pthread.h>
+#include <ifaddrs.h>
+#include <sys/epoll.h>
+
 #include "krad_app_server.h"
 
 static kr_app_server *server_init(char *appname, char *sysname);
-static void *server_loop(void *arg);
-static void disconnect_client(kr_app_server *app, kr_app_server_client *client);
 static void update_pollfds(kr_app_server *app_server);
+static void *server_loop(void *arg);
+static int  handle_client(kr_app_server_client *client);
+static void disconnect_client(kr_app_server *app, kr_app_server_client *client);
 static kr_app_server_client *accept_client(kr_app_server *app, int sd);
-int current_client_is_subscriber(kr_app_server *server);
 
 typedef enum {
   KR_APP_STARTING = -1,
@@ -32,9 +55,8 @@ struct kr_app_server {
 
 struct kr_app_server_client {
   int sd;
-  void *ptr;
   int valid;
-  int broadcasts;
+  int local;
   kr_io2_t *in;
   kr_io2_t *out;
 };
@@ -114,12 +136,12 @@ void pack_client_header(kr_io2_t *out) {
   kr_io2_advance(out, ebml.pos);
 }
 
-int validate_client(kr_io2_t *in, kr_io2_t *out, kr_app_server_client *client) {
+int validate_client(kr_app_server_client *client) {
   int ret;
-  ret = validate_header(in);
+  ret = validate_header(client->in);
   if (ret > 0) {
     client->valid = 1;
-    pack_client_header(out);
+    pack_client_header(client->out);
     printk("Valid client!");
     return 1;
   } else {
@@ -178,17 +200,18 @@ static kr_app_server_client *accept_client(kr_app_server *server, int sd) {
       return NULL;
     }
   }
-  sin_len = sizeof (sin);
+  sin_len = sizeof(sin);
   client->sd = accept(sd, (struct sockaddr *)&sin, &sin_len);
   if (client->sd > 0) {
+    client->local = 1;
+    client->valid = 0;
     krad_system_set_socket_nonblocking(client->sd);
     client->in = kr_io2_create();
     client->out = kr_io2_create();
     kr_io2_set_fd(client->in, client->sd);
     kr_io2_set_fd(client->out, client->sd);
-    //client->ptr = server->client_create(server->pointer);
     server->num_clients++;
-    //printk("Krad App Server: Client accepted!");
+    printk("Krad App Server: Local client accepted");
     return client;
   } else {
     printke("Krad App Server: accept() failed!");
@@ -199,13 +222,12 @@ static kr_app_server_client *accept_client(kr_app_server *server, int sd) {
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client) {
   close(client->sd);
   client->sd = 0;
-  client->broadcasts = 0;
-  //server->client_destroy(client->ptr);
-  client->ptr = NULL;
+  client->local = 0;
+  client->valid = 0;
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
   server->num_clients--;
-  //printk("Krad App Server: Client disconnected");
+  printk("Krad App Server: Client disconnected");
 }
 
 static void update_pollfds(kr_app_server *server) {
@@ -233,13 +255,6 @@ static void update_pollfds(kr_app_server *server) {
   //printk("Krad App Server: polled fds updated");
 }
 
-int kr_app_server_current_client_is_subscriber (kr_app_server *app) {
-  if (app->current_client->broadcasts > 0) {
-    return 1;
-  }
-  return 0;
-}
-
 /*
 kr_app_server_client *kr_app_server_client_create(kr_app_server_client_setup *s) {
   if (s == NULL) return NULL;
@@ -254,65 +269,24 @@ int kr_app_server_client_destroy(kr_app_server_client *client) {
   free(client);
   return 0;
 }
+*/
 
-int kr_radio_server_handle(kr_app_server_request *request) {
-  kr_io2_t *in;
-  kr_io2_t *out;
-  void *ptr;
-  ptr = request->ptr;
-  in = request->in;
-  out = request->out;
-  kr_radio_client *client;
+static int handle_client(kr_app_server_client *client) {
   int ret;
-  uint32_t command;
-  if (in == NULL) {
-    printke("krad_radio_client handler called with null input buffer");
-    return -1;
-  }
-  if (out == NULL) {
-    printke("krad_radio_client handler called with null output buffer");
-    return -1;
-  }
-  if (ptr == NULL) {
-    printke("krad_radio_client handler called with null client pointerr");
-    return -1;
-  }
-  client = (kr_radio_client *)ptr;
   if (!client->valid) {
-    ret = validate_client(in, out, client);
+    ret = validate_client(client);
     if (ret != 1) {
-      return -1;
+      return 1;
     }
-  }
-  for (;;) {
-    command = full_crate(in);
-    if (command == 0) {
-      return 0;
-    }
-    switch (command) {
-      case EBML_ID_KRAD_MIXER_CMD:
-        //ret = kr_mixer_server_handle(request);
-        break;
-      case EBML_ID_KRAD_COMPOSITOR_CMD:
-        //ret = kr_compositor_cmd(in, out, client);
-        break;
-      case EBML_ID_KRAD_TRANSPONDER_CMD:
-        //ret = kr_transponder_cmd(in, out, client);
-        break;
-      case EBML_ID_KRAD_RADIO_CMD:
-        //ret = kr_radio_cmd(request);
-        break;
-      default:
-        ret = -1;
-        break;
-    }
-    if (ret != 0) {
-      return -1;
+  } else {
+    while (full_crate(client->in)) {
+      printk("we got a full crate! and we should deal with it!");
+      printk("but we weill disconnnect instead lol");
+      return 1;
     }
   }
   return 0;
 }
-*/
 
 static void *server_loop(void *arg) {
   kr_app_server *server;
@@ -334,7 +308,7 @@ static void *server_loop(void *arg) {
       break;
     }
     s++;
-    // Unix socket for local connections
+    // Linux abstract socket for local connections
     if (server->sockets[s].revents & POLLIN) {
       accept_client(server, server->sd);
       ret--;
@@ -345,19 +319,11 @@ static void *server_loop(void *arg) {
         ret--;
           client = server->sockets_clients[s];
           if (server->sockets[s].revents & POLLIN) {
-            read_ret = kr_io2_read (client->in);
+            read_ret = kr_io2_read(client->in);
             if (read_ret > 0) {
-              //printk("Krad APP Server %d: Got %d bytes\n", s, read_ret);
-              /*
+              printk("Krad App Server fd %d: Got %d bytes", s, read_ret);
               server->current_client = client;
-              kr_app_server_request request;
-              request.ptr = client->ptr;
-              request.in = client->in;
-              request.out = client->out;
-              request.app = server;
-              hret = server->client_handler(&request);
-              */
-              hret = 0;
+              hret = handle_client(client);
               if (hret != 0) {
                 disconnect_client(server, client);
                 continue;
