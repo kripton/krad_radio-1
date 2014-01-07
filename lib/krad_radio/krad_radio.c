@@ -58,44 +58,15 @@ int kr_radio_destroy(kr_radio *radio) {
   return 0;
 }
 
-static void router_test(kr_radio *radio) {
-  kr_crate2 crate;
-  memset(&crate, 0, sizeof(kr_crate2));
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_PUT;
-  kr_app_server_route(radio->app, &crate);
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_GET;
-  kr_app_server_route(radio->app, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_GET;
-  kr_app_server_route(radio->app, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_PUT;
-  kr_app_server_route(radio->app, &crate);
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_DELETE;
-  kr_app_server_route(radio->app, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_PUT;
-  kr_app_server_route(radio->app, &crate);
-}
-
-static void mapper_test(kr_radio *radio) {
-  kr_app_address_mapper mapper;
-  memset(&mapper, 0, sizeof(kr_app_address_mapper));
-  strcpy(mapper.prefix, "/mixer");
-  mapper.ptr = radio->mixer;
-  mapper.create = kr_mixer_mkpath;
-  mapper.patch = kr_mixer_path_ctl;
-  mapper.destroy = kr_mixer_unlink;
-  kr_app_server_add_mapper(radio->app, &mapper);
+static void setup_maps(kr_radio *radio) {
+  kr_app_server_map_setup map;
+  memset(&map, 0, sizeof(kr_app_server_map_setup));
+  strcpy(map.prefix, "/mixer");
+  map.ptr = radio->mixer;
+  map.create = kr_mixer_mkpath;
+  map.patch = kr_mixer_path_ctl;
+  map.destroy = kr_mixer_unlink;
+  kr_app_server_map_create(radio->app, &map);
 }
 
 kr_radio *kr_radio_create(char *sysname) {
@@ -107,7 +78,6 @@ kr_radio *kr_radio_create(char *sysname) {
   radio = calloc(1, sizeof(kr_radio));
   strncpy(app_setup.appname, "krad_radio", sizeof(app_setup.appname));
   strncpy(app_setup.sysname, sysname, sizeof(app_setup.sysname));
-  app_setup.app = radio;
   radio->app = kr_app_server_create(&app_setup);
   if (radio->app) {
     kr_mixer_setup_init(&mixer_setup);
@@ -121,9 +91,8 @@ kr_radio *kr_radio_create(char *sysname) {
         transponder_setup.mixer = radio->mixer;
         transponder_setup.compositor = radio->compositor;
         radio->transponder = kr_transponder_create(&transponder_setup);
-        mapper_test(radio);
-        router_test(radio);
-        kr_app_server_run(radio->app);
+        setup_maps(radio);
+        kr_app_server_enable(radio->app);
         return radio;
       }
     }
