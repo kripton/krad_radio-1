@@ -6,21 +6,21 @@
 #define KR_POOL_MAX 64
 
 struct kr_pool {
-  uint32_t slices;
-  uint32_t active;
-  int shared;
-  size_t info_size;
   size_t slice_size;
-  size_t total_size;
   uint64_t use;
   /*uint8_t type[KR_POOL_MAX];
   uint8_t state[KR_POOL_MAX];*/
-  uint8_t ref[KR_POOL_MAX];
-  size_t overlay_sz;
-  size_t overlay_actual_sz;
   void *overlay;
   void *data;
   void *map;
+  size_t info_size;
+  size_t total_size;
+  size_t overlay_sz;
+  size_t overlay_actual_sz;
+  uint16_t slices;
+  uint16_t active;
+  uint8_t shared;
+  uint8_t ref[KR_POOL_MAX];
 };
 
 int kr_pool_avail(kr_pool *pool) {

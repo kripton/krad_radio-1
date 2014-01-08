@@ -10,7 +10,7 @@ krad_radio_libkradradio_la_LIBADD = krad_radio/libkradclient.la
 krad_radio_libkradradio_la_LIBADD += $(CAIRO_LIBS) $(FLAC_LIBS) $(JACK_LIBS)\
  $(VORBIS_LIBS)	$(XMMS2_LIBS) $(THEORA_LIBS) $(VPX_LIBS) $(LIBSWSCALE_LIBS)\
  $(X11_LIBS) $(SAMPLERATE_LIBS) $(ALSA_LIBS) $(WAYLAND_LIBS) $(XKBCOMMON_LIBS)\
- $(LIBUDEV_LIBS)
+ $(LIBUDEV_LIBS) $(OPUS_LIBS) -lpthread
 
 krad_radio_libkradradio_la_LDFLAGS = -shared -no-undefined \
  -version-info @KR_LT_CURRENT@:@KR_LT_REVISION@:@KR_LT_AGE@
@@ -120,7 +120,7 @@ AM_CPPFLAGS += -DKR_V4L2
 endif
 
 krad_radio_libkradclient_la_CFLAGS =
-krad_radio_libkradclient_la_LIBADD = $(OPUS_LIBS) -lpthread
+krad_radio_libkradclient_la_LIBADD =
 krad_radio_libkradclient_la_LDFLAGS = -shared -no-undefined \
  -version-info @KR_LT_CURRENT@:@KR_LT_REVISION@:@KR_LT_AGE@
 krad_radio_libkradclient_la_LDFLAGS +=
