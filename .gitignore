@@ -119,5 +119,6 @@ clients/kr_test_client
 clients/kr_snapshot
 tests/kr_pool_test
 tests/kr_adpmon_test
-tests/kr_alsa_test
 tests/kr_helpers_test
+tests/kr_ebml_serial_test
+tests/kr_alsa_test
