@@ -1,3 +1,26 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <signal.h>
+#include <time.h>
+#include <sys/utsname.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <ctype.h>
+#include <sys/stat.h>
+#include <sys/un.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <errno.h>
+#include <poll.h>
+#include <pthread.h>
+#include <netinet/tcp.h>
+#include <ifaddrs.h>
+
 #include "krad_interweb.h"
 #include "embed.h"
 
@@ -306,23 +329,21 @@ void kr_web_server_run(kr_web_server *server) {
   pthread_create(&server->thread, NULL, web_server_loop, (void *)server);
 }
 
-kr_web_server *kr_web_server_create(char *sysname, int32_t port,
- char *headcode, char *htmlheader, char *htmlfooter) {
+kr_web_server *kr_web_server_create(kr_web_server_setup *setup) {
   kr_web_server *server;
-  server = calloc(1, sizeof (kr_web_server));
+  server = calloc(1, sizeof(kr_web_server));
   if (krad_control_init(&server->krad_control)) {
     free(server);
     return NULL;
   }
-  strcpy(server->sysname, sysname);
-  server->uberport = port;
-  server->headcode_source = headcode;
-  server->htmlheader_source = htmlheader;
-  server->htmlfooter_source = htmlfooter;
+  strcpy(server->sysname, setup->sysname);
+  server->headcode_source = setup->headcode;
+  server->htmlheader_source = setup->htmlheader;
+  server->htmlfooter_source = setup->htmlfooter;
   server->shutdown = KRAD_INTERWEB_STARTING;
   server->clients = calloc(KR_WEB_CLIENTS_MAX, sizeof(kr_web_client));
   web_server_setup_html(server);
-  kr_web_server_listen_on(server, NULL, port);
+  kr_web_server_listen_on(server, NULL, setup->port);
   kr_web_server_run(server);
   return server;
 }

@@ -3,21 +3,9 @@
 static int print_lock;
 static kr_system krad_system;
 
-float kr_round2(float f) {
-  f = rintf(f * 100.0);
-  f = f / 100.0;
-  return f;
-}
-
-float kr_round3(float f) {
-  f = rintf(f * 1000.0);
-  f = f / 1000.0;
-  return f;
-}
-
-int krad_control_init (krad_control_t *krad_control) {
+int krad_control_init(krad_control_t *krad_control) {
   if (socketpair(AF_UNIX, SOCK_STREAM, 0, krad_control->sockets)) {
-    printke ("Krad System: can't socketpair errno: %d", errno);
+    printke("Krad System: can't socketpair errno: %d", errno);
     krad_control->sockets[0] = 0;
     krad_control->sockets[1] = 0;
     return -1;
@@ -25,80 +13,71 @@ int krad_control_init (krad_control_t *krad_control) {
   return 0;
 }
 
-int krad_controller_get_client_fd (krad_control_t *krad_control) {
+int krad_controller_get_client_fd(krad_control_t *krad_control) {
   if ((krad_control->sockets[0] != 0) && (krad_control->sockets[1] != 0)) {
     return krad_control->sockets[1];
   }
   return -1;
 }
 
-int krad_controller_get_controller_fd (krad_control_t *krad_control) {
+int krad_controller_get_controller_fd(krad_control_t *krad_control) {
   if ((krad_control->sockets[0] != 0) && (krad_control->sockets[1] != 0)) {
     return krad_control->sockets[1];
   }
   return -1;
 }
 
-int krad_controller_client_close (krad_control_t *krad_control) {
+int krad_controller_client_close(krad_control_t *krad_control) {
   if ((krad_control->sockets[0] != 0) && (krad_control->sockets[1] != 0)) {
-    close (krad_control->sockets[1]);
+    close(krad_control->sockets[1]);
     krad_control->sockets[1] = 0;
     return 0;
   }
   return -1;
 }
 
-
-int krad_controller_client_wait (krad_control_t *krad_control, int timeout) {
-
+int krad_controller_client_wait(krad_control_t *krad_control, int timeout) {
   struct pollfd pollfds[1];
-
   pollfds[0].fd = krad_control->sockets[1];
   pollfds[0].events = POLLIN;
-  if (poll (pollfds, 1, timeout) != 0) {
+  if (poll(pollfds, 1, timeout) != 0) {
     return 1;
   }
-
   return 0;
 }
 
 int krad_controller_shutdown(krad_control_t *krad_control, pthread_t *thread,
  int timeout) {
-
   struct pollfd pollfds[1];
   int ret;
-
   timeout = (timeout / 2) + 2;
-
   pollfds[0].fd = krad_control->sockets[0];
   pollfds[0].events = POLLOUT;
-  if (poll (pollfds, 1, timeout) == 1) {
-    ret = write (krad_control->sockets[0], "0", 1);
+  if (poll(pollfds, 1, timeout) == 1) {
+    ret = write(krad_control->sockets[0], "0", 1);
     if (ret == 1) {
       pollfds[0].fd = krad_control->sockets[0];
       pollfds[0].events = POLLIN;
-      if (poll (pollfds, 1, timeout) == 1) {
-        pthread_join (*thread, NULL);
-        close (krad_control->sockets[0]);
+      if (poll(pollfds, 1, timeout) == 1) {
+        pthread_join(*thread, NULL);
+        close(krad_control->sockets[0]);
         krad_control->sockets[0] = 1;
         return 1;
       }
     }
   }
-
   return 0;
 }
 
 void krad_controller_destroy(krad_control_t *krad_control, pthread_t *thread) {
-
   if (krad_control->sockets[1] != 0) {
-    close (krad_control->sockets[1]);
+    close(krad_control->sockets[1]);
     krad_control->sockets[1] = 0;
   }
-  pthread_cancel (*thread);
-  pthread_join (*thread, NULL);
+  pthread_cancel(*thread);
+  pthread_join(*thread, NULL);
   if (krad_control->sockets[1] != 0) {
-    close (krad_control->sockets[1]);
+    close(krad_control->sockets[1]);
     krad_control->sockets[1] = 0;
   }
 }

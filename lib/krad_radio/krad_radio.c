@@ -72,6 +72,16 @@ static void setup_maps(kr_radio *radio) {
     printke("map was null");
   }
   memset(&setup, 0, sizeof(kr_router_map_setup));
+  strcpy(setup.prefix, "/compositor");
+  setup.ptr = radio->mixer;
+  setup.create = kr_compositor_mkpath;
+  setup.patch = kr_compositor_path_ctl;
+  setup.destroy = kr_compositor_unlink;
+  map = kr_app_server_map_create(radio->app, &setup);
+  if (map == NULL) {
+    printke("map was null");
+  }
+  memset(&setup, 0, sizeof(kr_router_map_setup));
   strcpy(setup.prefix, "/transponder");
   setup.ptr = radio->transponder;
   setup.create = kr_transponder_mkpath;

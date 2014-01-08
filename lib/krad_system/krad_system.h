@@ -97,17 +97,14 @@ struct kr_system {
   int log_in_use;
 };
 
-float kr_round2(float f);
-float kr_round3(float f);
-
-int krad_controller_get_controller_fd (krad_control_t *krad_control);
-int krad_control_init (krad_control_t *krad_control);
-int krad_controller_get_client_fd (krad_control_t *krad_control);
-void krad_controller_destroy (krad_control_t *krad_control, pthread_t *thread);
-int krad_controller_shutdown (krad_control_t *krad_control, pthread_t *thread,
+int krad_controller_get_controller_fd(krad_control_t *krad_control);
+int krad_control_init(krad_control_t *krad_control);
+int krad_controller_get_client_fd(krad_control_t *krad_control);
+void krad_controller_destroy(krad_control_t *krad_control, pthread_t *thread);
+int krad_controller_shutdown(krad_control_t *krad_control, pthread_t *thread,
  int timeout);
-int krad_controller_client_wait (krad_control_t *krad_control, int timeout);
-int krad_controller_client_close (krad_control_t *krad_control);
+int krad_controller_client_wait(krad_control_t *krad_control, int timeout);
+int krad_controller_client_close(krad_control_t *krad_control);
 
 void krad_system_unset_monitor_cpu_callback ();
 void krad_system_set_monitor_cpu_callback (void *callback_pointer,

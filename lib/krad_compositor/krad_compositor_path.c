@@ -14,6 +14,12 @@ struct kr_compositor_path {
 
 static void path_tick(kr_compositor_path *path);
 
+static float kr_round3(float f) {
+  f = rintf(f * 1000.0);
+  f = f / 1000.0;
+  return f;
+}
+
 size_t kr_compositor_path_size() {
   return sizeof(kr_compositor_path);
 }

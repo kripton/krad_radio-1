@@ -1,3 +1,12 @@
+#define WS_MASK_BIT 0x80  // 10000000
+#define WS_FIN_FRM 0x80   // 10000000
+#define WS_CONT_FRM 0x00  // 00000000
+#define WS_TEXT_FRM 0x01  // 00000001
+#define WS_BIN_FRM 0x02   // 00000010
+#define WS_CLOSE_FRM 0x08 // 00001000
+#define WS_PING_FRM 0x09  // 00001001
+#define WS_PONG_FRM 0x0a  // 00001010
+
 int32_t interweb_ws_parse_frame_header(kr_web_client *client) {
   kr_websocket_client *ws;
   uint8_t *size_bytes;
@@ -6,27 +15,20 @@ int32_t interweb_ws_parse_frame_header(kr_web_client *client) {
   uint16_t payload_sz_16;
   int32_t bytes_read;
   uint8_t frame_type;
-
   bytes_read = 0;
-
   ws = &client->ws;
   ws->input_len = client->in->len;
   ws->input = client->in->rd_buf;
-
   if (ws->input_len < 6) {
     return 0;
   }
-
   frame_type = ws->input[0];
-
   //printk("pframe type = %2X", frame_type);
-
   if (frame_type & WS_FIN_FRM) {
     //printk ("We have a fin frame!");
     frame_type ^= WS_FIN_FRM;
   }
   //printk("poframe type = %2X", frame_type);
-
   if (frame_type == WS_PING_FRM) {
     printke("We have a ping frame but we are not dealing with it right!");
   } else {
@@ -50,16 +52,13 @@ int32_t interweb_ws_parse_frame_header(kr_web_client *client) {
       }
     }
   }
-
   payload_sz_8 = ws->input[1];
-
   if (payload_sz_8 & WS_MASK_BIT) {
     payload_sz_8 ^= WS_MASK_BIT;
   } else {
     printke("Mask Bit is NOT set");
     return -4;
   }
-
   if (payload_sz_8 < 126) {
     //printk("payload size is %u", payload_sz_8);
     ws->mask[0] = ws->input[2];
@@ -103,20 +102,16 @@ int32_t interweb_ws_parse_frame_header(kr_web_client *client) {
       bytes_read = 14;
     }
   }
-
   if (ws->len > 8192 * 6) {
     printke("input ws frame size too big");
     ws->len = 0;
     ws->pos = 0;
     return -10;
   }
-
   ws->pos = 0;
   ws->frames++;
   //printk("payload size is %"PRIu64"", ws->len);
-
-  kr_io2_pulled (client->in, bytes_read);
-
+  kr_io2_pulled(client->in, bytes_read);
   return bytes_read;
 }
 
@@ -126,79 +121,58 @@ int32_t interweb_ws_parse_frame_data(kr_web_client *client) {
   int32_t pos;
   int32_t max;
   uint8_t output[4096];
-
   ws = &client->ws;
   ws->input_len = client->in->len;
   ws->input = client->in->rd_buf;
-
   if (ws->input_len < ws->len) {
     printk("Incomplete WS frame: %u / %"PRIu64"", ws->input_len,
      ws->len);
     return 0;
   }
-
   ws->output = output;
   ws->output_len = sizeof(output);
-
   pos = 0;
-
   if ((ws->len == 0) || (ws->pos == ws->len) || (ws->input_len == 0) ||
       (ws->output_len == 0)) {
     return 0;
   }
-
   max = MIN(MIN((ws->len - ws->pos), ws->input_len), ws->output_len);
-
   //printk ("max is %d", max);
-
   for (pos = 0; pos < max; pos++) {
     ws->output[pos] = ws->input[ws->pos] ^ ws->mask[ws->pos % 4];
     ws->pos++;
   }
-
   output[pos] = '\0';
   //printk("unmasked %d bytes %s", pos, (char *)output);
-
   ret = handle_json(client, (char *)output, pos);
   if (ret != 0) return -1;
-
-  kr_io2_pulled (client->in, pos);
-
+  kr_io2_pulled(client->in, pos);
   if (ws->pos == ws->len) {
     ws->len = 0;
     ws->pos = 0;
   }
-
   return pos;
 }
 
 int32_t interweb_ws_pack_gen_accept_resp(char *resp, char *key) {
-
   static char *ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
   int32_t ret;
   char string[128];
   uint8_t hash[20];
-
   if ((resp == NULL) || (key == NULL)) {
     return -1;
   }
-
   snprintf(string, sizeof(string), "%s%s", key, ws_guid);
   string[127] = '\0';
-
   kr_sha1((uint8_t *)string, strlen(string), hash);
-
   ret = kr_base64((uint8_t *)resp, hash, 20, 64);
-
   return ret;
 }
 
 uint32_t interweb_ws_pack_frame_header(uint8_t *out, uint32_t size) {
-
   uint16_t size_16;
   uint64_t size_64;
   uint8_t *size_bytes;
-
   out[0] = WS_FIN_FRM | WS_TEXT_FRM;
   if (size < 126) {
     out[1] = size;
@@ -229,10 +203,8 @@ uint32_t interweb_ws_pack_frame_header(uint8_t *out, uint32_t size) {
 }
 
 void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len) {
-
   uint32_t header_len;
   uint8_t header[10];
-
   if (len > 0) {
     header_len = interweb_ws_pack_frame_header(header, len);
     if (client->out->space >= (header_len + len)) {
@@ -245,74 +217,55 @@ void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len) {
 }
 
 int32_t interweb_ws_kr_client_connect(kr_web_client *client) {
-
   client->ws.krclient = kr_client_create("websocket client");
-
   if (client->ws.krclient == NULL) {
     return -1;
   }
-
   if (!kr_connect(client->ws.krclient, client->server->sysname)) {
     kr_client_destroy(&client->ws.krclient);
     return -1;
   }
-
   //kr_mixer_info_get(client->ws.krclient);
   //kr_mixer_portgroup_list (client->ws.krclient);
   //kr_compositor_subunit_list (client->ws.krclient);
   kr_subscribe_all(client->ws.krclient);
-
   //printk("interweb_ws_kr_client_connect happens");
-
   return 0;
 }
 
 int32_t interweb_ws_json_hello(kr_web_client *client) {
-
   char json[128];
-
   snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
    "\"info\":\"sysname\",\"infoval\":\"%s\"}]", client->server->sysname);
-
   interweb_ws_pack(client, (uint8_t *)json, strlen(json));
-
   return 0;
 }
 
 int32_t interweb_ws_shake(kr_web_client *client) {
-
   int32_t pos;
   char *buffer;
   char acceptkey[64];
-
   pos = 0;
   buffer = (char *)client->out->buf;
   memset(acceptkey, 0, sizeof(acceptkey));
-
-  interweb_ws_pack_gen_accept_resp (acceptkey, client->ws.key);
-
-  pos += sprintf (buffer + pos, "HTTP/1.1 101 Switching Protocols\r\n");
-  pos += sprintf (buffer + pos, "Upgrade: websocket\r\n");
-  pos += sprintf (buffer + pos, "Connection: Upgrade\r\n");
-  pos += sprintf (buffer + pos, "Sec-WebSocket-Protocol: krad-ws-api\r\n");
-  pos += sprintf (buffer + pos, "Sec-WebSocket-Accept: %s\r\n", acceptkey);
-  pos += sprintf (buffer + pos, "\r\n");
-
-  kr_io2_advance (client->out, pos);
+  interweb_ws_pack_gen_accept_resp(acceptkey, client->ws.key);
+  pos += sprintf(buffer + pos, "HTTP/1.1 101 Switching Protocols\r\n");
+  pos += sprintf(buffer + pos, "Upgrade: websocket\r\n");
+  pos += sprintf(buffer + pos, "Connection: Upgrade\r\n");
+  pos += sprintf(buffer + pos, "Sec-WebSocket-Protocol: krad-ws-api\r\n");
+  pos += sprintf(buffer + pos, "Sec-WebSocket-Accept: %s\r\n", acceptkey);
+  pos += sprintf(buffer + pos, "\r\n");
+  kr_io2_advance(client->out, pos);
   client->ws.shaked = 1;
   set_socket_nodelay(client->sd);
   interweb_ws_json_hello(client);
   interweb_ws_kr_client_connect(client);
-
   //printk("interweb_ws_shake happens");
-
   return 0;
 }
 
 int32_t web_ws_client_handle(kr_web_client *client) {
-
   int ret;
-
   if (!client->ws.shaked) {
     ret = interweb_ws_shake(client);
   } else {
@@ -334,6 +287,5 @@ int32_t web_ws_client_handle(kr_web_client *client) {
       }
     }
   }
-
   return ret;
 }

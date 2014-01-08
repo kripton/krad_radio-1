@@ -1,28 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/utsname.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <ctype.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <errno.h>
-#include <poll.h>
-#include <pthread.h>
-#include <netinet/tcp.h>
-#ifdef KR_LINUX
-#include <ifaddrs.h>
-#endif
-
 #include "krad_radio_version.h"
 #include "krad_system.h"
 #include "krad_ring.h"
@@ -46,15 +21,6 @@
 #define KR_MAX_SDS KR_WEB_CLIENTS_MAX + KR_WEB_KRCLIENTS_MAX + MAX_REMOTES + 1
 #define KR_WEBRTC_NAME_MAX 64
 
-#define WS_MASK_BIT 0x80  // 10000000
-#define WS_FIN_FRM 0x80   // 10000000
-#define WS_CONT_FRM 0x00  // 00000000
-#define WS_TEXT_FRM 0x01  // 00000001
-#define WS_BIN_FRM 0x02   // 00000010
-#define WS_CLOSE_FRM 0x08 // 00001000
-#define WS_PING_FRM 0x09  // 00001001
-#define WS_PONG_FRM 0x0a  // 00001010
-
 enum krad_interweb_shutdown {
   KRAD_INTERWEB_STARTING = -1,
   KRAD_INTERWEB_RUNNING,
@@ -63,11 +29,20 @@ enum krad_interweb_shutdown {
 };
 
 typedef struct kr_web_server kr_web_server;
+typedef struct kr_web_server_setup kr_web_server_setup;
 typedef struct kr_web_client kr_web_client;
 typedef struct kr_websocket_client kr_websocket_client;
 
 typedef struct kr_webrtc_user kr_webrtc_user;
 typedef struct kr_webrtc_signal kr_webrtc_signal;
+
+struct kr_web_server_setup {
+  char *sysname;
+  int32_t port;
+  char *headcode;
+  char *htmlheader;
+  char *htmlfooter;
+};
 
 struct kr_webrtc_user {
   int active;
@@ -184,6 +159,6 @@ int32_t kr_web_server_listen_on(kr_web_server *server, char *interface, int32_t 
 void kr_web_server_disable(kr_web_server *server);
 void kr_web_server_destroy(kr_web_server **server);
 void kr_web_server_run(kr_web_server *server);
-kr_web_server *kr_web_server_create(char *sysname, int32_t port,
- char *headcode, char *htmlheader, char *htmlfooter);
+kr_web_server *kr_web_server_create(kr_web_server_setup *setup);
+
 #endif

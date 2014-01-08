@@ -98,9 +98,7 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
     printk("incompatible slice count and method");
     return -3;
   }
-  //printk("method and slice count compatible");
   while ((map = kr_pool_iterate_active(router->maps, &i))) {
-    //printk("Checking Mapper Prefix: %s", mapper->prefix);
     len = strlen(map->prefix + 1);
     if (((strlen(sliced.slice[0])) == len)
      && (memcmp(map->prefix + 1, sliced.slice[0], len) == 0)) {
@@ -144,37 +142,6 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
   address_slices_print(&sliced);
   return -5;
 }
-
-/*
-static void router_test(kr_router *router) {
-  kr_crate2 crate;
-  memset(&crate, 0, sizeof(kr_crate2));
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_PUT;
-  kr_router_route(router, &crate);
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_GET;
-  kr_router_route(router, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_GET;
-  kr_router_route(router, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_PUT;
-  kr_router_route(router, &crate);
-
-  strcpy(crate.address, "/mixer/Music3");
-  crate.method = KR_DELETE;
-  kr_router_route(router, &crate);
-
-  strcpy(crate.address, "/mixer");
-  crate.method = KR_PUT;
-  kr_router_route(router, &crate);
-}
-*/
 
 int kr_router_map_destroy(kr_router *router, kr_router_map *map) {
   int ret;
