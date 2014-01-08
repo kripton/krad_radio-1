@@ -50,7 +50,6 @@ mkdir -p $gencommon
 
 run_codegen $path $pre $suff $gencommon
 
+sh scripts/update_embeded.sh
+
 echo 'All Done!'
-
-
-
