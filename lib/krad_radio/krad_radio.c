@@ -16,9 +16,9 @@ struct kr_radio {
 };
 
 static int setup_maps(kr_radio *radio);
-static void xpdr_event(kr_transponder_event_info *event);
+static void xpdr_event(kr_transponder_event *event);
 
-static void xpdr_event(kr_transponder_event_info *event) {
+static void xpdr_event(kr_transponder_event *event) {
   printk("got a xpdr event");
 }
 
@@ -28,7 +28,7 @@ static int setup_maps(kr_radio *radio) {
   memset(&setup, 0, sizeof(kr_router_map_setup));
   strcpy(setup.prefix, "/mixer");
   setup.ptr = radio->mixer;
-  setup.create = (kr_router_map_create_handler *)kr_mixer_mkpath;
+  setup.create = (kr_router_map_create_handler *)kr_mixer_mkbus;
   setup.patch = (kr_router_map_patch_handler *)kr_mixer_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_mixer_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
@@ -39,7 +39,7 @@ static int setup_maps(kr_radio *radio) {
   memset(&setup, 0, sizeof(kr_router_map_setup));
   strcpy(setup.prefix, "/compositor");
   setup.ptr = radio->compositor;
-  setup.create = (kr_router_map_create_handler *)kr_compositor_mkpath;
+  setup.create = (kr_router_map_create_handler *)kr_compositor_mkbus;
   setup.patch = (kr_router_map_patch_handler *)kr_compositor_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
@@ -51,7 +51,7 @@ static int setup_maps(kr_radio *radio) {
   strcpy(setup.prefix, "/transponder");
   setup.ptr = radio->transponder;
   setup.create = (kr_router_map_create_handler *)kr_transponder_mkpath;
-  //setup.patch = (kr_router_map_patch_handler *)kr_transponder_path_ctl;
+  setup.patch = (kr_router_map_patch_handler *)kr_transponder_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_transponder_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {

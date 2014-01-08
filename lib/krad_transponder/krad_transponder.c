@@ -164,8 +164,8 @@ static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
   kr_mixer *mixer;
   kr_compositor *compositor;
   kr_adapter *adapter;
-  kr_mixer_path_setup mp_setup;
-  kr_compositor_path_setup cp_setup;
+  kr_mixer_io_path_setup mp_setup;
+  kr_compositor_io_path_setup cp_setup;
   kr_adapter_path_setup ap_setup;
   mixer = path->xpdr->mixer;
   compositor = path->xpdr->compositor;
@@ -201,7 +201,7 @@ static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
        sizeof(kr_mixer_path_info));
       mp_setup.audio_cb = xpdr_mixer_path_audio_cb;
       mp_setup.user = path;
-      io->mixer_path = kr_mixer_mkpath(mixer, &mp_setup);
+      io->mixer_path = kr_mixer_mkio(mixer, &mp_setup);
       if (io->mixer_path == NULL) {
         printke("mixer mkpath returned NULL");
       }
@@ -211,7 +211,7 @@ static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
        sizeof(kr_compositor_path_info));
       cp_setup.frame_cb = xpdr_compositor_path_frame_cb;
       cp_setup.user = path;
-      io->compositor_path = kr_compositor_mkpath(compositor, &cp_setup);
+      io->compositor_path = kr_compositor_mkio(compositor, &cp_setup);
       if (io->compositor_path == NULL) {
         printke("compositor mkpath returned NULL");
       }
@@ -263,6 +263,10 @@ static kr_xpdr_path *path_alloc(kr_transponder *xpdr) {
     }
   }
   return NULL;
+}
+
+int kr_transponder_path_ctl(kr_xpdr *xpdr, kr_xpdr_path_patch *patch) {
+  return -1;
 }
 
 kr_xpdr_path *kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {

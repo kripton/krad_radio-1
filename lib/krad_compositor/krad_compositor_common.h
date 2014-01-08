@@ -5,6 +5,7 @@
 
 #include "krad_system.h"
 #include "krad_perspective.h"
+#include "krad_easing_common.h"
 
 typedef enum {
   KR_CMP_OUTPUT = 666,
@@ -68,6 +69,7 @@ typedef struct kr_vector_info kr_vector_info;
 typedef struct kr_compositor_path_info kr_compositor_path_info;
 typedef struct kr_compositor_controls kr_compositor_controls;
 typedef struct kr_compositor_info kr_compositor_info;
+typedef struct kr_compositor_path_patch kr_compositor_path_patch;
 
 #include "gen/krad_compositor_to_json.h"
 #include "gen/krad_compositor_to_ebml.h"
@@ -133,7 +135,15 @@ struct kr_compositor_info {
   uint32_t inputs; /* 0, 0, 32 */
   uint32_t outputs; /* 0, 0, 32 */
   uint64_t frames;
-  uint64_t timecode; 
+  uint64_t timecode;
+};
+
+struct kr_compositor_path_patch {
+  kr_compositor_control control;
+  int32_t integer;
+  float real;
+  int duration;
+  kr_easing easing;
 };
 
 void kr_aspect_scale(int srcw, int srch, int dstw, int dsth, int *w, int *h);

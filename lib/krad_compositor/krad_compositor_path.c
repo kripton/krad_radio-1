@@ -151,7 +151,7 @@ int path_render(kr_compositor_path *path, kr_image *dst, cairo_t *cr) {
   return 0;
 }
 
-int path_setup_check(kr_compositor_path_setup *setup) {
+int path_setup_check(kr_compositor_io_path_setup *setup) {
 
   kr_compositor_path_info *info;
   info = &setup->info;
@@ -171,8 +171,7 @@ int path_setup_check(kr_compositor_path_setup *setup) {
 }
 
 static void path_create(kr_compositor_path *path,
- kr_compositor_path_setup *setup) {
-
+ kr_compositor_io_path_setup *setup) {
   path->info = setup->info;
   /* FIXME a silly default? */
   path->info.controls.opacity = 0.0f;
@@ -189,11 +188,13 @@ static void path_create(kr_compositor_path *path,
   }
 }
 
-kr_compositor_path *kr_compositor_mkpath(kr_compositor *compositor,
- kr_compositor_path_setup *setup) {
+kr_compositor_path *kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *p) {
+  return NULL;
+}
 
+kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
+ kr_compositor_io_path_setup *setup) {
   kr_compositor_path *path;
-
   if ((compositor == NULL) || (setup == NULL)) return NULL;
   if (path_setup_check(setup)) {
     printke("compositor mkpath failed setup check");
@@ -243,31 +244,7 @@ int kr_compositor_path_info_get(kr_compositor_path *path,
  return 0;
 }
 
-kr_compositor_path *kr_compositor_find_num(kr_compositor *c, int num) {
-  kr_compositor_path *path;
-  if (c == NULL) return NULL;
-  while ((path = kr_pool_slice_num(c->path_pool, num))) {
-    if (path->info.type == KR_CMP_INPUT) {
-      return path;
-    }
-  }
-  return NULL;
-}
-
-kr_compositor_path *kr_compositor_find(kr_compositor *c, char *name) {
-  int i;
-  kr_compositor_path *path;
-  if (c == NULL) return NULL;
-  i = 0;
-  while ((path = kr_pool_iterate_active(c->path_pool, &i))) {
-    if (path->info.type == KR_CMP_INPUT) {
-      return path;
-    }
-  }
-  return NULL;
-}
-
-int kr_compositor_path_ctl(kr_compositor_path *p, kr_compositor_path_setting *s) {
+int kr_compositor_path_ctl(kr_compositor_path *p, kr_compositor_path_patch *s) {
   if ((p == NULL) || (s == NULL)) return -1;
   switch (s->control) {
     case KR_NO:

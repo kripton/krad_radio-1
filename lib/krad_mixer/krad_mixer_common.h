@@ -15,7 +15,7 @@
 #define KR_MXR_RMS_WINDOW_MS 100
 
 #include "krad_sfx_common.h"
-#include "krad_ebml.h"
+#include "krad_easing_common.h"
 
 #include "gen/krad_mixer_to_json.h"
 #include "gen/krad_mixer_from_json.h"
@@ -29,6 +29,8 @@ typedef struct kr_mixer_path_info kr_mixer_path_info;
 typedef struct kr_mixer_path_info kr_mixer_input_info;
 typedef struct kr_mixer_path_info kr_mixer_bus_info;
 typedef struct kr_mixer_path_info kr_mixer_output_info;
+typedef struct kr_mixer_path_patch kr_mixer_path_patch;
+
 
 typedef enum {
   NIL,
@@ -89,6 +91,13 @@ struct kr_mixer_path_info {
   kr_highpass_info highpass;
   kr_analog_info analog;
   kr_eq_info eq;
+};
+
+struct kr_mixer_path_patch {
+  char *ctl;
+  float val;
+  int ms;
+  void *p;
 };
 
 char *kr_mixer_channeltostr(int channel);

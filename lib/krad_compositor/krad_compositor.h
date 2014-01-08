@@ -3,10 +3,15 @@
 
 typedef struct kr_compositor kr_compositor;
 typedef struct kr_compositor_setup kr_compositor_setup;
-typedef struct kr_compositor_info_cb_arg kr_compositor_info_cb_arg;
+typedef struct kr_compositor_event kr_compositor_event;
 typedef struct kr_compositor_control_easers kr_compositor_control_easers;
+typedef void (kr_compositor_event_cb)(kr_compositor_event *);
 
 #include "krad_easing.h"
+
+struct kr_compositor_event {
+  void *user;
+};
 
 struct kr_compositor_control_easers {
   kr_easer x;
@@ -44,17 +49,13 @@ struct kr_compositor_control_easers {
 #define GREY 0.197 / 0.255 * 1.0, 0.203 / 0.255 * 1.0, 0.203 / 0.255 * 1.0
 #define BGCOLOR_CLR 0.0, 0.0, 0.0, 1.0
 
-struct kr_compositor_info_cb_arg {
-  void *user;
-};
-
 struct kr_compositor_setup {
   uint32_t width;
   uint32_t height;
   uint32_t fps_num;
   uint32_t fps_den;
   void *user;
-  kr_compositor_info_cb *cb;
+  kr_compositor_event_cb *event_cb;
 };
 
 struct kr_compositor {
