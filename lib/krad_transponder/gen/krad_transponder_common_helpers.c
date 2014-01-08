@@ -407,3 +407,30 @@ int kr_transponder_path_info_random(void *st) {
   return 0;
 }
 
+int kr_transponder_path_patch_init(void *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+
+  return 0;
+}
+
+int kr_transponder_path_patch_valid(void *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+
+  return 0;
+}
+
+int kr_transponder_path_patch_random(void *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+
+  return 0;
+}
+

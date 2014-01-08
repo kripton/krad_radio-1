@@ -246,3 +246,34 @@ int kr_compositor_info_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
+int kr_compositor_path_patch_to_json(char *json, void *st, int32_t max) {
+  uber_St uber;
+  int res;
+  struct kr_compositor_path_patch *actual;
+
+  res = 0;
+
+  if ((json == NULL) || (st == NULL) || (max < 1)) {
+    return -1;
+  }
+
+  actual = (struct kr_compositor_path_patch *)st;
+
+  res += snprintf(&json[res],max-res,"{");
+  res += snprintf(&json[res],max-res,"\"control\": ");
+  uber.actual = &(actual->control);
+  uber.type = JSON_KR_COMPOSITOR_CONTROL;
+  res += info_pack_to_json(&json[res],&uber,max-res);
+  res += snprintf(&json[res],max-res,",");
+  res += snprintf(&json[res],max-res,"\"integer\" : %d,",actual->integer);
+  res += snprintf(&json[res],max-res,"\"real\" : %0.2f,",actual->real);
+  res += snprintf(&json[res],max-res,"\"duration\" : %d,",actual->duration);
+  res += snprintf(&json[res],max-res,"\"easing\": ");
+  uber.actual = &(actual->easing);
+  uber.type = JSON_KR_EASING;
+  res += info_pack_to_json(&json[res],&uber,max-res);
+  res += snprintf(&json[res],max-res,"}");
+
+  return res;
+}
+

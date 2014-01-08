@@ -193,3 +193,24 @@ int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
+int kr_mixer_path_patch_to_json(char *json, void *st, int32_t max) {
+  uber_St uber;
+  int res;
+  struct kr_mixer_path_patch *actual;
+
+  res = 0;
+
+  if ((json == NULL) || (st == NULL) || (max < 1)) {
+    return -1;
+  }
+
+  actual = (struct kr_mixer_path_patch *)st;
+
+  res += snprintf(&json[res],max-res,"{");
+  res += snprintf(&json[res],max-res,"\"val\" : %0.2f,",actual->val);
+  res += snprintf(&json[res],max-res,"\"ms\" : %d",actual->ms);
+  res += snprintf(&json[res],max-res,"}");
+
+  return res;
+}
+

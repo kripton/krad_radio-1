@@ -148,3 +148,23 @@ int kr_mixer_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
+int kr_mixer_path_patch_fr_ebml(kr_ebml *ebml, void *st) {
+  uber_St uber;
+  int res;
+  struct kr_mixer_path_patch *actual;
+
+  res = 0;
+
+  if ((ebml == NULL) || (st == NULL)) {
+    return -1;
+  }
+
+  actual = (struct kr_mixer_path_patch *)st;
+
+  res += kr_ebml2_unpack_element_string(ebml, NULL, actual->ctl , sizeof(actual->ctl));
+  res += kr_ebml2_unpack_element_float(ebml, NULL, &actual->val);
+  res += kr_ebml2_unpack_element_int32(ebml, NULL, &actual->ms);
+
+  return res;
+}
+

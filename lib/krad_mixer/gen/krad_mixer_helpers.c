@@ -436,3 +436,41 @@ int kr_mixer_path_info_random(void *st) {
   return 0;
 }
 
+int kr_mixer_path_patch_init(void *st) {
+  struct kr_mixer_path_patch *actual;
+
+  if (st == NULL) {
+    return -1;
+  }
+
+  actual = (struct kr_mixer_path_patch *)st;
+  memset(actual, 0, sizeof(struct kr_mixer_path_patch));
+
+  return 0;
+}
+
+int kr_mixer_path_patch_valid(void *st) {
+  struct kr_mixer_path_patch *actual;
+
+  if (st == NULL) {
+    return -1;
+  }
+
+  actual = (struct kr_mixer_path_patch *)st;
+
+  return 0;
+}
+
+int kr_mixer_path_patch_random(void *st) {
+  struct kr_mixer_path_patch *actual;
+
+  if (st == NULL) {
+    return -1;
+  }
+
+  actual = (struct kr_mixer_path_patch *)st;
+  memset(actual, 0, sizeof(struct kr_mixer_path_patch));
+
+  return 0;
+}
+

@@ -13,3 +13,4 @@ int kr_text_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_vector_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_compositor_path_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_compositor_info_fr_ebml(kr_ebml *ebml, void *st);
+int kr_compositor_path_patch_fr_ebml(kr_ebml *ebml, void *st);

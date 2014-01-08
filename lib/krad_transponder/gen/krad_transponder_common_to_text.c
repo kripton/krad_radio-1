@@ -183,3 +183,20 @@ int kr_transponder_path_info_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
+int kr_transponder_path_patch_to_text(char *text, void *st, int32_t max) {
+  int res;
+  struct kr_transponder_path_patch *actual;
+
+  res = 0;
+
+  if ((text == NULL) || (st == NULL) || (max < 1)) {
+    return -1;
+  }
+
+  actual = (struct kr_transponder_path_patch *)st;
+
+  res += snprintf(&text[res],max-res,"coconut : %d \n",actual->coconut);
+
+  return res;
+}
+

@@ -8,3 +8,4 @@ int kr_mixer_path_type_to_text(char *text, void *st, int32_t max);
 int kr_mixer_adv_ctl_to_text(char *text, void *st, int32_t max);
 int kr_mixer_info_to_text(char *text, void *st, int32_t max);
 int kr_mixer_path_info_to_text(char *text, void *st, int32_t max);
+int kr_mixer_path_patch_to_text(char *text, void *st, int32_t max);
