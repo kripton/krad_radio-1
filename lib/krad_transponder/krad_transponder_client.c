@@ -5,9 +5,9 @@
 int kr_xpdr_mkpath(kr_client *client, kr_transponder_path_info *info) {
   if (client == NULL) return -1;
   if (info == NULL) return -1;
-  if (kr_transponder_path_info_valid(info) < 0) {
-   return -1;
-  }
+  //if (kr_transponder_path_info_valid(info) < 0) {
+  // return -1;
+  //}
   uint8_t *ebml_crate;
   kr_crate2 crate;
   strcpy(crate.address, "/transponder/bongo");
