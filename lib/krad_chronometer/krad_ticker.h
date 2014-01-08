@@ -1,17 +1,7 @@
-#include <time.h>
-
 #include "krad_system.h"
 
 typedef struct kr_ticker kr_ticker;
 typedef struct kr_ticker krad_ticker_t;
-
-struct kr_ticker {
-  struct timespec start_time;
-  struct timespec wakeup_time;
-  uint64_t period_time_ns;
-  uint64_t total_periods;
-  uint64_t total_ms;
-};
 
 struct timespec timespec_add_ms(struct timespec ts, uint64_t ms);
 struct timespec timespec_add_ns(struct timespec ts, uint64_t ns);

@@ -1,9 +1,9 @@
+#ifndef KRAD_ROUTER_H
+#define KRAD_ROUTER_H
+
 #include "krad_system.h"
 #include "krad_pool.h"
 #include "krad_app_common.h"
-
-#ifndef KRAD_ROUTER_H
-#define KRAD_ROUTER_H
 
 typedef struct kr_router_setup kr_router_setup;
 typedef struct kr_router_info kr_router_info;

@@ -1,3 +1,13 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <inttypes.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <poll.h>
+#include <errno.h>
+
 #include "krad_stream.h"
 
 static void kr_stream_read_http_headers(kr_stream *stream);

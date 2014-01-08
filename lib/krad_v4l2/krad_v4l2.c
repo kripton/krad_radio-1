@@ -1,3 +1,4 @@
+#include <poll.h>
 #include "krad_v4l2.h"
 
 #define KR_V4L2_BUFS_DEF 12
