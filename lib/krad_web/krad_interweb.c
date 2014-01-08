@@ -22,7 +22,7 @@
 #include <ifaddrs.h>
 
 #include "krad_interweb.h"
-#include "embed.h"
+#include "gen/embed.h"
 
 static void web_server_update_pollfds(kr_web_server *server);
 static void *web_server_loop(void *arg);

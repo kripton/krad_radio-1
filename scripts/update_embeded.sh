@@ -14,7 +14,7 @@ rm -f *.h
 ../../../tools/code/hextool/hextool dev_interface.js
 cat ../rack/*.js > interface.js
 ../../../tools/code/hextool/hextool interface.js
-cat *.h > ../embed.h
+cat *.h > ../gen/embed.h
 rm -f interface.js
 rm -f *.h
 cd ../../../
