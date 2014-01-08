@@ -16,9 +16,11 @@ int main(int argc, char const *argv[]) {
   info1.input.type = KR_XPDR_COMPOSITOR;
   info1.input.info.compositor_path_info.width = 1280;
   info1.input.info.compositor_path_info.height = 720;
+  info1.input.info.compositor_path_info.type = KR_CMP_INPUT;
   info1.output.type = KR_XPDR_MIXER;
   info1.output.info.mixer_path_info.volume[0] = 75.00f;
   info1.output.info.mixer_path_info.volume[1] = 75.00f;
+  info1.input.info.mixer_path_info.type = KR_MXR_OUTPUT;
 
   res = kr_transponder_path_info_to_json(json,&info1,sizeof(json));
 

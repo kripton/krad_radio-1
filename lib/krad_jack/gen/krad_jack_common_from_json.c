@@ -141,6 +141,7 @@ int kr_jack_setup_info_fr_json(char *json, void *st) {
 }
 
 int kr_jack_info_fr_json(char *json, void *st) {
+  int type;
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -223,10 +224,11 @@ int kr_jack_info_fr_json(char *json, void *st) {
     return -3;
   }
   json[tokens[k].end] = '\0';
-  actual->state = kr_strto_kr_jack_state(&json[tokens[k].start]);
-  if (actual->state < 0) {
+  type = kr_strto_kr_jack_state(&json[tokens[k].start]);
+  if (type < 0) {
     return -3;
   }
+  actual->state = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -343,6 +345,7 @@ int kr_jack_info_fr_json(char *json, void *st) {
 }
 
 int kr_jack_path_info_fr_json(char *json, void *st) {
+  int type;
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -425,10 +428,11 @@ int kr_jack_path_info_fr_json(char *json, void *st) {
     return -3;
   }
   json[tokens[k].end] = '\0';
-  actual->direction = kr_strto_kr_jack_direction(&json[tokens[k].start]);
-  if (actual->direction < 0) {
+  type = kr_strto_kr_jack_direction(&json[tokens[k].start]);
+  if (type < 0) {
     return -3;
   }
+  actual->direction = type;
   k++;
 
   res = k;

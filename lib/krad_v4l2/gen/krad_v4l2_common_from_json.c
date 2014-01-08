@@ -163,6 +163,7 @@ int kr_v4l2_mode_fr_json(char *json, void *st) {
 
 int kr_v4l2_info_fr_json(char *json, void *st) {
   uber_St uber;
+  int type;
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -245,10 +246,11 @@ int kr_v4l2_info_fr_json(char *json, void *st) {
     return -3;
   }
   json[tokens[k].end] = '\0';
-  actual->state = kr_strto_kr_v4l2_state(&json[tokens[k].start]);
-  if (actual->state < 0) {
+  type = kr_strto_kr_v4l2_state(&json[tokens[k].start]);
+  if (type < 0) {
     return -3;
   }
+  actual->state = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {

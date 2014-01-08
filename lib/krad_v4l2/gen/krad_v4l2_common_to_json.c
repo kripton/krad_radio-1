@@ -1,6 +1,7 @@
 #include "krad_v4l2_common_to_json.h"
 
 int kr_v4l2_state_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_v4l2_state *actual;
 
@@ -12,7 +13,8 @@ int kr_v4l2_state_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_v4l2_state *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_v4l2_state(*actual));
+  type = kr_strfr_kr_v4l2_state(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }

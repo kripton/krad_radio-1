@@ -267,6 +267,7 @@ int kr_transponder_path_io_path_info_fr_json(char *json, void *st) {
 
 int kr_transponder_path_io_info_fr_json(char *json, void *st) {
   uber_St uber;
+  int type;
   uber_St uber_sub;
   int index;
   int res;
@@ -315,10 +316,11 @@ int kr_transponder_path_io_info_fr_json(char *json, void *st) {
     return -1;
   }
   json[tokens[k].end] = '\0';
-  actual->type = kr_strto_kr_transponder_path_io_type(&json[tokens[k].start]);
-  if (actual->type < 0) {
+  type = kr_strto_kr_transponder_path_io_type(&json[tokens[k].start]);
+  if (type < 0) {
     return -1;
   }
+  actual->type = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {

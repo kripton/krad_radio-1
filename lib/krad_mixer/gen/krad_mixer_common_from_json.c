@@ -316,6 +316,7 @@ int kr_mixer_info_fr_json(char *json, void *st) {
 
 int kr_mixer_path_info_fr_json(char *json, void *st) {
   uber_St uber;
+  int type;
   int i;
   int res;
   jsmn_parser parser;
@@ -417,10 +418,11 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     return -4;
   }
   json[tokens[k].end] = '\0';
-  actual->channels = kr_strto_kr_mixer_channels(&json[tokens[k].start]);
-  if (actual->channels < 0) {
+  type = kr_strto_kr_mixer_channels(&json[tokens[k].start]);
+  if (type < 0) {
     return -4;
   }
+  actual->channels = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -437,10 +439,11 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     return -5;
   }
   json[tokens[k].end] = '\0';
-  actual->type = kr_strto_kr_mixer_path_type(&json[tokens[k].start]);
-  if (actual->type < 0) {
+  type = kr_strto_kr_mixer_path_type(&json[tokens[k].start]);
+  if (type < 0) {
     return -5;
   }
+  actual->type = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {

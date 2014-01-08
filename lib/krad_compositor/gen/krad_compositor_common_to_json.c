@@ -1,6 +1,7 @@
 #include "krad_compositor_common_to_json.h"
 
 int kr_compositor_path_type_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_compositor_path_type *actual;
 
@@ -12,12 +13,14 @@ int kr_compositor_path_type_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_compositor_path_type *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_compositor_path_type(*actual));
+  type = kr_strfr_kr_compositor_path_type(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_compositor_subunit_type_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_compositor_subunit_type *actual;
 
@@ -29,12 +32,14 @@ int kr_compositor_subunit_type_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_compositor_subunit_type *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_compositor_subunit_type(*actual));
+  type = kr_strfr_kr_compositor_subunit_type(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_vector_type_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_vector_type *actual;
 
@@ -46,12 +51,14 @@ int kr_vector_type_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_vector_type *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_vector_type(*actual));
+  type = kr_strfr_kr_vector_type(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_compositor_control_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_compositor_control *actual;
 
@@ -63,7 +70,8 @@ int kr_compositor_control_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_compositor_control *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_compositor_control(*actual));
+  type = kr_strfr_kr_compositor_control(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }

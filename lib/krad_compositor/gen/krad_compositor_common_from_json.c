@@ -552,6 +552,7 @@ int kr_text_info_fr_json(char *json, void *st) {
 
 int kr_vector_info_fr_json(char *json, void *st) {
   uber_St uber;
+  int type;
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -598,10 +599,11 @@ int kr_vector_info_fr_json(char *json, void *st) {
     return -1;
   }
   json[tokens[k].end] = '\0';
-  actual->type = kr_strto_kr_vector_type(&json[tokens[k].start]);
-  if (actual->type < 0) {
+  type = kr_strto_kr_vector_type(&json[tokens[k].start]);
+  if (type < 0) {
     return -1;
   }
+  actual->type = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -690,6 +692,7 @@ int kr_vector_info_fr_json(char *json, void *st) {
 
 int kr_compositor_path_info_fr_json(char *json, void *st) {
   uber_St uber;
+  int type;
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -754,10 +757,11 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
     return -2;
   }
   json[tokens[k].end] = '\0';
-  actual->type = kr_strto_kr_compositor_path_type(&json[tokens[k].start]);
-  if (actual->type < 0) {
+  type = kr_strto_kr_compositor_path_type(&json[tokens[k].start]);
+  if (type < 0) {
     return -2;
   }
+  actual->type = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {

@@ -244,6 +244,16 @@ static void codegen_function(struct_data *def, char *type,
   }
 
   for (i = 0; i < def->info.member_count; i++) {
+    if ((def->info.members[i].type == T_STRUCT) && 
+      codegen_is_enum(def->info.members[i].type_info.substruct_info.type_name) ) {
+      if ((gformat == DEJSON)) {
+        res += sprintf(&decl[res],"  int type;\n");
+        break;
+      }
+    }
+  }
+
+  for (i = 0; i < def->info.member_count; i++) {
     if ( /* (def->info.members[i-1].type == T_STRUCT && 
       codegen_is_enum(def->info.members[i-1].type_info.substruct_info.type_name))
        && */ memb_struct_check(&def->info.members[i]) &&
@@ -252,6 +262,10 @@ static void codegen_function(struct_data *def, char *type,
       res += sprintf(&decl[res],"  int index;\n");
       break;
     }
+  }
+
+  if (def->info.type == ST_ENUM && gformat == JSON) {
+    res += sprintf(&decl[res],"  char *type;\n");
   }
 
   for (i = 0; i < def->info.member_count; i++) {

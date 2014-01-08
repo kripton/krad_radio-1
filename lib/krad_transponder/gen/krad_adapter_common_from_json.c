@@ -272,6 +272,7 @@ int kr_adapter_api_path_info_fr_json(char *json, void *st) {
 
 int kr_adapter_info_fr_json(char *json, void *st) {
   uber_St uber;
+  int type;
   uber_St uber_sub;
   int index;
   int res;
@@ -320,10 +321,11 @@ int kr_adapter_info_fr_json(char *json, void *st) {
     return -1;
   }
   json[tokens[k].end] = '\0';
-  actual->api = kr_strto_kr_adapter_api(&json[tokens[k].start]);
-  if (actual->api < 0) {
+  type = kr_strto_kr_adapter_api(&json[tokens[k].start]);
+  if (type < 0) {
     return -1;
   }
+  actual->api = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -360,6 +362,7 @@ int kr_adapter_info_fr_json(char *json, void *st) {
 
 int kr_adapter_path_info_fr_json(char *json, void *st) {
   uber_St uber;
+  int type;
   uber_St uber_sub;
   int index;
   int res;
@@ -426,10 +429,11 @@ int kr_adapter_path_info_fr_json(char *json, void *st) {
     return -2;
   }
   json[tokens[k].end] = '\0';
-  actual->dir = kr_strto_kr_adapter_path_direction(&json[tokens[k].start]);
-  if (actual->dir < 0) {
+  type = kr_strto_kr_adapter_path_direction(&json[tokens[k].start]);
+  if (type < 0) {
     return -2;
   }
+  actual->dir = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -446,10 +450,11 @@ int kr_adapter_path_info_fr_json(char *json, void *st) {
     return -3;
   }
   json[tokens[k].end] = '\0';
-  actual->api = kr_strto_kr_adapter_api(&json[tokens[k].start]);
-  if (actual->api < 0) {
+  type = kr_strto_kr_adapter_api(&json[tokens[k].start]);
+  if (type < 0) {
     return -3;
   }
+  actual->api = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {

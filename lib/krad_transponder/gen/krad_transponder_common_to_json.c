@@ -1,6 +1,7 @@
 #include "krad_transponder_common_to_json.h"
 
 int krad_link_av_mode_t_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   krad_link_av_mode_t *actual;
 
@@ -12,12 +13,14 @@ int krad_link_av_mode_t_to_json(char *json, void *st, int32_t max) {
 
   actual = (krad_link_av_mode_t *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_krad_link_av_mode_t(*actual));
+  type = kr_strfr_krad_link_av_mode_t(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_txpdr_su_type_t_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_txpdr_su_type_t *actual;
 
@@ -29,12 +32,14 @@ int kr_txpdr_su_type_t_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_txpdr_su_type_t *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_txpdr_su_type_t(*actual));
+  type = kr_strfr_kr_txpdr_su_type_t(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int krad_link_transport_mode_t_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   krad_link_transport_mode_t *actual;
 
@@ -46,12 +51,14 @@ int krad_link_transport_mode_t_to_json(char *json, void *st, int32_t max) {
 
   actual = (krad_link_transport_mode_t *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_krad_link_transport_mode_t(*actual));
+  type = kr_strfr_krad_link_transport_mode_t(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_transponder_path_io_type_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_transponder_path_io_type *actual;
 
@@ -63,7 +70,8 @@ int kr_transponder_path_io_type_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_transponder_path_io_type *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_transponder_path_io_type(*actual));
+  type = kr_strfr_kr_transponder_path_io_type(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }

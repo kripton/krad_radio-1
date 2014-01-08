@@ -1,6 +1,7 @@
 #include "krad_mixer_common_to_json.h"
 
 int kr_mixer_channels_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_mixer_channels *actual;
 
@@ -12,12 +13,14 @@ int kr_mixer_channels_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_mixer_channels *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_mixer_channels(*actual));
+  type = kr_strfr_kr_mixer_channels(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_mixer_control_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_mixer_control *actual;
 
@@ -29,12 +32,14 @@ int kr_mixer_control_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_mixer_control *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_mixer_control(*actual));
+  type = kr_strfr_kr_mixer_control(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_mixer_path_type_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_mixer_path_type *actual;
 
@@ -46,12 +51,14 @@ int kr_mixer_path_type_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_mixer_path_type *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_mixer_path_type(*actual));
+  type = kr_strfr_kr_mixer_path_type(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_mixer_adv_ctl_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_mixer_adv_ctl *actual;
 
@@ -63,7 +70,8 @@ int kr_mixer_adv_ctl_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_mixer_adv_ctl *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_mixer_adv_ctl(*actual));
+  type = kr_strfr_kr_mixer_adv_ctl(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }

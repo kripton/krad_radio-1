@@ -1,6 +1,7 @@
 #include "krad_adapter_common_to_json.h"
 
 int kr_adapter_path_direction_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_adapter_path_direction *actual;
 
@@ -12,12 +13,14 @@ int kr_adapter_path_direction_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_adapter_path_direction *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_adapter_path_direction(*actual));
+  type = kr_strfr_kr_adapter_path_direction(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_adapter_api_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_adapter_api *actual;
 
@@ -29,7 +32,8 @@ int kr_adapter_api_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_adapter_api *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_adapter_api(*actual));
+  type = kr_strfr_kr_adapter_api(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }

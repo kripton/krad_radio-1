@@ -1,6 +1,7 @@
 #include "krad_jack_common_to_json.h"
 
 int kr_jack_direction_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_jack_direction *actual;
 
@@ -12,12 +13,14 @@ int kr_jack_direction_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_jack_direction *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_jack_direction(*actual));
+  type = kr_strfr_kr_jack_direction(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
 int kr_jack_state_to_json(char *json, void *st, int32_t max) {
+  char *type;
   int res;
   kr_jack_state *actual;
 
@@ -29,7 +32,8 @@ int kr_jack_state_to_json(char *json, void *st, int32_t max) {
 
   actual = (kr_jack_state *)st;
 
-  res += snprintf(&json[res],max-res,"\"%s\"",kr_strfr_kr_jack_state(*actual));
+  type = kr_strfr_kr_jack_state(*actual);
+  res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
