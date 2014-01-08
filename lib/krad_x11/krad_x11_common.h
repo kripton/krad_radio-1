@@ -18,11 +18,12 @@ struct kr_x11_path_info {
   int y;
 };
 
-#include "gen/krad_x11_to_ebml.h"
-#include "gen/krad_x11_from_ebml.h"
-#include "gen/krad_x11_to_text.h"
-#include "gen/krad_x11_to_json.h"
-#include "gen/krad_x11_helpers.h"
+#include "gen/krad_x11_common_to_ebml.h"
+#include "gen/krad_x11_common_from_ebml.h"
+#include "gen/krad_x11_common_to_text.h"
+#include "gen/krad_x11_common_to_json.h"
+#include "gen/krad_x11_common_from_json.h"
+#include "gen/krad_x11_common_helpers.h"
 
 #endif
 

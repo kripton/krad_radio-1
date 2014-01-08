@@ -18,10 +18,11 @@ struct kr_decklink_path_info {
   char audio_connector[64];
 };
 
-#include "gen/krad_decklink_to_ebml.h"
-#include "gen/krad_decklink_from_ebml.h"
-#include "gen/krad_decklink_to_text.h"
-#include "gen/krad_decklink_to_json.h"
-#include "gen/krad_decklink_helpers.h"
+#include "gen/krad_decklink_common_to_ebml.h"
+#include "gen/krad_decklink_common_from_ebml.h"
+#include "gen/krad_decklink_common_to_text.h"
+#include "gen/krad_decklink_common_to_json.h"
+#include "gen/krad_decklink_common_from_json.h"
+#include "gen/krad_decklink_common_helpers.h"
 
 #endif

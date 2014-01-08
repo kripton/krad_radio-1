@@ -7,10 +7,10 @@
 #define KR_EID_PAYLOAD 0xB9
 #define KR_EID_TERMINATOR 0xE2
 
-#include "gen/krad_app_to_ebml.h"
-#include "gen/krad_app_from_ebml.h"
-#include "gen/krad_app_to_text.h"
-#include "gen/krad_app_helpers.h"
+#include "gen/krad_app_common_to_ebml.h"
+#include "gen/krad_app_common_from_ebml.h"
+#include "gen/krad_app_common_to_text.h"
+#include "gen/krad_app_common_helpers.h"
 
 /* here is were we link our payload */
 #include "krad_radio_payload.h"

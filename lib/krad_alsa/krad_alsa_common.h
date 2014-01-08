@@ -13,10 +13,11 @@ struct kr_alsa_path_info {
   int card_num;
 };
 
-#include "gen/krad_alsa_to_ebml.h"
-#include "gen/krad_alsa_from_ebml.h"
-#include "gen/krad_alsa_to_text.h"
-#include "gen/krad_alsa_to_json.h"
-#include "gen/krad_alsa_helpers.h"
+#include "gen/krad_alsa_common_to_ebml.h"
+#include "gen/krad_alsa_common_from_ebml.h"
+#include "gen/krad_alsa_common_to_text.h"
+#include "gen/krad_alsa_common_to_json.h"
+#include "gen/krad_alsa_common_from_json.h"
+#include "gen/krad_alsa_common_helpers.h"
 
 #endif

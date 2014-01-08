@@ -7,12 +7,12 @@
 #define KR_SFX_MAX_CHANNELS 8
 #define KR_EQ_MAX_BANDS 32
 
-#include "gen/krad_sfx_to_json.h"
-#include "gen/krad_sfx_from_json.h"
-#include "gen/krad_sfx_to_ebml.h"
-#include "gen/krad_sfx_from_ebml.h"
-#include "gen/krad_sfx_to_text.h"
-#include "gen/krad_sfx_helpers.h"
+#include "gen/krad_sfx_common_to_json.h"
+#include "gen/krad_sfx_common_from_json.h"
+#include "gen/krad_sfx_common_to_ebml.h"
+#include "gen/krad_sfx_common_from_ebml.h"
+#include "gen/krad_sfx_common_to_text.h"
+#include "gen/krad_sfx_common_helpers.h"
 
 typedef enum {
   KR_SFX_EFFECT_ADD,

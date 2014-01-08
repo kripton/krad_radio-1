@@ -231,8 +231,15 @@ static void codegen_function(struct_data *def, char *type,
   for (i = 0; i < def->info.member_count; i++) {
     if (memb_struct_check(&def->info.members[i])
      || (def->info.members[i].ptr))  {
-      res += sprintf(&decl[res],"  uber_St uber;\n");
-      break;
+      if (gformat == DEJSON) {
+        if (!codegen_is_enum(def->info.members[i].type_info.substruct_info.type_name)) {
+          res += sprintf(&decl[res],"  uber_St uber;\n");
+          break;
+        }
+      } else {
+        res += sprintf(&decl[res],"  uber_St uber;\n");
+        break;
+      }
     }
   }
 

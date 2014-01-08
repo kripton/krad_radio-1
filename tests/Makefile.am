@@ -1,7 +1,7 @@
 include $(top_srcdir)/common.mk
 
 bin_PROGRAMS = kr_cbor_test kr_pool_test kr_v4l2_test kr_alsa_test
-bin_PROGRAMS += kr_helpers_test kr_ebml_serial_test
+bin_PROGRAMS += kr_helpers_test kr_ebml_serial_test kr_json_serial_test
 
 if HAVE_WAYLAND
   bin_PROGRAMS += kr_wayland_test
@@ -42,5 +42,10 @@ kr_ebml_serial_test_SOURCES = kr_ebml_serial_test.c
 kr_ebml_serial_test_CFLAGS =
 kr_ebml_serial_test_CFLAGS += -DKR_GIT_VERSION=\"$(KR_GIT_VERSION)\"
 kr_ebml_serial_test_LDFLAGS = ../lib/krad_radio/libkradclient.la
+
+kr_json_serial_test_SOURCES = kr_json_serial_test.c
+kr_json_serial_test_CFLAGS =
+kr_json_serial_test_CFLAGS += -DKR_GIT_VERSION=\"$(KR_GIT_VERSION)\"
+kr_json_serial_test_LDFLAGS = ../lib/krad_radio/libkradclient.la
 
 .PHONY: all

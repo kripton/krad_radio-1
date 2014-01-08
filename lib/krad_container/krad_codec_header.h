@@ -47,10 +47,11 @@ struct krad_codec_header_St {
   uint32_t count;
 }; /* do not generate */
 
-#include "gen/krad_container_to_ebml.h"
-#include "gen/krad_container_from_ebml.h"
-#include "gen/krad_container_to_text.h"
-#include "gen/krad_container_to_json.h"
-#include "gen/krad_container_helpers.h"
+#include "gen/krad_codec_header_to_ebml.h"
+#include "gen/krad_codec_header_from_ebml.h"
+#include "gen/krad_codec_header_to_text.h"
+#include "gen/krad_codec_header_to_json.h"
+#include "gen/krad_codec_header_from_json.h"
+#include "gen/krad_codec_header_helpers.h"
 
 #endif

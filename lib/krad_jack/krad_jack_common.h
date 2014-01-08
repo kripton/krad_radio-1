@@ -40,10 +40,11 @@ typedef struct {
   /* Connections? */
 } kr_jack_path_info;
 
-#include "gen/krad_jack_to_ebml.h"
-#include "gen/krad_jack_from_ebml.h"
-#include "gen/krad_jack_to_text.h"
-#include "gen/krad_jack_to_json.h"
-#include "gen/krad_jack_helpers.h"
+#include "gen/krad_jack_common_to_ebml.h"
+#include "gen/krad_jack_common_from_ebml.h"
+#include "gen/krad_jack_common_to_text.h"
+#include "gen/krad_jack_common_to_json.h"
+#include "gen/krad_jack_common_from_json.h"
+#include "gen/krad_jack_common_helpers.h"
 
 #endif

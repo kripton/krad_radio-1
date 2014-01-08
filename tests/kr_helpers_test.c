@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include "../lib/krad_compositor/gen/krad_compositor_helpers.h"
-#include "../lib/krad_mixer/gen/krad_mixer_helpers.h"
+#include "../lib/krad_compositor/gen/krad_compositor_common_helpers.h"
+#include "../lib/krad_mixer/gen/krad_mixer_common_helpers.h"
 
 int main(int argc, char const *argv[]) {
   char text[2048];
