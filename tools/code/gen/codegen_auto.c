@@ -133,6 +133,7 @@ void files_gen(header_data *hdata,
   char *targets[256];
   char *p;
   char *pp;
+  char *ppp;
   int i;
   int l;
   int ntargets;
@@ -177,9 +178,12 @@ void files_gen(header_data *hdata,
 
         if (hdata[i].targets[l].type == TO_JSON) {
           pp = strrchr(hdata[i].path,'/');
-          pp[0] = '\0';
-          fprintf(header,"#include \"%s_helpers.h\"\n",basename(hdata[i].path));
-          pp[0] = '/';
+          ppp = strstr(pp,".h");
+          if (ppp) {
+            ppp[0] = '\0';
+            fprintf(header,"#include \"%s_helpers.h\"\n",&pp[1]);
+            ppp[0] = '.';
+          }
         }
 
         codegen(hdata[i].defs,hdata[i].def_count,prefix,suffix,"includes",header);

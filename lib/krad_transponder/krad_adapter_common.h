@@ -58,10 +58,11 @@ struct kr_adapter_path_info {
   kr_adapter_api_path_info info;
 };
 
-#include "gen/krad_transponder_to_ebml.h"
-#include "gen/krad_transponder_from_ebml.h"
-#include "gen/krad_transponder_to_text.h"
-#include "gen/krad_transponder_to_json.h"
-#include "gen/krad_transponder_helpers.h"
+#include "gen/krad_adapter_common_to_ebml.h"
+#include "gen/krad_adapter_common_from_ebml.h"
+#include "gen/krad_adapter_common_to_text.h"
+#include "gen/krad_adapter_common_to_json.h"
+#include "gen/krad_adapter_common_from_json.h"
+#include "gen/krad_adapter_common_helpers.h"
 
 #endif

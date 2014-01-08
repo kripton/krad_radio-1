@@ -4,6 +4,27 @@ LIBPATH='lib/'
 GEN_COMMON='lib/gen/'
 TOOLS_PATH='tools/'
 
+function update_embedded {
+  if [ ! -f "tools/code/hextool/hextool" ]; then
+    echo "hextool binary ain't existing mate"
+    exit
+  fi
+
+  rm -f lib/krad_web/gen/embed.h
+  cd lib/krad_web/core
+  rm -f interface.js
+  rm -f *.h
+  ../../../tools/code/hextool/hextool api.js
+  ../../../tools/code/hextool/hextool index.html
+  ../../../tools/code/hextool/hextool dev_interface.js
+  cat ../rack/*.js > interface.js
+  ../../../tools/code/hextool/hextool interface.js
+  cat *.h > ../gen/embed.h
+  rm -f interface.js
+  rm -f *.h
+  cd ../../../
+}
+
 function run_codegen_precheck {
   if [ ! -f "tools/code/gen/codegen_auto" ]; then
     cd tools/code/gen/
@@ -50,6 +71,6 @@ mkdir -p $gencommon
 
 run_codegen $path $pre $suff $gencommon
 
-sh scripts/update_embeded.sh
+update_embedded
 
 echo 'All Done!'

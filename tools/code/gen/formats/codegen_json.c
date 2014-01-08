@@ -35,9 +35,11 @@ void codegen_json(struct_data *def, char *type, FILE *out) {
   } 
 
   if (def->info.type == ST_ENUM) {
+    fprintf(out,"  type = kr_strfr_%s(*actual);\n",def->info.name);
+    /* fprintf(out,"  if (type == NULL) {\n    return  -1;\n  }\n"); FIXME, should check everytime */
     fprintf(out,"  res += snprintf(&%s[res],max-res,\"\\\"%%s\\\"\"",
       type);
-    fprintf(out,",kr_strfr_%s(*actual));\n",def->info.name);
+    fprintf(out,",type);\n");
     return;
   }
 

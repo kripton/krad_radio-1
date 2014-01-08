@@ -90,8 +90,10 @@ static void codegen_dejson_union_content_from_type(struct_data *def, FILE *out) 
       fprintf(out,"    case %d: {\n",i);
       fprintf(out,"      uber.actual = &(actual->%s);\n      ",
         def->info.members[i].name);
-      fprintf(out,"uber.type = JSON_%s;\n",uppercased);
-      fprintf(out,"      res += info_unpack_fr_json(&json[res],&uber,max-res);\n");
+      fprintf(out,"uber.type = DEJSON_%s;\n",uppercased);
+      fprintf(out,"      json[tokens[k].end] = '\\0';\n");
+      fprintf(out,"      res += info_unpack_fr_json(&json[tokens[k].start],&uber);\n");
+      fprintf(out,"      if (res < 0) {\n        return -%d;\n      }\n",i+1);
       fprintf(out,"      break;\n    }\n");
     }
     /* TODO: handle unions of primitives (ints,floats,strings...) */
@@ -110,7 +112,11 @@ void codegen_dejson(struct_data *def, char *type, FILE *out) {
   fprintf(out,"  jsmn_init(&parser);\n  err = jsmn_parse(&parser,json,tokens,%d);\n  ntokens = parser.toknext;\n\n",JSON_MAX_TOKENS);
   fprintf(out,"  k = 0;\n\n");
   fprintf(out,"  if (err != JSMN_SUCCESS || ntokens < 3) {\n    return -1;\n  }\n\n");
-  fprintf(out,"  if (tokens[k].type != JSMN_OBJECT) {\n    return -1;\n  }\n\n  k++;\n\n");
+  fprintf(out,"  if (tokens[k].type != JSMN_OBJECT) {\n    return -1;\n  }\n\n  ");
+
+  if (def->info.type != ST_UNION) {
+    fprintf(out,"k++;\n\n");
+  }
 
   if (def->info.type == ST_ENUM) {
     return;
@@ -141,7 +147,9 @@ void codegen_dejson(struct_data *def, char *type, FILE *out) {
         if ((memb->type == T_STRUCT) && codegen_is_enum(memb->type_info.substruct_info.type_name)) {
           fprintf(out,"  if (ntokens > k && tokens[k].type != JSMN_STRING) {\n    return -%d;\n  }\n",i+1);
           fprintf(out,"  json[tokens[k].end] = '\\0';\n");
-          fprintf(out,"  actual->%s = kr_strto_%s(&json[tokens[k].start]);\n",memb->name,memb->type_info.substruct_info.type_name);
+          fprintf(out,"  type = kr_strto_%s(&json[tokens[k].start]);\n",memb->type_info.substruct_info.type_name);
+          fprintf(out,"  if (type < 0) {\n    return -%d;\n  }\n",i+1);
+          fprintf(out,"  actual->%s = type;\n",memb->name);
         } else {
           fprintf(out,"  if (ntokens > k && tokens[k].type != %s) {\n    return -%d;\n  }\n\n",
             format,i+1);
@@ -180,6 +188,18 @@ void codegen_dejson(struct_data *def, char *type, FILE *out) {
       char uppercased[strlen(memb->type_info.substruct_info.type_name)+1];
       uppercase(memb->type_info.substruct_info.type_name,uppercased);
 
+      fprintf(out,"  if (ntokens > k && tokens[k].type != JSMN_STRING) {\n    return -%d;\n  }\n\n",
+          i+1);
+
+      fprintf(out,"  json[tokens[k].end] = '\\0';\n");
+      fprintf(out,"  if (strncmp(&json[tokens[k].start],\"%s\",%zd)) {\n    return -%d;\n  }\n\n",
+          memb->name,strlen(memb->name),i+1);
+
+      fprintf(out,"  k++;\n");
+
+      fprintf(out,"  if (ntokens > k && tokens[k].type != JSMN_OBJECT) {\n    return -%d;\n  }\n\n",
+          i+1);
+
       fprintf(out,"  index = %s_to_index(actual->%s);\n",
           def->info.members[i-1].type_info.substruct_info.type_name,
           def->info.members[i-1].name);
@@ -189,10 +209,14 @@ void codegen_dejson(struct_data *def, char *type, FILE *out) {
 
       fprintf(out,"  uber.actual = &(uber_sub);\n  uber.type = DEJSON_%s;\n",
        uppercased);
-      fprintf(out,"  res += info_unpack_fr_%s(&%s[res],&uber,max-res);\n",&type[2],&type[2]);
+      fprintf(out,"  json[tokens[k].end] = '\\0';\n");
+      fprintf(out,"  res += info_unpack_fr_json(&json[tokens[k].start],&uber);\n");
+
+      fprintf(out,"  if (res < 0) {\n    return -%d;\n  }\n\n",i+1);
+      fprintf(out,"  k += res;\n\n");
 
 
-    } else if (memb->type == T_STRUCT) { 
+    } else if (memb_struct_check(memb)) { 
 
       char uppercased[strlen(memb->type_info.substruct_info.type_name)+1];
       uppercase(memb->type_info.substruct_info.type_name,uppercased);

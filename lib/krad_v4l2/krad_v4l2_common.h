@@ -5,12 +5,12 @@ typedef struct kr_v4l2_mode kr_v4l2_mode;
 typedef struct kr_v4l2_info kr_v4l2_info;
 typedef struct kr_v4l2_open_info kr_v4l2_open_info;
 
-#include "gen/krad_v4l2_to_text.h"
-#include "gen/krad_v4l2_to_json.h"
-//#include "gen/krad_v4l2_from_json.h"
-#include "gen/krad_v4l2_to_ebml.h"
-#include "gen/krad_v4l2_from_ebml.h"
-#include "gen/krad_v4l2_helpers.h"
+#include "gen/krad_v4l2_common_to_text.h"
+#include "gen/krad_v4l2_common_to_json.h"
+#include "gen/krad_v4l2_common_from_json.h"
+#include "gen/krad_v4l2_common_to_ebml.h"
+#include "gen/krad_v4l2_common_from_ebml.h"
+#include "gen/krad_v4l2_common_helpers.h"
 
 typedef enum {
   KR_V4L2_VOID,

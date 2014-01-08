@@ -336,5 +336,7 @@ struct kr_transponder_path_patch {
 #include "gen/krad_transponder_common_from_ebml.h"
 #include "gen/krad_transponder_common_helpers.h"
 #include "gen/krad_transponder_common_to_text.h"
+#include "gen/krad_transponder_common_to_json.h"
+#include "gen/krad_transponder_common_from_json.h"
 
 #endif

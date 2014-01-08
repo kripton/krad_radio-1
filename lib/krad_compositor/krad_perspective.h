@@ -28,6 +28,7 @@ struct kr_perspective_view {
 };
 
 #include "gen/krad_perspective_to_json.h"
+#include "gen/krad_perspective_from_json.h"
 #include "gen/krad_perspective_to_ebml.h"
 #include "gen/krad_perspective_from_ebml.h"
 #include "gen/krad_perspective_to_text.h"
