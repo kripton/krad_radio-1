@@ -319,6 +319,7 @@ void kr_web_server_destroy(kr_web_server **serv) {
       disconnect_client(server, &server->clients[i]);
     }
   }
+  free(server->html);
   free(server->clients);
   free(server);
   *serv = NULL;

@@ -82,7 +82,9 @@ kr_radio *kr_radio_create(char *sysname) {
         radio->transponder = kr_transponder_create(&transponder_setup);
         if (radio->transponder) {
           memset(&web_setup, 0, sizeof(kr_web_server_setup));
-          web_setup.port = 3000;
+          web_setup.sysname = sysname;
+          srand(time(NULL));
+          web_setup.port = 3000 + rand() % 32000;
           radio->web = kr_web_server_create(&web_setup);
           if (radio->web) {
             ret = setup_maps(radio);
