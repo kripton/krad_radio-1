@@ -65,11 +65,11 @@ int kr_radio_payload_valid(void *st, int idx) {
   actual = (kr_radio_payload *)st;
   switch (idx) {
     case 0: {
-      kr_transponder_path_info_init(&actual->transponder_path_info);
+      kr_transponder_path_info_valid(&actual->transponder_path_info);
       break;
     }
     case 1: {
-      kr_mixer_path_info_init(&actual->mixer_path_info);
+      kr_mixer_path_info_valid(&actual->mixer_path_info);
       break;
     }
   }
@@ -89,11 +89,11 @@ int kr_radio_payload_random(void *st, int idx) {
   memset(actual, 0, sizeof(kr_radio_payload));
   switch (idx) {
     case 0: {
-      kr_transponder_path_info_init(&actual->transponder_path_info);
+      kr_transponder_path_info_random(&actual->transponder_path_info);
       break;
     }
     case 1: {
-      kr_mixer_path_info_init(&actual->mixer_path_info);
+      kr_mixer_path_info_random(&actual->mixer_path_info);
       break;
     }
   }

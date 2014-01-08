@@ -252,15 +252,15 @@ int kr_transponder_path_io_path_info_valid(void *st, int idx) {
   actual = (kr_transponder_path_io_path_info *)st;
   switch (idx) {
     case 0: {
-      kr_mixer_path_info_init(&actual->mixer_path_info);
+      kr_mixer_path_info_valid(&actual->mixer_path_info);
       break;
     }
     case 1: {
-      kr_compositor_path_info_init(&actual->compositor_path_info);
+      kr_compositor_path_info_valid(&actual->compositor_path_info);
       break;
     }
     case 2: {
-      kr_adapter_path_info_init(&actual->adapter_path_info);
+      kr_adapter_path_info_valid(&actual->adapter_path_info);
       break;
     }
   }
@@ -280,15 +280,15 @@ int kr_transponder_path_io_path_info_random(void *st, int idx) {
   memset(actual, 0, sizeof(kr_transponder_path_io_path_info));
   switch (idx) {
     case 0: {
-      kr_mixer_path_info_init(&actual->mixer_path_info);
+      kr_mixer_path_info_random(&actual->mixer_path_info);
       break;
     }
     case 1: {
-      kr_compositor_path_info_init(&actual->compositor_path_info);
+      kr_compositor_path_info_random(&actual->compositor_path_info);
       break;
     }
     case 2: {
-      kr_adapter_path_info_init(&actual->adapter_path_info);
+      kr_adapter_path_info_random(&actual->adapter_path_info);
       break;
     }
   }

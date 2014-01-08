@@ -150,23 +150,23 @@ int kr_adapter_api_info_valid(void *st, int idx) {
   actual = (kr_adapter_api_info *)st;
   switch (idx) {
     case 0: {
-      kr_jack_info_init(&actual->jack);
+      kr_jack_info_valid(&actual->jack);
       break;
     }
     case 1: {
-      kr_wayland_info_init(&actual->wayland);
+      kr_wayland_info_valid(&actual->wayland);
       break;
     }
     case 2: {
-      kr_v4l2_info_init(&actual->v4l2);
+      kr_v4l2_info_valid(&actual->v4l2);
       break;
     }
     case 3: {
-      kr_decklink_info_init(&actual->decklink);
+      kr_decklink_info_valid(&actual->decklink);
       break;
     }
     case 4: {
-      kr_x11_info_init(&actual->x11);
+      kr_x11_info_valid(&actual->x11);
       break;
     }
   }
@@ -186,23 +186,23 @@ int kr_adapter_api_info_random(void *st, int idx) {
   memset(actual, 0, sizeof(kr_adapter_api_info));
   switch (idx) {
     case 0: {
-      kr_jack_info_init(&actual->jack);
+      kr_jack_info_random(&actual->jack);
       break;
     }
     case 1: {
-      kr_wayland_info_init(&actual->wayland);
+      kr_wayland_info_random(&actual->wayland);
       break;
     }
     case 2: {
-      kr_v4l2_info_init(&actual->v4l2);
+      kr_v4l2_info_random(&actual->v4l2);
       break;
     }
     case 3: {
-      kr_decklink_info_init(&actual->decklink);
+      kr_decklink_info_random(&actual->decklink);
       break;
     }
     case 4: {
-      kr_x11_info_init(&actual->x11);
+      kr_x11_info_random(&actual->x11);
       break;
     }
   }
@@ -261,27 +261,27 @@ int kr_adapter_api_path_info_valid(void *st, int idx) {
   actual = (kr_adapter_api_path_info *)st;
   switch (idx) {
     case 0: {
-      kr_jack_path_info_init(&actual->jack);
+      kr_jack_path_info_valid(&actual->jack);
       break;
     }
     case 1: {
-      kr_wayland_path_info_init(&actual->wayland);
+      kr_wayland_path_info_valid(&actual->wayland);
       break;
     }
     case 2: {
-      kr_v4l2_open_info_init(&actual->v4l2);
+      kr_v4l2_open_info_valid(&actual->v4l2);
       break;
     }
     case 3: {
-      kr_decklink_path_info_init(&actual->decklink);
+      kr_decklink_path_info_valid(&actual->decklink);
       break;
     }
     case 4: {
-      kr_x11_path_info_init(&actual->x11);
+      kr_x11_path_info_valid(&actual->x11);
       break;
     }
     case 5: {
-      kr_alsa_path_info_init(&actual->alsa);
+      kr_alsa_path_info_valid(&actual->alsa);
       break;
     }
   }
@@ -301,27 +301,27 @@ int kr_adapter_api_path_info_random(void *st, int idx) {
   memset(actual, 0, sizeof(kr_adapter_api_path_info));
   switch (idx) {
     case 0: {
-      kr_jack_path_info_init(&actual->jack);
+      kr_jack_path_info_random(&actual->jack);
       break;
     }
     case 1: {
-      kr_wayland_path_info_init(&actual->wayland);
+      kr_wayland_path_info_random(&actual->wayland);
       break;
     }
     case 2: {
-      kr_v4l2_open_info_init(&actual->v4l2);
+      kr_v4l2_open_info_random(&actual->v4l2);
       break;
     }
     case 3: {
-      kr_decklink_path_info_init(&actual->decklink);
+      kr_decklink_path_info_random(&actual->decklink);
       break;
     }
     case 4: {
-      kr_x11_path_info_init(&actual->x11);
+      kr_x11_path_info_random(&actual->x11);
       break;
     }
     case 5: {
-      kr_alsa_path_info_init(&actual->alsa);
+      kr_alsa_path_info_random(&actual->alsa);
       break;
     }
   }

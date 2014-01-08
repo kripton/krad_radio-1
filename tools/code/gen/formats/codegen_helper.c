@@ -271,7 +271,7 @@ static void codegen_helper_func(struct_data *def,
 
   if (def->info.type == ST_UNION) {
     fprintf(out,"  switch (idx) {\n");
-    codegen_helpers_union_content_from_type(def,"init",out);
+    codegen_helpers_union_content_from_type(def,type,out);
     fprintf(out,"  }\n\n");
     fprintf(out,"\n  return -1;\n}\n\n");
     return;
