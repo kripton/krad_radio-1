@@ -149,7 +149,6 @@ int kr_mixer_path_info_fr_ebml(kr_ebml *ebml, void *st) {
 }
 
 int kr_mixer_path_patch_fr_ebml(kr_ebml *ebml, void *st) {
-  uber_St uber;
   int res;
   struct kr_mixer_path_patch *actual;
 

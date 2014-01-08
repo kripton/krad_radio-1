@@ -704,7 +704,6 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
 }
 
 int kr_mixer_path_patch_fr_json(char *json, void *st) {
-  uber_St uber;
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -735,6 +734,24 @@ int kr_mixer_path_patch_fr_json(char *json, void *st) {
     return -1;
   }
 
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"ctl",3)) {
+    return -1;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+
+  json[tokens[k].end] = '\0';
+  snprintf(actual->ctl, sizeof(actual->ctl), "%s", &json[tokens[k].start]);
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -772,31 +789,6 @@ int kr_mixer_path_patch_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   actual->ms = atoi(&json[tokens[k].start]);
   k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -4;
-  }
-
-  json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"p",1)) {
-    return -4;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -4;
-  }
-
-  uber.actual = &(actual->p);
-  uber.type = DEJSON_VOID;
-  json[tokens[k].end] = '\0';
-  res = info_unpack_fr_json(&json[tokens[k].start],&uber);
-  if (res < 0) {
-    return -4;
-  }
-
-  k += res;
 
   res = k;
 

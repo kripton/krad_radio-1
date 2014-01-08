@@ -3,7 +3,6 @@
 
 typedef enum {
   LINEAR = 33999,
-  FIRSTEASING = LINEAR,
   EASEINSINE,
   EASEOUTSINE,
   EASEINOUTSINE,
@@ -11,7 +10,6 @@ typedef enum {
   EASEOUTCUBIC,
   EASEINOUTCUBIC,
   EASEINOUTELASTIC,
-  LASTEASING = EASEINOUTELASTIC,
 /*  EASEINCIRC,
   EASEOUTCIRC,
   EASEINOUTCIRC,
@@ -38,5 +36,15 @@ typedef enum {
   EASEINOUTQUINT,
 */
 } kr_easing;
+
+#define FIRSTEASING LINEAR
+#define LASTEASING EASEINOUTELASTIC
+
+#include "gen/krad_easing_common_to_json.h"
+#include "gen/krad_easing_common_from_json.h"
+#include "gen/krad_easing_common_to_ebml.h"
+#include "gen/krad_easing_common_from_ebml.h"
+#include "gen/krad_easing_common_helpers.h"
+#include "gen/krad_easing_common_to_text.h"
 
 #endif

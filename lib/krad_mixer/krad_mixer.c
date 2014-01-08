@@ -579,9 +579,8 @@ void kr_mixer_xf_decouple(kr_mixer *mixer, kr_mixer_crossfader *crossfader) {
     crossfader->path[1] = NULL;
     crossfader->fade = -100.0f;
     /* Hrm */
-    patch.ctl = "volume";
+    strncpy(patch.ctl, "volume", sizeof(patch.ctl));
     patch.val = 0;
-    patch.p = NULL;
     patch.ms = 0;
     kr_mixer_path_ctl(path[0], &patch);
     kr_mixer_path_ctl(path[1], &patch);
@@ -732,7 +731,7 @@ int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch) {
   duration = ms_to_cycles(path->mixer, patch->ms);
   if ((strncmp(patch->ctl, "volume", 6) == 0) && (strlen(patch->ctl) == 6)) {
     //path_set_volume (path, value);
-    kr_easer_set(&path->volume_easer, patch->val, duration, EASEINOUTSINE, patch->p);
+    kr_easer_set(&path->volume_easer, patch->val, duration, EASEINOUTSINE, NULL);
    return 0;
   }
   /* FIXME Add bus to bus and output to output crossfading */
@@ -740,8 +739,7 @@ int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch) {
     if ((strncmp(patch->ctl, "crossfade", 9) == 0) && (strlen(patch->ctl) == 9)) {
       if (path->crossfader != NULL) {
         //path_set_crossfade (path, value);
-        kr_easer_set(&path->crossfader->easer, patch->val, duration, EASEINOUTSINE,
-         patch->p);
+        kr_easer_set(&path->crossfader->easer, patch->val, duration, EASEINOUTSINE, NULL);
       }
       return 0;
     }

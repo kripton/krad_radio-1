@@ -94,10 +94,9 @@ struct kr_mixer_path_info {
 };
 
 struct kr_mixer_path_patch {
-  char *ctl;
+  char ctl[16];
   float val;
   int ms;
-  void *p;
 };
 
 char *kr_mixer_channeltostr(int channel);

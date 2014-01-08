@@ -452,11 +452,21 @@ int kr_mixer_path_patch_init(void *st) {
 int kr_mixer_path_patch_valid(void *st) {
   struct kr_mixer_path_patch *actual;
 
+  int i;
+
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_mixer_path_patch *)st;
+  for (i = 0; i < 16; i++) {
+    if (!actual->ctl[i]) {
+      break;
+    }
+    if (i == 15 && actual->ctl[i]) {
+      return -2;
+    }
+  }
 
   return 0;
 }
@@ -464,12 +474,27 @@ int kr_mixer_path_patch_valid(void *st) {
 int kr_mixer_path_patch_random(void *st) {
   struct kr_mixer_path_patch *actual;
 
+  int i;
+
+  struct timeval tv;
+  double scale;
+
+  gettimeofday(&tv, NULL);
+  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
+
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_mixer_path_patch *)st;
   memset(actual, 0, sizeof(struct kr_mixer_path_patch));
+  for (i = 0; i < 16; i++) {
+    scale = (double)25 / RAND_MAX;
+    actual->ctl[i] = 97 + floor(rand() * scale);
+    if (i == 15) {
+      actual->ctl[15] = '\0';
+    }
+  }
 
   return 0;
 }
