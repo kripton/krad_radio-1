@@ -15,7 +15,6 @@ struct kr_transponder_path {
   kr_audio audio;
   kr_image image;
   void *user;
-  kr_transponder_path_event_cb *ev_cb;
   kr_transponder *xpdr;
 };
 
@@ -27,7 +26,7 @@ struct kr_transponder {
   kr_transponder_path *path[KR_XPDR_PATHS_MAX];
   kr_adapter_monitor *adapter_mon;
   void *user;
-  kr_transponder_event_cb *ev_cb;
+  kr_transponder_event_cb *event_cb;
 };
 
 #include "krad_transponder_processor.c"
@@ -37,9 +36,8 @@ static kr_adapter *adapter_create(kr_xpdr *xpdr, kr_adapter_path_setup *ps);
 static kr_adapter *adapter_get(kr_xpdr *xpdr, kr_adapter_path_setup *ps);
 static int path_io_info_check(kr_xpdr_path_io_info *info);
 static int path_info_check(kr_xpdr_path_info *info);
-static int path_setup_check(kr_xpdr_path_setup *setup);
 static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info);
-static int path_create(kr_xpdr_path *path, kr_xpdr_path_setup *setup);
+static int path_create(kr_xpdr_path *path, kr_xpdr_path_info *info, void *p);
 static void path_io_destroy(kr_xpdr_path_io *io, kr_xpdr_path_io_type type);
 static void path_destroy(kr_xpdr_path *path);
 
@@ -148,10 +146,6 @@ static int path_io_info_check(kr_transponder_path_io_info *info) {
 }
 
 static int path_info_check(kr_xpdr_path_info *info) {
-  if (memchr(info->name + 1, '\0', sizeof(info->name) - 1) == NULL) {
-    return -2;
-  }
-  if (strlen(info->name) == 0) return -3;
   if (((info->input.type == KR_XPDR_MIXER)
       && (info->output.type == KR_XPDR_COMPOSITOR))
       || ((info->input.type == KR_XPDR_COMPOSITOR)
@@ -162,13 +156,6 @@ static int path_info_check(kr_xpdr_path_info *info) {
   }
   if (path_io_info_check(&info->input)) return -5;
   if (path_io_info_check(&info->output)) return -6;
-  return 0;
-}
-
-static int path_setup_check(kr_xpdr_path_setup *setup) {
-  if (setup->user == NULL) return -1;
-  if (setup->ev_cb == NULL) return -2;
-  if (path_info_check(&setup->info)) return -3;
   return 0;
 }
 
@@ -232,10 +219,9 @@ static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
   }
 }
 
-static int path_create(kr_xpdr_path *path, kr_xpdr_path_setup *setup) {
-  memcpy(&path->info, &setup->info, sizeof(kr_transponder_path_info));
-  path->user = setup->user;
-  path->ev_cb = setup->ev_cb;
+static int path_create(kr_xpdr_path *path, kr_xpdr_path_info *info, void *p) {
+  memcpy(&path->info, info, sizeof(kr_transponder_path_info));
+  path->user = p;
   path_io_create(path, &path->info.output);
   /* FIXME hrmmm i think we need to create both and if in failed state owell*/
   if (path->output.exists != NULL) {
@@ -267,12 +253,6 @@ static void path_destroy(kr_xpdr_path *path) {
   }
 }
 
-int kr_transponder_get_info(kr_transponder *xpdr, kr_xpdr_info *info) {
-  if ((xpdr == NULL) || (info == NULL)) return -1;
-  memcpy(info, &xpdr->info, sizeof(kr_transponder_info));
-  return 0;
-}
-
 static kr_xpdr_path *path_alloc(kr_transponder *xpdr) {
   int i;
   for (i = 0; i < KR_XPDR_PATHS_MAX; i++) {
@@ -285,16 +265,16 @@ static kr_xpdr_path *path_alloc(kr_transponder *xpdr) {
   return NULL;
 }
 
-kr_xpdr_path *kr_transponder_mkpath(kr_xpdr *xpdr, kr_xpdr_path_setup *setup) {
+kr_xpdr_path *kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   int ret;
   kr_transponder_path *path;
-  if ((xpdr == NULL) || (setup == NULL)) return NULL;
-  if (path_setup_check(setup)) return NULL;
-  path = path_alloc(xpdr);
+  if ((x == NULL) || (i == NULL)) return NULL;
+  if (path_info_check(i)) return NULL;
+  path = path_alloc(x);
   if (path == NULL) return NULL;
-  ret = path_create(path, setup);
+  ret = path_create(path, i, p);
   if (ret) return NULL;
-  xpdr->info.active_paths++;
+  x->info.active_paths++;
   return path;
 }
 

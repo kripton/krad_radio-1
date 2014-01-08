@@ -131,7 +131,8 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         printk("Found route! PUT %s in %s!", sliced.slice[1],
          sliced.slice[0]);
         printk("I will call %p with %p!", map->create, map->ptr);
-        map->create(map->ptr, (void *)&crate->payload);
+        /* FIXME replace null with route ptr */
+        map->create(map->ptr, (void *)&crate->payload, NULL);
         return 0;
       }
       printke("hrm wtf!");

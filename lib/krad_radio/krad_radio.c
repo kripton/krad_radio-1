@@ -16,6 +16,11 @@ struct kr_radio {
 };
 
 static int setup_maps(kr_radio *radio);
+static void xpdr_event(kr_transponder_event_info *event);
+
+static void xpdr_event(kr_transponder_event_info *event) {
+  printk("got a xpdr event");
+}
 
 static int setup_maps(kr_radio *radio) {
   void *map;
@@ -33,7 +38,7 @@ static int setup_maps(kr_radio *radio) {
   }
   memset(&setup, 0, sizeof(kr_router_map_setup));
   strcpy(setup.prefix, "/compositor");
-  setup.ptr = radio->mixer;
+  setup.ptr = radio->compositor;
   setup.create = (kr_router_map_create_handler *)kr_compositor_mkpath;
   setup.patch = (kr_router_map_patch_handler *)kr_compositor_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_unlink;
@@ -79,6 +84,10 @@ kr_radio *kr_radio_create(char *sysname) {
       if (radio->compositor) {
         transponder_setup.mixer = radio->mixer;
         transponder_setup.compositor = radio->compositor;
+        transponder_setup.user = radio;
+        transponder_setup.event_cb = xpdr_event;
+        /* FIXME need to enable adapter monitor after maps setup
+         * so that we can pick up the adapter paths */
         radio->transponder = kr_transponder_create(&transponder_setup);
         if (radio->transponder) {
           memset(&web_setup, 0, sizeof(kr_web_server_setup));
