@@ -40,7 +40,7 @@ int codegen_enum_util_functions(struct_data *defs, int n,
   char *prefix, char *suffix, FILE *out);
 int codegen_sizeof(header_data *hdata, int n, 
   char *prefix, char *suffix, FILE *fp);
-int codegen_jschema(struct_data *defs, int n, 
+int codegen_jschema(struct_data **defs, int n, 
   char *prefix, char *suffix, FILE *out);
 int codegen_enum(header_data *hdefs, int n, char *prefix,
  char *suffix, FILE *out, cgen_target_type type);

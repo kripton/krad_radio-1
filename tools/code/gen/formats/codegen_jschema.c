@@ -53,10 +53,11 @@ static void codegen_jschema_memb_limits(member_info *memb, FILE *out) {
 
   switch (type) {
     case T_CHAR: {
-      if (memb->arr || (memb->ptr == 1)) {
-        // TO-DO 
-        //fprintf(out,"\"maxLength\" : %d, ",info->info.int_info[1]);
-        //fprintf(out,"\"minLength\" : %d, ",info->info.int_info[2]);
+      if (memb->arr) {
+        fprintf(out,"\"maxLength\" : %d, ",memb->arr - 1);
+        if (info->char_info.notnull) {
+          fprintf(out,"\"minLength\" : 1, ");
+        }
       }
       break;
     }
@@ -96,37 +97,50 @@ static void codegen_jschema_memb_limits(member_info *memb, FILE *out) {
   return;
 }
 
-static void codegen_jschema_internal(struct_data *def, struct_data *defs, FILE *out) {
+static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE *out) {
 
   int j;
   int idx;
+  int actual_memb_count;
+  member_info *actual_members[def->info.member_count];
   const char *type;
+
+  for (j = actual_memb_count = 0; j < def->info.member_count; j++) {
+    if (memb_type_to_json_type(&def->info.members[j])) {
+      actual_members[actual_memb_count] = &def->info.members[j];
+      actual_memb_count++;
+    } else if ((idx = memb_struct_check(&def->info.members[j]))) {
+      if (defs[idx-1] && (defs[idx-1]->info.type != ST_ENUM) && (defs[idx-1]->info.type != ST_UNION)) {
+        actual_members[actual_memb_count] = &def->info.members[j];
+        actual_memb_count++;
+      }
+    }
+  }
 
   fprintf(out,"\"type\" : \"object\",");
   fprintf(out,"\"properties\" : {");
 
-  for (j = 0; j < def->info.member_count; j++) {
-    if ( (type = memb_type_to_json_type(&def->info.members[j])) ) {
+  for (j = 0; j < actual_memb_count; j++) {
+    if ( (type = memb_type_to_json_type(actual_members[j])) ) {
 
-      fprintf(out,"\"%s\" : {",def->info.members[j].name);
+      fprintf(out,"\"%s\" : {",actual_members[j]->name);
       fprintf(out,"\"type\" : \"%s\", ",type);
-      codegen_jschema_memb_limits(&def->info.members[j],out);
+      codegen_jschema_memb_limits(actual_members[j],out);
       fprintf(out,"\"required\" : true ");
       fprintf(out,"}");
 
-      if (j != (def->info.member_count - 1)) {
+      if (j != (actual_memb_count - 1)) {
         fprintf(out,",");
       }
 
-    } else if ( (def->info.members[j].type == T_STRUCT) &&
-     (idx = codegen_string_to_enum(def->info.members[j].type_info.substruct_info.type_name)) ) {
+    } else if ( (idx = memb_struct_check(actual_members[j])) ) {
 
-      if ((defs[idx-1].info.type != ST_ENUM) && (defs[idx-1].info.type != ST_UNION)) {
-        fprintf(out,"\"%s\" : {",def->info.members[j].name);
-        codegen_jschema_internal(&defs[idx-1],defs,out);
+      if (defs[idx-1] && (defs[idx-1]->info.type != ST_ENUM) && (defs[idx-1]->info.type != ST_UNION)) {
+        fprintf(out,"\"%s\" : {",actual_members[j]->name);
+        codegen_jschema_internal(defs[idx-1],defs,out);
         fprintf(out,"}");
 
-        if (j != (def->info.member_count - 1)) {
+        if (j != (actual_memb_count - 1)) {
           fprintf(out,",");
         }
       }
@@ -138,7 +152,7 @@ static void codegen_jschema_internal(struct_data *def, struct_data *defs, FILE *
   return;
 }
 
-int codegen_jschema(struct_data *defs, int ndefs, 
+int codegen_jschema(struct_data **defs, int ndefs, 
   char *prefix, char *suffix, FILE *out) {
 
   int i;
@@ -146,13 +160,15 @@ int codegen_jschema(struct_data *defs, int ndefs,
   struct_data *filtered_defs[ndefs];
 
   for (i = n = 0; i < ndefs; i++) {
-    if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
-      filtered_defs[n] = &defs[i];
+    if (defs[i] && is_prefix(defs[i]->info.name,prefix) && is_suffix(defs[i]->info.name,suffix) && defs[i]->info.type == ST_STRUCT) {
+      filtered_defs[n] = defs[i];
       n++;
     }
   }
 
-  fprintf(out,"[\n");
+  if (n) {
+    fprintf(out,"[\n");
+  }
 
   for (i = 0; i < n; i++) {
     fprintf(out,"{");
@@ -165,7 +181,9 @@ int codegen_jschema(struct_data *defs, int ndefs,
     fprintf(out,"\n");
   }
 
-  fprintf(out,"]\n");
-
+  if (n) {
+    fprintf(out,"]\n");
+  }
+  
   return 0;
 }

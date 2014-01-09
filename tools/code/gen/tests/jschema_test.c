@@ -1,15 +1,18 @@
 #include "codegen_utils.h"
 
 void print_usage(char *cmd) {
-  printf("  Generates compilable C file which prints out sizeofs for the gathered structs.\n");
-  printf("  syntax:\n   %s libpath prefix suffix outfile.c\n",cmd);
+  printf("  Generates JSchema for the structs gathered.\n");
+  printf("  syntax:\n   %s libpath prefix suffix outfile.json\n",cmd);
 }
 
 int main(int argc, char *argv[]) {
 
   header_data *hdata;
+  struct_data *defs[MAX_HEADERS * MAX_HEADER_DEFS];
   int n;
   int i;
+  int j;
+  int idx;
   FILE *out;
 
   if (argc != 5) {
@@ -17,6 +20,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  memset(defs,0,sizeof(defs));
   hdata = calloc(MAX_HEADERS,sizeof(header_data));
 
   for (i = 0; i < MAX_HEADERS; i++) {
@@ -33,7 +37,15 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  codegen_sizeof(hdata,n,argv[2],argv[3],out);
+  for (i = 0; i < n; i++) {
+    for (j = 0; j < hdata[i].def_count; j++) {
+      if ( (idx = codegen_string_to_enum(hdata[i].defs[j].info.name)) ) {
+        defs[idx-1] = &hdata[i].defs[j];
+      }
+    }
+  }
+
+  codegen_jschema(defs,MAX_HEADERS * MAX_HEADER_DEFS,argv[2],argv[3],out);
 
   for (i = 0; i < MAX_HEADERS; i++) {
     free(hdata[i].defs);

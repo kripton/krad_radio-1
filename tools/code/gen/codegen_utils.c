@@ -552,11 +552,6 @@ int codegen(struct_data *defs, int n, char *prefix,
     codegen_internal(defs,n,prefix,suffix,format,gformat,out);
   }
 
-  if (!strncmp(format,"jschema",7)) {
-    codegen_jschema(defs,n,prefix,suffix,out);
-    return 0;
-  }
-
   if (!strncmp(format,"enum_utils",10)) {
     codegen_enum_util_functions(defs,n,prefix,suffix,out);
     return 0;

@@ -110,6 +110,8 @@ tools/code/gen/codegen
 tools/code/gen/codegen_auto
 tools/code/gen/codegen_bootstrap
 tools/code/gen/test
+tools/code/gen/tests/sizeof_test
+tools/code/gen/tests/jschema_test
 tools/kr_dl_stream
 tools/kr_x11_stream
 tools/kr_v4l2_stream
