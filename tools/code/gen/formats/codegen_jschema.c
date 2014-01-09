@@ -119,7 +119,10 @@ static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE 
   int idx;
   int actual_memb_count;
   member_info *actual_members[def->info.member_count];
+  member_type_info cmp;
   const char *type;
+
+  memset(&cmp,0,sizeof(member_type_info));
 
   for (j = actual_memb_count = 0; j < def->info.member_count; j++) {
     if (memb_type_to_json_type(&def->info.members[j])) {
@@ -141,7 +144,9 @@ static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE 
 
       fprintf(out,"\"%s\" : {",actual_members[j]->name);
       fprintf(out,"\"type\" : \"%s\", ",type);
-      codegen_jschema_memb_limits(actual_members[j],out);
+      if (memcmp(&actual_members[j]->type_info,&cmp,sizeof(member_type_info))) {
+        codegen_jschema_memb_limits(actual_members[j],out);
+      }
       fprintf(out,"\"required\" : true ");
       fprintf(out,"}");
 
