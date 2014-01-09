@@ -93,6 +93,22 @@ static void codegen_jschema_memb_limits(member_info *memb, FILE *out) {
    }
    default : break;
  }
+  return;
+}
+
+static void codegen_jschema_enum(struct_data *def, FILE *out) {
+  int i;
+
+  fprintf(out,"\"enum\": [");
+
+  for (i = 0; i < def->info.member_count; i++) {
+    fprintf(out,"\"%s\"",def->info.members[i].name);
+    if (i != (def->info.member_count - 1)) {
+      fprintf(out,",");
+    }
+  }
+
+  fprintf(out,"]");
 
   return;
 }
@@ -110,7 +126,7 @@ static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE 
       actual_members[actual_memb_count] = &def->info.members[j];
       actual_memb_count++;
     } else if ((idx = memb_struct_check(&def->info.members[j]))) {
-      if (defs[idx-1] && (defs[idx-1]->info.type != ST_ENUM) && (defs[idx-1]->info.type != ST_UNION)) {
+      if (defs[idx-1] && (defs[idx-1]->info.type != ST_UNION)) {
         actual_members[actual_memb_count] = &def->info.members[j];
         actual_memb_count++;
       }
@@ -135,9 +151,18 @@ static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE 
 
     } else if ( (idx = memb_struct_check(actual_members[j])) ) {
 
-      if (defs[idx-1] && (defs[idx-1]->info.type != ST_ENUM) && (defs[idx-1]->info.type != ST_UNION)) {
+      if (defs[idx-1] && (defs[idx-1]->info.type == ST_STRUCT)) {
         fprintf(out,"\"%s\" : {",actual_members[j]->name);
         codegen_jschema_internal(defs[idx-1],defs,out);
+        fprintf(out,"}");
+
+        if (j != (actual_memb_count - 1)) {
+          fprintf(out,",");
+        }
+      } else if (defs[idx-1] && (defs[idx-1]->info.type == ST_ENUM)) {
+
+        fprintf(out,"\"%s\" : {",actual_members[j]->name);
+        codegen_jschema_enum(defs[idx-1],out);
         fprintf(out,"}");
 
         if (j != (actual_memb_count - 1)) {
