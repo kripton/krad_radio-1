@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 if KR_IZ_US
-  KR_DEV_TOOLS = tools/code/hextool tools/code/analysis/gather_structs tools/code/gen
+  KR_DEV_TOOLS = tools/code/hextool tools/code/analysis/gather_structs tools/code/gen tools/code/gen/tests
 	KR_TESTS = tests
 endif
 if KR_ENABLE_TOOLS
