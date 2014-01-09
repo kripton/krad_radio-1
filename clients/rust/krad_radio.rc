@@ -1,7 +1,0 @@
-#[crate_type = "bin"];
-
-extern mod std;
-extern mod syntax;
-
-mod krad_radio_client;
-mod krad_radio;

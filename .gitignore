@@ -114,7 +114,7 @@ tools/kr_dl_stream
 tools/kr_x11_stream
 tools/kr_v4l2_stream
 tests/kr_wayland_test
-clients/kr_example_client
+clients/kr_client_example
 clients/kr_test_client
 clients/kr_snapshot
 tests/kr_pool_test
