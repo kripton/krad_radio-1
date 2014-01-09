@@ -687,8 +687,9 @@ static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup) {
   path->state = KR_MXP_READY;
 }
 
-kr_mixer_path *kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *p) {
-  return NULL;
+int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
+  /* do event callback */
+  return -1;
 }
 
 kr_mixer_path *kr_mixer_mkio(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
@@ -722,6 +723,7 @@ int kr_mixer_unlink(kr_mixer_path *path) {
   if (path->mixer->clock == NULL) {
     update_state(path->mixer);
   }
+  /* do event callback */
   return 0;
 }
 

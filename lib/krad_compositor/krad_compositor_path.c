@@ -188,8 +188,8 @@ static void path_create(kr_compositor_path *path,
   }
 }
 
-kr_compositor_path *kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *p) {
-  return NULL;
+int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
+  return -1;
 }
 
 kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
@@ -214,6 +214,7 @@ kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
   }
   path->compositor = compositor;
   path_create(path, setup);
+  /* do event callback */
   return path;
 }
 
@@ -234,6 +235,7 @@ void cmper_path_release(kr_compositor *compositor, kr_compositor_path *path) {
 int kr_compositor_unlink(kr_compositor_path *path) {
   if (path == NULL) return -1;
   /*FIXME*/
+  /* do event callback */
   return 0;
 }
 

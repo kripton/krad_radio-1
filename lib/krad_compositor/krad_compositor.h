@@ -11,6 +11,9 @@ typedef void (kr_compositor_event_cb)(kr_compositor_event *);
 
 struct kr_compositor_event {
   void *user;
+  void *user_path;
+  /* method
+   * info struct */
 };
 
 struct kr_compositor_control_easers {

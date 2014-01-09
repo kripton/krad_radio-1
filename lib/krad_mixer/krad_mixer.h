@@ -23,8 +23,10 @@ typedef void (kr_mixer_event_cb)(kr_mixer_event *);
 typedef void (kr_mixer_path_audio_cb)(kr_mixer_path_audio_cb_arg *);
 
 struct kr_mixer_event {
-  /* EVENT INFO */
   void *user;
+  void *user_path;
+  /* method
+   * info struct */
 };
 
 struct kr_mixer_path_audio_cb_arg {
@@ -54,7 +56,7 @@ kr_mixer *kr_mixer_create(kr_mixer_setup *setup);
 
 int kr_mixer_unlink(kr_mixer_path *path);
 kr_mixer_path *kr_mixer_mkio(kr_mixer *mixer, kr_mixer_io_path_setup *setup);
-kr_mixer_path *kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *p);
+int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user);
 int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch);
 
 int kr_mixer_path_info_get(kr_mixer_path *unit, kr_mixer_path_info *info);

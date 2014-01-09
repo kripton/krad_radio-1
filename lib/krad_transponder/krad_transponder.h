@@ -23,6 +23,8 @@ typedef void (kr_xpdr_event_cb)(kr_xpdr_event *);
 struct kr_transponder_event {
   void *user;
   void *user_path;
+  /* method
+   * info struct */
 };
 
 struct kr_transponder_setup {
@@ -36,7 +38,7 @@ int kr_transponder_destroy(kr_transponder *transponder);
 kr_transponder *kr_transponder_create(kr_transponder_setup *setup);
 
 int kr_transponder_unlink(kr_xpdr_path *path);
-kr_xpdr_path *kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p);
+int kr_transponder_mkpath(kr_xpdr *xpdr, kr_xpdr_path_info *i, void *user);
 int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch);
 
 #endif

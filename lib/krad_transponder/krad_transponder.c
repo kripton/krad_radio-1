@@ -269,17 +269,18 @@ int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch) {
   return -1;
 }
 
-kr_xpdr_path *kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
+int kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   int ret;
   kr_transponder_path *path;
-  if ((x == NULL) || (i == NULL)) return NULL;
-  if (path_info_check(i)) return NULL;
+  if ((x == NULL) || (i == NULL)) return -1;
+  if (path_info_check(i)) return -2;
   path = path_alloc(x);
-  if (path == NULL) return NULL;
+  if (path == NULL) return -3;
   ret = path_create(path, i, p);
-  if (ret) return NULL;
+  if (ret) return -4;
   x->info.active_paths++;
-  return path;
+  /* do event callback */
+  return 0;
 }
 
 int kr_transponder_unlink(kr_xpdr_path *path) {
@@ -293,6 +294,7 @@ int kr_transponder_unlink(kr_xpdr_path *path) {
       free(path);
       xpdr->path[i] = NULL;
       xpdr->info.active_paths--;
+      /* do event callback */
       return 0;
     }
   }
