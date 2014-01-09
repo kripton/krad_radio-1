@@ -265,7 +265,7 @@ static kr_xpdr_path *path_alloc(kr_transponder *xpdr) {
   return NULL;
 }
 
-int kr_transponder_path_ctl(kr_xpdr *xpdr, kr_xpdr_path_patch *patch) {
+int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch) {
   return -1;
 }
 

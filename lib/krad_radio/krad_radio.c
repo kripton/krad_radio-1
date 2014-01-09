@@ -16,7 +16,17 @@ struct kr_radio {
 };
 
 static int setup_maps(kr_radio *radio);
+static void mixer_event(kr_mixer_event *event);
+static void compositor_event(kr_compositor_event *event);
 static void xpdr_event(kr_transponder_event *event);
+
+static void mixer_event(kr_mixer_event *event) {
+  printk("got a mixer event");
+}
+
+static void compositor_event(kr_compositor_event *event) {
+  printk("got a compositor event");
+}
 
 static void xpdr_event(kr_transponder_event *event) {
   printk("got a xpdr event");
@@ -76,10 +86,12 @@ kr_radio *kr_radio_create(char *sysname) {
   if (radio->app) {
     kr_mixer_setup_init(&mixer_setup);
     mixer_setup.user = radio;
-    //mixer_setup.cb = kr_mixer_server_info_cb;
+    mixer_setup.event_cb = mixer_event;
     radio->mixer = kr_mixer_create(&mixer_setup);
     if (radio->mixer) {
       kr_compositor_setup_init(&compositor_setup);
+      compositor_setup.event_cb = compositor_event;
+      compositor_setup.user = radio;
       radio->compositor = kr_compositor_create(&compositor_setup);
       if (radio->compositor) {
         transponder_setup.mixer = radio->mixer;
