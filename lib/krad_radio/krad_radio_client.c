@@ -377,13 +377,13 @@ int kr_have_full_crate(kr_io2_t *in) {
   uint32_t element;
   uint64_t size;
   int ret;
-  if (!(kr_io2_has_in (in))) {
+  if (!(kr_io2_has_in(in))) {
     return 0;
   }
-  kr_ebml2_set_buffer( &ebml, in->rd_buf, in->len );
+  kr_ebml2_set_buffer(&ebml, in->rd_buf, in->len);
   ret = kr_ebml2_unpack_id(&ebml, &element, &size);
   if (ret < 0) {
-    printf ("full_command EBML ID Not found");
+    printf("full_command EBML ID Not found");
     return 0;
   }
   size += ebml.pos;
@@ -394,6 +394,42 @@ int kr_have_full_crate(kr_io2_t *in) {
     //printf ("Got command have %zu need %zu\n", in->len, size);
   }
   return size;
+}
+
+int kr_streamer45(kr_client *client) {
+  kr_ebml2_t ebml;
+  kr_crate2 crate;
+  uint32_t element;
+  uint64_t size;
+  int ret;
+  if (!(kr_io2_has_in(client->io_in))) {
+    return 0;
+  }
+  memset(&crate, 0, sizeof(kr_crate2));
+  kr_ebml2_set_buffer(&ebml, client->io_in->rd_buf, client->io_in->len);
+  ret = kr_ebml2_unpack_id(&ebml, &element, &size);
+  if (ret < 0) {
+    printke("full crate EBML ID Not found");
+    return 0;
+  }
+  size += ebml.pos;
+  if (client->io_in->len < size) {
+    printke("Crate not full...");
+    return 0;
+  }
+  if (element == KR_EID_CRATE) {
+    ret = kr_crate2_fr_ebml(&ebml, &crate);
+    if (ret == 0) {
+      char string[8192];
+      ret = kr_crate2_to_text(string, &crate, sizeof(string));
+      if (ret > 0) {
+        printk("Got a %"PRIu64" Byte Crate: \n%s\n", size, string);
+      }
+      kr_io2_pulled(client->io_in, ebml.pos);
+      return 1;
+    }
+  }
+  return 0;
 }
 
 int kr_delivery_get(kr_client *client, kr_crate **crate) {

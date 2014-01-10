@@ -29,6 +29,7 @@ static void compositor_event(kr_compositor_event *event) {
   kr_route_setup route_setup;
   radio = (kr_radio *)event->user;
   printk("got a compositor event");
+  /* the following should only happen on a create event */
   route_setup.ptr = radio->compositor;
   route_setup.name = event->user_path;
   route_setup.ctx = event->path;

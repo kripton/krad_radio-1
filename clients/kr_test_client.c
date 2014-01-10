@@ -186,6 +186,14 @@ static int test_wayland_output_create(kr_client *client) {
   return ret;
 }
 
+int test_x11_get(kr_client *client) {
+  int ret;
+  ret = kr_get(client, "/compositor/X11Test");
+  kr_poll(client, 250);
+  kr_delivery_recv(client);
+  kr_streamer45(client);
+  return ret;
+}
 
 int run_test(kr_client *client, char *test) {
   int ret;
@@ -195,6 +203,10 @@ int run_test(kr_client *client, char *test) {
   }
   if ((strlen(test) == strlen("x11")) && (strcmp(test, "x11") == 0)) {
     ret = test_x11_input_create(client, 0);
+    if (ret != 0) return ret;
+  }
+  if ((strlen(test) == strlen("getx11")) && (strcmp(test, "getx11") == 0)) {
+    ret = test_x11_get(client);
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("jack")) && (strcmp(test, "jack") == 0)) {

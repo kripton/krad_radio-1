@@ -472,6 +472,7 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   }
   router_setup.routes_max = 64;
   router_setup.maps_max = 64;
+  router_setup.user = server;
   router_setup.response = (kr_router_response_handler *)kr_app_server_crate_reply;
   server->router = kr_router_create(&router_setup);
   return server;
