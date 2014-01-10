@@ -112,7 +112,6 @@ struct kr_vector_info {
 };
 
 struct kr_compositor_path_info {
-  char name[128];
   kr_compositor_path_type type;
   /* Source / Dest res */
   uint32_t width;

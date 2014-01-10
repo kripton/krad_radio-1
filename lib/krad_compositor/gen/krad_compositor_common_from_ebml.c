@@ -177,7 +177,6 @@ int kr_compositor_path_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   actual = (struct kr_compositor_path_info *)st;
 
-  res += kr_ebml2_unpack_element_string(ebml, NULL, actual->name , sizeof(actual->name));
   uber.actual = &(actual->type);
   uber.type = DEBML_KR_COMPOSITOR_PATH_TYPE;
   res += info_unpack_fr_ebml(&ebml[res],&uber);

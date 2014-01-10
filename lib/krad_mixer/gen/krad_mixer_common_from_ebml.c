@@ -106,7 +106,6 @@ int kr_mixer_path_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
 
-  res += kr_ebml2_unpack_element_string(ebml, NULL, actual->name , sizeof(actual->name));
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->bus , sizeof(actual->bus));
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->crossfade_group , sizeof(actual->crossfade_group));
   uber.actual = &(actual->channels);

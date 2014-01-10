@@ -117,7 +117,7 @@ static kr_route *create_route(kr_router *router, kr_router_map *map, char *name)
   if (route == NULL) return NULL;
   route->map = map;
   strncpy(route->name, name, sizeof(route->name));
-  printf("Created route: %s/%s", map->prefix, route->name);
+  printk("Created route: %s/%s", map->prefix, route->name);
   return route;
 }
 

@@ -188,7 +188,6 @@ int kr_transponder_path_info_to_json(char *json, void *st, int32_t max) {
   actual = (struct kr_transponder_path_info *)st;
 
   res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"name\" : \"%s\",",actual->name);
   res += snprintf(&json[res],max-res,"\"input\": ");
   uber.actual = &(actual->input);
   uber.type = JSON_KR_TRANSPONDER_PATH_IO_INFO;

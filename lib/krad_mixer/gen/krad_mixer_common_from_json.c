@@ -354,32 +354,14 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     return -1;
   }
   json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"name",4)) {
-    return -1;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -1;
-  }
-
-  json[tokens[k].end] = '\0';
-  snprintf(actual->name, sizeof(actual->name), "%s", &json[tokens[k].start]);
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -2;
-  }
-  json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"bus",3)) {
-    return -2;
+    return -1;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -2;
+    return -1;
   }
 
   json[tokens[k].end] = '\0';
@@ -387,17 +369,17 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -3;
+    return -2;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"crossfade_group",15)) {
-    return -3;
+    return -2;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -3;
+    return -2;
   }
 
   json[tokens[k].end] = '\0';
@@ -405,59 +387,59 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -4;
+    return -3;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"channels",8)) {
-    return -4;
+    return -3;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -4;
+    return -3;
   }
   json[tokens[k].end] = '\0';
   type = kr_strto_kr_mixer_channels(&json[tokens[k].start]);
   if (type < 0) {
-    return -4;
+    return -3;
   }
   actual->channels = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -5;
+    return -4;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"type",4)) {
-    return -5;
+    return -4;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -5;
+    return -4;
   }
   json[tokens[k].end] = '\0';
   type = kr_strto_kr_mixer_path_type(&json[tokens[k].start]);
   if (type < 0) {
-    return -5;
+    return -4;
   }
   actual->type = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -6;
+    return -5;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"fade",4)) {
-    return -6;
+    return -5;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -6;
+    return -5;
   }
 
   json[tokens[k].end] = '\0';
@@ -465,10 +447,35 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -7;
+    return -6;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"volume",6)) {
+    return -6;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_ARRAY) {
+    return -6;
+  }
+
+  k++;
+  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
+    if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+      return -6;
+    }
+
+    json[tokens[k].end] = '\0';
+    actual->volume[i] = atof(&json[tokens[k].start]);
+    k++;
+  }
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -7;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"map",3)) {
     return -7;
   }
 
@@ -485,7 +492,7 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     }
 
     json[tokens[k].end] = '\0';
-    actual->volume[i] = atof(&json[tokens[k].start]);
+    actual->map[i] = atoi(&json[tokens[k].start]);
     k++;
   }
 
@@ -493,7 +500,7 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     return -8;
   }
   json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"map",3)) {
+  if (strncmp(&json[tokens[k].start],"mixmap",6)) {
     return -8;
   }
 
@@ -510,7 +517,7 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     }
 
     json[tokens[k].end] = '\0';
-    actual->map[i] = atoi(&json[tokens[k].start]);
+    actual->mixmap[i] = atoi(&json[tokens[k].start]);
     k++;
   }
 
@@ -518,7 +525,7 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     return -9;
   }
   json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"mixmap",6)) {
+  if (strncmp(&json[tokens[k].start],"rms",3)) {
     return -9;
   }
 
@@ -535,7 +542,7 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     }
 
     json[tokens[k].end] = '\0';
-    actual->mixmap[i] = atoi(&json[tokens[k].start]);
+    actual->rms[i] = atof(&json[tokens[k].start]);
     k++;
   }
 
@@ -543,7 +550,7 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     return -10;
   }
   json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"rms",3)) {
+  if (strncmp(&json[tokens[k].start],"peak",4)) {
     return -10;
   }
 
@@ -560,47 +567,22 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
     }
 
     json[tokens[k].end] = '\0';
-    actual->rms[i] = atof(&json[tokens[k].start]);
-    k++;
-  }
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -11;
-  }
-  json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"peak",4)) {
-    return -11;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_ARRAY) {
-    return -11;
-  }
-
-  k++;
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-      return -11;
-    }
-
-    json[tokens[k].end] = '\0';
     actual->peak[i] = atof(&json[tokens[k].start]);
     k++;
   }
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -12;
+    return -11;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"delay",5)) {
-    return -12;
+    return -11;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -12;
+    return -11;
   }
 
   json[tokens[k].end] = '\0';
@@ -608,18 +590,18 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -13;
+    return -12;
   }
 
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"lowpass",7)) {
-    return -13;
+    return -12;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -13;
+    return -12;
   }
 
   uber.actual = &(actual->lowpass);
@@ -627,6 +609,31 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   res = info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
+    return -12;
+  }
+
+  k += res;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -13;
+  }
+
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"highpass",8)) {
+    return -13;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
+    return -13;
+  }
+
+  uber.actual = &(actual->highpass);
+  uber.type = DEJSON_KR_HIGHPASS_INFO;
+  json[tokens[k].end] = '\0';
+  res = info_unpack_fr_json(&json[tokens[k].start],&uber);
+  if (res < 0) {
     return -13;
   }
 
@@ -637,39 +644,14 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   }
 
   json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"highpass",8)) {
-    return -14;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -14;
-  }
-
-  uber.actual = &(actual->highpass);
-  uber.type = DEJSON_KR_HIGHPASS_INFO;
-  json[tokens[k].end] = '\0';
-  res = info_unpack_fr_json(&json[tokens[k].start],&uber);
-  if (res < 0) {
-    return -14;
-  }
-
-  k += res;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -15;
-  }
-
-  json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"analog",6)) {
-    return -15;
+    return -14;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -15;
+    return -14;
   }
 
   uber.actual = &(actual->analog);
@@ -677,24 +659,24 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   res = info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
-    return -15;
+    return -14;
   }
 
   k += res;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -16;
+    return -15;
   }
 
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"eq",2)) {
-    return -16;
+    return -15;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -16;
+    return -15;
   }
 
   uber.actual = &(actual->eq);
@@ -702,7 +684,7 @@ int kr_mixer_path_info_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   res = info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
-    return -16;
+    return -15;
   }
 
   k += res;

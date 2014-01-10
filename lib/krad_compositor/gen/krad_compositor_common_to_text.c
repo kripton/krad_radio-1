@@ -177,7 +177,6 @@ int kr_compositor_path_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_compositor_path_info *)st;
 
-  res += snprintf(&text[res],max-res,"name : %s \n",actual->name);
   uber.actual = &(actual->type);
   uber.type = TEXT_KR_COMPOSITOR_PATH_TYPE;
   res += info_pack_to_text(&text[res],&uber,max-res);

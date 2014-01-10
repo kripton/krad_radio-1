@@ -3,6 +3,6 @@
 
 #include "krad_transponder_common.h"
 
-int kr_xpdr_mkpath(kr_client *client, kr_transponder_path_info *info);
+int kr_xpdr_mkpath(kr_client *client, char *name, kr_transponder_path_info *info);
 
 #endif

@@ -106,7 +106,6 @@ int kr_mixer_path_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_mixer_path_info *)st;
 
-  res += snprintf(&text[res],max-res,"name : %s \n",actual->name);
   res += snprintf(&text[res],max-res,"bus : %s \n",actual->bus);
   res += snprintf(&text[res],max-res,"crossfade_group : %s \n",actual->crossfade_group);
   uber.actual = &(actual->channels);

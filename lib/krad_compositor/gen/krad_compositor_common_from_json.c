@@ -729,53 +729,35 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
     return -1;
   }
   json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"name",4)) {
-    return -1;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -1;
-  }
-
-  json[tokens[k].end] = '\0';
-  snprintf(actual->name, sizeof(actual->name), "%s", &json[tokens[k].start]);
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -2;
-  }
-  json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"type",4)) {
-    return -2;
+    return -1;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -2;
+    return -1;
   }
   json[tokens[k].end] = '\0';
   type = kr_strto_kr_compositor_path_type(&json[tokens[k].start]);
   if (type < 0) {
-    return -2;
+    return -1;
   }
   actual->type = type;
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -3;
+    return -2;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"width",5)) {
-    return -3;
+    return -2;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -3;
+    return -2;
   }
 
   json[tokens[k].end] = '\0';
@@ -783,17 +765,17 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -4;
+    return -3;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"height",6)) {
-    return -4;
+    return -3;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -4;
+    return -3;
   }
 
   json[tokens[k].end] = '\0';
@@ -801,17 +783,17 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -5;
+    return -4;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"crop_x",6)) {
-    return -5;
+    return -4;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -5;
+    return -4;
   }
 
   json[tokens[k].end] = '\0';
@@ -819,17 +801,17 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -6;
+    return -5;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"crop_y",6)) {
-    return -6;
+    return -5;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -6;
+    return -5;
   }
 
   json[tokens[k].end] = '\0';
@@ -837,17 +819,17 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -7;
+    return -6;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"crop_width",10)) {
-    return -7;
+    return -6;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -7;
+    return -6;
   }
 
   json[tokens[k].end] = '\0';
@@ -855,17 +837,17 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -8;
+    return -7;
   }
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"crop_height",11)) {
-    return -8;
+    return -7;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
-    return -8;
+    return -7;
   }
 
   json[tokens[k].end] = '\0';
@@ -873,18 +855,18 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -9;
+    return -8;
   }
 
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"view",4)) {
-    return -9;
+    return -8;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -9;
+    return -8;
   }
 
   uber.actual = &(actual->view);
@@ -892,24 +874,24 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   res = info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
-    return -9;
+    return -8;
   }
 
   k += res;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -10;
+    return -9;
   }
 
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"controls",8)) {
-    return -10;
+    return -9;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -10;
+    return -9;
   }
 
   uber.actual = &(actual->controls);
@@ -917,7 +899,7 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   res = info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
-    return -10;
+    return -9;
   }
 
   k += res;

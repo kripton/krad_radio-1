@@ -199,7 +199,6 @@ int kr_compositor_path_info_to_json(char *json, void *st, int32_t max) {
   actual = (struct kr_compositor_path_info *)st;
 
   res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"name\" : \"%s\",",actual->name);
   res += snprintf(&json[res],max-res,"\"type\": ");
   uber.actual = &(actual->type);
   uber.type = JSON_KR_COMPOSITOR_PATH_TYPE;

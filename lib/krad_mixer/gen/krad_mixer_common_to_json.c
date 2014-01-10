@@ -117,7 +117,6 @@ int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   actual = (struct kr_mixer_path_info *)st;
 
   res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"name\" : \"%s\",",actual->name);
   res += snprintf(&json[res],max-res,"\"bus\" : \"%s\",",actual->bus);
   res += snprintf(&json[res],max-res,"\"crossfade_group\" : \"%s\",",actual->crossfade_group);
   res += snprintf(&json[res],max-res,"\"channels\": ");

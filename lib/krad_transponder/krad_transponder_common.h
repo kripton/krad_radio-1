@@ -323,7 +323,6 @@ struct kr_transponder_path_io_info {
 };
 
 struct kr_transponder_path_info {
-  char name[128];
   kr_transponder_path_io_info input;
   kr_transponder_path_io_info output;
 };

@@ -392,34 +392,16 @@ int kr_transponder_path_info_fr_json(char *json, void *st) {
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
     return -1;
   }
-  json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"name",4)) {
-    return -1;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -1;
-  }
-
-  json[tokens[k].end] = '\0';
-  snprintf(actual->name, sizeof(actual->name), "%s", &json[tokens[k].start]);
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -2;
-  }
 
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"input",5)) {
-    return -2;
+    return -1;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -2;
+    return -1;
   }
 
   uber.actual = &(actual->input);
@@ -427,24 +409,24 @@ int kr_transponder_path_info_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   res = info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
-    return -2;
+    return -1;
   }
 
   k += res;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -3;
+    return -2;
   }
 
   json[tokens[k].end] = '\0';
   if (strncmp(&json[tokens[k].start],"output",6)) {
-    return -3;
+    return -2;
   }
 
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -3;
+    return -2;
   }
 
   uber.actual = &(actual->output);
@@ -452,7 +434,7 @@ int kr_transponder_path_info_fr_json(char *json, void *st) {
   json[tokens[k].end] = '\0';
   res = info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
-    return -3;
+    return -2;
   }
 
   k += res;

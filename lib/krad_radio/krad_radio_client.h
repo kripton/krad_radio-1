@@ -7,6 +7,7 @@
 
 typedef struct kr_client kr_client;
 
+#include "krad_app_common.h"
 #include "krad_easing_common.h"
 #include "krad_mixer_common.h"
 #include "krad_compositor_common.h"
@@ -230,4 +231,5 @@ int kr_crate_has_float (kr_crate *crate);
 int kr_delivery_get_until_final (kr_client *client, kr_crate **crate, uint32_t timeout_ms);
 int kr_delivery_final (kr_client *client);
 void kr_client_crate_wait(kr_client *client, kr_crate **crate);
+int kr_crate_send(kr_client *client, kr_crate2 *crate);
 #endif

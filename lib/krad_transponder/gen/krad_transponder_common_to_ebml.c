@@ -172,7 +172,6 @@ int kr_transponder_path_info_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (struct kr_transponder_path_info *)st;
 
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->name);
   uber.actual = &(actual->input);
   uber.type = EBML_KR_TRANSPONDER_PATH_IO_INFO;
   res += info_pack_to_ebml(&ebml[res],&uber);

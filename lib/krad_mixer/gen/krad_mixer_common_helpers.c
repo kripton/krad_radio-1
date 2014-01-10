@@ -339,19 +339,11 @@ int kr_mixer_path_info_valid(void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
   for (i = 0; i < 64; i++) {
-    if (!actual->name[i]) {
-      break;
-    }
-    if (i == 63 && actual->name[i]) {
-      return -2;
-    }
-  }
-  for (i = 0; i < 64; i++) {
     if (!actual->bus[i]) {
       break;
     }
     if (i == 63 && actual->bus[i]) {
-      return -3;
+      return -2;
     }
   }
   for (i = 0; i < 64; i++) {
@@ -359,7 +351,7 @@ int kr_mixer_path_info_valid(void *st) {
       break;
     }
     if (i == 63 && actual->crossfade_group[i]) {
-      return -4;
+      return -3;
     }
   }
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
@@ -397,13 +389,6 @@ int kr_mixer_path_info_random(void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
   memset(actual, 0, sizeof(struct kr_mixer_path_info));
-  for (i = 0; i < 64; i++) {
-    scale = (double)25 / RAND_MAX;
-    actual->name[i] = 97 + floor(rand() * scale);
-    if (i == 63) {
-      actual->name[63] = '\0';
-    }
-  }
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
     actual->bus[i] = 97 + floor(rand() * scale);

@@ -609,21 +609,11 @@ int kr_compositor_path_info_init(void *st) {
 int kr_compositor_path_info_valid(void *st) {
   struct kr_compositor_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_compositor_path_info *)st;
-  for (i = 0; i < 128; i++) {
-    if (!actual->name[i]) {
-      break;
-    }
-    if (i == 127 && actual->name[i]) {
-      return -2;
-    }
-  }
   kr_perspective_view_valid(&actual->view);
   kr_compositor_controls_valid(&actual->controls);
 
@@ -633,27 +623,12 @@ int kr_compositor_path_info_valid(void *st) {
 int kr_compositor_path_info_random(void *st) {
   struct kr_compositor_path_info *actual;
 
-  int i;
-
-  struct timeval tv;
-  double scale;
-
-  gettimeofday(&tv, NULL);
-  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_compositor_path_info *)st;
   memset(actual, 0, sizeof(struct kr_compositor_path_info));
-  for (i = 0; i < 128; i++) {
-    scale = (double)25 / RAND_MAX;
-    actual->name[i] = 97 + floor(rand() * scale);
-    if (i == 127) {
-      actual->name[127] = '\0';
-    }
-  }
   kr_perspective_view_random(&actual->view);
   kr_compositor_controls_random(&actual->controls);
 

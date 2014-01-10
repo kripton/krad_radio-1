@@ -75,7 +75,6 @@ struct kr_mixer_info {
 };
 
 struct kr_mixer_path_info {
-  char name[64];
   char bus[64];
   char crossfade_group[64];
   kr_mixer_channels channels;
