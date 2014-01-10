@@ -20,7 +20,8 @@ struct kr_route {
   void *ptr;
   kr_router_map *map;
   char name[48];
-  kr_radio_payload data;
+  kr_radio_payload_type payload_type;
+  kr_radio_payload payload;
 };
 
 struct kr_router_map {
@@ -206,9 +207,10 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
   int i;
   int len;
   int ret;
+  kr_crate2 outcrate;
   address_sliced sliced;
   kr_router_map *map;
-//  kr_route *route;
+  kr_route *route;
   kr_name *name;
   if ((router == NULL) || (crate == NULL)) return -1;
   i = 0;
@@ -240,6 +242,12 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
       if ((crate->method == KR_GET) && (sliced.slices == 2)) {
         printk("Found route! GET %s from %s!", sliced.slice[1],
          sliced.slice[0]);
+        route = find_route(router, map, sliced.slice[1]);
+        if (route == NULL) return 0;
+        outcrate.method = crate->method;
+        strcpy(outcrate.address, crate->address);
+        outcrate.payload_type = route->payload_type;
+        outcrate.payload = route->payload;
         return 0;
       }
       if ((crate->method == KR_PATCH) && (sliced.slices == 2)) {

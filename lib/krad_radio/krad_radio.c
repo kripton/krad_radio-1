@@ -32,7 +32,8 @@ static void compositor_event(kr_compositor_event *event) {
   route_setup.ptr = radio->compositor;
   route_setup.name = event->user_path;
   route_setup.ctx = event->path;
-  kr_compositor_path_info_get(event->path, &route_setup.data.compositor_path_info);
+  route_setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
+  kr_compositor_path_info_get(event->path, &route_setup.payload.compositor_path_info);
   kr_app_server_route_create(radio->app, &route_setup);
 }
 

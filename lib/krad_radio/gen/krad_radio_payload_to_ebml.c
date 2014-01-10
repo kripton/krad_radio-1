@@ -51,6 +51,12 @@ int kr_radio_payload_to_ebml(kr_ebml *ebml, void *st) {
       res += info_pack_to_ebml(&ebml[res],&uber);
       break;
     }
+    case 2: {
+      uber.actual = &(actual->compositor_path_info);
+      uber.type = EBML_KR_COMPOSITOR_PATH_INFO;
+      res += info_pack_to_ebml(&ebml[res],&uber);
+      break;
+    }
   }
 
 

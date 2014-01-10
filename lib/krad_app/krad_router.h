@@ -39,7 +39,8 @@ struct kr_route_setup {
   kr_name *name;
   void *ptr; /* for map */
   void *ctx;
-  kr_radio_payload data;
+  kr_radio_payload_type payload_type;
+  kr_radio_payload payload;
 };
 
 struct kr_router_setup {

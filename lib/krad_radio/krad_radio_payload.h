@@ -13,7 +13,8 @@
 
 typedef enum {
   PL_KR_TRANSPONDER_PATH_INFO,
-  PL_KR_MIXER_PATH_INFO
+  PL_KR_MIXER_PATH_INFO,
+  PL_KR_COMPOSITOR_PATH_INFO
 } kr_radio_payload_type;
 
 typedef union {
