@@ -1,7 +1,8 @@
 struct kr_compositor_path {
   kr_compositor_path_info info;
   kr_compositor_control_easers easers;
-  void *user;
+  void *frame_user;
+  void *control_user;
   kr_compositor_path_frame_cb *frame_cb;
   kr_compositor *compositor;
   kr_easer crop_x_easer;
@@ -74,7 +75,7 @@ static void path_tick(kr_compositor_path *path) {
 
 void path_output(kr_compositor_path *path, kr_image *image) {
   kr_compositor_path_frame_cb_arg cb_arg;
-  cb_arg.user = path->user;
+  cb_arg.user = path->frame_user;
   path->frame_cb(&cb_arg);
   memcpy(cb_arg.image.px, image->px, image->w * image->h * 4);
 }
@@ -87,7 +88,7 @@ int path_render(kr_compositor_path *path, kr_image *dst, cairo_t *cr) {
   cairo_surface_t *src;
   static uint8_t scratch[1920*1080*4]; /*FIXME*/
 
-  cb_arg.user = path->user;
+  cb_arg.user = path->frame_user;
   path_tick(path);
   /*if (path->info.controls.opacity == 0.0f) return 0; Hrmzor */
   path->frame_cb(&cb_arg);
@@ -152,14 +153,14 @@ int path_render(kr_compositor_path *path, kr_image *dst, cairo_t *cr) {
 }
 
 int path_setup_check(kr_compositor_io_path_setup *setup) {
-
   kr_compositor_path_info *info;
   info = &setup->info;
-
-  if ((setup->user == NULL) || (setup->frame_cb == NULL)) {
+  if ((setup->frame_user == NULL) || (setup->frame_cb == NULL)) {
     /* FIXME HRMMM */
   }
-
+  if (setup->control_user == NULL) {
+    /* FIXME HRMMM */
+  }
   if ((info->width == 0) || (info->height == 0)) {
     return -1;
   }
@@ -177,7 +178,8 @@ static void path_create(kr_compositor_path *path,
   path->info.controls.opacity = 0.0f;
   kr_easer_set(&path->easers.opacity, 1.0f, 60, EASEINOUTSINE, NULL);
   /* End silly thing */
-  path->user = setup->user;
+  path->frame_user = setup->frame_user;
+  path->control_user = setup->control_user;
   path->frame_cb = setup->frame_cb;
   kr_image_convert_init(&path->converter);
   if (path->info.type == KR_CMP_INPUT) {
@@ -195,6 +197,7 @@ int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user
 kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
  kr_compositor_io_path_setup *setup) {
   kr_compositor_path *path;
+  kr_compositor_event event;
   if ((compositor == NULL) || (setup == NULL)) return NULL;
   if (path_setup_check(setup)) {
     printke("compositor mkpath failed setup check");
@@ -215,6 +218,9 @@ kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
   path->compositor = compositor;
   path_create(path, setup);
   /* do event callback */
+  event.user = compositor->user;
+  event.user_path = path->control_user;
+  compositor->event_cb(&event);
   return path;
 }
 

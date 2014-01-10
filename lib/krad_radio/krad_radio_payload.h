@@ -19,6 +19,7 @@ typedef enum {
 typedef union {
   kr_transponder_path_info transponder_path_info;
   kr_mixer_path_info mixer_path_info;
+  kr_compositor_path_info compositor_path_info;
 } kr_radio_payload;
 
 #endif

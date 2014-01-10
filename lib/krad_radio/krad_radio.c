@@ -25,7 +25,15 @@ static void mixer_event(kr_mixer_event *event) {
 }
 
 static void compositor_event(kr_compositor_event *event) {
+  kr_radio *radio;
+  kr_route_setup route_setup;
+  radio = (kr_radio *)event->user;
   printk("got a compositor event");
+  route_setup.ptr = radio->compositor;
+  route_setup.name = event->user_path;
+  route_setup.ctx = event->path;
+  kr_compositor_path_info_get(event->path, &route_setup.data.compositor_path_info);
+  kr_app_server_route_create(radio->app, &route_setup);
 }
 
 static void xpdr_event(kr_transponder_event *event) {

@@ -11,7 +11,9 @@ typedef struct kr_router_map_setup kr_router_map_setup;
 typedef struct kr_router_map_info kr_router_map_info;
 typedef struct kr_router kr_router;
 typedef struct kr_router_map kr_router_map;
+typedef struct kr_route_setup kr_route_setup;
 typedef struct kr_route kr_route;
+typedef struct kr_name kr_name;
 
 typedef int (kr_router_map_create_handler)(void *, void *, void *);
 typedef int (kr_router_map_patch_handler)(void *, void *);
@@ -33,11 +35,19 @@ struct kr_router_map_setup {
   kr_router_map_destroy_handler *destroy;
 };
 
+struct kr_route_setup {
+  kr_name *name;
+  void *ptr; /* for map */
+  void *ctx;
+  kr_radio_payload data;
+};
+
 struct kr_router_setup {
   int routes_max;
   int maps_max;
 };
 
+kr_route *kr_route_create(kr_router *router, kr_route_setup *setup);
 int kr_router_handle(kr_router *router, kr_crate2 *crate);
 int kr_router_map_destroy(kr_router *router, kr_router_map *map);
 kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setup);

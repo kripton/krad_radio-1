@@ -256,6 +256,8 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   kr_compositor *com;
   if (setup == NULL) return NULL;
   com = calloc(1, sizeof(kr_compositor));
+  com->user = setup->user;
+  com->event_cb = setup->event_cb;
   resolution_set(com, setup->width, setup->height);
   frame_rate_set(com, setup->fps_num, setup->fps_den);
   FT_Init_FreeType(&com->ftlib);

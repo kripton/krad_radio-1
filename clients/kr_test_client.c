@@ -95,7 +95,7 @@ static int test_x11_input_create(kr_client *client, int dev) {
   int height;
   int num;
   int den;
-  name = "X11 Test";
+  name = "X11Test";
   width = 640;
   height = 360;
   num = 30;
@@ -127,7 +127,7 @@ static int test_decklink_input_create(kr_client *client, int dev) {
   int height;
   int num;
   int den;
-  name = "Decklink Test";
+  name = "DecklinkTest";
   video_connector = "hdmi";
   audio_connector = "hdmi";
   width = 1280;

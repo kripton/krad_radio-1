@@ -3,6 +3,7 @@
 struct kr_router {
   kr_pool *maps;
   kr_pool *routes;
+  kr_pool *names;
 };
 
 typedef struct {
@@ -10,11 +11,16 @@ typedef struct {
   size_t slices;
 } address_sliced;
 
+struct kr_name {
+  char name[48];
+  int use;
+};
 
 struct kr_route {
-  char name[48];
   void *ptr;
   kr_router_map *map;
+  char name[48];
+  kr_radio_payload data;
 };
 
 struct kr_router_map {
@@ -35,6 +41,7 @@ int kr_router_destroy(kr_router *router) {
   if (router == NULL) return -1;
   kr_pool_destroy(router->maps);
   kr_pool_destroy(router->routes);
+  kr_pool_destroy(router->names);
   free(router);
   return 0;
 }
@@ -61,6 +68,18 @@ kr_router *kr_router_create(kr_router_setup *setup) {
       kr_pool_destroy(router->routes);
       free(router);
       router = NULL;
+    } else {
+      pool_setup.size = sizeof(kr_name);
+      pool_setup.slices = setup->maps_max;
+      pool_setup.shared = 0;
+      pool_setup.overlay_sz = 0;
+      router->names = kr_pool_create(&pool_setup);
+      if (router->names == NULL) {
+        kr_pool_destroy(router->routes);
+        kr_pool_destroy(router->maps);
+        free(router);
+        router = NULL;
+      }
     }
   }
   return router;
@@ -92,6 +111,43 @@ static void address_slices_print(address_sliced *sliced) {
   }
 }
 
+static kr_name *find_name(kr_router *router, char *name) {
+  int i;
+  kr_name *space;
+  i = 0;
+  int len;
+  int namelen;
+  namelen = strlen(name);
+  while ((space = kr_pool_iterate_active(router->names, &i))) {
+    len = strlen(space->name);
+    if ((namelen == len) && (memcmp(space->name, name, len) == 0)) {
+      return space;
+    }
+  }
+  return NULL;
+}
+
+static kr_name *create_name(kr_router *router, char *name) {
+  kr_name *space;
+  space = find_name(router, name);
+  if (space != NULL) return NULL;
+  space = (kr_name *)kr_pool_slice(router->names);
+  if (space == NULL) return NULL;
+  memset(space, 0, sizeof(kr_name));
+  strncpy(space->name, name, sizeof(space->name));
+  printk("Created name: %s", space->name);
+  return space;
+}
+
+/*
+static int destroy_name(kr_router *router, kr_name *name) {
+  int ret;
+  if ((router == NULL) || (name == NULL)) return -1;
+  ret = kr_pool_recycle(router->names, name);
+  return ret;
+}
+*/
+
 static kr_route *find_route(kr_router *router, kr_router_map *map, char *name) {
   int i;
   kr_route *route;
@@ -109,24 +165,42 @@ static kr_route *find_route(kr_router *router, kr_router_map *map, char *name) {
   return NULL;
 }
 
-static kr_route *create_route(kr_router *router, kr_router_map *map, char *name) {
+static kr_router_map *map_from_ptr(kr_router *router, void *ptr) {
+  int i;
+  kr_router_map *map;
+  i = 0;
+  while ((map = kr_pool_iterate_active(router->maps, &i))) {
+    if (map->ptr == ptr) return map;
+  }
+  return NULL;
+}
+
+kr_route *kr_route_create(kr_router *router, kr_route_setup *setup) {
   kr_route *route;
-  route = find_route(router, map, name);
+  kr_router_map *map;
+  if ((router == NULL) || (setup == NULL)) return NULL;
+  map = map_from_ptr(router, setup->ptr);
+  if (map == NULL) return NULL;
+  route = find_route(router, map, setup->name->name);
   if (route != NULL) return NULL;
   route = (kr_route *)kr_pool_slice(router->routes);
   if (route == NULL) return NULL;
+  memset(route, 0, sizeof(kr_route));
   route->map = map;
-  strncpy(route->name, name, sizeof(route->name));
+  strncpy(route->name, setup->name->name, sizeof(route->name));
+  setup->name->use++;
   printk("Created route: %s/%s", map->prefix, route->name);
   return route;
 }
 
+/*
 static int destroy_route(kr_router *router, kr_route *route) {
   int ret;
   if ((router == NULL) || (route == NULL)) return -1;
   ret = kr_pool_recycle(router->routes, route);
   return ret;
 }
+*/
 
 int kr_router_handle(kr_router *router, kr_crate2 *crate) {
   int i;
@@ -134,7 +208,8 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
   int ret;
   address_sliced sliced;
   kr_router_map *map;
-  kr_route *route;
+//  kr_route *route;
+  kr_name *name;
   if ((router == NULL) || (crate == NULL)) return -1;
   i = 0;
   printk("Routing: %s", crate->address);
@@ -183,9 +258,10 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         //printk("I will call %p with %p!", map->create, map->ptr);
         /* FIXME replace null with route ptr */
         if (sliced.slice[1] == NULL) return -9;
-        route = create_route(router, map, sliced.slice[1]);
-        if (!route) return -6;
-        ret = map->create(map->ptr, (void *)&crate->payload, route);
+        //route = create_route(router, map, sliced.slice[1]);
+        name = create_name(router, sliced.slice[1]);
+        if (!name) return -6;
+        ret = map->create(map->ptr, (void *)&crate->payload, name);
         return ret;
       }
       printke("hrm wtf!");

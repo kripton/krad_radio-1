@@ -27,7 +27,8 @@ struct kr_compositor_path_frame_cb_arg {
 
 struct kr_compositor_io_path_setup {
   kr_compositor_path_info info;
-  void *user;
+  void *frame_user;
+  void *control_user;
   kr_compositor_path_frame_cb *frame_cb;
 };
 

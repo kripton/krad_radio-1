@@ -9,13 +9,6 @@ typedef void (kr_compositor_event_cb)(kr_compositor_event *);
 
 #include "krad_easing.h"
 
-struct kr_compositor_event {
-  void *user;
-  void *user_path;
-  /* method
-   * info struct */
-};
-
 struct kr_compositor_control_easers {
   kr_easer x;
   kr_easer y;
@@ -71,7 +64,17 @@ struct kr_compositor {
   kr_pool *text_pool;
   kr_pool *vector_pool;
   kr_pool *path_pool;
+  void *user;
+  kr_compositor_event_cb *event_cb;
   FT_Library ftlib;
+};
+
+struct kr_compositor_event {
+  kr_compositor_path *path;
+  void *user;
+  void *user_path;
+  //kr_app_method method;
+  /* info struct */
 };
 
 int kr_compositor_destroy(kr_compositor *compositor);

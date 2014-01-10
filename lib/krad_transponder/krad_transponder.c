@@ -210,7 +210,8 @@ static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
       memcpy(&cp_setup.info, &info->info.compositor_path_info,
        sizeof(kr_compositor_path_info));
       cp_setup.frame_cb = xpdr_compositor_path_frame_cb;
-      cp_setup.user = path;
+      cp_setup.frame_user = path;
+      cp_setup.control_user = path->user;
       io->compositor_path = kr_compositor_mkio(compositor, &cp_setup);
       if (io->compositor_path == NULL) {
         printke("compositor mkpath returned NULL");
