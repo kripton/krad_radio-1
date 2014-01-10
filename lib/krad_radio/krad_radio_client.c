@@ -53,6 +53,19 @@ int kr_crate_send(kr_client *client, kr_crate2 *crate) {
   return 0;
 }
 
+int kr_get(kr_client *client, char *address) {
+  int ret;
+  kr_crate2 crate;
+  if (client == NULL) return -1;
+  if (address == NULL) return -2;
+  memset(&crate, 0, sizeof(kr_crate2));
+  crate.method = KR_GET;
+  strncpy(crate.address, address, sizeof(crate.address));
+  /* need a no payload type or something */
+  ret = kr_crate_send(client, &crate);
+  return ret;
+}
+
 int kr_client_push(kr_client *client) {
   kr_io2_advance(client->io, client->ebml2->pos);
   if (kr_client_want_out(client)) {

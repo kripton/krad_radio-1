@@ -232,4 +232,5 @@ int kr_delivery_get_until_final (kr_client *client, kr_crate **crate, uint32_t t
 int kr_delivery_final (kr_client *client);
 void kr_client_crate_wait(kr_client *client, kr_crate **crate);
 int kr_crate_send(kr_client *client, kr_crate2 *crate);
+int kr_get(kr_client *client, char *address);
 #endif
