@@ -18,6 +18,7 @@ typedef struct kr_name kr_name;
 typedef int (kr_router_map_create_handler)(void *, void *, void *);
 typedef int (kr_router_map_patch_handler)(void *, void *);
 typedef int (kr_router_map_destroy_handler)(void *);
+typedef int (kr_router_response_handler)(void *, kr_crate2 *crate);
 
 struct kr_router_info {
   uint64_t maps;
@@ -46,6 +47,8 @@ struct kr_route_setup {
 struct kr_router_setup {
   int routes_max;
   int maps_max;
+  void *user;
+  kr_router_response_handler *response;
 };
 
 kr_route *kr_route_create(kr_router *router, kr_route_setup *setup);

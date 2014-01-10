@@ -46,6 +46,7 @@ struct kr_app_server_info {
 kr_app_server_client *kr_app_server_client_create(kr_app_server_client_setup *s);
 int kr_app_server_client_destroy(kr_app_server_client *client);
 */
+int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate);
 int kr_app_server_map_destroy(kr_app_server *server, kr_router_map *map);
 kr_router_map *kr_app_server_map_create(kr_app_server *server, kr_router_map_setup *setup);
 kr_route *kr_app_server_route_create(kr_app_server *server, kr_route_setup *setup);

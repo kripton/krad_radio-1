@@ -1,6 +1,8 @@
 #include "krad_router.h"
 
 struct kr_router {
+  void *user;
+  kr_router_response_handler *response;
   kr_pool *maps;
   kr_pool *routes;
   kr_pool *names;
@@ -49,8 +51,10 @@ int kr_router_destroy(kr_router *router) {
 
 kr_router *kr_router_create(kr_router_setup *setup) {
   kr_router *router;
-  router = calloc(1, sizeof(kr_router));
   kr_pool_setup pool_setup;
+  router = calloc(1, sizeof(kr_router));
+  router->user = setup->user;
+  router->response = setup->response;
   pool_setup.size = sizeof(kr_route);
   pool_setup.slices = setup->maps_max;
   pool_setup.shared = 0;
@@ -248,6 +252,7 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         strcpy(outcrate.address, crate->address);
         outcrate.payload_type = route->payload_type;
         outcrate.payload = route->payload;
+        router->response(router->user, &outcrate);
         return 0;
       }
       if ((crate->method == KR_PATCH) && (sliced.slices == 2)) {

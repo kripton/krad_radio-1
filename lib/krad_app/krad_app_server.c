@@ -272,6 +272,24 @@ int kr_app_server_client_destroy(kr_app_server_client *client) {
 }
 */
 
+int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
+  kr_app_server_client *client;
+  kr_ebml2_t ebml;
+  if (crate == NULL) return -2;
+  client = server->current_client;
+  if (client == NULL) return -1;
+  kr_ebml2_set_buffer(&ebml, client->out->buf, client->out->space);
+  //if (kr_crate2_valid(info) < 0) {
+  // return -1;
+  //}
+  uint8_t *ebml_crate;
+  kr_ebml2_start_element(&ebml, KR_EID_CRATE, &ebml_crate);
+  kr_crate2_to_ebml(&ebml, crate);
+  kr_ebml2_finish_element(&ebml, ebml_crate);
+  kr_io2_advance(client->out, ebml.pos);
+  return 0;
+}
+
 static int handle_client(kr_app_server *server, kr_app_server_client *client) {
   int ret;
   kr_crate2 crate;
@@ -454,6 +472,7 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   }
   router_setup.routes_max = 64;
   router_setup.maps_max = 64;
+  router_setup.response = (kr_router_response_handler *)kr_app_server_crate_reply;
   server->router = kr_router_create(&router_setup);
   return server;
 }

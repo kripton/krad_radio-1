@@ -53,7 +53,7 @@ int kr_crate_send(kr_client *client, kr_crate2 *crate) {
   return 0;
 }
 
-int kr_client_push (kr_client *client) {
+int kr_client_push(kr_client *client) {
   kr_io2_advance(client->io, client->ebml2->pos);
   if (kr_client_want_out(client)) {
     if ((client->autosync == 1) && (kr_poll_out(client, 0) > 0)) {
@@ -284,7 +284,7 @@ static void kr_crate_payload_ebml_reset (kr_crate *crate) {
   kr_ebml2_set_buffer ( &crate->payload_ebml, crate->buffer, crate->size );
 }
 
-int kr_uncrate_rep (kr_crate *crate) {
+int kr_uncrate_rep(kr_crate *crate) {
   if (!(crate->notice == KR_GET)) {
     return 0;
   }
