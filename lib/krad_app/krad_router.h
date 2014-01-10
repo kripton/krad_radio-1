@@ -11,6 +11,7 @@ typedef struct kr_router_map_setup kr_router_map_setup;
 typedef struct kr_router_map_info kr_router_map_info;
 typedef struct kr_router kr_router;
 typedef struct kr_router_map kr_router_map;
+typedef struct kr_route kr_route;
 
 typedef int (kr_router_map_create_handler)(void *, void *, void *);
 typedef int (kr_router_map_patch_handler)(void *, void *);
