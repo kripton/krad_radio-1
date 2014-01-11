@@ -11,13 +11,21 @@
 #include "gen/krad_radio_payload_to_text.h"
 #include "gen/krad_radio_payload_helpers.h"
 
+typedef struct kr_nil kr_nil;
+
+struct kr_nil {
+  int n;
+};
+
 typedef enum {
+  PL_KR_NIL,
   PL_KR_TRANSPONDER_PATH_INFO,
   PL_KR_MIXER_PATH_INFO,
   PL_KR_COMPOSITOR_PATH_INFO
 } kr_radio_payload_type;
 
 typedef union {
+  kr_nil nil;
   kr_transponder_path_info transponder_path_info;
   kr_mixer_path_info mixer_path_info;
   kr_compositor_path_info compositor_path_info;

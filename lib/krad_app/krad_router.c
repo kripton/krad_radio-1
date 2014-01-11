@@ -11,6 +11,7 @@ struct kr_router {
 typedef struct {
   char *slice[4];
   size_t slices;
+  char address[128];
 } address_sliced;
 
 struct kr_name {
@@ -93,7 +94,8 @@ kr_router *kr_router_create(kr_router_setup *setup) {
 static void slice_address(address_sliced *sliced, char *addr) {
   char *slice;
   memset(sliced, 0, sizeof(address_sliced));
-  slice = addr;
+  strncpy(sliced->address, addr, sizeof(sliced->address));
+  slice = sliced->address;
   while ((slice = strchr(slice, '/'))) {
     sliced->slice[sliced->slices] = slice + 1;
     sliced->slices++;

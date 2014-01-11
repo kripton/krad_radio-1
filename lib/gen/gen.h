@@ -54,6 +54,7 @@ typedef enum {
   TEXT_KR_MIXER_INFO,
   TEXT_KR_MIXER_PATH_INFO,
   TEXT_KR_MIXER_PATH_PATCH,
+  TEXT_KR_NIL,
   TEXT_KR_RADIO_PAYLOAD_TYPE,
   TEXT_KR_RADIO_PAYLOAD,
   TEXT_KR_SFX_CONTROL,
@@ -90,7 +91,7 @@ typedef enum {
 } text_enum;
 
 enum {
-  TEXT_ENUM_LAST = 68
+  TEXT_ENUM_LAST = 69
 };
 
 typedef enum {
@@ -273,6 +274,7 @@ typedef enum {
   EBML_KR_MIXER_INFO,
   EBML_KR_MIXER_PATH_INFO,
   EBML_KR_MIXER_PATH_PATCH,
+  EBML_KR_NIL,
   EBML_KR_RADIO_PAYLOAD_TYPE,
   EBML_KR_RADIO_PAYLOAD,
   EBML_KR_SFX_CONTROL,
@@ -309,7 +311,7 @@ typedef enum {
 } ebml_enum;
 
 enum {
-  EBML_ENUM_LAST = 70
+  EBML_ENUM_LAST = 71
 };
 
 typedef enum {
@@ -348,6 +350,7 @@ typedef enum {
   DEBML_KR_MIXER_INFO,
   DEBML_KR_MIXER_PATH_INFO,
   DEBML_KR_MIXER_PATH_PATCH,
+  DEBML_KR_NIL,
   DEBML_KR_RADIO_PAYLOAD_TYPE,
   DEBML_KR_RADIO_PAYLOAD,
   DEBML_KR_SFX_CONTROL,
@@ -384,7 +387,7 @@ typedef enum {
 } debml_enum;
 
 enum {
-  DEBML_ENUM_LAST = 68
+  DEBML_ENUM_LAST = 69
 };
 
 typedef enum {
@@ -423,6 +426,7 @@ typedef enum {
   HELPERS_KR_MIXER_INFO,
   HELPERS_KR_MIXER_PATH_INFO,
   HELPERS_KR_MIXER_PATH_PATCH,
+  HELPERS_KR_NIL,
   HELPERS_KR_RADIO_PAYLOAD_TYPE,
   HELPERS_KR_RADIO_PAYLOAD,
   HELPERS_KR_SFX_CONTROL,
@@ -459,7 +463,7 @@ typedef enum {
 } helpers_enum;
 
 enum {
-  HELPERS_ENUM_LAST = 68
+  HELPERS_ENUM_LAST = 69
 };
 
 

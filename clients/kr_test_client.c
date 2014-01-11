@@ -229,7 +229,7 @@ int run_test(kr_client *client, char *test) {
   return ret;
 }
 
-int main (int argc, char *argv[]) {
+int main(int argc, char *argv[]) {
   kr_client *client;
   char *sysname;
   const char *tests;
