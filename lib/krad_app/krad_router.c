@@ -260,20 +260,25 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
       if ((crate->method == KR_PATCH) && (sliced.slices == 2)) {
         printk("Found route! PATCH for %s on %s!", sliced.slice[1],
          sliced.slice[0]);
-        return 0;
+        route = find_route(router, map, sliced.slice[1]);
+        if (route == NULL) return 0;
+        ret = map->patch(route->ptr, (void *)&crate->payload);
+        return ret;
       }
       if ((crate->method == KR_DELETE) && (sliced.slices == 2)) {
         printk("Found route! DELETE %s from %s!", sliced.slice[1],
          sliced.slice[0]);
-        return 0;
+        route = find_route(router, map, sliced.slice[1]);
+        if (route == NULL) return 0;
+        ret = map->destroy(route->ptr);
+        //ret = destroy_route(router, route);
+        return ret;
       }
       if ((crate->method == KR_PUT) && (sliced.slices == 2)) {
         printk("Found route! PUT %s in %s!", sliced.slice[1],
          sliced.slice[0]);
         //printk("I will call %p with %p!", map->create, map->ptr);
-        /* FIXME replace null with route ptr */
         if (sliced.slice[1] == NULL) return -9;
-        //route = create_route(router, map, sliced.slice[1]);
         name = create_name(router, sliced.slice[1]);
         if (!name) return -6;
         ret = map->create(map->ptr, (void *)&crate->payload, name);
