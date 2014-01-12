@@ -69,12 +69,20 @@ struct kr_compositor {
   FT_Library ftlib;
 };
 
+typedef enum {
+  KR_COMP_CREATE = 1,
+  KR_COMP_PATCH,
+  KR_COMP_DESTROY
+} kr_compositor_event_type;
+
+
 struct kr_compositor_event {
   kr_compositor_path *path;
   void *user;
   void *user_path;
-  //kr_app_method method;
-  /* info struct */
+  kr_compositor_event_type type;
+  kr_compositor_path_patch patch;
+  kr_compositor_path_info info;
 };
 
 int kr_compositor_destroy(kr_compositor *compositor);

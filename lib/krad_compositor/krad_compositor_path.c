@@ -221,6 +221,8 @@ kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
   event.user = compositor->user;
   event.user_path = path->control_user;
   event.path = path;
+  event.type = KR_COMP_CREATE;
+  event.info = path->info;
   compositor->event_cb(&event);
   return path;
 }

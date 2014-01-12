@@ -28,14 +28,26 @@ static void compositor_event(kr_compositor_event *event) {
   kr_radio *radio;
   kr_route_setup route_setup;
   radio = (kr_radio *)event->user;
-  printk("got a compositor event");
-  /* the following should only happen on a create event */
-  route_setup.ptr = radio->compositor;
-  route_setup.name = event->user_path;
-  route_setup.ctx = event->path;
-  route_setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
-  kr_compositor_path_info_get(event->path, &route_setup.payload.compositor_path_info);
-  kr_app_server_route_create(radio->app, &route_setup);
+  printk("Krad Radio: Compositor event");
+  switch (event->type) {
+    case KR_COMP_CREATE:
+      route_setup.ptr = radio->compositor;
+      route_setup.name = event->user_path;
+      route_setup.ctx = event->path;
+      route_setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
+      route_setup.payload.compositor_path_info = event->info;
+      kr_app_server_route_create(radio->app, &route_setup);
+      break;
+    case KR_COMP_PATCH:
+      /* update the info struct in the route */
+      break;
+    case KR_COMP_DESTROY:
+      /* remove the route */
+      break;
+    default:
+      printke("Bad event from compositor");
+      break;
+  }
 }
 
 static void xpdr_event(kr_transponder_event *event) {
