@@ -196,6 +196,8 @@ kr_route *kr_route_create(kr_router *router, kr_route_setup *setup) {
   route->map = map;
   strncpy(route->name, setup->name->name, sizeof(route->name));
   setup->name->use++;
+  route->payload_type = setup->payload_type;
+  route->payload = setup->payload;
   printk("Created route: %s/%s", map->prefix, route->name);
   return route;
 }

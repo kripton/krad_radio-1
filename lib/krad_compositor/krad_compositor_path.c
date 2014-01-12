@@ -220,6 +220,7 @@ kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
   /* do event callback */
   event.user = compositor->user;
   event.user_path = path->control_user;
+  event.path = path;
   compositor->event_cb(&event);
   return path;
 }
