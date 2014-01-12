@@ -1,33 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <fcntl.h>
-#ifndef __STDC_FORMAT_MACROS
-#define __STDC_FORMAT_MACROS
-#endif
-#include <inttypes.h>
-#include <math.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/utsname.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <ctype.h>
-#include <sys/stat.h>
-#include <sys/un.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <stdarg.h>
-#include <limits.h>
-
-#include "krad_system.h"
-
 #ifndef KR_IO2_H
 #define KR_IO2_H
+
+#include <inttypes.h>
 
 #define KR_IO2_BUF_SZ 8192 * 8
 

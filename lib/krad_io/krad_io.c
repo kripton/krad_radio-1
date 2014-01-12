@@ -1,3 +1,29 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <fcntl.h>
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+#include <math.h>
+#include <signal.h>
+#include <time.h>
+#include <sys/utsname.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <ctype.h>
+#include <sys/stat.h>
+#include <sys/un.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <limits.h>
+
+#include <krad_system.h>
+
 #include "krad_io.h"
 
 static ssize_t kr_io2_write(kr_io2_t *io);

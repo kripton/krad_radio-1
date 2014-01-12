@@ -52,4 +52,4 @@ AM_CPPFLAGS = \
 -I../lib/gen \
 -I../lib/gen/jsmn \
 -I../tools \
--I../tools/kr_config 
+-I../tools/kr_config
