@@ -53,7 +53,8 @@ struct kr_mixer_path {
   int delay_actual;
   int state;
   kr_mixer_path_audio_cb *audio_cb;
-  void *user;
+  void *audio_user;
+  void *control_user;
   kr_mixer *mixer;
   kr_sfx *sfx;
 };
@@ -250,7 +251,7 @@ static void audio_cb(kr_mixer_path *path, uint32_t nframes) {
   cb_arg.audio.channels = path->channels;
   cb_arg.audio.count = nframes;
   cb_arg.audio.rate = path->mixer->sample_rate;
-  cb_arg.user = path->user;
+  cb_arg.user = path->audio_user;
   path->audio_cb(&cb_arg);
   if (path->type == KR_MXR_INPUT) {
     import_frames(path, &cb_arg.audio);
@@ -659,10 +660,11 @@ static void path_sfx_create(kr_mixer_path *path) {
 
 static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup) {
   int c;
+  kr_mixer_event event;
   path->channels = setup->info.channels;
   path->type = setup->info.type;
   path->audio_cb = setup->audio_cb;
-  path->user = setup->user;
+  path->control_user = setup->user;
   if (path->type == KR_MXR_BUS) {
     path->bus = NULL;
   } else {
@@ -685,10 +687,15 @@ static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup) {
   }
   path_sfx_create(path);
   path->state = KR_MXP_READY;
+  event.user = path->mixer->user;
+  event.user_path = path->control_user;
+  event.path = path;
+  event.type = KR_MIXER_CREATE;
+  kr_mixer_path_info_get(path, &event.info);
+  path->mixer->event_cb(&event);
 }
 
 int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
-  /* do event callback */
   return -1;
 }
 

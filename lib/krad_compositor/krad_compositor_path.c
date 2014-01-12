@@ -173,6 +173,7 @@ int path_setup_check(kr_compositor_io_path_setup *setup) {
 
 static void path_create(kr_compositor_path *path,
  kr_compositor_io_path_setup *setup) {
+  kr_compositor_event event;
   path->info = setup->info;
   /* FIXME a silly default? */
   path->info.controls.opacity = 0.0f;
@@ -188,6 +189,12 @@ static void path_create(kr_compositor_path *path,
   if (path->info.type == KR_CMP_OUTPUT) {
     path->compositor->info.outputs++;
   }
+  event.user = path->compositor->user;
+  event.user_path = path->control_user;
+  event.path = path;
+  event.type = KR_COMP_CREATE;
+  event.info = path->info;
+  path->compositor->event_cb(&event);
 }
 
 int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
@@ -197,7 +204,6 @@ int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user
 kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
  kr_compositor_io_path_setup *setup) {
   kr_compositor_path *path;
-  kr_compositor_event event;
   if ((compositor == NULL) || (setup == NULL)) return NULL;
   if (path_setup_check(setup)) {
     printke("compositor mkpath failed setup check");
@@ -217,13 +223,6 @@ kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
   }
   path->compositor = compositor;
   path_create(path, setup);
-  /* do event callback */
-  event.user = compositor->user;
-  event.user_path = path->control_user;
-  event.path = path;
-  event.type = KR_COMP_CREATE;
-  event.info = path->info;
-  compositor->event_cb(&event);
   return path;
 }
 
@@ -244,7 +243,7 @@ void cmper_path_release(kr_compositor *compositor, kr_compositor_path *path) {
 int kr_compositor_unlink(kr_compositor_path *path) {
   if (path == NULL) return -1;
   /*FIXME*/
-  /* do event callback */
+  /* do destroy event callback */
   return 0;
 }
 

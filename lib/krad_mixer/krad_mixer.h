@@ -19,14 +19,22 @@ typedef struct kr_mixer_setup kr_mixer_setup;
 #include "krad_av.h"
 #include "krad_sfx.h"
 
+typedef enum {
+  KR_MIXER_CREATE = 1,
+  KR_MIXER_PATCH,
+  KR_MIXER_DESTROY
+} kr_mixer_event_type;
+
 typedef void (kr_mixer_event_cb)(kr_mixer_event *);
 typedef void (kr_mixer_path_audio_cb)(kr_mixer_path_audio_cb_arg *);
 
 struct kr_mixer_event {
+  kr_mixer_path *path;
   void *user;
   void *user_path;
-  /* method
-   * info struct */
+  kr_mixer_event_type type;
+  kr_mixer_path_patch patch;
+  kr_mixer_path_info info;
 };
 
 struct kr_mixer_path_audio_cb_arg {
