@@ -75,7 +75,6 @@ typedef enum {
   KR_COMP_DESTROY
 } kr_compositor_event_type;
 
-
 struct kr_compositor_event {
   kr_compositor_path *path;
   void *user;
