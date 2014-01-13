@@ -62,18 +62,18 @@ int strmatch(char *string1, char *string2) {
 #include "stream.c"
 #include "file.c"
 
-int32_t krad_interweb_client_handle(kr_web_client *client) {
+int32_t handle_client(kr_web_client *client) {
   int32_t ret;
   ret = -1;
   if (client->type == INTERWEB_UNKNOWN) {
-    ret = krad_interweb_client_handle_request(client);
+    ret = handle_unknown_client(client);
     if (client->type == INTERWEB_UNKNOWN) {
       return ret;
     }
   }
   switch (client->type) {
     case KR_IWS_WS:
-      ret = websocket_client_handle(client);
+      ret = handle_websocket_client(client);
       break;
     case KR_IWS_FILE:
       ret = web_file_client_handle(client);
@@ -217,11 +217,11 @@ static void *web_server_loop(void *arg) {
         if (server->sockets[s].revents & POLLIN) {
           read_ret = kr_io2_read(client->in);
           if (read_ret > 0) {
-            if (krad_interweb_client_handle(client) < 0) {
+            if (handle_client(client) < 0) {
               disconnect_client(server, client);
               continue;
             }
-            if (kr_io2_want_out (client->out)) {
+            if (kr_io2_want_out(client->out)) {
               server->sockets[s].events |= POLLOUT;
             }
           } else {

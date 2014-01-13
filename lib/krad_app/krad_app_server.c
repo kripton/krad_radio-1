@@ -200,7 +200,10 @@ static void disconnect_client(kr_app_server *server, kr_app_server_client *clien
   if (ret != 0) {
     printke("App Server: remove client from epoll on disconnect failed!");
   }
-  close(client->sd);
+  if (client->sd != -1) {
+    close(client->sd);
+    client->sd = -1;
+  }
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
   kr_pool_recycle(server->client_pool, client);

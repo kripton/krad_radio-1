@@ -142,7 +142,6 @@ struct kr_websocket_client {
   uint8_t *output;
   uint32_t output_len;
   uint64_t frames;
-  uint32_t shaked;
   char key[96];
   char proto[96];
 };

@@ -158,7 +158,7 @@ static int32_t unpack_frame_data(kr_web_client *client) {
   return pos;
 }
 
-static int32_t pack_accept_response(char *resp, char *key) {
+static int32_t build_accept_key(char *resp, char *key) {
   static char *ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
   int32_t ret;
   char string[128];
@@ -257,14 +257,14 @@ int32_t app_client_event(kr_web_client *client) {
   return 0;
 }
 
-int32_t websocket_client_handle(kr_web_client *client) {
+int32_t handle_websocket_client(kr_web_client *client) {
   int32_t pos;
   char *buffer;
   char acceptkey[64];
   pos = 0;
   buffer = (char *)client->out->buf;
   memset(acceptkey, 0, sizeof(acceptkey));
-  pack_accept_response(acceptkey, client->ws.key);
+  build_accept_key(acceptkey, client->ws.key);
   pos += sprintf(buffer + pos, "HTTP/1.1 101 Switching Protocols\r\n");
   pos += sprintf(buffer + pos, "Upgrade: websocket\r\n");
   pos += sprintf(buffer + pos, "Connection: Upgrade\r\n");
@@ -272,7 +272,6 @@ int32_t websocket_client_handle(kr_web_client *client) {
   pos += sprintf(buffer + pos, "Sec-WebSocket-Accept: %s\r\n", acceptkey);
   pos += sprintf(buffer + pos, "\r\n");
   kr_io2_advance(client->out, pos);
-  client->ws.shaked = 1;
   set_socket_nodelay(client->sd);
   app_client_event(client);
   //printk("interweb_ws_shake happens");
