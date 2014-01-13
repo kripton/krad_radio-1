@@ -21,9 +21,12 @@
 #include <pthread.h>
 #include <ifaddrs.h>
 #include <sys/epoll.h>
-
+#include <sys/signalfd.h>
+#include <sys/syscall.h>
 #include "krad_app_server.h"
 #include "krad_pool.h"
+
+#define KR_APP_EVENTS_MAX 16
 
 typedef enum {
   KR_APP_STARTING = -1,
@@ -34,18 +37,20 @@ typedef enum {
 
 struct kr_app_server {
   int sd;
+  int pd;
+  int app_pd;
+  kr_pool *client_pool;
+  kr_router *router;
+  uint64_t num_clients;
+  int socket_count;
+  kr_app_server_client *current_client;
+  int sfd;
   uint64_t start_time;
   app_state state;
-  int socket_count;
-  krad_control_t krad_control;
-  uint64_t num_clients;
-  kr_app_server_client *clients;
-  kr_app_server_client *current_client;
+  krad_control_t control;
+  pid_t pid;
+  pid_t tid;
   pthread_t thread;
-  struct pollfd sockets[KR_APP_SERVER_CLIENTS_MAX + 2];
-  kr_app_server_client *sockets_clients[KR_APP_SERVER_CLIENTS_MAX + 2];
-  kr_router *router;
-  kr_pool *client_pool;
 };
 
 struct kr_app_server_client {
@@ -65,12 +70,12 @@ struct kr_app_server_client {
 
 static int validate_client_header(uint8_t *header, size_t sz);
 static int pack_server_header(uint8_t *buffer, size_t max);
+static int local_client_pack_crate(uint8_t *buffer, kr_crate2 *crate, size_t max);
 static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in);
 static int handle_client(kr_app_server *server, kr_app_server_client *client);
 static int validate_client(kr_app_server_client *client);
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client);
-static kr_app_server_client *accept_client(kr_app_server *server, int sd);
-static void update_pollfds(kr_app_server *server);
+static kr_app_server_client *accept_client(kr_app_server *server);
 static void *server_loop(void *arg);
 static int setup_socket(char *appname, char *sysname);
 
@@ -108,6 +113,19 @@ static int pack_server_header(uint8_t *buffer, size_t max) {
   return ebml.pos;
 }
 
+static int local_client_pack_crate(uint8_t *buffer, kr_crate2 *crate, size_t max) {
+  kr_ebml2_t ebml;
+  uint8_t *ebml_crate;
+  kr_ebml2_set_buffer(&ebml, buffer, max);
+  //if (kr_crate2_valid(info) < 0) {
+  // return -1;
+  //}
+  kr_ebml2_start_element(&ebml, KR_EID_CRATE, &ebml_crate);
+  kr_crate2_to_ebml(&ebml, crate);
+  kr_ebml2_finish_element(&ebml, ebml_crate);
+  return ebml.pos;
+}
+
 static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
   kr_ebml2_t ebml;
   uint32_t element;
@@ -119,12 +137,12 @@ static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
   kr_ebml2_set_buffer(&ebml, in->rd_buf, in->len);
   ret = kr_ebml2_unpack_id(&ebml, &element, &size);
   if (ret < 0) {
-    printke("full crate EBML ID Not found");
+    printke("App Server: Full crate EBML ID Not found");
     return 0;
   }
   size += ebml.pos;
   if (in->len < size) {
-    printke("Crate not full...");
+    printke("App Server: Crate not full...");
     return 0;
   }
   if (element == KR_EID_CRATE) {
@@ -133,7 +151,7 @@ static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
       char string[8192];
       ret = kr_crate2_to_text(string, crate, sizeof(string));
       if (ret > 0) {
-        printk("%"PRIu64" Byte Crate: \n%s\n", size, string);
+        printk("App Server: %"PRIu64" byte crate: \n%s\n", size, string);
       }
       kr_io2_pulled(in, ebml.pos);
       return 1;
@@ -166,10 +184,12 @@ static int validate_client(kr_app_server_client *client) {
   if (ret > 0) {
     kr_io2_pulled(client->in, ret);
     client->valid = 1;
+    printk("client is valid");
     ret = pack_server_header(client->out->buf, client->out->space);
     if (ret < 1) {
       printke("App Server: Error packing client header");
     } else {
+      printk("packed server header %d", ret);
       kr_io2_advance(client->out, ret);
       return 1;
     }
@@ -179,6 +199,11 @@ static int validate_client(kr_app_server_client *client) {
 }
 
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client) {
+  int ret;
+  ret = epoll_ctl(server->pd, EPOLL_CTL_DEL, client->sd, NULL);
+  if (ret != 0) {
+    printke("App Server: remove client from epoll on disconnect failed!");
+  }
   close(client->sd);
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
@@ -187,20 +212,33 @@ static void disconnect_client(kr_app_server *server, kr_app_server_client *clien
   printk("App Server: Client disconnected");
 }
 
-static kr_app_server_client *accept_client(kr_app_server *server, int sd) {
+static kr_app_server_client *accept_client(kr_app_server *server) {
+  struct epoll_event ev;
   kr_app_server_client *client;
   struct sockaddr_un sin;
   socklen_t slen;
+  int ret;
   slen = sizeof(sin);
   client = kr_pool_slice(server->client_pool);
   if (client == NULL) {
-    printke("App Server: Overloaded with clients!");
+    printke("App Server: Overloaded can't accept client");
     return NULL;
   }
-  client->sd = accept4(sd, (struct sockaddr *)&sin, &slen, SOCK_NONBLOCK);
+  client->sd = accept4(server->sd, (struct sockaddr *)&sin, &slen,
+   SOCK_NONBLOCK | SOCK_CLOEXEC);
   if (client->sd < 0) {
     kr_pool_recycle(server->client_pool, client);
-    printke("App Server: accept() failed!");
+    printke("App Server: accept4() failed!");
+    return NULL;
+  }
+  memset(&ev, 0, sizeof(struct epoll_event));
+  ev.events = EPOLLIN;
+  ev.data.ptr = client;
+  ret = epoll_ctl(server->pd, EPOLL_CTL_ADD, client->sd, &ev);
+  if (ret != 0) {
+    kr_pool_recycle(server->client_pool, client);
+    printke("App Server: Adding client to epoll after accept4 failed");
+    close(client->sd);
     return NULL;
   }
   client->local = 1;
@@ -214,116 +252,163 @@ static kr_app_server_client *accept_client(kr_app_server *server, int sd) {
   return client;
 }
 
-static void update_pollfds(kr_app_server *server) {
-  kr_app_server_client *client;
-  int s;
-  int i;
-  s = 0;
-  server->sockets[s].fd = krad_controller_get_client_fd(&server->krad_control);
-  server->sockets[s].events = POLLIN;
-  s++;
-  server->sockets[s].fd = server->sd;
-  server->sockets[s].events = POLLIN;
-  s++;
-  i = 0;
-  while ((client = kr_pool_iterate_active(server->client_pool, &i))) {
-    server->sockets[s].fd = client->sd;
-    server->sockets[s].events |= POLLIN;
-    if (kr_io2_want_out(client->out)) {
-      server->sockets[s].events |= POLLOUT;
-    }
-    server->sockets_clients[s] = client;
-    s++;
+static int setup_signals(kr_app_server *server) {
+  int ret;
+  sigset_t mask;
+  struct epoll_event ev;
+  printk("App Server: Was run from a thread so we handle signals");
+  sigemptyset(&mask);
+  sigfillset(&mask);
+  if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0) {
+    printke("App Server: Could not set signal mask!");
+    return -1;
   }
-  server->socket_count = s;
-  //printk("App Server: polled fds updated");
+  server->sfd = signalfd(-1, &mask, SFD_CLOEXEC | SFD_NONBLOCK);
+  if (server->sfd == -1) {
+    return -1;
+  }
+  memset(&ev, 0, sizeof(struct epoll_event));
+  ev.events = EPOLLIN;
+  ev.data.fd = server->sfd;
+  ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
+  if (ret != 0) {
+    printke("App Server: epoll ctl app pd sfd fail");
+    return -1;
+  }
+  return 0;
+}
+
+static int handle_app_events(kr_app_server *server) {
+  int cfd;
+  int fd;
+  int n;
+  int i;
+  printk("App Server: Got app event");
+  struct epoll_event events[KR_APP_EVENTS_MAX];
+  n = epoll_wait(server->app_pd, events, KR_APP_EVENTS_MAX, -1);
+  if (n < 1) {
+    return -1;
+  }
+  cfd = krad_controller_get_client_fd(&server->control);
+  for (i = 0; i < n; i++) {
+    fd = events[i].data.fd;
+    if (fd == server->sd) {
+      accept_client(server);
+      continue;
+    }
+    if (fd == server->sfd) {
+      printk("App Server: Signal");
+      server->state = KR_APP_DO_SHUTDOWN;
+    }
+    if (fd == cfd) {
+      printk("App Server: Shutdown from controller");
+      server->state = KR_APP_DO_SHUTDOWN;
+    }
+  }
+  return 0;
 }
 
 static void *server_loop(void *arg) {
   kr_app_server *server;
   kr_app_server_client *client;
+  struct epoll_event events[KR_APP_EVENTS_MAX];
+  struct epoll_event ev;
+  int n;
+  int i;
   int ret;
-  int s;
-  int read_ret;
-  int hret;
-  int32_t oret;
   server = (kr_app_server *)arg;
-  krad_system_set_thread_name("kr_app_server");
-  server->state = KR_APP_RUNNING;
   server->start_time = time(NULL);
+  krad_system_set_thread_name("kr_app_server");
+  if (server->pid != server->tid) {
+    ret = setup_signals(server);
+    if (ret != 0) {
+      printke("App Server: Failed to setup signal handler");
+    }
+  }
+  server->state = KR_APP_RUNNING;
   while (server->state == KR_APP_RUNNING) {
-    s = 0;
-    update_pollfds(server);
-    ret = poll (server->sockets, server->socket_count, -1);
-    if ((ret < 1) || (server->state) || (server->sockets[s].revents)) {
+    n = epoll_wait(server->pd, events, KR_APP_EVENTS_MAX, -1);
+    if ((n < 1) || (server->state)) {
       break;
     }
-    s++;
-    // Linux abstract socket for local connections
-    if (server->sockets[s].revents & POLLIN) {
-      accept_client(server, server->sd);
-      ret--;
-    }
-    s++;
-    for (; ret > 0; s++) {
-      if (server->sockets[s].revents) {
-        ret--;
-          client = server->sockets_clients[s];
-          if (server->sockets[s].revents & POLLIN) {
-            read_ret = kr_io2_read(client->in);
-            if (read_ret > 0) {
-              printk("App Server fd %d: Got %d bytes", s, read_ret);
-              server->current_client = client;
-              hret = handle_client(server, client);
-              if (hret != 0) {
-                disconnect_client(server, client);
-                continue;
-              } else {
-                if (kr_io2_want_out (client->out)) {
-                  server->sockets[s].events |= POLLOUT;
+    for (i = 0; i < n; i++) {
+      if (events[i].data.ptr == server) {
+        handle_app_events(server);
+        continue;
+      }
+      printk("App Server: Got client event");
+      client = events[i].data.ptr;
+      server->current_client = client;
+      //switch (events[i].events) {
+      //  case EPOLLIN:
+      if (events[i].events & EPOLLIN) {
+          ret = kr_io2_read(client->in);
+          if (ret > 0) {
+            printk("App Server: Got %d bytes from client", ret);
+            if (handle_client(server, client)) {
+              printk("App Server: Handle client ret %d", ret);
+              disconnect_client(server, client);
+              continue;
+            } else {
+              printk("client check");
+              if (kr_io2_want_out(client->out)) {
+                printk("client did want out");
+                memset(&ev, 0, sizeof(struct epoll_event));
+                ev.events = EPOLLIN | EPOLLOUT;
+                ev.data.ptr = client;
+                if (epoll_ctl(server->pd, EPOLL_CTL_MOD, client->sd, &ev)) {
+                  printke("Error modding client epoll fd to also look for out");
                 }
               }
-            } else {
-              if (read_ret == 0) {
-                //printk("App Server: Client EOF\n");
-                disconnect_client(server, client);
-                continue;
-              }
-              if (read_ret == -1) {
-                printke ("Krad App Server: Client Socket Error");
-                disconnect_client(server, client);
-                continue;
-              }
-            }
-          }
-          if (server->sockets[s].revents & POLLOUT) {
-            oret = kr_io2_output(client->out);
-            if (oret != 0) {
-              printke("App Server: panic drop");
-              disconnect_client(server, client);
-              continue;
-            }
-            if (!(kr_io2_want_out(client->out))) {
-              server->sockets[s].events = POLLIN;
             }
           } else {
-            if (server->sockets[s].revents & POLLHUP) {
-              //printk("App Server %d: POLLHUP", s);
+            if (ret == 0) {
+              printk("App Server: Client EOF");
+              disconnect_client(server, client);
+              continue;
+            }
+            if (ret == -1) {
+              printke("App Server: Client Socket Error");
               disconnect_client(server, client);
               continue;
             }
           }
-          if (server->sockets[s].revents & POLLERR) {
-            printke("App Server: POLLERR");
+      }
+      if (events[i].events & EPOLLOUT) {
+//        case EPOLLOUT:
+          printk("App Server: EPOLLOUT");
+          ret = kr_io2_output(client->out);
+          if (ret != 0) {
+            printke("App Server: panic drop");
             disconnect_client(server, client);
             continue;
           }
-        }
+          if (!(kr_io2_want_out(client->out))) {
+            memset(&ev, 0, sizeof(struct epoll_event));
+            ev.events = EPOLLIN;
+            ev.data.ptr = client;
+            if (epoll_ctl(server->pd, EPOLL_CTL_MOD, client->sd, &ev)) {
+              printke("Error modding client epoll fd to also look for out");
+            }
+          }
+      }
+      if (events[i].events & EPOLLHUP) {
+      //  case EPOLLHUP:
+          printk("App Server: EPOLLHUP");
+          disconnect_client(server, client);
+          continue;
+      }
+      if (events[i].events & EPOLLERR) {
+//        case EPOLLERR:
+          printke("App Server: EPOLLERR");
+          disconnect_client(server, client);
+          continue;
+      }
     }
   }
-  server->state = KR_APP_SHUTINGDOWN;
   server->start_time = 0;
-  krad_controller_client_close(&server->krad_control);
+  krad_controller_client_close(&server->control);
+  printk("App Server: Mainloop exits");
   return NULL;
 }
 
@@ -331,7 +416,7 @@ static int setup_socket(char *appname, char *sysname) {
   int sd;
   struct sockaddr_un saddr;
   socklen_t socket_sz;
-  sd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+  sd = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0);
   if (sd == -1) {
     printke("App Server: Socket failed.");
     return -1;
@@ -373,21 +458,17 @@ int kr_app_server_client_destroy(kr_app_server_client *client) {
 */
 
 int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
+  int ret;
   kr_app_server_client *client;
-  kr_ebml2_t ebml;
   if (crate == NULL) return -2;
   client = server->current_client;
   if (client == NULL) return -1;
-  kr_ebml2_set_buffer(&ebml, client->out->buf, client->out->space);
-  //if (kr_crate2_valid(info) < 0) {
-  // return -1;
-  //}
-  uint8_t *ebml_crate;
-  kr_ebml2_start_element(&ebml, KR_EID_CRATE, &ebml_crate);
-  kr_crate2_to_ebml(&ebml, crate);
-  kr_ebml2_finish_element(&ebml, ebml_crate);
-  kr_io2_advance(client->out, ebml.pos);
-  return 0;
+  ret = local_client_pack_crate(client->out->buf, crate, client->out->space);
+  if (ret > 0) {
+    kr_io2_advance(client->out, ret);
+    return 0;
+  }
+  return -1;
 }
 
 int kr_app_server_map_destroy(kr_app_server *server, kr_router_map *map) {
@@ -422,11 +503,8 @@ int kr_app_server_info_get(kr_app_server *server, kr_app_server_info *info) {
 int kr_app_server_disable(kr_app_server *server) {
   if (server == NULL) return -1;
   printk("App Server: Disabling");
-  if (!krad_controller_shutdown(&server->krad_control, &server->thread, 30)) {
-    krad_controller_destroy(&server->krad_control, &server->thread);
-  }
-  if (server->sd != 0) {
-    close(server->sd);
+  if (!krad_controller_shutdown(&server->control, &server->thread, 30)) {
+    krad_controller_destroy(&server->control, &server->thread);
   }
   printk("App Server: Disabled");
   return 0;
@@ -435,6 +513,9 @@ int kr_app_server_disable(kr_app_server *server) {
 int kr_app_server_enable(kr_app_server *server) {
   if (server == NULL) return -1;
   if (server->state != KR_APP_STARTING) return -2;
+  printk("App Server: Enabling");
+  server->pid = getpid();
+  server->tid = syscall(SYS_gettid);
   pthread_create(&server->thread, NULL, server_loop, (void *)server);
   return 0;
 }
@@ -447,9 +528,21 @@ int kr_app_server_destroy(kr_app_server *server) {
   if (server->state != KR_APP_SHUTINGDOWN) {
     kr_app_server_disable(server);
   }
+  if (server->sd != 0) {
+    close(server->sd);
+  }
   i = 0;
   while ((client = kr_pool_iterate_active(server->client_pool, &i))) {
     disconnect_client(server, client);
+  }
+  if (server->app_pd > -1) {
+    close(server->app_pd);
+  }
+  if (server->sfd > -1) {
+    close(server->sfd);
+  }
+  if (server->pd > -1) {
+    close(server->pd);
   }
   kr_router_destroy(server->router);
   kr_pool_destroy(server->client_pool);
@@ -459,6 +552,8 @@ int kr_app_server_destroy(kr_app_server *server) {
 
 kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   int sd;
+  int ret;
+  struct epoll_event ev;
   kr_app_server *server;
   kr_pool *pool;
   kr_pool_setup pool_setup;
@@ -478,16 +573,55 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   server = kr_pool_overlay_get(pool);
   memset(server, 0, sizeof(kr_app_server));
   server->client_pool = pool;
+  server->sd = sd;
+  server->sfd = -1;
+  server->app_pd = -1;
+  server->pd = -1;
+  server->state = KR_APP_STARTING;
   /*
   server->user = setup->user;
   server->event_cb = setup->event_cb;
   */
-  if (krad_control_init(&server->krad_control)) {
+  if (krad_control_init(&server->control)) {
+    printke("App Server: Control init failed");
     kr_app_server_destroy(server);
     return NULL;
   }
-  server->state = KR_APP_STARTING;
-  server->sd = sd;
+  server->app_pd = epoll_create1(EPOLL_CLOEXEC);
+  if (server->app_pd == -1) {
+    printke("App Server: app_pd epoll created failed");
+    kr_app_server_destroy(server);
+    return NULL;
+  }
+  server->pd = epoll_create1(EPOLL_CLOEXEC);
+  if (server->pd == -1) {
+    printke("App Server: pd epoll create failed");
+    kr_app_server_destroy(server);
+    return NULL;
+  }
+  memset(&ev, 0, sizeof(struct epoll_event));
+  ev.events = EPOLLIN;
+  ev.data.fd = krad_controller_get_client_fd(&server->control);
+  ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
+  if (ret != 0) {
+    printke("App Server: epoll ctl app pd fail");
+    kr_app_server_destroy(server);
+    return NULL;
+  }
+  ev.data.fd = server->sd;
+  ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
+  if (ret != 0) {
+    printke("App Server: epoll ctl app pd 2 fail");
+    kr_app_server_destroy(server);
+    return NULL;
+  }
+  ev.data.ptr = server;
+  ret = epoll_ctl(server->pd, EPOLL_CTL_ADD, server->app_pd, &ev);
+  if (ret != 0) {
+    printke("App Server: epoll ctl pd failed");
+    kr_app_server_destroy(server);
+    return NULL;
+  }
   router_setup.routes_max = 64;
   router_setup.maps_max = 64;
   router_setup.user = server;
