@@ -14,7 +14,7 @@ void krad_y4m_destroy (krad_y4m_t *krad_y4m) {
 
 krad_y4m_t *krad_y4m_create (int width, int height, int color_depth) {
 
-	krad_y4m_t *krad_y4m = calloc(1, sizeof(krad_y4m_t));
+	krad_y4m_t *krad_y4m = kr_allocz(1, sizeof(krad_y4m_t));
 
 	if (krad_y4m == NULL) {
 		failfast ("Krad y4m: Out of memory");
@@ -53,9 +53,9 @@ krad_y4m_t *krad_y4m_create (int width, int height, int color_depth) {
         break;
   }
 	
-	krad_y4m->planes[0] = malloc(krad_y4m->size[0]);
-	krad_y4m->planes[1] = malloc(krad_y4m->size[1]);
-	krad_y4m->planes[2] = malloc(krad_y4m->size[2]);
+	krad_y4m->planes[0] = kr_alloc(krad_y4m->size[0]);
+	krad_y4m->planes[1] = kr_alloc(krad_y4m->size[1]);
+	krad_y4m->planes[2] = kr_alloc(krad_y4m->size[2]);
 
   krad_y4m->frame_size = krad_y4m->size[0] + krad_y4m->size[1] + krad_y4m->size[2];
 

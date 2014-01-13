@@ -53,7 +53,7 @@ int kr_router_destroy(kr_router *router) {
 kr_router *kr_router_create(kr_router_setup *setup) {
   kr_router *router;
   kr_pool_setup pool_setup;
-  router = calloc(1, sizeof(kr_router));
+  router = kr_allocz(1, sizeof(kr_router));
   router->user = setup->user;
   router->response = setup->response;
   pool_setup.size = sizeof(kr_route);
@@ -309,6 +309,6 @@ kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setu
   slice = kr_pool_slice(router->maps);
   if (slice == NULL) return NULL;
   memcpy(slice, setup, sizeof(kr_router_map));
-  printk("Krad Router: Added map for: %s", setup->prefix);
+  printk("Router: Added map for: %s", setup->prefix);
   return slice;
 }

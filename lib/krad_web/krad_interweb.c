@@ -127,10 +127,10 @@ static kr_web_client *accept_client(kr_web_server *server, int sd) {
     kr_io2_set_fd(client->in, client->sd);
     kr_io2_set_fd(client->out, client->sd);
     client->server = server;
-    printk ("Krad Interweb Server: Client accepted!");
+    printk("Web Server: Client accepted!");
     return client;
   } else {
-    printke ("Krad Interweb Server: Client NOT accepted!");
+    printke("Web Server: Client NOT accepted!");
     client->sd = 0;
   }
   return NULL;
@@ -153,7 +153,7 @@ static void disconnect_client(kr_web_server *server, kr_web_client *client) {
   memset(client->get, 0, sizeof(client->get));
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
-  printk ("Krad Interweb Server: Client Disconnected");
+  printk("Web Server: Client Disconnected");
 }
 
 static void web_server_update_pollfds(kr_web_server *server) {
@@ -250,10 +250,10 @@ static void *web_server_loop(void *arg) {
             }
           } else {
             if (read_ret == 0) {
-              //printk ("Krad Interweb Server: Client EOF\n");
+              //printk("Interweb Server: Client EOF\n");
             }
             if (read_ret == -1) {
-              printke("Krad Interweb Server: Client Socket Error");
+              printke("Web Server: Client Socket Error");
             }
             disconnect_client(server, client);
             continue;
@@ -262,7 +262,7 @@ static void *web_server_loop(void *arg) {
         if (server->sockets[s].revents & POLLOUT) {
           oret = kr_io2_output(client->out);
           if (oret != 0) {
-            printke ("panic dropping the client");
+            printke("Web Server: panic dropping the client");
             disconnect_client(server, client);
             continue;
           }
@@ -281,7 +281,7 @@ static void *web_server_loop(void *arg) {
           }
         }
         if (server->sockets[s].revents & POLLERR) {
-          printke("Krad Interweb Server: POLLERR");
+          printke("Web Server: POLLERR");
           disconnect_client(server, client);
           continue;
         }
@@ -294,13 +294,13 @@ static void *web_server_loop(void *arg) {
 }
 
 void kr_web_server_disable(kr_web_server *server) {
-  printk ("Krad Interweb Server: Disable Started");
+  printk("Web Server: Disabling");
   if (!krad_controller_shutdown(&server->krad_control, &server->thread,
       30)) {
     krad_controller_destroy(&server->krad_control, &server->thread);
   }
   kr_web_server_listen_off(server, "", 0);
-  printk ("Krad Interweb Server: Disable Complete");
+  printk("Web Server: Disabled");
 }
 
 void kr_web_server_destroy(kr_web_server **serv) {
@@ -310,7 +310,7 @@ void kr_web_server_destroy(kr_web_server **serv) {
     return;
   }
   server = *serv;
-  printk("Krad Interweb Server: Destroy Started");
+  printk("Web Server: Destroying");
   if (server->shutdown != KRAD_INTERWEB_SHUTINGDOWN) {
     kr_web_server_disable(server);
   }
@@ -323,7 +323,7 @@ void kr_web_server_destroy(kr_web_server **serv) {
   free(server->clients);
   free(server);
   *serv = NULL;
-  printk ("Krad Interweb Server: Destroy Completed");
+  printk ("Web Server: Destroyed");
 }
 
 void kr_web_server_run(kr_web_server *server) {
@@ -332,7 +332,8 @@ void kr_web_server_run(kr_web_server *server) {
 
 kr_web_server *kr_web_server_create(kr_web_server_setup *setup) {
   kr_web_server *server;
-  server = calloc(1, sizeof(kr_web_server));
+  printk("Web Server: Creating");
+  server = kr_allocz(1, sizeof(kr_web_server));
   if (krad_control_init(&server->krad_control)) {
     free(server);
     return NULL;
@@ -342,9 +343,10 @@ kr_web_server *kr_web_server_create(kr_web_server_setup *setup) {
   server->htmlheader_source = setup->htmlheader;
   server->htmlfooter_source = setup->htmlfooter;
   server->shutdown = KRAD_INTERWEB_STARTING;
-  server->clients = calloc(KR_WEB_CLIENTS_MAX, sizeof(kr_web_client));
+  server->clients = kr_allocz(KR_WEB_CLIENTS_MAX, sizeof(kr_web_client));
   web_server_setup_html(server);
   kr_web_server_listen_on(server, NULL, setup->port);
   kr_web_server_run(server);
+  printk("Web Server: Created");
   return server;
 }

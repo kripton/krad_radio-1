@@ -21,14 +21,14 @@ static void compositor_event(kr_compositor_event *event);
 static void xpdr_event(kr_transponder_event *event);
 
 static void mixer_event(kr_mixer_event *event) {
-  printk("got a mixer event");
+  printk("Radio: Mixer event");
 }
 
 static void compositor_event(kr_compositor_event *event) {
   kr_radio *radio;
   kr_route_setup route_setup;
   radio = (kr_radio *)event->user;
-  printk("Krad Radio: Compositor event");
+  printk("Radio: Compositor event");
   switch (event->type) {
     case KR_COMP_CREATE:
       route_setup.ptr = radio->compositor;
@@ -57,37 +57,34 @@ static void xpdr_event(kr_transponder_event *event) {
 static int setup_maps(kr_radio *radio) {
   void *map;
   kr_router_map_setup setup;
-  memset(&setup, 0, sizeof(kr_router_map_setup));
-  strcpy(setup.prefix, "/mixer");
+  setup.prefix = "/mixer";
   setup.ptr = radio->mixer;
   setup.create = (kr_router_map_create_handler *)kr_mixer_mkbus;
   setup.patch = (kr_router_map_patch_handler *)kr_mixer_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_mixer_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {
-    printke("map was null");
+    printke("Radio: router map was null");
     return -1;
   }
-  memset(&setup, 0, sizeof(kr_router_map_setup));
-  strcpy(setup.prefix, "/compositor");
+  setup.prefix = "/compositor";
   setup.ptr = radio->compositor;
   setup.create = (kr_router_map_create_handler *)kr_compositor_mkbus;
   setup.patch = (kr_router_map_patch_handler *)kr_compositor_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {
-    printke("map was null");
+    printke("Radio: router map was null");
     return -1;
   }
-  memset(&setup, 0, sizeof(kr_router_map_setup));
-  strcpy(setup.prefix, "/transponder");
+  setup.prefix = "/transponder";
   setup.ptr = radio->transponder;
   setup.create = (kr_router_map_create_handler *)kr_transponder_mkpath;
   setup.patch = (kr_router_map_patch_handler *)kr_transponder_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_transponder_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {
-    printke("map was null");
+    printke("Radio: router map was null");
     return -1;
   }
   return 0;
@@ -101,7 +98,8 @@ kr_radio *kr_radio_create(char *sysname) {
   kr_mixer_setup mixer_setup;
   kr_compositor_setup compositor_setup;
   kr_transponder_setup transponder_setup;
-  radio = calloc(1, sizeof(kr_radio));
+  printk("Radio: Creating");
+  radio = kr_allocz(1, sizeof(kr_radio));
   strncpy(app_setup.appname, "krad_radio", sizeof(app_setup.appname));
   strncpy(app_setup.sysname, sysname, sizeof(app_setup.sysname));
   radio->app = kr_app_server_create(&app_setup);
@@ -135,6 +133,7 @@ kr_radio *kr_radio_create(char *sysname) {
             if (ret == 0) {
               ret = kr_app_server_enable(radio->app);
               if (ret == 0) {
+                printk("Radio: Created");
                 return radio;
               }
             }
@@ -150,7 +149,9 @@ kr_radio *kr_radio_create(char *sysname) {
 int kr_radio_destroy(kr_radio *radio) {
   kr_timer *timer;
   if (radio == NULL) return -1;
-  timer = kr_timer_create_with_name("shutdown");
+  printk("Radio: Destroying");
+  timer = kr_timer_alloca();
+  kr_timer_name_set(timer, "Shutdown");
   kr_timer_start(timer);
   if (radio->app != NULL) {
     kr_app_server_disable(radio->app);
@@ -179,14 +180,8 @@ int kr_radio_destroy(kr_radio *radio) {
     kr_app_server_destroy(radio->app);
     radio->app = NULL;
   }
-  if (timer != NULL) {
-    kr_timer_finish(timer);
-    printk("Krad Radio took %"PRIu64"ms to shutdown",
-           kr_timer_duration_ms(timer));
-    kr_timer_destroy(timer);
-    timer = NULL;
-  }
+  kr_timer_finish(timer);
+  printk("Radio took %"PRIu64"ms to shutdown", kr_timer_duration_ms(timer));
   free(radio);
-  printk("Krad Radio exited cleanly");
   return 0;
 }

@@ -74,26 +74,26 @@ static void wait_on_signals() {
   sigemptyset(&mask);
   sigfillset(&mask);
   if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0) {
-    failfast("Could not set signal mask!");
+    failfast("Daemon: Could not set signal mask!");
   }
   while (1) {
     if (sigwait(&mask, &caught) != 0) {
-      failfast("Krad Radio: Error on sigwait!");
+      failfast("Daemon: Error on sigwait!");
     }
     switch (caught) {
       case SIGHUP:
-        printk("Got HANGUP Signal!");
+        printk("Daemon: Got HANGUP Signal!");
         break;
       case SIGINT:
-        printk("Got INT Signal!");
-        printk("Krad Radio: Shutting down");
+        printk("\nDaemon: Got INT Signal!");
+        printk("Daemon: Shutting down");
         return;
       case SIGTERM:
-        printk("Got TERM Signal!");
-        printk("Krad Radio: Shutting down");
+        printk("Daemon: Got TERM Signal!");
+        printk("Daemon: Shutting down");
         return;
       default:
-        printk("Krad Radio: Got Signal %d", caught);
+        printk("Daemon: Got Signal %d", caught);
     }
   }
 }

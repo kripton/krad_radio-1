@@ -68,7 +68,7 @@ void krad_rc_pololu_maestro_destroy (krad_rc_pololu_maestro_t *krad_rc_pololu_ma
 
 krad_rc_pololu_maestro_t *krad_rc_pololu_maestro_create (char *device) {
 
-  krad_rc_pololu_maestro_t *krad_rc_pololu_maestro = calloc (1, sizeof(krad_rc_pololu_maestro_t));
+  krad_rc_pololu_maestro_t *krad_rc_pololu_maestro = kr_allocz (1, sizeof(krad_rc_pololu_maestro_t));
 
   strcpy (krad_rc_pololu_maestro->device, device);
 

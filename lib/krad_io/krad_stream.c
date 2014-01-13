@@ -107,7 +107,7 @@ static kr_stream *kr_stream_connect(char *host, int port) {
     return NULL;
   }
 
-  stream = calloc(1, sizeof(kr_stream));
+  stream = kr_allocz(1, sizeof(kr_stream));
 
   memset(&hints, 0, sizeof(hints));
   hints.ai_flags = AI_NUMERICSERV;

@@ -190,9 +190,9 @@ void krad_alsa_seq_destroy (krad_alsa_seq_t *krad_alsa_seq) {
 
 krad_alsa_seq_t *krad_alsa_seq_create () {
 
-	krad_alsa_seq_t *krad_alsa_seq = calloc (1, sizeof(krad_alsa_seq_t));
+	krad_alsa_seq_t *krad_alsa_seq = kr_allocz (1, sizeof(krad_alsa_seq_t));
 
-	krad_alsa_seq->buffer = calloc (1, 4000);
+	krad_alsa_seq->buffer = kr_allocz (1, 4000);
 
 
 	return krad_alsa_seq;

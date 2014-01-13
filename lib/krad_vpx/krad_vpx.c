@@ -19,7 +19,7 @@ krad_vpx_encoder_t *krad_vpx_encoder_create (int width, int height,
 
   krad_vpx_encoder_t *vpx;
   
-  vpx = calloc (1, sizeof(krad_vpx_encoder_t));
+  vpx = kr_allocz (1, sizeof(krad_vpx_encoder_t));
   
   vpx->width = width;
   vpx->height = height;
@@ -379,7 +379,7 @@ krad_vpx_decoder_t *krad_vpx_decoder_create () {
 
   krad_vpx_decoder_t *vpx;
   
-  vpx = calloc (1, sizeof(krad_vpx_decoder_t));
+  vpx = kr_allocz (1, sizeof(krad_vpx_decoder_t));
 
   vpx->stream_info.sz = sizeof (vpx->stream_info);
   vpx->dec_flags = 0;

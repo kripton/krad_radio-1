@@ -126,6 +126,7 @@ krad_radio_libkradclient_la_LDFLAGS = -shared -no-undefined \
 krad_radio_libkradclient_la_LDFLAGS +=
 krad_radio_libkradclient_la_SOURCES = \
 krad_io/krad_io.c \
+krad_mem/krad_mem.c \
 krad_mem/krad_pool.c \
 krad_ebml/krad_ebml.c \
 krad_ebml/krad_ebmlx.c \

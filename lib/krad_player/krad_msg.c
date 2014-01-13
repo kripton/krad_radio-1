@@ -5,7 +5,7 @@ static kr_msg_t *kr_player_alloc_msg (kr_msgpair_t *msgpair) {
   if (msgpair == NULL) {
     return NULL;
   }
-  return calloc (1, sizeof(kr_msg_t));
+  return kr_allocz (1, sizeof(kr_msg_t));
 }
 
 static void kr_player_free_msg (kr_msgpair_t *msgpair, kr_msg_t **msg) {
@@ -24,7 +24,7 @@ static kr_msg_t *kr_player_alloc_user_msg (kr_msgpair_t *msgpair) {
   if (msgpair == NULL) {
     return NULL;
   }
-  return calloc (1, msgpair->msgsys->msg_sz);
+  return kr_allocz (1, msgpair->msgsys->msg_sz);
 }
 
 static void kr_player_free_user_msg (kr_msgpair_t *msgpair, void **usermsg) {
@@ -77,7 +77,7 @@ static kr_msgpair_t *kr_msgpair_create (kr_msgsys_t *msgsys) {
 
   kr_msgpair_t *msgpair;
 
-  msgpair = calloc (1, sizeof (kr_msgpair_t));
+  msgpair = kr_allocz (1, sizeof (kr_msgpair_t));
   msgpair->msgsys = msgsys;
   if (socketpair (AF_UNIX, SOCK_STREAM, 0, msgpair->fd)) {
     fprintf (stderr, "Can't socketpair errno: %d\n", errno);
@@ -104,7 +104,7 @@ static kr_msgpair_t **kr_msgpairs_create (kr_msgsys_t *msgsys) {
   int i;
   kr_msgpair_t **msgpairs;
 
-  msgpairs = calloc (msgsys->msgpairs_count, sizeof (kr_msgpair_t *));
+  msgpairs = kr_allocz (msgsys->msgpairs_count, sizeof (kr_msgpair_t *));
 
   for (i = 0; i < msgsys->msgpairs_count; i++) {
     msgpairs[i] = kr_msgpair_create (msgsys);
@@ -189,10 +189,10 @@ kr_msgsys_t *kr_msgsys_create (uint32_t count, size_t msg_sz) {
 
   kr_msgsys_t *msgsys;
 
-  msgsys = calloc (1, sizeof (kr_msgsys_t));
+  msgsys = kr_allocz (1, sizeof (kr_msgsys_t));
   msgsys->msgpairs_count = count;
   msgsys->msg_sz = msg_sz;
-  msgsys->pollfds = calloc (msgsys->msgpairs_count, sizeof(struct pollfd));
+  msgsys->pollfds = kr_allocz (msgsys->msgpairs_count, sizeof(struct pollfd));
   msgsys->msgpairs = kr_msgpairs_create (msgsys);
   return msgsys;
 }

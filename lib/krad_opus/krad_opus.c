@@ -26,9 +26,9 @@ krad_opus_t *krad_opus_encoder_create (int channels, int input_sample_rate,
 
   int c;
 
-  krad_opus_t *krad_opus = calloc(1, sizeof(krad_opus_t));
+  krad_opus_t *krad_opus = kr_allocz(1, sizeof(krad_opus_t));
 
-  krad_opus->opus_header = calloc(1, sizeof(OpusHeader));
+  krad_opus->opus_header = kr_allocz(1, sizeof(OpusHeader));
 
   krad_opus->input_sample_rate = input_sample_rate;
   krad_opus->channels = channels;
@@ -48,8 +48,8 @@ krad_opus_t *krad_opus_encoder_create (int channels, int input_sample_rate,
   for (c = 0; c < krad_opus->channels; c++) {
     krad_opus->ringbuf[c] = krad_ringbuffer_create (RINGBUFFER_SIZE);
     krad_opus->resampled_ringbuf[c] = krad_ringbuffer_create (RINGBUFFER_SIZE);
-    krad_opus->samples[c] = malloc(16 * 8192);
-    krad_opus->resampled_samples[c] = malloc(16 * 8192);
+    krad_opus->samples[c] = kr_alloc(16 * 8192);
+    krad_opus->resampled_samples[c] = kr_alloc(16 * 8192);
     krad_opus->src_resampler[c] = src_new (KRAD_OPUS_SRC_QUALITY,
                                            1,
                                            &krad_opus->src_error[c]);
@@ -182,7 +182,7 @@ krad_opus_t *krad_opus_encoder_create (int channels, int input_sample_rate,
   strlen (KR_VERSION_STR_FULL);
 
   krad_opus->opustags_header =
-  calloc (1, krad_opus->krad_codec_header.sz[1]);
+  kr_allocz (1, krad_opus->krad_codec_header.sz[1]);
 
   memcpy (krad_opus->opustags_header, "OpusTags", 8);
 
@@ -396,11 +396,11 @@ krad_opus_t *krad_opus_decoder_create (krad_codec_header_t *header) {
 
   int c;
 
-  krad_opus_t *krad_opus = calloc (1, sizeof(krad_opus_t));
+  krad_opus_t *krad_opus = kr_allocz (1, sizeof(krad_opus_t));
 
   krad_opus->output_sample_rate = 48000.0f;
 
-  krad_opus->opus_header = calloc (1, sizeof(OpusHeader));
+  krad_opus->opus_header = kr_allocz (1, sizeof(OpusHeader));
 
   //if (opus_header_parse (header->header[0], header->header_size[0], krad_opus->opus_header) != 1) {
   //  failfast ("krad_opus_decoder_create problem reading opus header");
@@ -411,14 +411,14 @@ krad_opus_t *krad_opus_decoder_create (krad_codec_header_t *header) {
 
   krad_opus->channels = krad_opus->opus_header->channels;
 
-  krad_opus->interleaved_samples = malloc (16 * 8192);
+  krad_opus->interleaved_samples = kr_alloc (16 * 8192);
 
   for (c = 0; c < krad_opus->channels; c++) {
     krad_opus->ringbuf[c] = krad_ringbuffer_create (RINGBUFFER_SIZE);
     krad_opus->resampled_ringbuf[c] = krad_ringbuffer_create (RINGBUFFER_SIZE);
-    krad_opus->samples[c] = malloc (16 * 8192);
-    krad_opus->read_samples[c] = malloc (16 * 8192);
-    krad_opus->resampled_samples[c] = malloc (16 * 8192);
+    krad_opus->samples[c] = kr_alloc (16 * 8192);
+    krad_opus->read_samples[c] = kr_alloc (16 * 8192);
+    krad_opus->resampled_samples[c] = kr_alloc (16 * 8192);
 
     krad_opus->src_resampler[c] =
     src_new (KRAD_OPUS_SRC_QUALITY, 1, &krad_opus->src_error[c]);

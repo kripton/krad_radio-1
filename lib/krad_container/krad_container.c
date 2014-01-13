@@ -140,7 +140,7 @@ krad_container_t *krad_container_create_stream (char *host, uint32_t port,
     return NULL;
   }
 
-  container = calloc (1, sizeof(krad_container_t));
+  container = kr_allocz (1, sizeof(krad_container_t));
 
   container->type = type;
 
@@ -176,7 +176,7 @@ krad_container_t *krad_container_open_file (char *filename,
 
   krad_container_t *container;
 
-  container = calloc (1, sizeof(krad_container_t));
+  container = kr_allocz (1, sizeof(krad_container_t));
 
   container->type = krad_container_select (filename);
 
@@ -235,7 +235,7 @@ krad_container_open_transmission (krad_transmission_t *transmission) {
     return NULL;
   }
 
-  container = calloc(1, sizeof(krad_container_t));
+  container = kr_allocz(1, sizeof(krad_container_t));
 
   container->type = type;
 

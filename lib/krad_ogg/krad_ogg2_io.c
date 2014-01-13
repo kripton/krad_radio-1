@@ -35,7 +35,7 @@ kr_ogg_io *kr_ogg_io_create_file(char *filename) {
     return NULL;
   }
 
-  ogg_io = calloc(1, sizeof(kr_ogg_io));
+  ogg_io = kr_allocz(1, sizeof(kr_ogg_io));
 
   ogg_io->ogg = kr_ogg_create ();
   ogg_io->io = kr_io2_create ();
@@ -58,7 +58,7 @@ kr_ogg_io *kr_ogg_io_create_stream (char *host, int port, char *mount,
     return NULL;
   }
 
-  ogg_io = calloc(1, sizeof(kr_ogg_io));
+  ogg_io = kr_allocz(1, sizeof(kr_ogg_io));
 
   while (stream->ready != 1) {
     kr_stream_handle_headers(stream);

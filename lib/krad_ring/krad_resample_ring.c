@@ -81,14 +81,14 @@ void krad_resample_ring_set_input_sample_rate (krad_resample_ring_t *krad_resamp
 
 krad_resample_ring_t *krad_resample_ring_create (uint32_t size, int input_sample_rate, int output_sample_rate) {
 
-	krad_resample_ring_t *krad_resample_ring = calloc (1, sizeof(krad_resample_ring_t));
+	krad_resample_ring_t *krad_resample_ring = kr_allocz (1, sizeof(krad_resample_ring_t));
 
 	krad_resample_ring->speed = 100.0;
 
 	krad_resample_ring->size = size;
 	
-	krad_resample_ring->inbuffer = malloc (8192 * 2);	
-	krad_resample_ring->outbuffer = malloc (8192 * 2);
+	krad_resample_ring->inbuffer = kr_alloc (8192 * 2);	
+	krad_resample_ring->outbuffer = kr_alloc (8192 * 2);
 	
 	krad_resample_ring->output_sample_rate = output_sample_rate;	
 	

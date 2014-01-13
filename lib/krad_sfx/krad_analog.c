@@ -63,7 +63,7 @@ kr_analog *kr_analog_create(int sample_rate) {
 
   kr_analog *analog;
 
-  analog = calloc(1, sizeof(kr_analog));
+  analog = kr_allocz(1, sizeof(kr_analog));
   analog->sample_rate = sample_rate;
   analog->prev_drive = -1.0f;
   analog->prev_blend = -11.0f;

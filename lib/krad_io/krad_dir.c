@@ -44,8 +44,8 @@ char **dirscan(char *path, char *match, int *matches) {
   max = MAX_SCAN;
   upstr[4095] = '\0';
   pathstr[4095] = '\0';
-  results = calloc(MAX_RESULTS, sizeof(char *));
-  scan_dirs = calloc(MAX_SCAN, sizeof(char *));
+  results = kr_allocz(MAX_RESULTS, sizeof(char *));
+  scan_dirs = kr_allocz(MAX_SCAN, sizeof(char *));
   scan_dirs[0] = realpath(path, NULL);
   for (;;) {
     for (i = 0; i < max; i++) {

@@ -456,7 +456,7 @@ int krad_transmitter_transmission_set_header (krad_transmission_t *krad_transmis
   temp = NULL;
 
   header_temp_len = length;
-  header_temp = calloc (1, header_temp_len);
+  header_temp = kr_allocz (1, header_temp_len);
   memcpy (header_temp, buffer, header_temp_len);
 
   if (krad_transmission->header != NULL) {
@@ -493,7 +493,7 @@ void krad_transmitter_transmission_add_header (krad_transmission_t *krad_transmi
     header_temp_len += krad_transmission->header_len;
   }
 
-  header_temp = calloc (1, header_temp_len);
+  header_temp = kr_allocz (1, header_temp_len);
 
   if (krad_transmission->header_len != 0) {
     memcpy (header_temp, krad_transmission->header, krad_transmission->header_len);
@@ -584,7 +584,7 @@ krad_transmission_t *krad_transmitter_transmission_create (krad_transmitter_t *k
           krad_transmitter->krad_transmissions[t].http_header);
       
       krad_transmitter->krad_transmissions[t].connections_efd = epoll_create1 (0);
-      krad_transmitter->krad_transmissions[t].transmission_events = calloc (KRAD_TRANSMITTER_MAXEVENTS, sizeof (struct epoll_event));
+      krad_transmitter->krad_transmissions[t].transmission_events = kr_allocz (KRAD_TRANSMITTER_MAXEVENTS, sizeof (struct epoll_event));
       krad_transmitter->krad_transmissions[t].ringbuffer = krad_ringbuffer_create (DEFAULT_RING_SIZE);
 
       if (krad_transmitter->krad_transmissions[t].ringbuffer == NULL) {
@@ -597,7 +597,7 @@ krad_transmission_t *krad_transmitter_transmission_create (krad_transmitter_t *k
         failfast ("Krad Transmitter: Out of memory creating new transmission");
       }
 
-      krad_transmitter->krad_transmissions[t].transmission_buffer = calloc (1, DEFAULT_RING_SIZE);
+      krad_transmitter->krad_transmissions[t].transmission_buffer = kr_allocz (1, DEFAULT_RING_SIZE);
 
       if (krad_transmitter->krad_transmissions[t].transmission_buffer == NULL) {
         failfast ("Krad Transmitter: Out of memory creating new transmission");
@@ -1033,7 +1033,7 @@ int krad_transmitter_listen_on (krad_transmitter_t *krad_transmitter, uint16_t p
     return -1;
   }
 
-  krad_transmitter->incoming_connection_events = calloc (KRAD_TRANSMITTER_MAXEVENTS, sizeof (struct epoll_event));
+  krad_transmitter->incoming_connection_events = kr_allocz (KRAD_TRANSMITTER_MAXEVENTS, sizeof (struct epoll_event));
 
   if (krad_transmitter->incoming_connection_events == NULL) {
     krad_transmitter->listening = 0;
@@ -1044,7 +1044,7 @@ int krad_transmitter_listen_on (krad_transmitter_t *krad_transmitter, uint16_t p
     return -1;
   }
 
-  krad_transmitter->krad_transmission_receivers = calloc (TOTAL_RECEIVERS, sizeof (krad_transmission_receiver_t));
+  krad_transmitter->krad_transmission_receivers = kr_allocz (TOTAL_RECEIVERS, sizeof (krad_transmission_receiver_t));
   
   if (krad_transmitter->krad_transmission_receivers == NULL) {
     free (krad_transmitter->incoming_connection_events);
@@ -1074,14 +1074,14 @@ krad_transmitter_t *krad_transmitter_create () {
   t = 0;
   krad_transmitter = NULL;
   
-  krad_transmitter = calloc (1, sizeof(krad_transmitter_t));
+  krad_transmitter = kr_allocz (1, sizeof(krad_transmitter_t));
 
   if (krad_transmitter == NULL) {
     printke ("Krad Transmitter: Out of memory!");
     return NULL;    
   }
   
-  krad_transmitter->krad_transmissions = calloc (DEFAULT_MAX_TRANSMISSIONS, sizeof(krad_transmission_t));
+  krad_transmitter->krad_transmissions = kr_allocz (DEFAULT_MAX_TRANSMISSIONS, sizeof(krad_transmission_t));
 
   if (krad_transmitter->krad_transmissions == NULL) {
     free (krad_transmitter);

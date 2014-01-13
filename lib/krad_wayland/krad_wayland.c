@@ -820,7 +820,7 @@ kr_wayland *kr_wayland_create(kr_wayland_setup *setup) {
 
   kr_wayland *wayland;
 
-  wayland = calloc(1, sizeof(kr_wayland));
+  wayland = kr_allocz(1, sizeof(kr_wayland));
   if (setup != NULL) {
     wayland->info = setup->info;
   }

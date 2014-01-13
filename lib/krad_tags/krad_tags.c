@@ -19,8 +19,8 @@ void kr_tags_destroy(kr_tags *tags) {
 }
 
 kr_tags *kr_tags_create(char *item) {
-  kr_tags *tags = calloc(1, sizeof(kr_tags));
-  tags->tags = calloc(KRAD_MAX_TAGS, sizeof(kr_tag));
+  kr_tags *tags = kr_allocz(1, sizeof(kr_tags));
+  tags->tags = kr_allocz(KRAD_MAX_TAGS, sizeof(kr_tag));
   if (tags->tags == NULL) {
     failfast ("Krad Tags: Out of memory");
   }

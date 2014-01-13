@@ -158,7 +158,7 @@ kr_file *kr_file_create(char *path) {
   //file.seekable;
   //file.mapmode;
 
-  ofile = malloc(sizeof(kr_file));
+  ofile = kr_alloc(sizeof(kr_file));
   memcpy(ofile, &file, sizeof(kr_file));
   ofile->path = strdup(path);
 
@@ -226,7 +226,7 @@ kr_file *kr_file_open(char *path) {
   //file.seekable;
   //file.mapmode;
 
-  ofile = malloc(sizeof(kr_file));
+  ofile = kr_alloc(sizeof(kr_file));
   memcpy (ofile, &file, sizeof(kr_file));
   ofile->path = strdup(path);
 

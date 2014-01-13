@@ -70,7 +70,7 @@ cairo_surface_t **gif2surface(char *filename, int *frames) {
   cairo_surface_t *surface;
   cairo_surface_t **surfaces;
   //FIXME this is going to leak on free, make this be the correct amount
-  surfaces = calloc (512, sizeof(cairo_surface_t *));
+  surfaces = kr_allocz (512, sizeof(cairo_surface_t *));
   cairo_t *cr;
 
   int image_stride;
@@ -94,10 +94,10 @@ cairo_surface_t **gif2surface(char *filename, int *frames) {
   }
 
   Size = gif->SWidth * sizeof(GifPixelType);
-  ScreenBuffer = (GifRowType *)malloc(gif->SHeight * sizeof(GifRowType));
+  ScreenBuffer = (GifRowType *)kr_alloc(gif->SHeight * sizeof(GifRowType));
 
   for (i = 0; i < gif->SHeight; i++) {
-    ScreenBuffer[i] = (GifRowType)malloc(Size);
+    ScreenBuffer[i] = (GifRowType)kr_alloc(Size);
   }
 
   for (i = 0; i < gif->SWidth; i++)  {
@@ -351,7 +351,7 @@ int kr_sprite_open(kr_sprite *sprite, char *filename) {
     int jpeg_fd;
     int stride;
 
-    jpeg_buffer = malloc(size);
+    jpeg_buffer = kr_alloc(size);
     if (jpeg_buffer == NULL) {
       return -1;
     }

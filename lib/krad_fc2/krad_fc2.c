@@ -221,7 +221,7 @@ kr_fc2_t *kr_fc2_create () {
   fc2Error error;
   kr_fc2_t *fc;
 
-  fc = calloc (1, sizeof(kr_fc2_t));
+  fc = kr_allocz (1, sizeof(kr_fc2_t));
 
   error = fc2CreateContext (&fc->context);
   if (error != FC2_ERROR_OK) {

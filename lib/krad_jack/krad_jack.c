@@ -246,7 +246,7 @@ kr_jack_path *kr_jack_mkpath(kr_jack *jack, kr_jack_path_setup *setup) {
     return NULL;
   }
 
-  path = calloc(1, sizeof(kr_jack_path));
+  path = kr_allocz(1, sizeof(kr_jack_path));
 
   path->jack = jack;
   path->user = setup->user;
@@ -325,7 +325,7 @@ kr_jack *kr_jack_create(kr_jack_setup *setup) {
   if (jack_setup_check(setup)) return NULL;
 
   memset(old_thread_name, 0, sizeof(old_thread_name));
-  jack = calloc(1, sizeof(kr_jack));
+  jack = kr_allocz(1, sizeof(kr_jack));
 
   strncpy(jack->info.client_name, setup->client_name,
    sizeof(jack->info.client_name));

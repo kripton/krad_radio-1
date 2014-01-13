@@ -447,8 +447,8 @@ void krad_player_free_framebuf(kr_player *player) {
 void krad_player_alloc_framebuf(kr_player *player) {
   player->framebufsize = 120;
   player->frame_size = player->width * player->height * 4;
-  player->rgba = malloc (player->frame_size * player->framebufsize);
-  player->frameime = calloc (player->framebufsize, sizeof(int64));
+  player->rgba = kr_alloc (player->frame_size * player->framebufsize);
+  player->frameime = kr_allocz (player->framebufsize, sizeof(int64));
 }
 
 static void kr_player_station_connect(kr_player *player) {
@@ -519,7 +519,7 @@ static void kr_player_start (void *actual) {
   for (c = 0; c < player->channels; c++) {
     player->resample_ring[c] = krad_resample_ring_create (1600000, 48000,
                                                           player->sample_rate);
-    player->samples[c] = malloc(4 * 8192);
+    player->samples[c] = kr_alloc(4 * 8192);
   }
 
   if (player->station != NULL) {
@@ -563,7 +563,7 @@ kr_player *kr_player_create(char *station, char *url) {
   kr_player *player;
   kr_machine_params machine_params;
 
-  player = calloc (1, sizeof(kr_player));
+  player = kr_allocz (1, sizeof(kr_player));
   player->url = strdup (url);
   if (station == NULL) {
     player->station = NULL;

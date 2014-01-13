@@ -69,7 +69,7 @@ static int kr_mkv_sync (kr_mkv_t *mkv, int splicepoint) {
 
   if ((mkv->stream_hdr_len == 0) && (mkv->e->pos > 0)) {
     mkv->stream_hdr_len = mkv->e->pos;
-    mkv->stream_hdr = malloc (mkv->stream_hdr_len);
+    mkv->stream_hdr = kr_alloc (mkv->stream_hdr_len);
     memcpy (mkv->stream_hdr, mkv->io->buf, mkv->stream_hdr_len);
     if (mkv->transmission != NULL) {
       krad_transmitter_transmission_set_header (mkv->transmission,
@@ -490,8 +490,8 @@ kr_mkv_t *kr_mkv_create_stream (char *host, int port,
 
 kr_mkv_t *kr_mkv_create_bufsize (size_t size) {
   kr_mkv_t *mkv;
-  mkv = calloc (1, sizeof(kr_mkv_t));
-  mkv->tracks = calloc (KR_MKV_MAX_TRACKS, sizeof(kr_mkv_track_t));
+  mkv = kr_allocz (1, sizeof(kr_mkv_t));
+  mkv->tracks = kr_allocz (KR_MKV_MAX_TRACKS, sizeof(kr_mkv_track_t));
   mkv->io = kr_io2_create_size (size);
   mkv->e = &mkv->ebml;
   return mkv;

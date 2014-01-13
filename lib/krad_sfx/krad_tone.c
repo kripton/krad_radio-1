@@ -1,8 +1,9 @@
 #include "krad_tone.h"
+#include "krad_mem.h"
 
 krad_tone_t *krad_tone_create (float sample_rate) {
 
-  krad_tone_t *krad_tone = calloc (1, sizeof(krad_tone_t));
+  krad_tone_t *krad_tone = kr_allocz (1, sizeof(krad_tone_t));
 
   krad_tone_set_sample_rate (krad_tone, sample_rate);
   krad_tone_set_volume (krad_tone, KR_TONE_DEFAULT_VOLUME);

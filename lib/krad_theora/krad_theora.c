@@ -9,7 +9,7 @@ krad_theora_encoder_t *krad_theora_encoder_create (int width, int height,
 
   krad_theora_encoder_t *krad_theora;
 
-  krad_theora = calloc (1, sizeof(krad_theora_encoder_t));
+  krad_theora = kr_allocz (1, sizeof(krad_theora_encoder_t));
 
   krad_theora->width = width;
   krad_theora->height = height;
@@ -94,7 +94,7 @@ krad_theora_encoder_t *krad_theora_encoder_create (int width, int height,
 
     krad_theora->header_combined_size += krad_theora->packet.bytes;
     krad_theora->header[krad_theora->header_count] =
-      malloc (krad_theora->packet.bytes);
+      kr_alloc (krad_theora->packet.bytes);
     memcpy (krad_theora->header[krad_theora->header_count],
             krad_theora->packet.packet,
             krad_theora->packet.bytes);
@@ -110,7 +110,7 @@ krad_theora_encoder_t *krad_theora_encoder_create (int width, int height,
   //printk ("krad_theora_encoder_create Got %d header packets\n",
   //      krad_theora->header_count);
 
-  krad_theora->header_combined = calloc (1, krad_theora->header_combined_size + 10);
+  krad_theora->header_combined = kr_allocz (1, krad_theora->header_combined_size + 10);
 
   krad_theora->header_combined[0] = 0x02;
   krad_theora->header_combined_pos++;
@@ -171,7 +171,7 @@ krad_theora_encoder_t *krad_theora_encoder_create (int width, int height,
   krad_theora->ycbcr[0].width =  krad_theora->info.frame_width;
   krad_theora->ycbcr[0].height =  krad_theora->info.frame_height;
 
-  krad_theora->ycbcr[0].data = calloc(1, krad_theora->info.frame_width * krad_theora->info.frame_height);
+  krad_theora->ycbcr[0].data = kr_allocz(1, krad_theora->info.frame_width * krad_theora->info.frame_height);
 
   if (krad_theora->color_depth == PIX_FMT_YUV420P) {
     krad_theora->ycbcr[1].stride = krad_theora->info.frame_width / 2;
@@ -181,8 +181,8 @@ krad_theora_encoder_t *krad_theora_encoder_create (int width, int height,
     krad_theora->ycbcr[2].width = krad_theora->info.frame_width / 2;
     krad_theora->ycbcr[2].height = krad_theora->info.frame_height / 2;
 
-    krad_theora->ycbcr[1].data = calloc(1, ((krad_theora->info.frame_width / 2) * (krad_theora->info.frame_height / 2)));
-    krad_theora->ycbcr[2].data = calloc(1, ((krad_theora->info.frame_width / 2) * (krad_theora->info.frame_height / 2)));
+    krad_theora->ycbcr[1].data = kr_allocz(1, ((krad_theora->info.frame_width / 2) * (krad_theora->info.frame_height / 2)));
+    krad_theora->ycbcr[2].data = kr_allocz(1, ((krad_theora->info.frame_width / 2) * (krad_theora->info.frame_height / 2)));
   }
   if (krad_theora->color_depth == PIX_FMT_YUV422P) {
     krad_theora->ycbcr[1].stride = krad_theora->info.frame_width / 2;
@@ -192,8 +192,8 @@ krad_theora_encoder_t *krad_theora_encoder_create (int width, int height,
     krad_theora->ycbcr[2].width = krad_theora->info.frame_width / 2;
     krad_theora->ycbcr[2].height =  krad_theora->info.frame_height;
 
-    krad_theora->ycbcr[1].data = calloc(1, ((krad_theora->info.frame_width / 2) * krad_theora->info.frame_height));
-    krad_theora->ycbcr[2].data = calloc(1, ((krad_theora->info.frame_width / 2) * krad_theora->info.frame_height));
+    krad_theora->ycbcr[1].data = kr_allocz(1, ((krad_theora->info.frame_width / 2) * krad_theora->info.frame_height));
+    krad_theora->ycbcr[2].data = kr_allocz(1, ((krad_theora->info.frame_width / 2) * krad_theora->info.frame_height));
 
   }
   if (krad_theora->color_depth == PIX_FMT_YUV444P) {
@@ -204,8 +204,8 @@ krad_theora_encoder_t *krad_theora_encoder_create (int width, int height,
     krad_theora->ycbcr[2].width = krad_theora->info.frame_width;
     krad_theora->ycbcr[2].height = krad_theora->info.frame_height;
 
-    krad_theora->ycbcr[1].data = calloc(1, krad_theora->info.frame_width * krad_theora->info.frame_height);
-    krad_theora->ycbcr[2].data = calloc(1, krad_theora->info.frame_width * krad_theora->info.frame_height);
+    krad_theora->ycbcr[1].data = kr_allocz(1, krad_theora->info.frame_width * krad_theora->info.frame_height);
+    krad_theora->ycbcr[2].data = kr_allocz(1, krad_theora->info.frame_width * krad_theora->info.frame_height);
   }
 */
   return krad_theora;
@@ -383,7 +383,7 @@ krad_theora_decoder_create (krad_codec_header_t *header) {
 
   krad_theora_decoder_t *krad_theora;
 
-  krad_theora = calloc(1, sizeof(krad_theora_decoder_t));
+  krad_theora = kr_allocz(1, sizeof(krad_theora_decoder_t));
 
   krad_theora->granulepos = -1;
 

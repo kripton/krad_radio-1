@@ -39,14 +39,14 @@ void krad_ticker_destroy(krad_ticker_t *ticker) {
 
 krad_ticker_t *krad_ticker_create(int numerator, int denominator) {
   krad_ticker_t *ticker;
-  ticker = calloc (1, sizeof (krad_ticker_t));
+  ticker = kr_allocz (1, sizeof (krad_ticker_t));
   ticker->period_time_ns = (1000000000 / numerator) * denominator;
   return ticker;
 }
 
 krad_ticker_t *krad_ticker_throttle_create() {
   krad_ticker_t *ticker;
-  ticker = calloc(1, sizeof (krad_ticker_t));
+  ticker = kr_allocz(1, sizeof (krad_ticker_t));
   return ticker;
 }
 

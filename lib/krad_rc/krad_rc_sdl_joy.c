@@ -62,7 +62,7 @@ void krad_rc_sdl_joy_destroy (krad_rc_sdl_joy_t *krad_rc_sdl_joy) {
 krad_rc_sdl_joy_t *krad_rc_sdl_joy_create (int joynum) {
 
 
-  krad_rc_sdl_joy_t *krad_rc_sdl_joy = calloc(1, sizeof(krad_rc_sdl_joy_t));
+  krad_rc_sdl_joy_t *krad_rc_sdl_joy = kr_allocz(1, sizeof(krad_rc_sdl_joy_t));
   int num_axes, num_buttons, num_balls, num_hats;
 
   krad_rc_sdl_joy->joynum = joynum;

@@ -7,6 +7,8 @@
 #include <math.h>
 #include <sys/time.h>
 
+#include "krad_mem.h"
+
 #define KR_LINUX
 
 #define sbyte signed char

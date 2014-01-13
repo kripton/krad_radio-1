@@ -29,7 +29,7 @@ char *web_server_load_file_or_string(char *input) {
       return NULL;
     }
 
-    string = calloc (1, length);
+    string = kr_allocz (1, length);
 
     while (bytes_read < length) {
 
@@ -97,7 +97,7 @@ void web_server_setup_html(kr_web_server *server) {
   }
 
   server->html_len = total_len;
-  server->html = malloc(server->html_len + 1);
+  server->html = kr_alloc(server->html_len + 1);
 
   len = strcspn (html_template, "~");
   strncpy (server->html, html_template, len);

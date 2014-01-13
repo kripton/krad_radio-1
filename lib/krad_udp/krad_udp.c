@@ -4,7 +4,7 @@ krad_udp_t *kr_udp (char *host, int port, char *mount, char *password) {
   
   krad_udp_t *udp;
    
-  udp = calloc(1, sizeof(krad_udp_t));
+  udp = kr_allocz(1, sizeof(krad_udp_t));
 
   udp->port = port;
 
@@ -30,9 +30,9 @@ void kr_udp_destroy (krad_udp_t **udp) {
 
 krad_slicer_t *krad_slicer_create () {
 
-  krad_slicer_t *krad_slicer = calloc(1, sizeof(krad_slicer_t));
+  krad_slicer_t *krad_slicer = kr_allocz(1, sizeof(krad_slicer_t));
 
-  krad_slicer->data = calloc(1, 2048);
+  krad_slicer->data = kr_allocz(1, 2048);
   strcpy ((char *)krad_slicer->data, "KQN");
 
   krad_slicer->sd = socket (AF_INET, SOCK_DGRAM, 0);
@@ -121,22 +121,22 @@ krad_rebuilder_t *krad_rebuilder_create () {
   krad_rebuilder_t *krad_rebuilder;
   int s;
   
-  krad_rebuilder = calloc(1, sizeof(krad_rebuilder_t));
+  krad_rebuilder = kr_allocz(1, sizeof(krad_rebuilder_t));
   
   krad_rebuilder->tracks[0].slice_count = 20;
   krad_rebuilder->tracks[1].slice_count = 20;
 
-  krad_rebuilder->tracks[0].slices = calloc(krad_rebuilder->tracks[0].slice_count,
+  krad_rebuilder->tracks[0].slices = kr_allocz(krad_rebuilder->tracks[0].slice_count,
                                             sizeof(krad_subslice_t));
-  krad_rebuilder->tracks[1].slices = calloc(krad_rebuilder->tracks[1].slice_count,
+  krad_rebuilder->tracks[1].slices = kr_allocz(krad_rebuilder->tracks[1].slice_count,
                                             sizeof(krad_subslice_t));
 
   for (s = 0; s < krad_rebuilder->tracks[0].slice_count; s++) {
-    krad_rebuilder->tracks[0].slices[s].data = malloc(500000);
+    krad_rebuilder->tracks[0].slices[s].data = kr_alloc(500000);
   }
 
   for (s = 0; s < krad_rebuilder->tracks[1].slice_count; s++) {
-    krad_rebuilder->tracks[1].slices[s].data = malloc(500000);
+    krad_rebuilder->tracks[1].slices[s].data = kr_alloc(500000);
   }
 
 

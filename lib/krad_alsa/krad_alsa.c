@@ -29,7 +29,7 @@ kr_alsa *kr_alsa_create(int card) {
   snd_pcm_info_t *pcm_info;
   kr_alsa_info *info;
   pcm_device = -1;
-  alsa = calloc(1, sizeof(kr_alsa));
+  alsa = kr_allocz(1, sizeof(kr_alsa));
   if (!alsa) return NULL;
   info = &alsa->info;
   info->card = card;

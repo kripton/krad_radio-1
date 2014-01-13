@@ -210,7 +210,7 @@ kr_decoder_t *kr_decoder_create () {
   kr_decoder_t *decoder;
   kr_machine_params_t machine_params;
 
-  decoder = calloc (1, sizeof(kr_decoder_t));
+  decoder = kr_allocz (1, sizeof(kr_decoder_t));
 
   decoder->codec = NOCODEC;
 
@@ -239,7 +239,7 @@ void kr_decoder_destroy_direct (kr_decoder_t **decoder) {
 
 kr_decoder_t *kr_decoder_create_direct () {
   kr_decoder_t *decoder;
-  decoder = calloc (1, sizeof(kr_decoder_t));
+  decoder = kr_allocz (1, sizeof(kr_decoder_t));
   decoder->codec = NOCODEC;
   return decoder;
 };

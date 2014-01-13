@@ -207,12 +207,12 @@ kr_perspective *kr_perspective_create(uint32_t width, uint32_t height) {
 
   kr_perspective *p;
 
-  p = calloc(1, sizeof(kr_perspective));
+  p = kr_allocz(1, sizeof(kr_perspective));
 
   p->width = width;
   p->height = height;
-  p->priv = calloc (1, sizeof(kr_perspective_priv));
-  p->priv->map = calloc(1, p->width * p->height * 4);
+  p->priv = kr_allocz (1, sizeof(kr_perspective_priv));
+  p->priv->map = kr_allocz(1, p->width * p->height * 4);
 
   p->priv->width = p->width;
   p->priv->height = p->height;

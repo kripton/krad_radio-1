@@ -234,7 +234,7 @@ static int kr_mkv_track_read_codec_hdr (kr_mkv_t *mkv,
   printk ("Got codec data size %"PRIu64"", size);
 
   track->codec_data_size = size;
-  track->codec_data = malloc (track->codec_data_size);
+  track->codec_data = kr_alloc (track->codec_data_size);
   ret = kr_ebml2_unpack_data (mkv->e,
                               track->codec_data,
                               track->codec_data_size);
@@ -422,7 +422,7 @@ static void kr_mkv_rebuild_header_for_streaming(kr_mkv_t *mkv) {
   char *title;
 
   len = mkv->e->pos;
-  mkv->stream_hdr = malloc(len);
+  mkv->stream_hdr = kr_alloc(len);
 
   shdr = kr_mkv_create_bufsize (len);
   kr_ebml2_set_buffer (shdr->e, shdr->io->buf, shdr->io->space);

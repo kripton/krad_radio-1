@@ -9,14 +9,14 @@ void audio_encoding_unit_create (void *arg) {
   printk ("Audio unit create");
 
   if (krad_link->codec != VORBIS) {
-    krad_link->au_buffer = malloc (300000);
+    krad_link->au_buffer = kr_alloc (300000);
   }
 
-  krad_link->au_interleaved_samples = malloc (8192 * 4 * KR_MXR_MAX_CHANNELS);
+  krad_link->au_interleaved_samples = kr_alloc (8192 * 4 * KR_MXR_MAX_CHANNELS);
 
   for (c = 0; c < krad_link->channels; c++) {
-    krad_link->au_samples[c] = malloc (8192 * 4);
-    krad_link->samples[c] = malloc (8192 * 4);
+    krad_link->au_samples[c] = kr_alloc (8192 * 4);
+    krad_link->samples[c] = kr_alloc (8192 * 4);
     krad_link->audio_input_ringbuffer[c] = krad_ringbuffer_create (2000000);
   }
 

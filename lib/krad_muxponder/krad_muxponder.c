@@ -107,7 +107,7 @@ int muxponder_data_cb (uint8_t *data, size_t size, uint32_t sync, void *ptr) {
   if (muxponder->got_hdr == 0) {
     muxponder->got_hdr = 1;
     muxponder->mkv_hdr_size = size;
-    muxponder->mkv_hdr = malloc (muxponder->mkv_hdr_size);
+    muxponder->mkv_hdr = kr_alloc (muxponder->mkv_hdr_size);
     memcpy (muxponder->mkv_hdr, data, muxponder->mkv_hdr_size);
     size = 0;
   }
@@ -171,10 +171,10 @@ int muxponder_data_cb (uint8_t *data, size_t size, uint32_t sync, void *ptr) {
 
 kr_muxponder_t *kr_muxponder_create (krad_transmitter_t *transmitter) {
   kr_muxponder_t *muxponder;
-  muxponder = calloc (1, sizeof(kr_muxponder_t));
-  muxponder->tracks = calloc (KR_MUXPONDER_MAX_TRACKS,
+  muxponder = kr_allocz (1, sizeof(kr_muxponder_t));
+  muxponder->tracks = kr_allocz (KR_MUXPONDER_MAX_TRACKS,
                               sizeof(kr_muxponder_track_t));
-  muxponder->outputs = calloc (KR_MUXPONDER_MAX_OUTPUTS,
+  muxponder->outputs = kr_allocz (KR_MUXPONDER_MAX_OUTPUTS,
                               sizeof(kr_muxponder_output_t));
 
   muxponder->transmitter = transmitter;

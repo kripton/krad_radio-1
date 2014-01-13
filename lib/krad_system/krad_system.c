@@ -27,7 +27,6 @@
 #include <pthread.h>
 #include <inttypes.h>
 #include <sys/prctl.h>
-#include <malloc.h>
 #include <sys/ioctl.h>
 #include <linux/netdevice.h>
 

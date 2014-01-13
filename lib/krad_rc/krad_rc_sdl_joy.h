@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <fcntl.h>
-#include <malloc.h>
+#include <kr_alloc.h>
 #include <time.h>
 #include <ctype.h>
 #include <sys/types.h>

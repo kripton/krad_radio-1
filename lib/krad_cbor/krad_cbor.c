@@ -24,7 +24,7 @@ int kr_cbor_free(kr_cbor *cbor) {
 
 kr_cbor *kr_cbor_create() {
   kr_cbor *cbor;
-  cbor = malloc(kr_cbor_sizeof());
+  cbor = kr_alloc(kr_cbor_sizeof());
   if (cbor == NULL) return NULL;
   if (kr_cbor_init(cbor) != 0) {
     free(cbor);

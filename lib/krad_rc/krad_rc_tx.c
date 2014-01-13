@@ -2,9 +2,9 @@
 
 krad_rc_tx_t *krad_rc_tx_create (char *ip, int port) {
 
-  krad_rc_tx_t *krad_rc_tx = calloc(1, sizeof(krad_rc_tx_t));
+  krad_rc_tx_t *krad_rc_tx = kr_allocz(1, sizeof(krad_rc_tx_t));
 
-  krad_rc_tx->data = calloc(1, 2048);
+  krad_rc_tx->data = kr_allocz(1, 2048);
   strcpy ((char *)krad_rc_tx->data, "KRC");
 
   krad_rc_tx->ip = strdup (ip);

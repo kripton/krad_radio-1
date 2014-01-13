@@ -23,6 +23,8 @@ struct kr_timer {
   int32_t started;
 };
 
+int kr_timer_name_set(kr_timer *timer, const char *name);
+#define kr_timer_alloca() alloca(sizeof(kr_timer))
 kr_timer *kr_timer_create();
 kr_timer *kr_timer_create_with_name(const char *name);
 void kr_timer_status(kr_timer *timer);

@@ -25,7 +25,7 @@ char *krad_radio_running_stations() {
     printke("krad_radio_list_running_daemons: Could not open /proc/net/unix");
     return NULL;
   }
-  unix_sockets = malloc(512000);
+  unix_sockets = kr_alloc(512000);
   bytes = read(fd, unix_sockets, 512000);
   if (bytes > 512000) {
     printke("lots of unix sockets oh my");

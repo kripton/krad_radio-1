@@ -95,7 +95,7 @@ kwcap_decoder_get_frame(struct kwcap_decoder *decoder)
 	remaining = 0;
 	
 	ret = 0;
-	header = malloc(sizeof(struct kwcap_frame_header));
+	header = kr_alloc(sizeof(struct kwcap_frame_header));
 	//return 0;
 	while (ret != sizeof(struct kwcap_frame_header)) {
 		ret += read (decoder->fd, header + ret, sizeof(struct kwcap_frame_header) - ret);
@@ -111,7 +111,7 @@ kwcap_decoder_get_frame(struct kwcap_decoder *decoder)
 
 	ret = 0;
 
-	rects = malloc(sizeof(struct wcap_rectangle) * header->nrects);	
+	rects = kr_alloc(sizeof(struct wcap_rectangle) * header->nrects);	
 
 	while (ret != (sizeof(struct wcap_rectangle) * header->nrects)) {
 		ret += read (decoder->fd, rects + ret, (sizeof(struct wcap_rectangle) * header->nrects) - ret);
@@ -165,9 +165,9 @@ kwcap_decoder_create(const char *filename, int external_buffer)
 	int frame_size;
 	struct stat buf;
 
-	decoder = malloc(sizeof *decoder);
+	decoder = kr_alloc(sizeof *decoder);
 	
-	decoder->read_buffer = calloc(1, 1920 * 1080 * 8);
+	decoder->read_buffer = kr_allocz(1, 1920 * 1080 * 8);
 	
 	if (decoder == NULL)
 		return NULL;
@@ -181,7 +181,7 @@ kwcap_decoder_create(const char *filename, int external_buffer)
 	//decoder->map = mmap(NULL, decoder->size,
 	//		    PROT_READ, MAP_PRIVATE, decoder->fd, 0);
 		
-	header = malloc(sizeof(struct wcap_header));
+	header = kr_alloc(sizeof(struct wcap_header));
 	
 	read (decoder->fd, header, sizeof(struct wcap_header));
 	
@@ -199,7 +199,7 @@ kwcap_decoder_create(const char *filename, int external_buffer)
 	if (external_buffer == 1) {
 		decoder->external_buffer = 1;
 	} else {
-		decoder->frame = malloc(frame_size);
+		decoder->frame = kr_alloc(frame_size);
 		memset(decoder->frame, 0, frame_size);
 	}
 	return decoder;
@@ -213,11 +213,11 @@ kwcap_decoder_listen(int port, int external_buffer)
 	int frame_size;
 	struct stat buf;
 
-	decoder = malloc(sizeof *decoder);
+	decoder = kr_alloc(sizeof *decoder);
 	
 	decoder->port = port;
 	
-	decoder->read_buffer = calloc(1, 1920 * 1080 * 8);
+	decoder->read_buffer = kr_allocz(1, 1920 * 1080 * 8);
 	
 	if (decoder == NULL)
 		return NULL;
@@ -311,7 +311,7 @@ kwcap_decoder_listen(int port, int external_buffer)
 	//decoder->map = mmap(NULL, decoder->size,
 	//		    PROT_READ, MAP_PRIVATE, decoder->fd, 0);
 		
-	header = malloc(sizeof(struct wcap_header));
+	header = kr_alloc(sizeof(struct wcap_header));
 	
 	read (decoder->fd, header, sizeof(struct wcap_header));
 	
@@ -329,7 +329,7 @@ kwcap_decoder_listen(int port, int external_buffer)
 	if (external_buffer == 1) {
 		decoder->external_buffer = 1;
 	} else {
-		decoder->frame = malloc(frame_size);
+		decoder->frame = kr_alloc(frame_size);
 		memset(decoder->frame, 0, frame_size);
 	}
 	return decoder;

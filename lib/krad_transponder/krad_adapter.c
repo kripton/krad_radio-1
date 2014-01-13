@@ -151,7 +151,7 @@ static kr_adapter_path *path_alloc(kr_adapter *adapter) {
 
   for (i = 0; i < KR_ADAPTER_PATHS_MAX; i++) {
     if (adapter->path[i] == NULL) {
-      adapter->path[i] = calloc(1, sizeof(kr_adapter_path));
+      adapter->path[i] = kr_allocz(1, sizeof(kr_adapter_path));
       adapter->path[i]->adapter = adapter;
       return adapter->path[i];
     }
@@ -264,7 +264,7 @@ int kr_adapter_destroy(kr_adapter *adapter) {
 kr_adapter *kr_adapter_create(kr_adapter_setup *setup) {
   kr_adapter *adapter;
   if (setup == NULL) return NULL;
-  adapter = calloc(1, sizeof(kr_adapter));
+  adapter = kr_allocz(1, sizeof(kr_adapter));
   adapter->user = setup->user;
   adapter->ev_cb = setup->ev_cb;
   memcpy(&adapter->info, &setup->info, sizeof(kr_adapter_info));

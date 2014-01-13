@@ -132,6 +132,6 @@ void kr_easer_destroy(kr_easer *easer) {
 
 kr_easer *kr_easer_create() {
   kr_easer *easer;
-  easer = calloc(1, sizeof(kr_easer));
+  easer = kr_allocz(1, sizeof(kr_easer));
   return easer;
 }

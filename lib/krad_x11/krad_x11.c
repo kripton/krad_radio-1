@@ -10,7 +10,7 @@ void kr_x11_destroy(kr_x11 *x11) {
 kr_x11 *kr_x11_create() {
   kr_x11 *x11;
   int s;
-  x11 = calloc(1, sizeof (kr_x11));
+  x11 = kr_allocz(1, sizeof (kr_x11));
   x11->connection = xcb_connect(NULL, &x11->screen_number);
   x11->iter = xcb_setup_roots_iterator(xcb_get_setup(x11->connection));
   s = x11->screen_number;

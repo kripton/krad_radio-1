@@ -86,7 +86,7 @@ kr_client *kr_client_create(char *client_name) {
   if ((len == 0) || (len > 255)) {
     return NULL;
   }
-  client = calloc (1, sizeof(kr_client));
+  client = kr_allocz (1, sizeof(kr_client));
   client->name = strdup(client_name);
   client->autosync = 1;
   return client;
@@ -259,7 +259,7 @@ void kr_crate_free_string(char **string) {
 }
 
 char *kr_crate_alloc_string(int length) {
-  return calloc (1, length + 16);
+  return kr_allocz (1, length + 16);
 }
 
 int kr_poll(kr_client *client, uint32_t timeout_ms) {
@@ -367,7 +367,7 @@ void kr_crate_recycle(kr_crate **crate) {
 
 kr_crate *kr_crate_create(kr_client *client) {
   kr_crate *crate;
-  crate = calloc (1, sizeof(kr_crate));
+  crate = kr_allocz (1, sizeof(kr_crate));
   crate->client = client;
   return crate;
 }
@@ -472,7 +472,7 @@ int kr_delivery_get(kr_client *client, kr_crate **crate) {
         //printf ("KR Client Response payload size: %"PRIu64"\n", ebml_data_size);
         response->size = ebml_data_size;
         if (response->buffer == NULL) {
-          response->buffer = malloc(2048);
+          response->buffer = kr_alloc(2048);
         }
         kr_ebml2_unpack_data(client->ebml_in, response->buffer, ebml_data_size);
       }

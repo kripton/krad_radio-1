@@ -2,9 +2,9 @@
 
 krad_rc_rx_t *krad_rc_rx_create (krad_rc_t *krad_rc, int port) {
 
-  krad_rc_rx_t *krad_rc_rx = calloc(1, sizeof(krad_rc_rx_t));
+  krad_rc_rx_t *krad_rc_rx = kr_allocz(1, sizeof(krad_rc_rx_t));
 
-  krad_rc_rx->data = calloc(1, 2048);
+  krad_rc_rx->data = kr_allocz(1, 2048);
   strcpy ((char *)krad_rc_rx->data, "KRC");
 
   krad_rc_rx->port = port;

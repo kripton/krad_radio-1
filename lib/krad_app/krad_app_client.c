@@ -39,7 +39,7 @@ void kr_app_disconnect(kr_app_client *client) {
 
 kr_app_client *kr_app_connect(char *sysname, int timeout_ms) {
   kr_app_client *client;
-  client = calloc(1, sizeof(kr_app_client));
+  client = kr_allocz(1, sizeof(kr_app_client));
   if (client == NULL) {
     failfast("Krad APP Client mem alloc fail");
     return NULL;

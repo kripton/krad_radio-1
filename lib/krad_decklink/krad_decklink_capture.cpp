@@ -113,7 +113,7 @@ extern "C" {
 krad_decklink_capture_t *krad_decklink_capture_create(int device) {
 
   int d;
-  krad_decklink_capture_t *krad_decklink_capture = (krad_decklink_capture_t *)calloc(1, sizeof(krad_decklink_capture_t));
+  krad_decklink_capture_t *krad_decklink_capture = (krad_decklink_capture_t *)kr_allocz(1, sizeof(krad_decklink_capture_t));
 
   krad_decklink_capture->device = device;
   krad_decklink_capture->inputFlags = 0;

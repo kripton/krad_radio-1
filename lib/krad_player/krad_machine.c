@@ -11,7 +11,7 @@ static void *krad_machine_run (void *arg) {
   machine = (kr_machine_t *)arg;
   krad_system_set_thread_name ("kr_machine");
 
-  msg = calloc (1, machine->params.msg_sz);
+  msg = kr_allocz (1, machine->params.msg_sz);
   //printf ("kr_msg size %zu\n", machine->params.msg_sz);
   if (machine->params.start != NULL) {
     machine->params.start (machine->params.actual);
@@ -52,7 +52,7 @@ kr_machine_t *krad_machine_create (kr_machine_params_t *params) {
 
   kr_machine_t *machine;
 
-  machine = calloc (1, sizeof (kr_machine_t));
+  machine = kr_allocz (1, sizeof (kr_machine_t));
   memcpy (&machine->params, params, sizeof(kr_machine_params_t));
   machine->msgsys = kr_msgsys_create (2, machine->params.msg_sz);
   pthread_create (&machine->thread, NULL, krad_machine_run, (void *)machine);

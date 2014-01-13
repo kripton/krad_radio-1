@@ -662,7 +662,7 @@ static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup) {
     path->volume_actual[c] = (float)(path->volume[c]/100.0f);
     path->volume_actual[c] *= path->volume_actual[c];
     path->new_volume_actual[c] = path->volume_actual[c];
-    path->samples[c] = calloc(1, KR_MXR_PERIOD_MAX * sizeof(float));
+    path->samples[c] = kr_allocz(1, KR_MXR_PERIOD_MAX * sizeof(float));
   }
   path_sfx_create(path);
   path->state = KR_MXP_READY;
@@ -797,7 +797,7 @@ int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
 int kr_mixer_destroy(kr_mixer *mixer) {
   int i;
   kr_mixer_path *path;
-  printk("Krad Mixer shutdown started");
+  printk("Mixer: shutdown started");
   i = 0;
   if (mixer->clock != NULL) {
     while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
@@ -817,7 +817,7 @@ int kr_mixer_destroy(kr_mixer *mixer) {
     /* FIXME maybe we need to wait maybe not well see (dobut it) */
   }
   kr_pool_destroy(mixer->path_pool);
-  printk("Krad Mixer shutdown complete");
+  printk("Mixer: shutdown complete");
   return 0;
 }
 

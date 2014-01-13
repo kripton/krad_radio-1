@@ -393,7 +393,7 @@ int kr_ebml2_set_buffer(kr_ebml *ebml, uint8_t *buffer, size_t len) {
 
 kr_ebml *kr_ebml2_create() {
   kr_ebml *ebml;
-  ebml = malloc(sizeof(kr_ebml));
+  ebml = kr_alloc(sizeof(kr_ebml));
   //ebml->buf = ebml->buffer;
   ebml->buf = NULL;
   ebml->bufstart = NULL;

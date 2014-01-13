@@ -304,7 +304,7 @@ kr_v4l2 *kr_v4l2_create(kr_v4l2_setup *setup) {
 
   if (setup == NULL) return NULL;
 
-  v4l2 = calloc(1, sizeof(kr_v4l2));
+  v4l2 = kr_allocz(1, sizeof(kr_v4l2));
   v4l2->info.dev = setup->dev;
   v4l2->info.priority = setup->priority;
   kr_v4l2_open(v4l2);

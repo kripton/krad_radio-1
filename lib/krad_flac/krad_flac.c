@@ -83,7 +83,7 @@ krad_flac_encoder_write_callback (const FLAC__StreamEncoder *encoder,
     4 + 4 + strlen (FLAC__VENDOR_STRING) + 4 + 4 +
     strlen ("ENCODER=") + strlen (KR_VERSION_STR_FULL);
 
-    flac->comment_header = calloc (1, flac->krad_codec_header.sz[1]);
+    flac->comment_header = kr_allocz (1, flac->krad_codec_header.sz[1]);
 
     memcpy (flac->comment_header, "\x84\x00\x00", 3);
 
@@ -233,7 +233,7 @@ krad_flac_t *krad_flac_encoder_create (int channels,
                                        int sample_rate,
                                        int bit_depth) {
 
-  krad_flac_t *flac = calloc (1, sizeof(krad_flac_t));
+  krad_flac_t *flac = kr_allocz (1, sizeof(krad_flac_t));
 
   flac->channels = channels;
   flac->sample_rate = sample_rate;
@@ -429,7 +429,7 @@ int krad_flac_decode (krad_flac_t *flac,
 krad_flac_t *krad_flac_decoder_create (krad_codec_header_t *header) {
 
   int h;
-  krad_flac_t *flac = calloc (1, sizeof(krad_flac_t));
+  krad_flac_t *flac = kr_allocz (1, sizeof(krad_flac_t));
   FLAC__StreamDecoderInitStatus ret;
 
   flac->channels = 2;
@@ -437,7 +437,7 @@ krad_flac_t *krad_flac_decoder_create (krad_codec_header_t *header) {
 
   flac->decoder = FLAC__stream_decoder_new ();
 
-  flac->decode_buffer = malloc (8192 * 64);
+  flac->decode_buffer = kr_alloc (8192 * 64);
 
   ret =
   FLAC__stream_decoder_init_stream (flac->decoder,

@@ -69,7 +69,7 @@ kr_encoder_machine_t *kr_encoder_machine_create (kr_encoder_machine_process_cb p
     return NULL;
   }
 
-  encoder_machine = calloc (1, sizeof(kr_encoder_machine_t));
+  encoder_machine = kr_allocz (1, sizeof(kr_encoder_machine_t));
   memset (&machine_params, 0, sizeof(kr_machine_params_t));
 
   encoder_machine->process_cb = process_callback;

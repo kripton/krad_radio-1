@@ -217,7 +217,7 @@ int krad_ogg_read_packet (krad_ogg_t *krad_ogg, uint32_t *track,
 
             krad_ogg->tracks[t].header_len[krad_ogg->tracks[t].header_count] = packet.bytes;
 
-            krad_ogg->tracks[t].header[krad_ogg->tracks[t].header_count] = malloc(packet.bytes);
+            krad_ogg->tracks[t].header[krad_ogg->tracks[t].header_count] = kr_alloc(packet.bytes);
             memcpy (krad_ogg->tracks[t].header[krad_ogg->tracks[t].header_count],
                 packet.packet,
                 packet.bytes);
@@ -434,16 +434,16 @@ krad_ogg_t *krad_ogg_create () {
   int t;
   krad_ogg_t *krad_ogg;
 
-  krad_ogg = calloc (1, sizeof(krad_ogg_t));
+  krad_ogg = kr_allocz (1, sizeof(krad_ogg_t));
 
-  krad_ogg->tracks = calloc (KRAD_OGG_MAX_TRACKS, sizeof(krad_ogg_track_t));
+  krad_ogg->tracks = kr_allocz (KRAD_OGG_MAX_TRACKS, sizeof(krad_ogg_track_t));
 
   for (t = 0; t < KRAD_OGG_MAX_TRACKS; t++ ) {
     krad_ogg->tracks[t].serial = KRAD_OGG_NO_SERIAL;
     krad_ogg->tracks[t].last_serial = KRAD_OGG_NO_SERIAL;
   }
 
-  krad_ogg->input_buffer = calloc(1, 4096);
+  krad_ogg->input_buffer = kr_allocz(1, 4096);
 
   ogg_sync_init (&krad_ogg->sync_state);
 
@@ -635,7 +635,7 @@ int krad_ogg_add_track (krad_ogg_t *krad_ogg, kr_codec codec,
 
   if (codec == FLAC) {
     // adding ogg flac mapping to flac header
-    temp_header = calloc (1, 9 + 42);
+    temp_header = kr_allocz (1, 9 + 42);
     memcpy (temp_header, "\x7F\x46\x4C\x41\x43\x01\x00\x00\x01", 9);
     memcpy (temp_header + 9, header[0], 42);
   }
@@ -643,7 +643,7 @@ int krad_ogg_add_track (krad_ogg_t *krad_ogg, kr_codec codec,
   if (header_count) {
 
     krad_ogg->tracks[track].header_len[0] = header_size[0];
-    krad_ogg->tracks[track].header[0] = malloc (header_size[0]);
+    krad_ogg->tracks[track].header[0] = kr_alloc (header_size[0]);
     memcpy (krad_ogg->tracks[track].header[0], header[0], header_size[0]);
     krad_ogg->tracks[track].header_count++;
 
@@ -687,7 +687,7 @@ int krad_ogg_add_track (krad_ogg_t *krad_ogg, kr_codec codec,
 
   for (h = 1; h < header_count; h++) {
     krad_ogg->tracks[track].header_len[h] = header_size[h];
-    krad_ogg->tracks[track].header[h] = malloc (krad_ogg->tracks[track].header_len[h]);
+    krad_ogg->tracks[track].header[h] = kr_alloc (krad_ogg->tracks[track].header_len[h]);
     memcpy (krad_ogg->tracks[track].header[h], header[h], krad_ogg->tracks[track].header_len[h]);
     krad_ogg->tracks[track].header_count++;
   }

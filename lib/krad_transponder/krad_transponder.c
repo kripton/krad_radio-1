@@ -284,7 +284,7 @@ int kr_transponder_destroy(kr_transponder *xpdr) {
   int ret;
   kr_transponder_path *path;
   if (xpdr == NULL) return -1;
-  printk("Krad Transponder: Destroy Started");
+  printk("Transponder: Destroy Started");
   kr_adapter_monitor_destroy(xpdr->adapter_mon);
   i = 0;
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
@@ -299,7 +299,7 @@ int kr_transponder_destroy(kr_transponder *xpdr) {
     }
   }
   kr_pool_destroy(xpdr->path_pool);
-  printk("Krad Transponder: Destroy Completed");
+  printk("Transponder: Destroy Completed");
   return 0;
 }
 

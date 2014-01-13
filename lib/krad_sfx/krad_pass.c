@@ -108,7 +108,7 @@ kr_pass *kr_pass_create(int sample_rate, kr_sfx_effect_type type) {
   if ((type != KR_LOWPASS) && (type != KR_HIGHPASS)) {
     return NULL;
   }
-  pass = calloc(1, sizeof(kr_pass));
+  pass = kr_allocz(1, sizeof(kr_pass));
   pass->new_sample_rate = sample_rate;
   pass->info.type = type;
   pass->new_type = pass->info.type;

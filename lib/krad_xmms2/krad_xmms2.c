@@ -506,7 +506,7 @@ void krad_xmms_destroy (krad_xmms_t *krad_xmms) {
 
 krad_xmms_t *krad_xmms_create (char *sysname, char *ipc_path, kr_tags *tags) {
 
-  krad_xmms_t *krad_xmms = calloc (1, sizeof(krad_xmms_t));
+  krad_xmms_t *krad_xmms = kr_allocz (1, sizeof(krad_xmms_t));
 
   strcpy (krad_xmms->sysname, sysname);
   strcpy (krad_xmms->ipc_path, ipc_path);

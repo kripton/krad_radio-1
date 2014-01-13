@@ -43,7 +43,7 @@ krad_vorbis_t *krad_vorbis_encoder_create (int channels,
   ogg_packet header_comments;
   ogg_packet header_codebooks;
 
-  vorbis = calloc (1, sizeof(krad_vorbis_t));
+  vorbis = kr_allocz (1, sizeof(krad_vorbis_t));
 
   pos = 0;
 
@@ -246,7 +246,7 @@ krad_vorbis_t *krad_vorbis_decoder_create (kr_codec_hdr_t *header) {
   int ret;
   ogg_packet op;
 
-  vorbis = calloc (1, sizeof(krad_vorbis_t));
+  vorbis = kr_allocz (1, sizeof(krad_vorbis_t));
 
   vorbis->error = 0;
   vorbis->state_str = "";

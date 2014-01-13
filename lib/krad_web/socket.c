@@ -38,7 +38,7 @@ static int kr_interweb_server_socket_setup(char *interface, int port) {
 
   interface_actual = interface;
 
-  printk ("Krad Interweb Server: interface: %s port %d", interface, port);
+  printk ("Web Server: socket setup on interface: %s port %d", interface, port);
   snprintf (port_string, 6, "%d", port);
   memset (&hints, 0, sizeof (struct addrinfo));
   hints.ai_family = AF_UNSPEC;     /* Return IPv4 and IPv6 choices */
@@ -143,7 +143,7 @@ int kr_web_server_listen_off(kr_web_server *server, char *interface,
       close(server->tcp_sd[r]);
       server->tcp_sd[r] = 0;
       d++;
-      printk("Disabled interweb on %s port %d",
+      printk("Web Server: Stopped listening on %s port %d",
              server->tcp_interface[r], server->tcp_port[r]);
       server->tcp_port[r] = 0;
       free(server->tcp_interface[r]);
@@ -192,7 +192,7 @@ int kr_web_server_listen_on(kr_web_server *server, char *interface, int32_t port
       if (server->tcp_sd[r] != 0) {
         listen (server->tcp_sd[r], SOMAXCONN);
         server->tcp_interface[r] = strdup (interface);
-        printk ("Enable remote on interface %s port %d", interface, port);
+        printk("Web Server: Listen on interface %s port %d", interface, port);
         return 1;
       } else {
         server->tcp_port[r] = 0;

@@ -115,7 +115,7 @@ wcap_decoder_create(const char *filename, int external_buffer)
 	int frame_size;
 	struct stat buf;
 
-	decoder = malloc(sizeof *decoder);
+	decoder = kr_alloc(sizeof *decoder);
 	if (decoder == NULL)
 		return NULL;
 
@@ -141,7 +141,7 @@ wcap_decoder_create(const char *filename, int external_buffer)
 	if (external_buffer == 1) {
 		decoder->external_buffer = 1;
 	} else {
-		decoder->frame = malloc(frame_size);
+		decoder->frame = kr_alloc(frame_size);
 		memset(decoder->frame, 0, frame_size);
 	}
 	return decoder;

@@ -29,7 +29,7 @@ struct kr_router_map_info {
 };
 
 struct kr_router_map_setup {
-  char prefix[32];
+  const char *prefix;
   void *ptr; /* for create */
   kr_router_map_create_handler *create;
   kr_router_map_patch_handler *patch;

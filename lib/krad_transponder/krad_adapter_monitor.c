@@ -162,7 +162,7 @@ int kr_adapter_monitor_destroy(kr_adapter_monitor *monitor) {
 
 kr_adapter_monitor *kr_adapter_monitor_create() {
   kr_adapter_monitor *monitor;
-	monitor = calloc(1, sizeof(kr_adapter_monitor));
+	monitor = kr_allocz(1, sizeof(kr_adapter_monitor));
   monitor->fd = -1;
   return monitor;
 }

@@ -39,7 +39,7 @@ static int effect_info(kr_sfx *sfx, kr_sfx_effect_type effect, void *effect_info
 
 kr_sfx *kr_sfx_create(kr_sfx_setup *setup) {
   kr_sfx *sfx;
-  sfx = calloc(1, sizeof(kr_sfx));
+  sfx = kr_allocz(1, sizeof(kr_sfx));
   sfx->channels = setup->channels;
   sfx->sample_rate = setup->sample_rate;
   sfx->user = setup->user;

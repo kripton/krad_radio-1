@@ -284,7 +284,7 @@ void kr_osc_destroy(kr_osc *osc) {
 }
 
 kr_osc *kr_osc_create(char *sysname) {
-  kr_osc *osc = calloc(1, sizeof(kr_osc));
+  kr_osc *osc = kr_allocz(1, sizeof(kr_osc));
   strncpy(osc->sysname, sysname, sizeof(osc->sysname));
   osc->client = kr_client_create("krad osc client");
   if (osc->client == NULL) {

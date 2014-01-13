@@ -35,7 +35,7 @@ void krad_rc_safe (krad_rc_t *krad_rc) {
 
 krad_rc_t *krad_rc_create (char *type, char *device) {
 
-  krad_rc_t *krad_rc = calloc (1, sizeof(krad_rc_t));
+  krad_rc_t *krad_rc = kr_allocz (1, sizeof(krad_rc_t));
 
   if (strcmp(type, "Pololu Maestro") == 0) {
   

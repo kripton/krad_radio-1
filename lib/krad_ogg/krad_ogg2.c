@@ -40,8 +40,8 @@ kr_ogg *kr_ogg_create() {
 
   kr_ogg *ogg;
 
-  ogg = calloc(1, sizeof(kr_ogg));
-  ogg->tracks = calloc(KRAD_OGG_MAX_TRACKS, sizeof(kr_ogg_track));
+  ogg = kr_allocz(1, sizeof(kr_ogg));
+  ogg->tracks = kr_allocz(KRAD_OGG_MAX_TRACKS, sizeof(kr_ogg_track));
 
   return ogg;
 }
@@ -86,7 +86,7 @@ int kr_ogg_generate_header(kr_ogg *ogg) {
 
   sz += 2048;
 
-  ogg->hdr = malloc (sz);
+  ogg->hdr = kr_alloc (sz);
 
   for (t = 0; t < KRAD_OGG_MAX_TRACKS; t++) {
     if (ogg->tracks[t].bitstream_serial != 0) {

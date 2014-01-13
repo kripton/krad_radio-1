@@ -35,7 +35,7 @@ static void kr_demuxer_step (kr_demuxer_t *demuxer) {
   uint32_t size;
   uint8_t *buffer;
   
-  buffer = malloc (2000000);
+  buffer = kr_alloc (2000000);
   
   while (1) {
     size = krad_container_read_packet (demuxer->input, &track,
@@ -144,7 +144,7 @@ kr_demuxer_t *kr_demuxer_create (kr_demuxer_params_t *demuxer_params) {
   kr_demuxer_t *demuxer;
   kr_machine_params_t machine_params;
 
-  demuxer = calloc (1, sizeof(kr_demuxer_t));
+  demuxer = kr_allocz (1, sizeof(kr_demuxer_t));
 
   demuxer->params.url = strdup (demuxer_params->url);
   demuxer->params.controller = demuxer_params->controller;

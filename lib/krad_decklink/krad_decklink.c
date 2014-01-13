@@ -12,7 +12,7 @@ void kr_decklink_destroy(kr_decklink *decklink) {
 kr_decklink *kr_decklink_create(char *device) {
   int c;
   kr_decklink *decklink;
-  decklink = calloc(1, sizeof(kr_decklink));
+  decklink = kr_allocz(1, sizeof(kr_decklink));
   decklink->devicenum = atoi(device);
   if (decklink->devicenum > 0) {
     sprintf(decklink->simplename, "Decklink%d", decklink->devicenum);
@@ -20,7 +20,7 @@ kr_decklink *kr_decklink_create(char *device) {
     sprintf(decklink->simplename, "Decklink");
   }
   for (c = 0; c < 2; c++) {
-    decklink->samples[c] = malloc(4 * 8192);
+    decklink->samples[c] = kr_alloc(4 * 8192);
   }
   decklink->capture = krad_decklink_capture_create(decklink->devicenum);
   return decklink;

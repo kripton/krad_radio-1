@@ -135,7 +135,7 @@ int kr_encoder_destroy_direct (kr_encoder2_t **encoder) {
 
 kr_encoder2_t *kr_encoder_create_direct () {
   kr_encoder2_t *encoder;
-  encoder = calloc (1, sizeof(kr_encoder2_t));
+  encoder = kr_allocz (1, sizeof(kr_encoder2_t));
   encoder->codec = NOCODEC;
   return encoder;
 };

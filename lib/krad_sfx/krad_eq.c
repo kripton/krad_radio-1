@@ -106,7 +106,7 @@ kr_eq *kr_eq_create(int sample_rate) {
   float hz;
   kr_eq *eq;
 
-  eq = calloc(1, sizeof(kr_eq));
+  eq = kr_allocz(1, sizeof(kr_eq));
 
   eq->new_sample_rate = sample_rate;
   eq->sample_rate = eq->new_sample_rate;

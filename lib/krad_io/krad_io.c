@@ -30,9 +30,9 @@ static ssize_t kr_io2_write(kr_io2_t *io);
 
 kr_io2_t *kr_io2_create_size(size_t size) {
   kr_io2_t *io;
-  io = malloc (sizeof(kr_io2_t));
+  io = kr_alloc (sizeof(kr_io2_t));
   io->size = size;
-  io->buffer = malloc (io->size);
+  io->buffer = kr_alloc (io->size);
   io->fd = -1;
   kr_io2_restart (io);
   return io;

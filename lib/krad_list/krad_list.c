@@ -382,7 +382,7 @@ static void krad_list_parse_error (krad_list_t *kradlist, const char *msg, ...)
 
 krad_list_t *krad_list_open_file(char *filename) {
 
-  krad_list_t *kradlist = calloc(1, sizeof(krad_list_t));
+  krad_list_t *kradlist = kr_allocz(1, sizeof(krad_list_t));
 
   kradlist->handler.characters = (charactersSAXFunc) krad_list_parse_characters;
   kradlist->handler.startElement = (startElementSAXFunc) krad_list_parse_start_element;
@@ -434,7 +434,7 @@ krad_list_t *krad_list_open_file(char *filename) {
 
 krad_list_t *krad_list_create(krad_list_format_t format, char *title, char *description, char *image_url, char *creator) {
 
-  krad_list_t *kradlist = calloc(1, sizeof(krad_list_t));
+  krad_list_t *kradlist = kr_allocz(1, sizeof(krad_list_t));
 
   kradlist->format = format;
 

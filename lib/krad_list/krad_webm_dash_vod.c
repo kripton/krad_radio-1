@@ -3,7 +3,7 @@
 
 krad_webm_dash_vod_t *krad_webm_dash_vod_create (int width, int height, int sample_rate, float duration, char *lang) {
 
-  krad_webm_dash_vod_t *krad_webm_dash_vod = calloc(1, sizeof(krad_webm_dash_vod_t));
+  krad_webm_dash_vod_t *krad_webm_dash_vod = kr_allocz(1, sizeof(krad_webm_dash_vod_t));
   char string[16];
 
   memset (string, 0, sizeof(string));
