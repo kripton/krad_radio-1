@@ -4,6 +4,7 @@
 #include <math.h>
 #include <signal.h>
 #include <time.h>
+#define _GNU_SOURCE
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -24,7 +25,7 @@
 #include "krad_app_server.h"
 #include "krad_pool.h"
 
-static kr_app_server *server_init(char *appname, char *sysname);
+static int setup_socket(char *appname, char *sysname);
 static void update_pollfds(kr_app_server *server);
 static void *server_loop(void *arg);
 static int  handle_client(kr_app_server *server, kr_app_server_client *client);
@@ -39,7 +40,6 @@ typedef enum {
 } app_state;
 
 struct kr_app_server {
-  struct sockaddr_un saddr;
   int sd;
   uint64_t start_time;
   app_state state;
@@ -70,40 +70,33 @@ struct kr_app_server_client {
 };
 */
 
-static kr_app_server *server_init(char *appname, char *sysname) {
-  kr_app_server *server;
+static int setup_socket(char *appname, char *sysname) {
+  int sd;
+  struct sockaddr_un saddr;
   socklen_t socket_sz;
-  server = kr_allocz(1, sizeof(kr_app_server));
-  if (krad_control_init(&server->krad_control)) {
-    free(server);
-    return NULL;
+  sd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
+  if (sd == -1) {
+    printke("App Server: Socket failed.");
+    return -1;
   }
-  server->state = KR_APP_STARTING;
-  server->clients = kr_allocz(KR_APP_SERVER_CLIENTS_MAX, sizeof(kr_app_server_client));
-  server->sd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0);
-  if (server->sd == -1) {
-    printke ("Krad App Server: Socket failed.\n");
-    kr_app_server_destroy(server);
-    return NULL;
-  }
-  server->saddr.sun_family = AF_UNIX;
-  snprintf(server->saddr.sun_path, sizeof(server->saddr.sun_path),
+  saddr.sun_family = AF_UNIX;
+  snprintf(saddr.sun_path, sizeof(saddr.sun_path),
    "@%s_%s_api", appname, sysname);
-  socket_sz = sizeof(server->saddr) - sizeof(server->saddr.sun_path);
-  socket_sz += strlen(server->saddr.sun_path);
-  server->saddr.sun_path[0] = '\0';
-  if (connect(server->sd, (struct sockaddr *)&server->saddr, socket_sz) != -1) {
+  socket_sz = sizeof(saddr) - sizeof(saddr.sun_path);
+  socket_sz += strlen(saddr.sun_path);
+  saddr.sun_path[0] = '\0';
+  if (connect(sd, (struct sockaddr *)&saddr, socket_sz) != -1) {
     printke("App Server: Socket name in use.");
-    kr_app_server_destroy(server);
-    return NULL;
+    close(sd);
+    return -1;
   }
-  if (bind(server->sd, (struct sockaddr *)&server->saddr, socket_sz) == -1) {
-    printke("App Server: Can't bind to socket.\n");
-    kr_app_server_destroy(server);
-    return NULL;
+  if (bind(sd, (struct sockaddr *)&saddr, socket_sz) == -1) {
+    printke("App Server: Can't bind to socket.");
+    close(sd);
+    return -1;
   }
-  listen(server->sd, SOMAXCONN);
-  return server;
+  listen(sd, SOMAXCONN);
+  return sd;
 }
 
 int validate_header(kr_io2_t *in) {
@@ -187,55 +180,45 @@ int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
 }
 
 static kr_app_server_client *accept_client(kr_app_server *server, int sd) {
-  kr_app_server_client *client = NULL;
-  int i;
+  kr_app_server_client *client;
   struct sockaddr_un sin;
-  socklen_t sin_len;
-  while (client == NULL) {
-    for(i = 0; i < KR_APP_SERVER_CLIENTS_MAX; i++) {
-      if (server->clients[i].sd == 0) {
-        client = &server->clients[i];
-        break;
-      }
-    }
-    if (client == NULL) {
-      printke("App Server: Overloaded with clients!");
-      return NULL;
-    }
+  socklen_t slen;
+  slen = sizeof(sin);
+  client = kr_pool_slice(server->client_pool);
+  if (client == NULL) {
+    printke("App Server: Overloaded with clients!");
+    return NULL;
   }
-  sin_len = sizeof(sin);
-  client->sd = accept(sd, (struct sockaddr *)&sin, &sin_len);
-  if (client->sd > 0) {
-    client->local = 1;
-    client->valid = 0;
-    krad_system_set_socket_nonblocking(client->sd);
-    client->in = kr_io2_create();
-    client->out = kr_io2_create();
-    kr_io2_set_fd(client->in, client->sd);
-    kr_io2_set_fd(client->out, client->sd);
-    server->num_clients++;
-    printk("App Server: Local client accepted");
-    return client;
-  } else {
+  client->sd = accept4(sd, (struct sockaddr *)&sin, &slen, SOCK_NONBLOCK);
+  if (client->sd < 0) {
+    kr_pool_recycle(server->client_pool, client);
     printke("App Server: accept() failed!");
+    return NULL;
   }
-  return NULL;
+  client->local = 1;
+  client->valid = 0;
+  client->in = kr_io2_create();
+  client->out = kr_io2_create();
+  kr_io2_set_fd(client->in, client->sd);
+  kr_io2_set_fd(client->out, client->sd);
+  server->num_clients++;
+  printk("App Server: Local client accepted");
+  return client;
 }
 
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client) {
   close(client->sd);
-  client->sd = 0;
-  client->local = 0;
-  client->valid = 0;
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
+  kr_pool_recycle(server->client_pool, client);
   server->num_clients--;
   printk("App Server: Client disconnected");
 }
 
 static void update_pollfds(kr_app_server *server) {
-  int c;
+  kr_app_server_client *client;
   int s;
+  int i;
   s = 0;
   server->sockets[s].fd = krad_controller_get_client_fd(&server->krad_control);
   server->sockets[s].events = POLLIN;
@@ -243,16 +226,15 @@ static void update_pollfds(kr_app_server *server) {
   server->sockets[s].fd = server->sd;
   server->sockets[s].events = POLLIN;
   s++;
-  for (c = 0; c < KR_APP_SERVER_CLIENTS_MAX; c++) {
-    if (server->clients[c].sd > 0) {
-      server->sockets[s].fd = server->clients[c].sd;
-      server->sockets[s].events |= POLLIN;
-      if (kr_io2_want_out(server->clients[c].out)) {
-        server->sockets[s].events |= POLLOUT;
-      }
-      server->sockets_clients[s] = &server->clients[c];
-      s++;
+  i = 0;
+  while ((client = kr_pool_iterate_active(server->client_pool, &i))) {
+    server->sockets[s].fd = client->sd;
+    server->sockets[s].events |= POLLIN;
+    if (kr_io2_want_out(client->out)) {
+      server->sockets[s].events |= POLLOUT;
     }
+    server->sockets_clients[s] = client;
+    s++;
   }
   server->socket_count = s;
   //printk("App Server: polled fds updated");
@@ -413,19 +395,6 @@ kr_route *kr_app_server_route_create(kr_app_server *server, kr_route_setup *setu
   return kr_route_create(server->router, setup);
 }
 
-int kr_app_server_disable(kr_app_server *server) {
-  if (server == NULL) return -1;
-  printk("App Server: Disabling");
-  if (!krad_controller_shutdown(&server->krad_control, &server->thread, 30)) {
-    krad_controller_destroy(&server->krad_control, &server->thread);
-  }
-  if (server->sd != 0) {
-    close(server->sd);
-  }
-  printk("App Server: Disabled");
-  return 0;
-}
-
 int kr_app_server_info_get(kr_app_server *server, kr_app_server_info *info) {
   uint64_t now;
   if ((server == NULL) || (info == NULL)) return -1;
@@ -440,22 +409,16 @@ int kr_app_server_info_get(kr_app_server *server, kr_app_server_info *info) {
   return 0;
 }
 
-int kr_app_server_destroy(kr_app_server *server) {
-  int i;
+int kr_app_server_disable(kr_app_server *server) {
   if (server == NULL) return -1;
-  printk("App Server: Destroying");
-  if (server->state != KR_APP_SHUTINGDOWN) {
-    kr_app_server_disable(server);
+  printk("App Server: Disabling");
+  if (!krad_controller_shutdown(&server->krad_control, &server->thread, 30)) {
+    krad_controller_destroy(&server->krad_control, &server->thread);
   }
-  for (i = 0; i < KR_APP_SERVER_CLIENTS_MAX; i++) {
-    if (server->clients[i].sd > 0) {
-      disconnect_client(server, &server->clients[i]);
-    }
+  if (server->sd != 0) {
+    close(server->sd);
   }
-  kr_router_destroy(server->router);
-  free(server->clients);
-  free(server);
-  printk("App Server: Destroyed");
+  printk("App Server: Disabled");
   return 0;
 }
 
@@ -465,14 +428,55 @@ int kr_app_server_enable(kr_app_server *server) {
   return 0;
 }
 
+int kr_app_server_destroy(kr_app_server *server) {
+  int i;
+  kr_app_server_client *client;
+  if (server == NULL) return -1;
+  printk("App Server: Destroying");
+  if (server->state != KR_APP_SHUTINGDOWN) {
+    kr_app_server_disable(server);
+  }
+  i = 0;
+  while ((client = kr_pool_iterate_active(server->client_pool, &i))) {
+    disconnect_client(server, client);
+  }
+  kr_router_destroy(server->router);
+  kr_pool_destroy(server->client_pool);
+  printk("App Server: Destroyed");
+  return 0;
+}
+
 kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
+  int sd;
   kr_app_server *server;
+  kr_pool *pool;
+  kr_pool_setup pool_setup;
   kr_router_setup router_setup;
+  if (setup == NULL) return NULL;
   printk("App Server: Creating");
-  server = server_init(setup->appname, setup->sysname);
-  if (server == NULL) {
+  sd = setup_socket(setup->appname, setup->sysname);
+  if (sd < 0) {
     return NULL;
   }
+  pool_setup.shared = 0;
+  pool_setup.overlay = NULL;
+  pool_setup.overlay_sz = sizeof(kr_app_server);
+  pool_setup.size = sizeof(kr_app_server_client);
+  pool_setup.slices = KR_APP_SERVER_CLIENTS_MAX;
+  pool = kr_pool_create(&pool_setup);
+  server = kr_pool_overlay_get(pool);
+  memset(server, 0, sizeof(kr_app_server));
+  server->client_pool = pool;
+  /*
+  server->user = setup->user;
+  server->event_cb = setup->event_cb;
+  */
+  if (krad_control_init(&server->krad_control)) {
+    kr_app_server_destroy(server);
+    return NULL;
+  }
+  server->state = KR_APP_STARTING;
+  server->sd = sd;
   router_setup.routes_max = 64;
   router_setup.maps_max = 64;
   router_setup.user = server;
