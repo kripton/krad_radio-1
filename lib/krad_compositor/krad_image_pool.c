@@ -11,7 +11,7 @@ kr_image_pool *kr_image_pool_create(kr_image *image, size_t len) {
 }
 
 int kr_image_pool_getimage(kr_image_pool *image_pool, kr_image *image) {
-  kr_pool_overlay_copy(image_pool, image);
+  kr_pool_overlay_get_copy(image_pool, image);
   image->px = kr_pool_slice(image_pool);
   if (image->px == NULL) return 0;
   image->ppx[0] = image->px;
@@ -22,6 +22,6 @@ int kr_image_pool_getimage(kr_image_pool *image_pool, kr_image *image) {
   return 1;
 }
 
-void kr_image_pool_destroy(kr_image_pool *image_pool) {
+int kr_image_pool_destroy(kr_image_pool *image_pool) {
   return kr_pool_destroy(image_pool);
 }

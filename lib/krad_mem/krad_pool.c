@@ -104,7 +104,7 @@ int kr_pool_overlay_set(kr_pool *pool, void *overlay) {
   return 0;
 }
 
-int kr_pool_overlay_copy(kr_pool *pool, void *overlay) {
+int kr_pool_overlay_get_copy(kr_pool *pool, void *overlay) {
   if ((pool == NULL) || (overlay == NULL)) return -2;
   if (pool->overlay == NULL) return -3;
   memcpy(overlay, pool->overlay, pool->overlay_sz);
@@ -122,26 +122,6 @@ int kr_pool_recycle(kr_pool *pool, void *slice) {
       pool->use = pool->use ^ mask;
       pool->active--;
       return 0;
-  }
-  return -1;
-}
-
-int kr_pool_recycle_old(kr_pool *pool, void *slice) {
-
-  int i;
-  uint64_t mask;
-
-  if ((pool == NULL) || (slice == NULL)) return -2;
-
-  mask = 1;
-  for (i = 0; i < pool->slices; i++) {
-    if (((pool->use & mask) != 0)
-        && (slice == (pool->data + (pool->slice_size * i)))) {
-      pool->use = pool->use ^ mask;
-      pool->active--;
-      return 0;
-    }
-    mask = mask << 1;
   }
   return -1;
 }
@@ -200,9 +180,11 @@ void kr_pool_debug(kr_pool *pool) {
   printk("pool total size: %zu\n", pool->total_size);
 }
 
-void kr_pool_destroy(kr_pool *pool) {
-  if (pool == NULL) return;
-  munmap(pool->map, pool->total_size);
+int kr_pool_destroy(kr_pool *pool) {
+  int ret;
+  if (pool == NULL) return -1;
+  ret = munmap(pool->map, pool->total_size);
+  return ret;
 }
 
 kr_pool *kr_pool_create(kr_pool_setup *setup) {
