@@ -310,6 +310,7 @@ kr_transponder *kr_transponder_create(kr_transponder_setup *setup) {
   if (setup == NULL) return NULL;
   printk("Transponder: Creating");
   pool_setup.shared = 0;
+  pool_setup.overlay = NULL;
   pool_setup.overlay_sz = sizeof(kr_transponder);
   pool_setup.size = sizeof(kr_transponder_path);
   pool_setup.slices = setup->path_count;

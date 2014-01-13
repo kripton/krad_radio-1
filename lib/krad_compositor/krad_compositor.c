@@ -165,7 +165,6 @@ static void subunits_free(kr_compositor *com) {
   int i;
   i = 0;
   void *overlay;
-
   while ((overlay = kr_pool_iterate_active(com->sprite_pool, &i))) {
     kr_sprite_clear(overlay);
     kr_pool_recycle(com->sprite_pool, overlay);
@@ -174,71 +173,25 @@ static void subunits_free(kr_compositor *com) {
   }
   while ((overlay = kr_pool_iterate_active(com->vector_pool, &i))) {
   }
-
-  kr_pool_destroy(com->path_pool);
   kr_pool_destroy(com->sprite_pool);
   kr_pool_destroy(com->text_pool);
   kr_pool_destroy(com->vector_pool);
+  kr_pool_destroy(com->path_pool);
 }
 
 static void subunits_create(kr_compositor *compositor) {
   kr_pool_setup setup;
   setup.shared = 0;
   setup.overlay_sz = 0;
-
-  setup.size = kr_compositor_path_size();
-  setup.slices = KC_MAX_PORTS;
-  compositor->path_pool = kr_pool_create(&setup);
-
   setup.size = kr_sprite_size();
   setup.slices = KC_MAX_SPRITES;
   compositor->sprite_pool = kr_pool_create(&setup);
-
   setup.size = kr_text_size();
   setup.slices = KC_MAX_TEXTS;
   compositor->text_pool = kr_pool_create(&setup);
-
   setup.size = kr_vector_size();
   setup.slices = KC_MAX_VECTORS;
   compositor->vector_pool = kr_pool_create(&setup);
-
-  /*
-  TEMP
-  char *filename;
-  void *overlay;
-  int ret;
-  filename = "/home/oneman/images/krad_color_logo_trans2.png";
-  overlay = kr_pool_slice(compositor->sprite_pool);
-  if (overlay != NULL) {
-    ret = kr_sprite_open(overlay, filename);
-    if (ret) {
-      failfast("sprite open %s did not work", filename);
-    }
-  }
-
-  char *string;
-  char *font;
-  string = "Weee!";
-  font = "/home/oneman/.local/share/fonts/Inconsolata.otf";
-  //font = NULL;
-  overlay = kr_pool_slice(compositor->text_pool);
-  if (overlay != NULL) {
-    ret = kr_text_init(overlay, string, font, &compositor->ftlib);
-    if (ret) {
-      failfast("text init %s did not work", string);
-    }
-  }
-
-  char *vector_string;
-  vector_string = "viper";
-  overlay = kr_pool_slice(compositor->vector_pool);
-  if (overlay != NULL) {
-    ret = kr_vector_init(overlay, vector_string);
-    if (ret) {
-      failfast("text vector %s did not work", vector_string);
-    }
-  }
-  */
 }
 
 int kr_compositor_destroy(kr_compositor *com) {
@@ -247,16 +200,24 @@ int kr_compositor_destroy(kr_compositor *com) {
   subunits_free(com);
   FT_Done_FreeType(com->ftlib);
   kr_pool_destroy(com->image_pool);
-  free(com);
   printk("Compositor: Destroyed");
   return 0;
 }
 
 kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   kr_compositor *com;
+  kr_pool *pool;
+  kr_pool_setup pool_setup;
   if (setup == NULL) return NULL;
   printk("Compositor: Creating");
-  com = kr_allocz(1, sizeof(kr_compositor));
+  pool_setup.shared = 0;
+  pool_setup.overlay = NULL;
+  pool_setup.overlay_sz = sizeof(kr_compositor);
+  pool_setup.size = kr_compositor_path_size();
+  pool_setup.slices = KC_MAX_PORTS;
+  pool = kr_pool_create(&pool_setup);
+  com = kr_pool_overlay_get(pool);
+  memset(com, 0, sizeof(kr_compositor));
   com->user = setup->user;
   com->event_cb = setup->event_cb;
   resolution_set(com, setup->width, setup->height);

@@ -22,6 +22,7 @@
 #include <sys/epoll.h>
 
 #include "krad_app_server.h"
+#include "krad_pool.h"
 
 static kr_app_server *server_init(char *appname, char *sysname);
 static void update_pollfds(kr_app_server *server);
@@ -51,6 +52,7 @@ struct kr_app_server {
   struct pollfd sockets[KR_APP_SERVER_CLIENTS_MAX + 2];
   kr_app_server_client *sockets_clients[KR_APP_SERVER_CLIENTS_MAX + 2];
   kr_router *router;
+  kr_pool *client_pool;
 };
 
 struct kr_app_server_client {

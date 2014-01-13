@@ -828,6 +828,7 @@ kr_mixer *kr_mixer_create(kr_mixer_setup *setup) {
   if (setup == NULL) return NULL;
   printk("Mixer: Creating");
   pool_setup.shared = 0;
+  pool_setup.overlay = NULL;
   pool_setup.overlay_sz = sizeof(kr_mixer);
   pool_setup.size = sizeof(kr_mixer_path);
   pool_setup.slices = setup->path_count;
