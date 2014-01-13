@@ -29,6 +29,7 @@ static void web_event(kr_web_event *event) {
   switch (event->type) {
     case KR_WEB_CLIENT_CREATE:
       client_setup.fd = event->fd;
+      client_setup.output_cb = event->output_cb;
       kr_app_server_client_create(radio->app, &client_setup);
       break;
     default:

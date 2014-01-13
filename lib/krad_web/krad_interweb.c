@@ -55,7 +55,7 @@ int strmatch(char *string1, char *string2) {
 
 #include "socket.c"
 #include "websocket.c"
-#include "webrtc.c"
+//#include "webrtc.c"
 #include "setup.c"
 #include "header_out.c"
 #include "request.c"
@@ -73,7 +73,7 @@ int32_t krad_interweb_client_handle(kr_web_client *client) {
   }
   switch (client->type) {
     case KR_IWS_WS:
-      ret = web_ws_client_handle(client);
+      ret = websocket_client_handle(client);
       break;
     case KR_IWS_FILE:
       ret = web_file_client_handle(client);

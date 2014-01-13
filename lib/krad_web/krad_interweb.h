@@ -34,6 +34,7 @@ typedef struct kr_websocket_client kr_websocket_client;
 
 typedef struct kr_web_event kr_web_event;
 typedef void (kr_web_event_cb)(kr_web_event *);
+typedef int (kr_web_output_cb)(kr_io2_t *, uint8_t *buffer, size_t len);
 
 typedef struct kr_webrtc_user kr_webrtc_user;
 typedef struct kr_webrtc_signal kr_webrtc_signal;
@@ -46,8 +47,9 @@ typedef enum {
 
 struct kr_web_event {
   kr_web_event_type type;
-  int fd;
   void *user;
+  int fd;
+  kr_web_output_cb *output_cb;
 };
 
 struct kr_web_server_setup {

@@ -20,6 +20,7 @@
 #include <pthread.h>
 #include <ifaddrs.h>
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 #include <sys/signalfd.h>
 #include <sys/syscall.h>
 #include "krad_app_server.h"
@@ -45,6 +46,7 @@ struct kr_app_server {
   int socket_count;
   kr_app_server_client *current_client;
   int sfd;
+  int efd;
   uint64_t start_time;
   app_state state;
   krad_control_t control;
@@ -246,6 +248,18 @@ static kr_app_server_client *accept_client(kr_app_server *server) {
   return client;
 }
 
+static void get_new_client(kr_app_server *server) {
+  uint64_t u;
+  ssize_t s;
+  u = 0;
+  s = read(server->efd, &u, sizeof(uint64_t));
+  if (s != sizeof(uint64_t)) {
+    printke("App Server: Error reading from eventfd");
+    return;
+  }
+  printk("App Server: %"PRIu64" new client from ws", u);
+}
+
 static int setup_signals(kr_app_server *server) {
   int ret;
   sigset_t mask;
@@ -297,6 +311,10 @@ static int handle_app_events(kr_app_server *server) {
     if (fd == cfd) {
       printk("App Server: Shutdown from controller");
       server->state = KR_APP_DO_SHUTDOWN;
+    }
+    if (fd == server->efd) {
+      printk("App Server: Must be a new client from web!");
+      get_new_client(server);
     }
   }
   return 0;
@@ -435,25 +453,35 @@ static int setup_socket(char *appname, char *sysname) {
 }
 
 /*
-kr_app_server_client *kr_app_server_client_create(kr_app_server_client_setup *s) {
-  if (s == NULL) return NULL;
-  client = kr_allocz(1, sizeof(kr_app_server_client));
-  //callbacks for broadcasting/serial?
-  return client;
-}
-
-int kr_app_server_client_destroy(kr_app_server_client *client) {
-  if (client == NULL) return -1;
-  //disconnect them
-  free(client);
+int32_t json_hello(kr_web_client *client) {
+  char json[128];
+  snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
+   "\"info\":\"sysname\",\"infoval\":\"%s\"}]", client->server->sysname);
+  interweb_ws_pack(client->out, (uint8_t *)json, strlen(json));
   return 0;
 }
 */
+
 int kr_app_server_client_create(kr_app_server *server,
  kr_app_server_client_setup *setup) {
+  uint64_t u;
+  ssize_t s;
   if (server == NULL) return -1;
   if (setup == NULL) return -2;
+  if (server->num_clients == server->max_clients) {
+    printke("App Server: To many clients to add ws client %d", setup->fd);
+    return -1;
+  }
   printk("client add happen! fd is %d", setup->fd);
+
+  //add stuff to array of new client stuff
+
+  u = 1;
+  s = write(server->efd, &u, sizeof(uint64_t));
+  if (s != sizeof(uint64_t)) {
+    printke("App Server: Error writing to eventfd");
+    return -2;
+  }
   return 0;
 }
 
@@ -537,6 +565,9 @@ int kr_app_server_destroy(kr_app_server *server) {
   while ((client = kr_pool_iterate_active(server->client_pool, &i))) {
     disconnect_client(server, client);
   }
+  if (server->efd > -1) {
+    close(server->efd);
+  }
   if (server->app_pd > -1) {
     close(server->app_pd);
   }
@@ -590,6 +621,12 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
     kr_app_server_destroy(server);
     return NULL;
   }
+  server->efd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+  if (server->efd == -1) {
+    printke("App Server: efd evenfd created failed");
+    kr_app_server_destroy(server);
+    return NULL;
+  }
   server->app_pd = epoll_create1(EPOLL_CLOEXEC);
   if (server->app_pd == -1) {
     printke("App Server: app_pd epoll created failed");
@@ -607,21 +644,28 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   ev.data.fd = krad_controller_get_client_fd(&server->control);
   ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
   if (ret != 0) {
-    printke("App Server: epoll ctl app pd fail");
+    printke("App Server: epoll ctl add controller to app pd fail");
     kr_app_server_destroy(server);
     return NULL;
   }
   ev.data.fd = server->sd;
   ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
   if (ret != 0) {
-    printke("App Server: epoll ctl app pd 2 fail");
+    printke("App Server: epoll ctl add abstractsocket to app pd fail");
+    kr_app_server_destroy(server);
+    return NULL;
+  }
+  ev.data.fd = server->efd;
+  ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
+  if (ret != 0) {
+    printke("App Server: epoll ctl add efd to app_pd fail");
     kr_app_server_destroy(server);
     return NULL;
   }
   ev.data.ptr = server;
   ret = epoll_ctl(server->pd, EPOLL_CTL_ADD, server->app_pd, &ev);
   if (ret != 0) {
-    printke("App Server: epoll ctl pd failed");
+    printke("App Server: epoll ctl add apppd to pd failed");
     kr_app_server_destroy(server);
     return NULL;
   }

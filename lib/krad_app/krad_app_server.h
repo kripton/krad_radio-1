@@ -30,6 +30,7 @@ typedef struct kr_app_server_client_setup kr_app_server_client_setup;
 typedef struct kr_app_server kr_app_server;
 typedef struct kr_app_server_client kr_app_server_client;
 
+typedef int (kr_app_server_output_cb)(kr_io2_t *, uint8_t *buffer, size_t len);
 //typedef void (kr_app_server_client_destroy_cb)(void *);
 
 struct kr_app_server_setup {
@@ -44,6 +45,7 @@ struct kr_app_server_info {
 
 struct kr_app_server_client_setup {
   int fd;
+  kr_app_server_output_cb *output_cb;
 };
 
 int kr_app_server_client_create(kr_app_server *server,
