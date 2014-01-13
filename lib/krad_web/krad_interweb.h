@@ -50,6 +50,10 @@ struct kr_web_event {
   void *user;
   int fd;
   kr_web_output_cb *output_cb;
+  kr_io2_t *in;
+  kr_io2_t *out;
+  void *in_state_tracker;
+  size_t in_state_tracker_sz;
 };
 
 struct kr_web_server_setup {

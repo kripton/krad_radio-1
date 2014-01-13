@@ -135,7 +135,11 @@ static kr_web_client *accept_client(kr_web_server *server, int sd) {
 
 static void disconnect_client(kr_web_server *server, kr_web_client *client) {
   /*kr_webrtc_unregister(client);*/
-  close(client->sd);
+  if (client->sd != -1) {
+    close(client->sd);
+  } else {
+    printk("Web Server: looks like a app server client handoff");
+  }
   client->sd = 0;
   client->type = 0;
   client->drop_after_sync = 0;

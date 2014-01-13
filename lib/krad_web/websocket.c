@@ -7,7 +7,7 @@
 #define WS_PING_FRM 0x09  // 00001001
 #define WS_PONG_FRM 0x0a  // 00001010
 
-static int32_t unpack_frame_header(kr_web_client *client) {
+static int unpack_frame_header(kr_web_client *client) {
   kr_websocket_client *ws;
   uint8_t *size_bytes;
   uint8_t payload_sz_8;
@@ -250,6 +250,10 @@ int32_t app_client_event(kr_web_client *client) {
   server = client->server;
   event.type = KR_WEB_CLIENT_CREATE;
   event.fd = client->sd;
+  event.in = client->in;
+  event.out = client->out;
+  event.in_state_tracker = &client->ws;
+  event.in_state_tracker_sz = sizeof(kr_websocket_client);
   event.output_cb = websocket_pack;
   //event.input_cb = websocket_unpack;
   event.user = server->user;
@@ -274,6 +278,8 @@ int32_t handle_websocket_client(kr_web_client *client) {
   kr_io2_advance(client->out, pos);
   set_socket_nodelay(client->sd);
   app_client_event(client);
-  //printk("interweb_ws_shake happens");
-  return 0;
+  //return 0;
+  client->sd = -1;
+  /* -1 to get rid of client in web serv */
+  return -1;
 }

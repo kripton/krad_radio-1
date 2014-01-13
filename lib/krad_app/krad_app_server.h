@@ -45,6 +45,10 @@ struct kr_app_server_info {
 
 struct kr_app_server_client_setup {
   int fd;
+  kr_io2_t *in;
+  kr_io2_t *out;
+  void *in_state_tracker;
+  size_t in_state_tracker_sz;
   kr_app_server_output_cb *output_cb;
 };
 

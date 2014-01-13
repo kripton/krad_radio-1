@@ -45,6 +45,7 @@ struct kr_app_server {
   uint64_t max_clients;
   int socket_count;
   kr_app_server_client *current_client;
+  kr_app_server_client *new_clients[KR_APP_SERVER_CLIENTS_MAX];
   int sfd;
   int efd;
   uint64_t start_time;
@@ -61,6 +62,9 @@ struct kr_app_server_client {
   int local;
   kr_io2_t *in;
   kr_io2_t *out;
+  uint8_t in_state_tracker[1024];
+  size_t in_state_tracker_sz;
+  kr_app_server_output_cb *output_cb;
 };
 
 static int validate_client_header(uint8_t *header, size_t sz);
@@ -252,8 +256,13 @@ static kr_app_server_client *accept_client(kr_app_server *server) {
 }
 
 static void get_new_client(kr_app_server *server) {
+  struct epoll_event ev;
+  int i;
   uint64_t u;
   ssize_t s;
+  int ret;
+  kr_app_server_client *new_client;
+  kr_app_server_client *client;
   u = 0;
   s = read(server->efd, &u, sizeof(uint64_t));
   if (s != sizeof(uint64_t)) {
@@ -261,6 +270,43 @@ static void get_new_client(kr_app_server *server) {
     return;
   }
   printk("App Server: %"PRIu64" new client from ws", u);
+  if (u == 0) return;
+  client = NULL;
+  new_client = NULL;
+  for (i = 0; i < KR_APP_SERVER_CLIENTS_MAX; i++) {
+    if (server->new_clients[i] != NULL) {
+      new_client = server->new_clients[i];
+      break;
+    }
+  }
+  if (new_client == NULL) {
+    printke("App Server: No new client really :/");
+    return;
+  }
+  client = kr_pool_slice(server->client_pool);
+  if (client == NULL) {
+    printke("App Server: Overloaded2 can't accept client");
+    return;
+  }
+  memcpy(client, new_client, sizeof(kr_app_server_client));
+  memset(&ev, 0, sizeof(struct epoll_event));
+  ev.events = EPOLLIN;
+  if (kr_io2_want_out(client->out)) {
+    ev.events = EPOLLIN | EPOLLOUT;
+    printk("App Server: Yes we want out");
+  }
+  ev.data.ptr = client;
+  ret = epoll_ctl(server->pd, EPOLL_CTL_ADD, client->sd, &ev);
+  if (ret != 0) {
+    kr_pool_recycle(server->client_pool, client);
+    printke("App Server: Adding client to epoll after accept4 failed");
+    close(client->sd);
+    return;
+  }
+  server->num_clients++;
+  printk("App Server: Websocket client accepted");
+  free(new_client);
+  server->new_clients[i] = NULL;
 }
 
 static int setup_signals(kr_app_server *server) {
@@ -467,18 +513,41 @@ int32_t json_hello(kr_web_client *client) {
 
 int kr_app_server_client_create(kr_app_server *server,
  kr_app_server_client_setup *setup) {
+  int i;
   uint64_t u;
   ssize_t s;
+  kr_app_server_client *client;
   if (server == NULL) return -1;
   if (setup == NULL) return -2;
   if (server->num_clients == server->max_clients) {
     printke("App Server: To many clients to add ws client %d", setup->fd);
     return -1;
   }
+  client = NULL;
+  for (i = 0; i < KR_APP_SERVER_CLIENTS_MAX; i++) {
+    if (server->new_clients[i] == NULL) {
+      client = kr_allocz(1, sizeof(kr_app_server_client));
+      break;
+    }
+  }
+  if (client == NULL) {
+    printke("App Server: too many new clients");
+    return -3;
+  }
+  client->sd = setup->fd;
+  client->output_cb = setup->output_cb;
+  client->in_state_tracker_sz = setup->in_state_tracker_sz;
+  memcpy(client->in_state_tracker, setup->in_state_tracker, client->in_state_tracker_sz);
+  client->in = kr_io2_create();
+  client->out = kr_io2_create();
+  client->local = 0;
+  client->valid = 1;
+  kr_io2_pack(client->in, setup->in->buffer, setup->in->len);
+  kr_io2_pack(client->out, setup->out->buffer, setup->out->len);
+  kr_io2_set_fd(client->in, client->sd);
+  kr_io2_set_fd(client->out, client->sd);
+  server->new_clients[i] = client;
   printk("client add happen! fd is %d", setup->fd);
-
-  //add stuff to array of new client stuff
-
   u = 1;
   s = write(server->efd, &u, sizeof(uint64_t));
   if (s != sizeof(uint64_t)) {
@@ -495,10 +564,14 @@ int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
   if (crate == NULL) return -2;
   client = server->current_client;
   if (client == NULL) return -1;
-  ret = local_client_pack_crate(client->out->buf, crate, client->out->space);
-  if (ret > 0) {
-    kr_io2_advance(client->out, ret);
-    return 0;
+  if (client->local) {
+    ret = local_client_pack_crate(client->out->buf, crate, client->out->space);
+    if (ret > 0) {
+      kr_io2_advance(client->out, ret);
+      return 0;
+    }
+  } else {
+    printke("magic happen here");
   }
   return -1;
 }
