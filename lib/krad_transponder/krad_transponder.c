@@ -1,5 +1,8 @@
 #include "krad_transponder.h"
+#include "krad_pool.h"
 #include "krad_av.h"
+
+#define ADP_TEMP_MAX 128
 
 typedef union {
   void *exists;
@@ -22,8 +25,8 @@ struct kr_transponder {
   kr_mixer *mixer;
   kr_compositor *compositor;
   kr_transponder_info info;
-  kr_adapter *adapter[KR_XPDR_PATHS_MAX * 2];
-  kr_transponder_path *path[KR_XPDR_PATHS_MAX];
+  kr_adapter *adapter[ADP_TEMP_MAX]; /*FIXME size*/
+  kr_pool *path_pool;
   kr_adapter_monitor *adapter_mon;
   void *user;
   kr_transponder_event_cb *event_cb;
@@ -75,7 +78,7 @@ static kr_adapter *adapter_find(kr_xpdr *xpdr, kr_adapter_path_setup *ps) {
   /* V4L2 is single adapter path per adapter */
   if (ps->info.api == KR_ADP_V4L2) return NULL;
   //find adapter instance
-  for (i = 0; i < KR_XPDR_PATHS_MAX * 2; i++) {
+  for (i = 0; i < ADP_TEMP_MAX; i++) {
     if (xpdr->adapter[i] != NULL) {
       adapter = xpdr->adapter[i];
       if (kr_adapter_get_info(adapter, &info)) {
@@ -105,7 +108,7 @@ static kr_adapter *adapter_create(kr_xpdr *xpdr, kr_adapter_path_setup *ps) {
   if (ps->info.api == KR_ADP_V4L2) {
     adapter_setup.info.api_info.v4l2.dev = ps->info.info.v4l2.dev;
   }
-  for (i = 0; i < KR_XPDR_PATHS_MAX; i++) {
+  for (i = 0; i < ADP_TEMP_MAX; i++) {
     if (xpdr->adapter[i] == NULL) {
       adapter_setup.user = xpdr;
       adapter_setup.ev_cb = xpdr_adapter_event_cb;
@@ -157,6 +160,20 @@ static int path_info_check(kr_xpdr_path_info *info) {
   if (path_io_info_check(&info->input)) return -5;
   if (path_io_info_check(&info->output)) return -6;
   return 0;
+}
+
+static void path_io_destroy(kr_xpdr_path_io *io, kr_xpdr_path_io_type type) {
+  switch (type) {
+    case KR_XPDR_ADAPTER:
+      kr_adapter_unlink(io->adapter_path);
+      break;
+    case KR_XPDR_MIXER:
+      kr_mixer_unlink(io->mixer_path);
+      break;
+    case KR_XPDR_COMPOSITOR:
+      kr_compositor_unlink(io->compositor_path);
+      break;
+  }
 }
 
 static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
@@ -220,53 +237,31 @@ static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
   }
 }
 
+static void path_destroy(kr_xpdr_path *path) {
+  path_io_destroy(&path->input, path->info.input.type);
+  path_io_destroy(&path->output, path->info.output.type);
+}
+
 static int path_create(kr_xpdr_path *path, kr_xpdr_path_info *info, void *p) {
   memcpy(&path->info, info, sizeof(kr_transponder_path_info));
   path->user = p;
   path_io_create(path, &path->info.output);
-  /* FIXME hrmmm i think we need to create both and if in failed state owell*/
-  if (path->output.exists != NULL) {
-    path_io_create(path, &path->info.input);
-  }
+  path_io_create(path, &path->info.input);
   return 0;
 }
 
-static void path_io_destroy(kr_xpdr_path_io *io, kr_xpdr_path_io_type type) {
-  switch (type) {
-    case KR_XPDR_ADAPTER:
-      kr_adapter_unlink(io->adapter_path);
-      break;
-    case KR_XPDR_MIXER:
-      kr_mixer_unlink(io->mixer_path);
-      break;
-    case KR_XPDR_COMPOSITOR:
-      kr_compositor_unlink(io->compositor_path);
-      break;
-  }
-}
-
-static void path_destroy(kr_xpdr_path *path) {
-  if (path->input.exists != NULL) {
-    path_io_destroy(&path->input, path->info.input.type);
-  }
-  if (path->output.exists != NULL) {
-    path_io_destroy(&path->output, path->info.output.type);
-  }
-}
-
-static kr_xpdr_path *path_alloc(kr_transponder *xpdr) {
-  int i;
-  for (i = 0; i < KR_XPDR_PATHS_MAX; i++) {
-    if (xpdr->path[i] == NULL) {
-      xpdr->path[i] = calloc(1, sizeof(kr_transponder_path));
-      xpdr->path[i]->xpdr = xpdr;
-      return xpdr->path[i];
-    }
-  }
-  return NULL;
-}
-
 int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch) {
+  return -1;
+}
+
+int kr_transponder_unlink(kr_xpdr_path *path) {
+  kr_transponder *xpdr;
+  if (path == NULL) return -1;
+  xpdr = path->xpdr;
+  path_destroy(path);
+  xpdr->info.active_paths--;
+  kr_pool_recycle(xpdr->path_pool, path);
+  /* do event callback */
   return -1;
 }
 
@@ -275,7 +270,7 @@ int kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   kr_transponder_path *path;
   if ((x == NULL) || (i == NULL)) return -1;
   if (path_info_check(i)) return -2;
-  path = path_alloc(x);
+  path = kr_pool_slice(x->path_pool);
   if (path == NULL) return -3;
   ret = path_create(path, i, p);
   if (ret) return -4;
@@ -284,52 +279,43 @@ int kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   return 0;
 }
 
-int kr_transponder_unlink(kr_xpdr_path *path) {
-  int i;
-  kr_transponder *xpdr;
-  if (path == NULL) return -1;
-  xpdr = path->xpdr;
-  for (i = 0; i < KR_XPDR_PATHS_MAX; i++) {
-    if (xpdr->path[i] == path) {
-      path_destroy(path);
-      free(path);
-      xpdr->path[i] = NULL;
-      xpdr->info.active_paths--;
-      /* do event callback */
-      return 0;
-    }
-  }
-  return -1;
-}
-
 int kr_transponder_destroy(kr_transponder *xpdr) {
   int i;
   int ret;
+  kr_transponder_path *path;
   if (xpdr == NULL) return -1;
   printk("Krad Transponder: Destroy Started");
   kr_adapter_monitor_destroy(xpdr->adapter_mon);
-  for (i = 0; i < KR_XPDR_PATHS_MAX; i++) {
-    if (xpdr->path[i] != NULL) {
-      ret = kr_transponder_unlink(xpdr->path[i]);
-      if (ret) printke("trouble unlinking an path..");
-    }
+  i = 0;
+  while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
+    ret = kr_transponder_unlink(path);
+    if (ret) printke("trouble unlinking an path..");
   }
-  for (i = 0; i < KR_XPDR_PATHS_MAX * 2; i++) {
+  for (i = 0; i < ADP_TEMP_MAX; i++) {
     if (xpdr->adapter[i] != NULL) {
       ret = kr_adapter_destroy(xpdr->adapter[i]);
       if (ret) printke("trouble unlinking an adapter..");
       xpdr->adapter[i] = NULL;
     }
   }
-  free(xpdr);
+  kr_pool_destroy(xpdr->path_pool);
   printk("Krad Transponder: Destroy Completed");
   return 0;
 }
 
 kr_transponder *kr_transponder_create(kr_transponder_setup *setup) {
   kr_transponder *xpdr;
+  kr_pool *pool;
+  kr_pool_setup pool_setup;
   if (setup == NULL) return NULL;
-  xpdr = calloc(1, sizeof(kr_transponder));
+  pool_setup.shared = 0;
+  pool_setup.overlay_sz = sizeof(kr_transponder);
+  pool_setup.size = sizeof(kr_transponder_path);
+  pool_setup.slices = setup->path_count;
+  pool = kr_pool_create(&pool_setup);
+  xpdr = kr_pool_overlay_get(pool);
+  memset(xpdr, 0, sizeof(kr_transponder));
+  xpdr->path_pool = pool;
   xpdr->mixer = setup->mixer;
   xpdr->compositor = setup->compositor;
   xpdr->adapter_mon = kr_adapter_monitor_create();

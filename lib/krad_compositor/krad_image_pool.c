@@ -11,7 +11,7 @@ kr_image_pool *kr_image_pool_create(kr_image *image, size_t len) {
 }
 
 int kr_image_pool_getimage(kr_image_pool *image_pool, kr_image *image) {
-  kr_pool_get_overlay(image_pool, image);
+  kr_pool_overlay_copy(image_pool, image);
   image->px = kr_pool_slice(image_pool);
   if (image->px == NULL) return 0;
   image->ppx[0] = image->px;

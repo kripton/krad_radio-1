@@ -1,8 +1,6 @@
 #ifndef KRAD_TRANSPONDER_H
 #define KRAD_TRANSPONDER_H
 
-#define KR_XPDR_PATHS_MAX 32
-
 typedef struct kr_transponder kr_transponder;
 typedef struct kr_transponder_setup kr_transponder_setup;
 typedef struct kr_transponder_path kr_transponder_path;
@@ -40,13 +38,13 @@ struct kr_transponder_setup {
   kr_compositor *compositor;
   kr_transponder_event_cb *event_cb;
   void *user;
+  int path_count;
 };
 
-int kr_transponder_destroy(kr_transponder *transponder);
-kr_transponder *kr_transponder_create(kr_transponder_setup *setup);
-
+int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch);
 int kr_transponder_unlink(kr_xpdr_path *path);
 int kr_transponder_mkpath(kr_xpdr *xpdr, kr_xpdr_path_info *i, void *user);
-int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch);
+int kr_transponder_destroy(kr_transponder *transponder);
+kr_transponder *kr_transponder_create(kr_transponder_setup *setup);
 
 #endif

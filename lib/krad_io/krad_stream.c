@@ -7,7 +7,7 @@
 #include <netdb.h>
 #include <poll.h>
 #include <errno.h>
-
+#include <fcntl.h>
 #include "krad_stream.h"
 
 static void kr_stream_read_http_headers(kr_stream *stream);

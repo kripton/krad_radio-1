@@ -106,7 +106,7 @@ kr_radio *kr_radio_create(char *sysname) {
   strncpy(app_setup.sysname, sysname, sizeof(app_setup.sysname));
   radio->app = kr_app_server_create(&app_setup);
   if (radio->app) {
-    kr_mixer_setup_init(&mixer_setup);
+    mixer_setup.path_count = 32;
     mixer_setup.user = radio;
     mixer_setup.event_cb = mixer_event;
     radio->mixer = kr_mixer_create(&mixer_setup);
@@ -120,6 +120,7 @@ kr_radio *kr_radio_create(char *sysname) {
         transponder_setup.compositor = radio->compositor;
         transponder_setup.user = radio;
         transponder_setup.event_cb = xpdr_event;
+        transponder_setup.path_count = 32;
         /* FIXME need to enable adapter monitor after maps setup
          * so that we can pick up the adapter paths */
         radio->transponder = kr_transponder_create(&transponder_setup);

@@ -2,6 +2,8 @@
 #include "krad_radio_client.h"
 #include "krad_radio_client_internal.h"
 
+#include <ctype.h>
+
 #define LISTMAX 4096
 
 static int krad_radio_pid(char *sysname);

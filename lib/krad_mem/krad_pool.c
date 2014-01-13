@@ -89,7 +89,22 @@ void *kr_pool_iterate_type_state(kr_pool *pool, int *count) {
   return NULL;
 }
 */
-int kr_pool_get_overlay(kr_pool *pool, void *overlay) {
+
+void *kr_pool_overlay_get(kr_pool *pool) {
+  if (pool == NULL) return NULL;
+  if (pool->overlay == NULL) return NULL;
+  if (pool->overlay_sz == 0) return NULL;
+  return pool->overlay;
+}
+
+int kr_pool_overlay_set(kr_pool *pool, void *overlay) {
+  if (pool == NULL) return -1;
+  if (pool->overlay_sz == 0) return -2;
+  memcpy(pool->overlay, overlay, pool->overlay_sz);
+  return 0;
+}
+
+int kr_pool_overlay_copy(kr_pool *pool, void *overlay) {
   if ((pool == NULL) || (overlay == NULL)) return -2;
   if (pool->overlay == NULL) return -3;
   memcpy(overlay, pool->overlay, pool->overlay_sz);
@@ -191,12 +206,10 @@ void kr_pool_destroy(kr_pool *pool) {
 }
 
 kr_pool *kr_pool_create(kr_pool_setup *setup) {
-
   char filename[] = "/tmp/test-shm-XXXXXX";
   int fd;
   int flags;
   kr_pool pool;
-
   if (setup == NULL) return NULL;
   if (setup->slices == 0) return NULL;
   if (setup->slices > KR_POOL_MAX) return NULL;
@@ -247,9 +260,11 @@ kr_pool *kr_pool_create(kr_pool_setup *setup) {
   }
   close(fd);
   pool.data = pool.map + (pool.info_size + pool.overlay_actual_sz);
-  if (pool.overlay != NULL) {
+  if (pool.overlay_sz != 0) {
     pool.overlay = pool.map + pool.info_size;
-    memcpy(pool.overlay, setup->overlay, pool.overlay_sz);
+    if (setup->overlay != NULL) {
+      kr_pool_overlay_set(&pool, setup->overlay);
+    }
   }
   memcpy(pool.map, &pool, sizeof(kr_pool));
   return (kr_pool *)pool.map;
