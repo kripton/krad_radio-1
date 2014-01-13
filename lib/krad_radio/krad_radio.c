@@ -151,7 +151,7 @@ int kr_radio_destroy(kr_radio *radio) {
   if (radio == NULL) return -1;
   printk("Radio: Destroying");
   timer = kr_timer_alloca();
-  kr_timer_name_set(timer, "Shutdown");
+  kr_timer_name_set(timer, "Destroy");
   kr_timer_start(timer);
   if (radio->app != NULL) {
     kr_app_server_disable(radio->app);
@@ -181,7 +181,7 @@ int kr_radio_destroy(kr_radio *radio) {
     radio->app = NULL;
   }
   kr_timer_finish(timer);
-  printk("Radio took %"PRIu64"ms to shutdown", kr_timer_duration_ms(timer));
+  printk("Radio: Destroyed in %"PRIu64"ms", kr_timer_duration_ms(timer));
   free(radio);
   return 0;
 }

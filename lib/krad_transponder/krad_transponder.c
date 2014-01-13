@@ -284,7 +284,7 @@ int kr_transponder_destroy(kr_transponder *xpdr) {
   int ret;
   kr_transponder_path *path;
   if (xpdr == NULL) return -1;
-  printk("Transponder: Destroy Started");
+  printk("Transponder: Destroying");
   kr_adapter_monitor_destroy(xpdr->adapter_mon);
   i = 0;
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
@@ -299,7 +299,7 @@ int kr_transponder_destroy(kr_transponder *xpdr) {
     }
   }
   kr_pool_destroy(xpdr->path_pool);
-  printk("Transponder: Destroy Completed");
+  printk("Transponder: Destroyed");
   return 0;
 }
 
@@ -308,6 +308,7 @@ kr_transponder *kr_transponder_create(kr_transponder_setup *setup) {
   kr_pool *pool;
   kr_pool_setup pool_setup;
   if (setup == NULL) return NULL;
+  printk("Transponder: Creating");
   pool_setup.shared = 0;
   pool_setup.overlay_sz = sizeof(kr_transponder);
   pool_setup.size = sizeof(kr_transponder_path);
@@ -320,5 +321,6 @@ kr_transponder *kr_transponder_create(kr_transponder_setup *setup) {
   xpdr->compositor = setup->compositor;
   xpdr->adapter_mon = kr_adapter_monitor_create();
   kr_adapter_monitor_wait(xpdr->adapter_mon, 0);
+  printk("Transponder: Created");
   return xpdr;
 }

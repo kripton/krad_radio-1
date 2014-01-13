@@ -243,18 +243,19 @@ static void subunits_create(kr_compositor *compositor) {
 
 int kr_compositor_destroy(kr_compositor *com) {
   if (com == NULL) return -1;
-  printk("Compositor: Destroy Started");
+  printk("Compositor: Destroying");
   subunits_free(com);
   FT_Done_FreeType(com->ftlib);
   kr_pool_destroy(com->image_pool);
   free(com);
-  printk("Compositor: Destroy Complete");
+  printk("Compositor: Destroyed");
   return 0;
 }
 
 kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   kr_compositor *com;
   if (setup == NULL) return NULL;
+  printk("Compositor: Creating");
   com = kr_allocz(1, sizeof(kr_compositor));
   com->user = setup->user;
   com->event_cb = setup->event_cb;
@@ -267,6 +268,7 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   com->image.pps[0] = com->image.w * 4;
   com->image.fmt = PIX_FMT_RGB32;
   com->image_pool = kr_image_pool_create(&com->image, DEFAULT_COMPOSITOR_BUFFER_FRAMES);
+  printk("Compositor: Created");
   return com;
 }
 

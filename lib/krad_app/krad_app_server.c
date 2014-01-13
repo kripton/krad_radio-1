@@ -466,6 +466,7 @@ int kr_app_server_enable(kr_app_server *server) {
 kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   kr_app_server *server;
   kr_router_setup router_setup;
+  printk("App Server: Creating");
   server = server_init(setup->appname, setup->sysname);
   if (server == NULL) {
     return NULL;
@@ -475,5 +476,6 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   router_setup.user = server;
   router_setup.response = (kr_router_response_handler *)kr_app_server_crate_reply;
   server->router = kr_router_create(&router_setup);
+  printk("App Server: Created");
   return server;
 }

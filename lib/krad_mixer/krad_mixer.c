@@ -797,7 +797,7 @@ int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
 int kr_mixer_destroy(kr_mixer *mixer) {
   int i;
   kr_mixer_path *path;
-  printk("Mixer: shutdown started");
+  printk("Mixer: Destroying");
   i = 0;
   if (mixer->clock != NULL) {
     while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
@@ -817,7 +817,7 @@ int kr_mixer_destroy(kr_mixer *mixer) {
     /* FIXME maybe we need to wait maybe not well see (dobut it) */
   }
   kr_pool_destroy(mixer->path_pool);
-  printk("Mixer: shutdown complete");
+  printk("Mixer: Destroyed");
   return 0;
 }
 
@@ -826,6 +826,7 @@ kr_mixer *kr_mixer_create(kr_mixer_setup *setup) {
   kr_pool *pool;
   kr_pool_setup pool_setup;
   if (setup == NULL) return NULL;
+  printk("Mixer: Creating");
   pool_setup.shared = 0;
   pool_setup.overlay_sz = sizeof(kr_mixer);
   pool_setup.size = sizeof(kr_mixer_path);
@@ -845,5 +846,6 @@ kr_mixer *kr_mixer_create(kr_mixer_setup *setup) {
   mixer->avg_window_size = (mixer->sample_rate / 1000) * KR_MXR_RMS_WINDOW_MS;
   mixer->frames_per_peak_broadcast = 1536;
   /* end defaults */
+  printk("Mixer: Created");
   return mixer;
 }
