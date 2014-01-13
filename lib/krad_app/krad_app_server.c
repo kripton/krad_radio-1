@@ -116,6 +116,7 @@ static int pack_server_header(uint8_t *buffer, size_t max) {
 static int local_client_pack_crate(uint8_t *buffer, kr_crate2 *crate, size_t max) {
   kr_ebml2_t ebml;
   uint8_t *ebml_crate;
+  printk("crate packing");
   kr_ebml2_set_buffer(&ebml, buffer, max);
   //if (kr_crate2_valid(info) < 0) {
   // return -1;
@@ -459,6 +460,7 @@ int kr_app_server_client_destroy(kr_app_server_client *client) {
 
 int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
   int ret;
+  printk("crate response");
   kr_app_server_client *client;
   if (crate == NULL) return -2;
   client = server->current_client;

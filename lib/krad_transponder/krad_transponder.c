@@ -40,7 +40,7 @@ static kr_adapter *adapter_get(kr_xpdr *xpdr, kr_adapter_path_setup *ps);
 static int path_io_info_check(kr_xpdr_path_io_info *info);
 static int path_info_check(kr_xpdr_path_info *info);
 static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info);
-static int path_create(kr_xpdr_path *path, kr_xpdr_path_info *info, void *p);
+static int path_create(kr_xpdr_path *path);
 static void path_io_destroy(kr_xpdr_path_io *io, kr_xpdr_path_io_type type);
 static void path_destroy(kr_xpdr_path *path);
 
@@ -242,9 +242,7 @@ static void path_destroy(kr_xpdr_path *path) {
   path_io_destroy(&path->output, path->info.output.type);
 }
 
-static int path_create(kr_xpdr_path *path, kr_xpdr_path_info *info, void *p) {
-  memcpy(&path->info, info, sizeof(kr_transponder_path_info));
-  path->user = p;
+static int path_create(kr_xpdr_path *path) {
   path_io_create(path, &path->info.output);
   path_io_create(path, &path->info.input);
   return 0;
@@ -272,7 +270,10 @@ int kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   if (path_info_check(i)) return -2;
   path = kr_pool_slice(x->path_pool);
   if (path == NULL) return -3;
-  ret = path_create(path, i, p);
+  memcpy(&path->info, i, sizeof(kr_transponder_path_info));
+  path->xpdr = x;
+  path->user = p;
+  ret = path_create(path);
   if (ret) return -4;
   x->info.active_paths++;
   /* do event callback */
