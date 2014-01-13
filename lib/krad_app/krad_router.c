@@ -235,6 +235,9 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
   }
   while ((map = kr_pool_iterate_active(router->maps, &i))) {
     len = strlen(map->prefix + 1);
+
+    //printk(" %s - %s ", map->prefix + 1, sliced.slice[0]);
+
     if (((strlen(sliced.slice[0])) == len)
      && (memcmp(map->prefix + 1, sliced.slice[0], len) == 0)) {
       /*
@@ -303,12 +306,16 @@ int kr_router_map_destroy(kr_router *router, kr_router_map *map) {
 }
 
 kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setup) {
+  kr_router_map *map;
   if ((router == NULL) || (setup == NULL)) return NULL;
   //check all for null basically
-  void *slice;
-  slice = kr_pool_slice(router->maps);
-  if (slice == NULL) return NULL;
-  memcpy(slice, setup, sizeof(kr_router_map));
-  printk("Router: Added map for: %s", setup->prefix);
-  return slice;
+  map = (kr_router_map *)kr_pool_slice(router->maps);
+  if (map == NULL) return NULL;
+  strncpy(map->prefix, setup->prefix, sizeof(map->prefix));
+  map->ptr = setup->ptr;
+  map->create = setup->create;
+  map->patch = setup->patch;
+  map->destroy = setup->destroy;
+  printk("Router: Added map for: %s", map->prefix);
+  return map;
 }
