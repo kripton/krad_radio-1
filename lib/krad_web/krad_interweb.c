@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,16 +29,12 @@ static void web_server_update_pollfds(kr_web_server *server);
 static void *web_server_loop(void *arg);
 static void disconnect_client(kr_web_server *server, kr_web_client *client);
 static kr_web_client *accept_client(kr_web_server *server, int sd);
-uint32_t interweb_ws_pack_frame_header(uint8_t *out, uint32_t size);
 int32_t web_client_get_stream(kr_web_client *client);
 static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz);
 
 static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz) {
   kr_io2_pack(c->out, buffer, sz);
 }
-
-void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len);
-static int handle_json(kr_web_client *client, char *json, size_t len);
 
 int strmatch(char *string1, char *string2) {
   int len1;
@@ -56,10 +53,9 @@ int strmatch(char *string1, char *string2) {
   return 0;
 }
 
-#include "webrtc.c"
 #include "socket.c"
 #include "websocket.c"
-#include "json.c"
+#include "webrtc.c"
 #include "setup.c"
 #include "header_out.c"
 #include "request.c"
@@ -99,7 +95,7 @@ static kr_web_client *accept_client(kr_web_server *server, int sd) {
   int outsize;
   int i;
   struct sockaddr_un sin;
-  socklen_t sin_len;
+  socklen_t slen;
   client = NULL;
   outsize = MAX(server->api_js_len, server->html_len);
   outsize = MAX(outsize + server->deviface_js_len,
@@ -118,8 +114,9 @@ static kr_web_client *accept_client(kr_web_server *server, int sd) {
       return NULL;
     }
   }
-  sin_len = sizeof(sin);
-  client->sd = accept(sd, (struct sockaddr *)&sin, &sin_len);
+  slen = sizeof(sin);
+  client->sd = accept4(sd, (struct sockaddr *)&sin, &slen,
+   SOCK_NONBLOCK | SOCK_CLOEXEC);
   if (client->sd > -1) {
     krad_system_set_socket_nonblocking(client->sd);
     client->in = kr_io2_create();
@@ -137,12 +134,9 @@ static kr_web_client *accept_client(kr_web_server *server, int sd) {
 }
 
 static void disconnect_client(kr_web_server *server, kr_web_client *client) {
-  kr_webrtc_unregister(client);
+  /*kr_webrtc_unregister(client);*/
   close(client->sd);
   client->sd = 0;
-  if (client->ws.krclient != NULL) {
-    kr_client_destroy(&client->ws.krclient);
-  }
   client->type = 0;
   client->drop_after_sync = 0;
   client->hdr_le = 0;
@@ -170,18 +164,6 @@ static void web_server_update_pollfds(kr_web_server *server) {
       server->sockets[s].events = POLLIN;
       s++;
       server->socket_type[s] = KR_REMOTE_LISTEN;
-    }
-  }
-  for (c = 0; c < KR_WEB_KRCLIENTS_MAX; c++) {
-    if ((server->clients[c].sd > 0) && (server->clients[c].ws.krclient != NULL)) {
-      server->sockets[s].fd = kr_client_get_fd(server->clients[c].ws.krclient);
-      server->sockets[s].events = POLLIN;
-      //if (kr_io2_want_out (server->clients[c].out)) {
-      //  server->sockets[s].events |= POLLOUT;
-      //}
-      server->sockets_clients[s] = &server->clients[c];
-      server->socket_type[s] = KR_APP;
-      s++;
     }
   }
   for (c = 0; c < KR_WEB_CLIENTS_MAX; c++) {
@@ -232,12 +214,6 @@ static void *web_server_loop(void *arg) {
       if (server->sockets[s].revents) {
         ret--;
         client = server->sockets_clients[s];
-        if (server->socket_type[s] == KR_APP) {
-          if (server->sockets[s].revents & POLLIN) {
-            krad_delivery_handler(client);
-          }
-          continue;
-        }
         if (server->sockets[s].revents & POLLIN) {
           read_ret = kr_io2_read(client->in);
           if (read_ret > 0) {
@@ -342,6 +318,8 @@ kr_web_server *kr_web_server_create(kr_web_server_setup *setup) {
   server->headcode_source = setup->headcode;
   server->htmlheader_source = setup->htmlheader;
   server->htmlfooter_source = setup->htmlfooter;
+  server->event_cb = setup->event_cb;
+  server->user = setup->user;
   server->shutdown = KRAD_INTERWEB_STARTING;
   server->clients = kr_allocz(KR_WEB_CLIENTS_MAX, sizeof(kr_web_client));
   web_server_setup_html(server);

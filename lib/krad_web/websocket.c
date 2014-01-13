@@ -7,6 +7,9 @@
 #define WS_PING_FRM 0x09  // 00001001
 #define WS_PONG_FRM 0x0a  // 00001010
 
+uint32_t interweb_ws_pack_frame_header(uint8_t *out, uint32_t size);
+void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len);
+
 int32_t interweb_ws_parse_frame_header(kr_web_client *client) {
   kr_websocket_client *ws;
   uint8_t *size_bytes;
@@ -144,7 +147,11 @@ int32_t interweb_ws_parse_frame_data(kr_web_client *client) {
   }
   output[pos] = '\0';
   //printk("unmasked %d bytes %s", pos, (char *)output);
-  ret = handle_json(client, (char *)output, pos);
+  /* FIXME important bit */
+  //ret = handle_json(client, (char *)output, pos);
+  ret = -1;
+
+
   if (ret != 0) return -1;
   kr_io2_pulled(client->in, pos);
   if (ws->pos == ws->len) {
@@ -217,19 +224,13 @@ void interweb_ws_pack(kr_web_client *client, uint8_t *buffer, size_t len) {
 }
 
 int32_t interweb_ws_kr_client_connect(kr_web_client *client) {
-  client->ws.krclient = kr_client_create("websocket client");
-  if (client->ws.krclient == NULL) {
-    return -1;
-  }
-  if (!kr_connect(client->ws.krclient, client->server->sysname)) {
-    kr_client_destroy(&client->ws.krclient);
-    return -1;
-  }
-  //kr_mixer_info_get(client->ws.krclient);
-  //kr_mixer_portgroup_list (client->ws.krclient);
-  //kr_compositor_subunit_list (client->ws.krclient);
-  kr_subscribe_all(client->ws.krclient);
-  //printk("interweb_ws_kr_client_connect happens");
+  kr_web_server *server;
+  kr_web_event event;
+  server = client->server;
+  event.type = KR_WEB_CLIENT_CREATE;
+  event.fd = client->sd;
+  event.user = server->user;
+  server->event_cb(&event);
   return 0;
 }
 

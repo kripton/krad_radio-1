@@ -15,10 +15,27 @@ struct kr_radio {
   kr_app_server *app;
 };
 
-static int setup_maps(kr_radio *radio);
+static void web_event(kr_web_event *event);
 static void mixer_event(kr_mixer_event *event);
 static void compositor_event(kr_compositor_event *event);
 static void xpdr_event(kr_transponder_event *event);
+static int setup_maps(kr_radio *radio);
+
+static void web_event(kr_web_event *event) {
+  kr_radio *radio;
+  kr_app_server_client_setup client_setup;
+  radio = (kr_radio *)event->user;
+  printk("Radio: Web event");
+  switch (event->type) {
+    case KR_WEB_CLIENT_CREATE:
+      client_setup.fd = event->fd;
+      kr_app_server_client_create(radio->app, &client_setup);
+      break;
+    default:
+      printke("Radio: Bad event from Web Server");
+      break;
+  }
+}
 
 static void mixer_event(kr_mixer_event *event) {
   printk("Radio: Mixer event");
@@ -125,6 +142,8 @@ kr_radio *kr_radio_create(char *sysname) {
         if (radio->transponder) {
           memset(&web_setup, 0, sizeof(kr_web_server_setup));
           web_setup.sysname = sysname;
+          web_setup.event_cb = web_event;
+          web_setup.user = radio;
           srand(time(NULL));
           web_setup.port = 3000 + rand() % 32000;
           radio->web = kr_web_server_create(&web_setup);

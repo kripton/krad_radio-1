@@ -1,5 +1,3 @@
-#include "krad_interweb.h"
-
 void kr_webrtc_register(kr_web_client *client, char *name) {
   int i;
   char json[256];
@@ -106,5 +104,3 @@ void kr_webrtc_candidate(kr_web_client *client, char *to, char *from, char *cand
     }
   }
 }
-
-

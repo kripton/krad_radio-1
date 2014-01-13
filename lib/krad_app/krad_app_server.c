@@ -1,10 +1,10 @@
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 #include <signal.h>
 #include <time.h>
-#define _GNU_SOURCE
 #include <sys/utsname.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -17,7 +17,6 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <errno.h>
-#include <poll.h>
 #include <pthread.h>
 #include <ifaddrs.h>
 #include <sys/epoll.h>
@@ -42,6 +41,7 @@ struct kr_app_server {
   kr_pool *client_pool;
   kr_router *router;
   uint64_t num_clients;
+  uint64_t max_clients;
   int socket_count;
   kr_app_server_client *current_client;
   int sfd;
@@ -60,13 +60,6 @@ struct kr_app_server_client {
   kr_io2_t *in;
   kr_io2_t *out;
 };
-
-/*
-  struct kr_app_server_client_setup {
-  //callback for broadcast/serialize?
-  int coconut;
-};
-*/
 
 static int validate_client_header(uint8_t *header, size_t sz);
 static int pack_server_header(uint8_t *buffer, size_t max);
@@ -326,7 +319,6 @@ static void *server_loop(void *arg) {
       printke("App Server: Failed to setup signal handler");
     }
   }
-  server->state = KR_APP_RUNNING;
   while (server->state == KR_APP_RUNNING) {
     n = epoll_wait(server->pd, events, KR_APP_EVENTS_MAX, -1);
     if ((n < 1) || (server->state)) {
@@ -457,6 +449,13 @@ int kr_app_server_client_destroy(kr_app_server_client *client) {
   return 0;
 }
 */
+int kr_app_server_client_create(kr_app_server *server,
+ kr_app_server_client_setup *setup) {
+  if (server == NULL) return -1;
+  if (setup == NULL) return -2;
+  printk("client add happen! fd is %d", setup->fd);
+  return 0;
+}
 
 int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
   int ret;
@@ -518,6 +517,7 @@ int kr_app_server_enable(kr_app_server *server) {
   printk("App Server: Enabling");
   server->pid = getpid();
   server->tid = syscall(SYS_gettid);
+  server->state = KR_APP_RUNNING;
   pthread_create(&server->thread, NULL, server_loop, (void *)server);
   return 0;
 }
@@ -527,7 +527,7 @@ int kr_app_server_destroy(kr_app_server *server) {
   kr_app_server_client *client;
   if (server == NULL) return -1;
   printk("App Server: Destroying");
-  if (server->state != KR_APP_SHUTINGDOWN) {
+  if (server->state == KR_APP_RUNNING) {
     kr_app_server_disable(server);
   }
   if (server->sd != 0) {
@@ -580,6 +580,7 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   server->app_pd = -1;
   server->pd = -1;
   server->state = KR_APP_STARTING;
+  server->max_clients = KR_APP_SERVER_CLIENTS_MAX;
   /*
   server->user = setup->user;
   server->event_cb = setup->event_cb;

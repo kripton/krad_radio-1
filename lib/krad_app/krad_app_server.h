@@ -20,13 +20,13 @@
 #define KR_APP_DOCTYPE_VERSION KR_VERSION
 #define KR_APP_DOCTYPE_READ_VERSION KR_VERSION
 
-#define KR_APP_SERVER_CLIENTS_MAX 16
+#define KR_APP_SERVER_CLIENTS_MAX 32
 #define KR_APP_SERVER_BROADCASTS_MAX 128
 #define KR_APP_SERVER_BROADCASTERS_MAX 16
 
 typedef struct kr_app_server_setup kr_app_server_setup;
 typedef struct kr_app_server_info kr_app_server_info;
-//typedef struct kr_app_server_client_setup kr_app_server_client_setup;
+typedef struct kr_app_server_client_setup kr_app_server_client_setup;
 typedef struct kr_app_server kr_app_server;
 typedef struct kr_app_server_client kr_app_server_client;
 
@@ -42,10 +42,13 @@ struct kr_app_server_info {
   uint64_t uptime;
 };
 
-/*
-kr_app_server_client *kr_app_server_client_create(kr_app_server_client_setup *s);
-int kr_app_server_client_destroy(kr_app_server_client *client);
-*/
+struct kr_app_server_client_setup {
+  int fd;
+};
+
+int kr_app_server_client_create(kr_app_server *server,
+ kr_app_server_client_setup *setup);
+
 int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate);
 int kr_app_server_map_destroy(kr_app_server *server, kr_router_map *map);
 kr_router_map *kr_app_server_map_create(kr_app_server *server, kr_router_map_setup *setup);
