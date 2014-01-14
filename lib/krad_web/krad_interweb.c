@@ -36,6 +36,10 @@ static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz) {
   kr_io2_pack(c->out, buffer, sz);
 }
 
+static void web_server_pack_buffer2(kr_io2_t *io, uint8_t *buffer, size_t sz) {
+  kr_io2_pack(io, buffer, sz);
+}
+
 int strmatch(char *string1, char *string2) {
   int len1;
   if ((string1 == NULL) || (string2 == NULL)) {
@@ -62,6 +66,27 @@ int strmatch(char *string1, char *string2) {
 #include "stream.c"
 #include "file.c"
 
+int32_t http_app_client_handle(kr_web_client *client) {
+  kr_web_server *server;
+  kr_web_event event;
+  server = client->server;
+  event.type = KR_WEB_CLIENT_CREATE;
+  event.fd = client->sd;
+  kr_io2_restart(client->in);
+  kr_io2_pack(client->in, client->get + 4, strlen(client->get + 4));
+  event.in = client->in;
+  web_server_pack_headers(client, "text/json");
+  event.out = client->out;
+  event.in_state_tracker = NULL;
+  event.in_state_tracker_sz = 0;
+  event.output_cb = web_server_pack_buffer2;
+  //event.input_cb = websocket_unpack;
+  event.user = server->user;
+  server->event_cb(&event);
+  client->sd = -1;
+  return -1;
+}
+
 int32_t handle_client(kr_web_client *client) {
   int32_t ret;
   ret = -1;
@@ -77,6 +102,9 @@ int32_t handle_client(kr_web_client *client) {
       break;
     case KR_IWS_FILE:
       ret = web_file_client_handle(client);
+      break;
+    case KR_IWS_API:
+      ret = http_app_client_handle(client);
       break;
     case KR_IWS_STREAM_OUT:
       ret = web_stream_client_handle(client);

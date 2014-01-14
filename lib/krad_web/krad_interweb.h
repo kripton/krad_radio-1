@@ -122,7 +122,7 @@ enum kr_web_client_type {
   KR_IWS_FILE,
   KR_IWS_STREAM_IN,
   KR_IWS_STREAM_OUT,
-  KR_APP,
+  KR_IWS_API,
   KR_REMOTE_LISTEN,
 };
 

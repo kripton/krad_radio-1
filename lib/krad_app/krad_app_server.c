@@ -160,6 +160,25 @@ static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
   return 0;
 }
 
+static int web_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
+  int ret;
+  if (!(kr_io2_has_in(in))) {
+    return 0;
+  }
+  ret = kr_crate2_fr_json(in->rd_buf, crate, in->len);
+  ret = 45; /*streamer*/
+  if (ret == 0) {
+    char string[8192];
+    ret = kr_crate2_to_text(string, crate, sizeof(string));
+    if (ret > 0) {
+      printk("App Server: %"PRIu64" byte crate: (from json)\n%s\n", string);
+    }
+    //kr_io2_pulled(in, ebml.pos);
+    return 1;
+  }
+  return 0;
+}
+
 static int handle_client(kr_app_server *server, kr_app_server_client *client) {
   int ret;
   kr_crate2 crate;
@@ -173,6 +192,10 @@ static int handle_client(kr_app_server *server, kr_app_server_client *client) {
       while (local_client_get_crate(&crate, client->in)) {
         kr_router_handle(server->router, &crate);
       }
+    }
+  } else {
+    while (web_client_get_crate(&crate, client->in)) {
+      kr_router_handle(server->router, &crate);
     }
   }
   return 0;

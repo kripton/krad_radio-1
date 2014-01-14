@@ -99,9 +99,14 @@ int32_t handle_get(kr_web_client *client) {
     if ((strstr(buf, "GET ") != NULL) && (strstr(buf, " HTTP/1") != NULL)) {
       ret = copy_header(buf, client->get, sizeof(client->get), "GET ");
       if (ret < 0) return -1;
-      /*printk("GET IS %s", client->get);*/
-      if (!web_client_get_stream(client)) {
-        client->type = KR_IWS_FILE;
+      printk("GET IS %s", client->get);
+      if (strncmp("/api", client->get, 4) == 0) {
+         client->type = KR_IWS_API;
+         printk("Web Server: REST API Client");
+      } else {
+        if (!web_client_get_stream(client)) {
+          client->type = KR_IWS_FILE;
+        }
       }
       kr_io2_pulled(client->in, client->hdr_pos);
       return 0;

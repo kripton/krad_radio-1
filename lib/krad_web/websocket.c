@@ -244,7 +244,7 @@ int32_t websocket_unpack(kr_web_client *client) {
   return ret;
 }
 
-int32_t app_client_event(kr_web_client *client) {
+int32_t websocket_app_client(kr_web_client *client) {
   kr_web_server *server;
   kr_web_event event;
   server = client->server;
@@ -277,7 +277,7 @@ int32_t handle_websocket_client(kr_web_client *client) {
   pos += sprintf(buffer + pos, "\r\n");
   kr_io2_advance(client->out, pos);
   set_socket_nodelay(client->sd);
-  app_client_event(client);
+  websocket_app_client(client);
   //return 0;
   client->sd = -1;
   /* -1 to get rid of client in web serv */
