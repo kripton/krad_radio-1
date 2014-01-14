@@ -255,6 +255,14 @@ static kr_app_server_client *accept_client(kr_app_server *server) {
   return client;
 }
 
+int32_t json_hello(kr_app_server_client *client) {
+  char json[128];
+  snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
+   "\"info\":\"sysname\",\"infoval\":\"%s\"}]", "bongohat");
+  client->output_cb(client->out, (uint8_t *)json, strlen(json));
+  return 0;
+}
+
 static void get_new_client(kr_app_server *server) {
   struct epoll_event ev;
   int i;
@@ -291,6 +299,7 @@ static void get_new_client(kr_app_server *server) {
   memcpy(client, new_client, sizeof(kr_app_server_client));
   memset(&ev, 0, sizeof(struct epoll_event));
   ev.events = EPOLLIN;
+  json_hello(client);
   if (kr_io2_want_out(client->out)) {
     ev.events = EPOLLIN | EPOLLOUT;
     printk("App Server: Yes we want out");
@@ -500,16 +509,6 @@ static int setup_socket(char *appname, char *sysname) {
   listen(sd, SOMAXCONN);
   return sd;
 }
-
-/*
-int32_t json_hello(kr_web_client *client) {
-  char json[128];
-  snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
-   "\"info\":\"sysname\",\"infoval\":\"%s\"}]", client->server->sysname);
-  interweb_ws_pack(client->out, (uint8_t *)json, strlen(json));
-  return 0;
-}
-*/
 
 int kr_app_server_client_create(kr_app_server *server,
  kr_app_server_client_setup *setup) {
