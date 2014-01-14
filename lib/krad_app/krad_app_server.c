@@ -58,8 +58,7 @@ struct kr_app_server {
 
 struct kr_app_server_client {
   int sd;
-  int valid;
-  int local;
+  kr_app_client_type type;
   kr_io2_t *in;
   kr_io2_t *out;
   uint8_t in_state_tracker[1024];
@@ -67,18 +66,23 @@ struct kr_app_server_client {
   kr_app_server_output_cb *output_cb;
 };
 
-static int validate_client_header(uint8_t *header, size_t sz);
-static int pack_server_header(uint8_t *buffer, size_t max);
-static int local_client_pack_crate(uint8_t *buffer, kr_crate2 *crate, size_t max);
-static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in);
+static int validate_ebml_client_header(uint8_t *header, size_t sz);
+static int pack_ebml_server_header(uint8_t *buffer, size_t max);
+static int validate_ebml_client(kr_app_server_client *client);
+static int pack_crate_rest(uint8_t *buffer, kr_crate2 *crate, size_t max);
+static int pack_crate_websocket(uint8_t *buffer, kr_crate2 *crate, size_t max);
+static int pack_crate_ebml(uint8_t *buffer, kr_crate2 *crate, size_t max);
+static int unpack_crate_rest(kr_crate2 *crate, kr_io2_t *in);
+static int unpack_crate_websocket(kr_crate2 *crate, kr_io2_t *in);
+static int unpack_crate_ebml(kr_crate2 *crate, kr_io2_t *in);
 static int handle_client(kr_app_server *server, kr_app_server_client *client);
-static int validate_client(kr_app_server_client *client);
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client);
 static kr_app_server_client *accept_client(kr_app_server *server);
 static void *server_loop(void *arg);
+static int setup_signals(kr_app_server *server);
 static int setup_socket(char *appname, char *sysname);
 
-static int validate_client_header(uint8_t *header, size_t sz) {
+static int validate_ebml_client_header(uint8_t *header, size_t sz) {
   kr_ebml2_t ebml;
   int ret;
   char doctype[32];
@@ -104,7 +108,7 @@ static int validate_client_header(uint8_t *header, size_t sz) {
   return -1;
 }
 
-static int pack_server_header(uint8_t *buffer, size_t max) {
+static int pack_ebml_server_header(uint8_t *buffer, size_t max) {
   kr_ebml2_t ebml;
   kr_ebml2_set_buffer(&ebml, buffer, max);
   kr_ebml_pack_header(&ebml, KR_APP_SERVER_DOCTYPE, KR_APP_DOCTYPE_VERSION,
@@ -112,7 +116,35 @@ static int pack_server_header(uint8_t *buffer, size_t max) {
   return ebml.pos;
 }
 
-static int local_client_pack_crate(uint8_t *buffer, kr_crate2 *crate, size_t max) {
+static int validate_ebml_client(kr_app_server_client *client) {
+  int ret;
+  ret = validate_ebml_client_header(client->in->rd_buf, client->in->len);
+  if (ret > 0) {
+    kr_io2_pulled(client->in, ret);
+    client->type = KR_APP_EBML_VALID;
+    printk("client is valid");
+    ret = pack_ebml_server_header(client->out->buf, client->out->space);
+    if (ret < 1) {
+      printke("App Server: Error packing client header");
+    } else {
+      printk("packed server header %d", ret);
+      kr_io2_advance(client->out, ret);
+      return 1;
+    }
+  }
+  printke("App Server: Invalid client!");
+  return -1;
+}
+
+static int pack_crate_rest(uint8_t *buffer, kr_crate2 *crate, size_t max) {
+  return 45;
+}
+
+static int pack_crate_websocket(uint8_t *buffer, kr_crate2 *crate, size_t max) {
+  return 666; /* :| */
+}
+
+static int pack_crate_ebml(uint8_t *buffer, kr_crate2 *crate, size_t max) {
   kr_ebml2_t ebml;
   uint8_t *ebml_crate;
   printk("crate packing");
@@ -126,7 +158,45 @@ static int local_client_pack_crate(uint8_t *buffer, kr_crate2 *crate, size_t max
   return ebml.pos;
 }
 
-static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
+static int unpack_crate_rest(kr_crate2 *crate, kr_io2_t *in) {
+  int ret;
+  if (!(kr_io2_has_in(in))) {
+    return 0;
+  }
+  //ret = kr_crate2_fr_json(in->rd_buf, crate, in->len);
+  ret = 45; /*streamer*/
+  if (ret == 0) {
+    char string[8192];
+    ret = kr_crate2_to_text(string, crate, sizeof(string));
+    if (ret > 0) {
+      printk("App Server: %"PRIu64" byte crate: (from json+rest)\n%s\n", string);
+    }
+    //kr_io2_pulled(in, ebml.pos);
+    return 1;
+  }
+  return 0;
+}
+
+static int unpack_crate_websocket(kr_crate2 *crate, kr_io2_t *in) {
+  int ret;
+  if (!(kr_io2_has_in(in))) {
+    return 0;
+  }
+  //ret = kr_crate2_fr_json(in->rd_buf, crate, in->len);
+  ret = 45; /*streamer*/
+  if (ret == 0) {
+    char string[8192];
+    ret = kr_crate2_to_text(string, crate, sizeof(string));
+    if (ret > 0) {
+      printk("App Server: %"PRIu64" byte crate: (from json+websocket)\n%s\n", string);
+    }
+    //kr_io2_pulled(in, ebml.pos);
+    return 1;
+  }
+  return 0;
+}
+
+static int unpack_crate_ebml(kr_crate2 *crate, kr_io2_t *in) {
   kr_ebml2_t ebml;
   uint32_t element;
   uint64_t size;
@@ -160,65 +230,40 @@ static int local_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
   return 0;
 }
 
-static int web_client_get_crate(kr_crate2 *crate, kr_io2_t *in) {
-  int ret;
-  if (!(kr_io2_has_in(in))) {
-    return 0;
-  }
-  ret = kr_crate2_fr_json(in->rd_buf, crate, in->len);
-  ret = 45; /*streamer*/
-  if (ret == 0) {
-    char string[8192];
-    ret = kr_crate2_to_text(string, crate, sizeof(string));
-    if (ret > 0) {
-      printk("App Server: %"PRIu64" byte crate: (from json)\n%s\n", string);
-    }
-    //kr_io2_pulled(in, ebml.pos);
-    return 1;
-  }
-  return 0;
-}
-
 static int handle_client(kr_app_server *server, kr_app_server_client *client) {
   int ret;
   kr_crate2 crate;
-  if (client->local) {
-    if (!client->valid) {
-      ret = validate_client(client);
+  switch (client->type) {
+    case KR_APP_REST:
+      while (unpack_crate_rest(&crate, client->in)) {
+        kr_router_handle(server->router, &crate);
+      }
+      break;
+    case KR_APP_WEBSOCKET:
+      while (unpack_crate_websocket(&crate, client->in)) {
+        kr_router_handle(server->router, &crate);
+      }
+      break;
+    case KR_APP_EBML_VALID:
+      while (unpack_crate_ebml(&crate, client->in)) {
+        kr_router_handle(server->router, &crate);
+      }
+      break;
+    case KR_APP_EBML_NEW:
+      ret = validate_ebml_client(client);
       if (ret != 1) {
         return 1;
       }
-    } else {
-      while (local_client_get_crate(&crate, client->in)) {
-        kr_router_handle(server->router, &crate);
-      }
-    }
-  } else {
-    while (web_client_get_crate(&crate, client->in)) {
-      kr_router_handle(server->router, &crate);
-    }
+      break;
+    default:
+      printke("App Server: Unimplmented protocal type");
+      return -1;
+  }
+  if (ret > 0) {
+    kr_io2_advance(client->out, ret);
+    return 0;
   }
   return 0;
-}
-
-static int validate_client(kr_app_server_client *client) {
-  int ret;
-  ret = validate_client_header(client->in->rd_buf, client->in->len);
-  if (ret > 0) {
-    kr_io2_pulled(client->in, ret);
-    client->valid = 1;
-    printk("client is valid");
-    ret = pack_server_header(client->out->buf, client->out->space);
-    if (ret < 1) {
-      printke("App Server: Error packing client header");
-    } else {
-      printk("packed server header %d", ret);
-      kr_io2_advance(client->out, ret);
-      return 1;
-    }
-  }
-  printke("App Server: Invalid client!");
-  return -1;
 }
 
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client) {
@@ -267,8 +312,7 @@ static kr_app_server_client *accept_client(kr_app_server *server) {
     close(client->sd);
     return NULL;
   }
-  client->local = 1;
-  client->valid = 0;
+  client->type = KR_APP_EBML_NEW;
   client->in = kr_io2_create();
   client->out = kr_io2_create();
   kr_io2_set_fd(client->in, client->sd);
@@ -279,6 +323,7 @@ static kr_app_server_client *accept_client(kr_app_server *server) {
 }
 
 int32_t json_hello(kr_app_server_client *client) {
+  /* current js expects this and it makes the rack load */
   char json[128];
   snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
    "\"info\":\"sysname\",\"infoval\":\"%s\"}]", "bongohat");
@@ -286,7 +331,7 @@ int32_t json_hello(kr_app_server_client *client) {
   return 0;
 }
 
-static void get_new_client(kr_app_server *server) {
+static void accept_web_client(kr_app_server *server) {
   struct epoll_event ev;
   int i;
   uint64_t u;
@@ -341,32 +386,6 @@ static void get_new_client(kr_app_server *server) {
   server->new_clients[i] = NULL;
 }
 
-static int setup_signals(kr_app_server *server) {
-  int ret;
-  sigset_t mask;
-  struct epoll_event ev;
-  printk("App Server: Was run from a thread so we handle signals");
-  sigemptyset(&mask);
-  sigfillset(&mask);
-  if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0) {
-    printke("App Server: Could not set signal mask!");
-    return -1;
-  }
-  server->sfd = signalfd(-1, &mask, SFD_CLOEXEC | SFD_NONBLOCK);
-  if (server->sfd == -1) {
-    return -1;
-  }
-  memset(&ev, 0, sizeof(struct epoll_event));
-  ev.events = EPOLLIN;
-  ev.data.fd = server->sfd;
-  ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
-  if (ret != 0) {
-    printke("App Server: epoll ctl app pd sfd fail");
-    return -1;
-  }
-  return 0;
-}
-
 static int handle_app_events(kr_app_server *server) {
   int cfd;
   int fd;
@@ -395,7 +414,7 @@ static int handle_app_events(kr_app_server *server) {
     }
     if (fd == server->efd) {
       printk("App Server: Must be a new client from web!");
-      get_new_client(server);
+      accept_web_client(server);
     }
   }
   return 0;
@@ -431,8 +450,6 @@ static void *server_loop(void *arg) {
       printk("App Server: Got client event");
       client = events[i].data.ptr;
       server->current_client = client;
-      //switch (events[i].events) {
-      //  case EPOLLIN:
       if (events[i].events & EPOLLIN) {
           ret = kr_io2_read(client->in);
           if (ret > 0) {
@@ -467,7 +484,6 @@ static void *server_loop(void *arg) {
           }
       }
       if (events[i].events & EPOLLOUT) {
-//        case EPOLLOUT:
           printk("App Server: EPOLLOUT");
           ret = kr_io2_output(client->out);
           if (ret != 0) {
@@ -485,13 +501,11 @@ static void *server_loop(void *arg) {
           }
       }
       if (events[i].events & EPOLLHUP) {
-      //  case EPOLLHUP:
           printk("App Server: EPOLLHUP");
           disconnect_client(server, client);
           continue;
       }
       if (events[i].events & EPOLLERR) {
-//        case EPOLLERR:
           printke("App Server: EPOLLERR");
           disconnect_client(server, client);
           continue;
@@ -502,6 +516,32 @@ static void *server_loop(void *arg) {
   krad_controller_client_close(&server->control);
   printk("App Server: Mainloop exits");
   return NULL;
+}
+
+static int setup_signals(kr_app_server *server) {
+  int ret;
+  sigset_t mask;
+  struct epoll_event ev;
+  printk("App Server: Was run from a thread so we handle signals");
+  sigemptyset(&mask);
+  sigfillset(&mask);
+  if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0) {
+    printke("App Server: Could not set signal mask!");
+    return -1;
+  }
+  server->sfd = signalfd(-1, &mask, SFD_CLOEXEC | SFD_NONBLOCK);
+  if (server->sfd == -1) {
+    return -1;
+  }
+  memset(&ev, 0, sizeof(struct epoll_event));
+  ev.events = EPOLLIN;
+  ev.data.fd = server->sfd;
+  ret = epoll_ctl(server->app_pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
+  if (ret != 0) {
+    printke("App Server: epoll ctl app pd sfd fail");
+    return -1;
+  }
+  return 0;
 }
 
 static int setup_socket(char *appname, char *sysname) {
@@ -562,8 +602,7 @@ int kr_app_server_client_create(kr_app_server *server,
   memcpy(client->in_state_tracker, setup->in_state_tracker, client->in_state_tracker_sz);
   client->in = kr_io2_create();
   client->out = kr_io2_create();
-  client->local = 0;
-  client->valid = 1;
+  client->type = setup->type;
   kr_io2_pack(client->in, setup->in->buffer, setup->in->len);
   kr_io2_pack(client->out, setup->out->buffer, setup->out->len);
   kr_io2_set_fd(client->in, client->sd);
@@ -586,14 +625,24 @@ int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
   if (crate == NULL) return -2;
   client = server->current_client;
   if (client == NULL) return -1;
-  if (client->local) {
-    ret = local_client_pack_crate(client->out->buf, crate, client->out->space);
-    if (ret > 0) {
-      kr_io2_advance(client->out, ret);
-      return 0;
-    }
-  } else {
-    printke("magic happen here");
+  ret = 0;
+  switch (client->type) {
+    case KR_APP_REST:
+      ret = pack_crate_rest(client->out->buf, crate, client->out->space);
+      break;
+    case KR_APP_WEBSOCKET:
+      ret = pack_crate_websocket(client->out->buf, crate, client->out->space);
+      break;
+    case KR_APP_EBML_VALID:
+      ret = pack_crate_ebml(client->out->buf, crate, client->out->space);
+      break;
+    default:
+      printke("App Server: Unimplmented protocal type");
+      break;
+  }
+  if (ret > 0) {
+    kr_io2_advance(client->out, ret);
+    return 0;
   }
   return -1;
 }

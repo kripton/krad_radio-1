@@ -43,10 +43,20 @@ struct kr_app_server_info {
   uint64_t uptime;
 };
 
+typedef enum {
+  KR_APP_EBML_NEW = 1,
+  KR_APP_EBML_VALID,
+  KR_APP_WEBSOCKET,
+  KR_APP_REST,
+  KR_APP_CBOR,
+  KR_APP_DBUS
+} kr_app_client_type;
+
 struct kr_app_server_client_setup {
   int fd;
   kr_io2_t *in;
   kr_io2_t *out;
+  kr_app_client_type type;
   void *in_state_tracker;
   size_t in_state_tracker_sz;
   kr_app_server_output_cb *output_cb;

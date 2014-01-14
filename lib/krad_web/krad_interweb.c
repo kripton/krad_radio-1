@@ -67,6 +67,7 @@ int strmatch(char *string1, char *string2) {
 #include "file.c"
 
 int32_t http_app_client_handle(kr_web_client *client) {
+  /* need to add client type or cb for proto */
   kr_web_server *server;
   kr_web_event event;
   server = client->server;
