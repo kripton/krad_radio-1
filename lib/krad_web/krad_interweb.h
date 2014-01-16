@@ -17,8 +17,7 @@
 
 #define MAX_REMOTES 16
 #define KR_WEB_CLIENTS_MAX 64
-#define KR_WEB_KRCLIENTS_MAX 64
-#define KR_MAX_SDS KR_WEB_CLIENTS_MAX + KR_WEB_KRCLIENTS_MAX + MAX_REMOTES + 1
+#define KR_MAX_SDS KR_WEB_CLIENTS_MAX + MAX_REMOTES + 1
 #define KR_WEBRTC_NAME_MAX 64
 
 enum krad_interweb_shutdown {
@@ -33,8 +32,29 @@ typedef struct kr_web_server_setup kr_web_server_setup;
 typedef struct kr_web_client kr_web_client;
 typedef struct kr_websocket_client kr_websocket_client;
 
+typedef struct kr_web_event kr_web_event;
+typedef void (kr_web_event_cb)(kr_web_event *);
+typedef int (kr_web_output_cb)(kr_io2_t *, uint8_t *buffer, size_t len);
+
 typedef struct kr_webrtc_user kr_webrtc_user;
 typedef struct kr_webrtc_signal kr_webrtc_signal;
+
+typedef enum {
+  KR_WEB_CLIENT_CREATE = 1,
+  KR_WEB_STREAM_MONKEY,
+  KR_WEB_BONGO_COCONUT
+} kr_web_event_type;
+
+struct kr_web_event {
+  kr_web_event_type type;
+  void *user;
+  int fd;
+  kr_web_output_cb *output_cb;
+  kr_io2_t *in;
+  kr_io2_t *out;
+  void *in_state_tracker;
+  size_t in_state_tracker_sz;
+};
 
 struct kr_web_server_setup {
   char *sysname;
@@ -42,6 +62,8 @@ struct kr_web_server_setup {
   char *headcode;
   char *htmlheader;
   char *htmlfooter;
+  void *user;
+  kr_web_event_cb *event_cb;
 };
 
 struct kr_webrtc_user {
@@ -75,6 +97,8 @@ struct kr_web_server {
   struct pollfd sockets[KR_MAX_SDS];
   int32_t socket_type[KR_MAX_SDS];
   kr_web_client *sockets_clients[KR_MAX_SDS];
+  void *user;
+  kr_web_event_cb *event_cb;
   int32_t uberport;
   char *headcode_source;
   char *htmlheader_source;
@@ -98,7 +122,7 @@ enum kr_web_client_type {
   KR_IWS_FILE,
   KR_IWS_STREAM_IN,
   KR_IWS_STREAM_OUT,
-  KR_APP,
+  KR_IWS_API,
   KR_REMOTE_LISTEN,
 };
 
@@ -122,10 +146,8 @@ struct kr_websocket_client {
   uint8_t *output;
   uint32_t output_len;
   uint64_t frames;
-  uint32_t shaked;
   char key[96];
   char proto[96];
-  kr_client *krclient;
 };
 
 struct kr_web_client {

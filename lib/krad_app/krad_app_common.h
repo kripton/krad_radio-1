@@ -9,6 +9,8 @@
 
 #include "gen/krad_app_common_to_ebml.h"
 #include "gen/krad_app_common_from_ebml.h"
+#include "gen/krad_app_common_to_json.h"
+#include "gen/krad_app_common_from_json.h"
 #include "gen/krad_app_common_to_text.h"
 #include "gen/krad_app_common_helpers.h"
 

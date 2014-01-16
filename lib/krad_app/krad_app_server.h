@@ -20,16 +20,17 @@
 #define KR_APP_DOCTYPE_VERSION KR_VERSION
 #define KR_APP_DOCTYPE_READ_VERSION KR_VERSION
 
-#define KR_APP_SERVER_CLIENTS_MAX 16
+#define KR_APP_SERVER_CLIENTS_MAX 32
 #define KR_APP_SERVER_BROADCASTS_MAX 128
 #define KR_APP_SERVER_BROADCASTERS_MAX 16
 
 typedef struct kr_app_server_setup kr_app_server_setup;
 typedef struct kr_app_server_info kr_app_server_info;
-//typedef struct kr_app_server_client_setup kr_app_server_client_setup;
+typedef struct kr_app_server_client_setup kr_app_server_client_setup;
 typedef struct kr_app_server kr_app_server;
 typedef struct kr_app_server_client kr_app_server_client;
 
+typedef int (kr_app_server_output_cb)(kr_io2_t *, uint8_t *buffer, size_t len);
 //typedef void (kr_app_server_client_destroy_cb)(void *);
 
 struct kr_app_server_setup {
@@ -42,10 +43,28 @@ struct kr_app_server_info {
   uint64_t uptime;
 };
 
-/*
-kr_app_server_client *kr_app_server_client_create(kr_app_server_client_setup *s);
-int kr_app_server_client_destroy(kr_app_server_client *client);
-*/
+typedef enum {
+  KR_APP_EBML_NEW = 1,
+  KR_APP_EBML_VALID,
+  KR_APP_WEBSOCKET,
+  KR_APP_REST,
+  KR_APP_CBOR,
+  KR_APP_DBUS
+} kr_app_client_type;
+
+struct kr_app_server_client_setup {
+  int fd;
+  kr_io2_t *in;
+  kr_io2_t *out;
+  kr_app_client_type type;
+  void *in_state_tracker;
+  size_t in_state_tracker_sz;
+  kr_app_server_output_cb *output_cb;
+};
+
+int kr_app_server_client_create(kr_app_server *server,
+ kr_app_server_client_setup *setup);
+
 int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate);
 int kr_app_server_map_destroy(kr_app_server *server, kr_router_map *map);
 kr_router_map *kr_app_server_map_create(kr_app_server *server, kr_router_map_setup *setup);

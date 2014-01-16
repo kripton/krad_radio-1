@@ -1,10 +1,14 @@
-int32_t krad_interweb_client_find_end_of_headers(kr_web_client *client) {
+void debug_print_headers(kr_web_client *client) {
+  char *headers;
+  headers = (char *)client->in->rd_buf;
+  printk("Headers length: %d", client->hdr_pos);
+  printk("%s", headers);
+}
 
+int32_t find_end_of_client_headers(kr_web_client *client) {
   int i;
   uint8_t *buf;
-
   buf = client->in->rd_buf;
-
   for (i = 0; i < client->in->len; i++) {
     if ((buf[i] == '\n') || (buf[i] == '\r')) {
       if (client->hdr_pos != (i - 1)) {
@@ -24,22 +28,10 @@ int32_t krad_interweb_client_find_end_of_headers(kr_web_client *client) {
   return 0;
 }
 
-void debug_print_headers(kr_web_client *client) {
-
-  char *headers;
-
-  headers = (char *)client->in->rd_buf;
-
-  printk("Headers length: %d", client->hdr_pos);
-  printk("%s", headers);
-}
-
-int32_t interweb_header(char *buf, char *out, uint32_t max, char *header) {
-
+int32_t copy_header(char *buf, char *out, uint32_t max, char *header) {
   char *pos;
   int32_t len;
   int32_t hdr_len;
-
   hdr_len = strlen(header);
   pos = strstr(buf, header) + hdr_len;
   if (pos == NULL) {
@@ -49,16 +41,12 @@ int32_t interweb_header(char *buf, char *out, uint32_t max, char *header) {
   len = MIN(len, max - 1);
   memcpy(out, pos, len);
   out[len] = '\0';
-
   return 0;
 }
 
-int32_t krad_interweb_client_parse_verb(kr_web_client *client) {
-
+int32_t identify_method(kr_web_client *client) {
   uint8_t *buf;
-
   buf = client->in->rd_buf;
-
   if (client->hdr_pos < 8) return -1;
   if (memcmp(buf, "GET ", 4) == 0) {
     client->verb = KR_IWS_GET;
@@ -88,55 +76,52 @@ int32_t krad_interweb_client_parse_verb(kr_web_client *client) {
     client->verb = KR_IWS_OPTIONS;
     return 0;
   }
-
   return -1;
 }
 
-int32_t krad_interweb_client_parse_get_request(kr_web_client *client) {
-
+int32_t handle_get(kr_web_client *client) {
   char *buf;
   int32_t ret;
-
   buf = (char *)client->in->rd_buf;
-
   if (strstr(buf, "Upgrade: websocket") != NULL) {
-    ret = interweb_header(buf, client->get, sizeof(client->get), "GET ");
+    ret = copy_header(buf, client->get, sizeof(client->get), "GET ");
     if (ret < 0) return -1;
-    ret = interweb_header(buf, client->ws.key, sizeof(client->ws.key),
+    ret = copy_header(buf, client->ws.key, sizeof(client->ws.key),
      "Sec-WebSocket-Key: ");
     if (ret < 0) return -1;
-    ret = interweb_header (buf, client->ws.proto, sizeof(client->ws.proto),
+    ret = copy_header(buf, client->ws.proto, sizeof(client->ws.proto),
      "Sec-WebSocket-Protocol: ");
     if (ret < 0) return -1;
     client->type = KR_IWS_WS;
-    kr_io2_pulled (client->in, client->hdr_pos + 1);
+    kr_io2_pulled(client->in, client->hdr_pos + 1);
     return 0;
   } else {
     if ((strstr(buf, "GET ") != NULL) && (strstr(buf, " HTTP/1") != NULL)) {
-      ret = interweb_header(buf, client->get, sizeof(client->get), "GET ");
+      ret = copy_header(buf, client->get, sizeof(client->get), "GET ");
       if (ret < 0) return -1;
-      /*printk("GET IS %s", client->get);*/
-      if (!web_client_get_stream(client)) {
-        client->type = KR_IWS_FILE;
+      printk("GET IS %s", client->get);
+      if (strncmp("/api", client->get, 4) == 0) {
+         client->type = KR_IWS_API;
+         printk("Web Server: REST API Client");
+      } else {
+        if (!web_client_get_stream(client)) {
+          client->type = KR_IWS_FILE;
+        }
       }
       kr_io2_pulled(client->in, client->hdr_pos);
       return 0;
     }
   }
-
   return -1;
 }
 
-int32_t krad_interweb_client_parse_put_request(kr_web_client *client) {
-
+int32_t handle_put(kr_web_client *client) {
   char *buf;
   int32_t mount_len;
   char *mount_start;
-
   mount_start = NULL;
   mount_len = 0;
   buf = (char *)client->in->rd_buf;
-
   switch (client->verb) {
     case KR_IWS_PUT:
       mount_start = buf + 4;
@@ -154,45 +139,40 @@ int32_t krad_interweb_client_parse_put_request(kr_web_client *client) {
   memcpy(client->mount, mount_start, mount_len);
   client->type = KR_IWS_STREAM_IN;
   printk("Source/Put client mount is: %s", client->mount);
-
   return 0;
 }
 
-int32_t parse_post_request(kr_web_client *client) {
+int32_t handle_post(kr_web_client *client) {
   return 0;
 }
 
-int32_t krad_interweb_client_handle_request(kr_web_client *client) {
-
+int32_t handle_unknown_client(kr_web_client *client) {
   int32_t ret;
-
   if (!client->hdrs_recvd) {
-    if (krad_interweb_client_find_end_of_headers(client)) {
-      ret = krad_interweb_client_parse_verb(client);
+    if (find_end_of_client_headers(client)) {
+      ret = identify_method(client);
       if (ret < 0) return -1;
       debug_print_headers(client);
       switch (client->verb) {
         case KR_IWS_GET:
-          ret = krad_interweb_client_parse_get_request(client);
+          ret = handle_get(client);
           return ret;
         case KR_IWS_POST:
-          ret = parse_post_request(client);
+          ret = handle_post(client);
           return ret;
         case KR_IWS_SOURCE: /* Fallin thru */
         case KR_IWS_PUT:
-          ret = krad_interweb_client_parse_put_request(client);
+          ret = handle_put(client);
           return ret;
         default:
           return -1;
       }
     }
   }
-
   if ((!client->hdrs_recvd) && (client->in->len >= 4096)) {
-    printk("Krad Interweb no header end in sight after %d bytes",
+    printk("Web Server: No end to headers in sight after %d bytes",
      client->in->len);
     return -1;
   }
-
   return 0;
 }

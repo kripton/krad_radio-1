@@ -8,6 +8,8 @@
 
 #include "gen/krad_radio_payload_to_ebml.h"
 #include "gen/krad_radio_payload_from_ebml.h"
+#include "gen/krad_radio_payload_to_json.h"
+#include "gen/krad_radio_payload_from_json.h"
 #include "gen/krad_radio_payload_to_text.h"
 #include "gen/krad_radio_payload_helpers.h"
 

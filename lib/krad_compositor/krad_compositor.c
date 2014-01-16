@@ -176,7 +176,6 @@ static void subunits_free(kr_compositor *com) {
   kr_pool_destroy(com->sprite_pool);
   kr_pool_destroy(com->text_pool);
   kr_pool_destroy(com->vector_pool);
-  kr_pool_destroy(com->path_pool);
 }
 
 static void subunits_create(kr_compositor *compositor) {
@@ -200,6 +199,7 @@ int kr_compositor_destroy(kr_compositor *com) {
   subunits_free(com);
   FT_Done_FreeType(com->ftlib);
   kr_pool_destroy(com->image_pool);
+  kr_pool_destroy(com->path_pool);
   printk("Compositor: Destroyed");
   return 0;
 }
@@ -218,6 +218,7 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   pool = kr_pool_create(&pool_setup);
   com = kr_pool_overlay_get(pool);
   memset(com, 0, sizeof(kr_compositor));
+  com->path_pool = pool;
   com->user = setup->user;
   com->event_cb = setup->event_cb;
   resolution_set(com, setup->width, setup->height);
