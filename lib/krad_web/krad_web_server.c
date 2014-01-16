@@ -165,9 +165,9 @@ int handle_rest_api(kr_web_client *client) {
   event.in = client->in;
   pack_http_header(client, "application/json");
   event.out = client->out;
-  event.in_state_tracker = NULL;
-  event.in_state_tracker_sz = 0;
-  event.output_cb = kr_io2_pack;
+  event.state_tracker = NULL;
+  event.state_tracker_sz = 0;
+  //event.output_cb = kr_io2_pack;
   //event.input_cb = websocket_unpack;
   event.user = server->user;
   server->event_cb(&event);

@@ -7,18 +7,16 @@
 #define WS_PING_FRM 0x09  // 00001001
 #define WS_PONG_FRM 0x0a  // 00001010
 
-static int unpack_frame_header(kr_web_client *client) {
-  kr_websocket_tracker *ws;
+ssize_t unpack_frame_header(kr_websocket_tracker *ws, void *out, size_t max, void *in, size_t len) {
   uint8_t *size_bytes;
   uint8_t payload_sz_8;
   uint64_t payload_sz_64;
   uint16_t payload_sz_16;
-  int32_t bytes_read;
+  int bytes_read;
   uint8_t frame_type;
   bytes_read = 0;
-  ws = &client->ws;
-  ws->input_len = client->in->len;
-  ws->input = client->in->rd_buf;
+  ws->input = in;
+  ws->input_len = len;
   if (ws->input_len < 6) {
     return 0;
   }
@@ -109,52 +107,71 @@ static int unpack_frame_header(kr_web_client *client) {
     return -10;
   }
   ws->pos = 0;
-  //printk("payload size is %"PRIu64"", ws->len);
-  kr_io2_pulled(client->in, bytes_read);
+  printk("payload size is %"PRIu64"", ws->len);
+  //kr_io2_pulled(client->in, bytes_read);
   return bytes_read;
 }
 
-static int32_t unpack_frame_data(kr_web_client *client) {
-  kr_websocket_tracker *ws;
-  int32_t ret;
-  int32_t pos;
-  int32_t max;
-  uint8_t output[4096];
-  ws = &client->ws;
-  ws->input_len = client->in->len;
-  ws->input = client->in->rd_buf;
+ssize_t unpack_frame_data(kr_websocket_tracker *ws, void *out, size_t maxout, void *in, size_t len) {
+  int pos;
+  int max;
+  ws->input = in;
+  ws->input_len = len;
   if (ws->input_len < ws->len) {
-    printk("Incomplete WS frame: %u / %"PRIu64"", ws->input_len,
-     ws->len);
+    printk("Incomplete WS frame: %u / %"PRIu64"", ws->input_len, ws->len);
     return 0;
   }
-  ws->output = output;
-  ws->output_len = sizeof(output);
+  ws->output = out;
+  ws->output_len = maxout;
   pos = 0;
   if ((ws->len == 0) || (ws->pos == ws->len) || (ws->input_len == 0) ||
       (ws->output_len == 0)) {
     return 0;
   }
   max = MIN(MIN((ws->len - ws->pos), ws->input_len), ws->output_len);
-  //printk ("max is %d", max);
   for (pos = 0; pos < max; pos++) {
     ws->output[pos] = ws->input[ws->pos] ^ ws->mask[ws->pos % 4];
     ws->pos++;
   }
-  output[pos] = '\0';
+  ws->output[pos] = '\0'; /* FIXME this could be overflow pos */
   //printk("unmasked %d bytes %s", pos, (char *)output);
-  /* FIXME important bit */
-  //ret = handle_json(client, (char *)output, pos);
-  ret = -1;
-
-
-  if (ret != 0) return -1;
-  kr_io2_pulled(client->in, pos);
   if (ws->pos == ws->len) {
     ws->len = 0;
     ws->pos = 0;
   }
   return pos;
+}
+
+ssize_t websocket_unpack(void *ctx, void *out, size_t max, void *in, size_t len) {
+  kr_websocket_tracker *ws;
+  int ret;
+  int bytes_read;
+  if (len < 1) return -1;
+  if (max < len) return -2;
+  if (ctx == NULL) return -3;
+  if (out == NULL) return -4;
+  if (in == NULL) return -5;
+  bytes_read = 0;
+  ws = (kr_websocket_tracker *)ctx;
+  if (ws->len == 0) {
+    ret = unpack_frame_header(ws, out, max, in, len);
+    if (ret < 1) {
+      return ret;
+    } else {
+      printk("frame header %d", ret);
+      bytes_read += ret;
+      in += ret;
+      len -= ret;
+    }
+  }
+  if (ws->len > 0) {
+    ret = unpack_frame_data(ws, out, max, in, len);
+    if (ret > 0) {
+      printk("frame data %d", ret);
+      bytes_read += ret;
+    }
+  }
+  return bytes_read;
 }
 
 static uint32_t pack_frame_header(uint8_t *out, uint32_t size) {
@@ -190,42 +207,24 @@ static uint32_t pack_frame_header(uint8_t *out, uint32_t size) {
   }
 }
 
-int websocket_pack(kr_io2_t *out, void *buffer, size_t len) {
+ssize_t websocket_pack(void *ctx, void *out, size_t max, void *in, size_t len) {
   uint32_t header_len;
+  uint32_t total_len;
   uint8_t header[10];
-  if (len > 0) {
-    header_len = pack_frame_header(header, len);
-    if (out->space >= (header_len + len)) {
-      kr_io2_pack(out, header, header_len);
-      kr_io2_pack(out, buffer, len);
-      return 0;
-    } else {
-      printke("Websocket client: No space to pack buffer");
-    }
+  if (len < 1) return -1;
+  if (max < len) return -2;
+  if (ctx == NULL) return -3;
+  if (out == NULL) return -4;
+  if (in == NULL) return -5;
+  header_len = pack_frame_header(header, len);
+  total_len = header_len + len;
+  if (max < total_len) {
+    printke("Websocket client: No space to pack buffer");
+    return -6;
   }
-  return -1;
-}
-
-int websocket_unpack(kr_web_client *client) {
-  int ret;
-  for (;;) {
-    if (client->ws.len == 0) {
-      ret = unpack_frame_header(client);
-      if (ret < 0) {
-        break;
-      }
-    }
-    if (client->ws.len > 0) {
-      ret = unpack_frame_data(client);
-      if (ret <= 0) {
-        break;
-      }
-    } else {
-      ret = 0;
-      break;
-    }
-  }
-  return ret;
+  memcpy(out, header, header_len);
+  memcpy(out + header_len, in, len);
+  return total_len;
 }
 
 static int build_accept_key(char *resp, char *key) {
@@ -251,10 +250,10 @@ int websocket_app_client(kr_web_client *client) {
   event.fd = client->sd;
   event.in = client->in;
   event.out = client->out;
-  event.in_state_tracker = &client->ws;
-  event.in_state_tracker_sz = sizeof(kr_websocket_tracker);
+  event.state_tracker = &client->ws;
+  event.state_tracker_sz = sizeof(kr_websocket_tracker);
   event.output_cb = websocket_pack;
-  //event.input_cb = websocket_unpack;
+  event.input_cb = websocket_unpack;
   event.user = server->user;
   server->event_cb(&event);
   return 0;

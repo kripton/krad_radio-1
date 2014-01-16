@@ -61,8 +61,8 @@ struct kr_app_server_client {
   kr_app_client_type type;
   kr_io2_t *in;
   kr_io2_t *out;
-  uint8_t in_state_tracker[1024];
-  size_t in_state_tracker_sz;
+  uint8_t state_tracker[256];
+  size_t state_tracker_sz;
   kr_app_server_io_cb *input_cb;
   kr_app_server_io_cb *output_cb;
 };
@@ -74,7 +74,7 @@ static int pack_crate_rest(uint8_t *buffer, kr_crate2 *crate, size_t max);
 static int pack_crate_websocket(uint8_t *buffer, kr_crate2 *crate, size_t max);
 static int pack_crate_ebml(uint8_t *buffer, kr_crate2 *crate, size_t max);
 static int unpack_crate_rest(kr_crate2 *crate, kr_io2_t *in);
-static int unpack_crate_websocket(kr_crate2 *crate, kr_io2_t *in);
+static int unpack_crate_websocket(kr_crate2 *crate, kr_app_server_client *client);
 static int unpack_crate_ebml(kr_crate2 *crate, kr_io2_t *in);
 static int handle_client(kr_app_server *server, kr_app_server_client *client);
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client);
@@ -185,12 +185,19 @@ static int unpack_crate_rest(kr_crate2 *crate, kr_io2_t *in) {
   return 0;
 }
 
-static int unpack_crate_websocket(kr_crate2 *crate, kr_io2_t *in) {
+static int unpack_crate_websocket(kr_crate2 *crate, kr_app_server_client *client) {
   int ret;
-  if (!(kr_io2_has_in(in))) {
+  char json[8192];
+  printk("unpack crate websocket");
+  if (!(kr_io2_has_in(client->in))) {
     return 0;
   }
-  ret = kr_crate2_fr_json((char *)in->rd_buf, crate);
+  ret = client->input_cb(&client->state_tracker, json, sizeof(json), client->in->rd_buf, client->in->len);
+  printk("input bytes: %d", ret);
+  if (ret < 1) return 0;
+  kr_io2_pulled(client->in, ret);
+  printk("Trying: \n%s\n", json);
+  ret = kr_crate2_fr_json(json, crate);
   if (ret > 0) {
     char string[8192];
     ret = kr_crate2_to_text(string, crate, sizeof(string));
@@ -198,8 +205,9 @@ static int unpack_crate_websocket(kr_crate2 *crate, kr_io2_t *in) {
       printk("App Server: %"PRIu64" byte crate: (from json+websocket)\n%s\n", ret);
       printk("%s",string);
     }
-    //kr_io2_pulled(in, ebml.pos);
     return 1;
+  } else {
+    printk("Misunderstood: \n%s\n", json);
   }
   return 0;
 }
@@ -248,7 +256,7 @@ static int handle_client(kr_app_server *server, kr_app_server_client *client) {
       }
       break;
     case KR_APP_WEBSOCKET:
-      while (unpack_crate_websocket(&crate, client->in)) {
+      while (unpack_crate_websocket(&crate, client)) {
         kr_router_handle(server->router, &crate);
       }
       break;
@@ -332,11 +340,17 @@ static kr_app_server_client *accept_client(kr_app_server *server) {
 
 int32_t json_hello(kr_app_server_client *client) {
   /* current js expects this and it makes the rack load */
+  ssize_t ret;
   char json[128];
   snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
    "\"info\":\"sysname\",\"infoval\":\"%s\"}]", "bongohat");
-  client->output_cb(client->out, (uint8_t *)json, strlen(json));
-  return 0;
+  ret = client->output_cb(client->state_tracker, client->out->buf, client->out->space, (uint8_t *)json, strlen(json));
+  if (ret > 0) {
+    kr_io2_advance(client->out, ret);
+    return 0;
+  } else {
+    return -1;
+  }
 }
 
 static void accept_web_client(kr_app_server *server) {
@@ -591,7 +605,11 @@ int kr_app_server_client_create(kr_app_server *server,
   if (setup == NULL) return -2;
   if (server->num_clients == server->max_clients) {
     printke("App Server: To many clients to add ws client %d", setup->fd);
-    return -1;
+    return -3;
+  }
+  if (setup->state_tracker_sz > sizeof(client->state_tracker)) {
+    printke("App Server: Client state tracker size to large!");
+    return -4;
   }
   client = NULL;
   for (i = 0; i < KR_APP_SERVER_CLIENTS_MAX; i++) {
@@ -602,12 +620,13 @@ int kr_app_server_client_create(kr_app_server *server,
   }
   if (client == NULL) {
     printke("App Server: too many new clients");
-    return -3;
+    return -5;
   }
   client->sd = setup->fd;
+  client->input_cb = setup->input_cb;
   client->output_cb = setup->output_cb;
-  client->in_state_tracker_sz = setup->in_state_tracker_sz;
-  memcpy(client->in_state_tracker, setup->in_state_tracker, client->in_state_tracker_sz);
+  client->state_tracker_sz = setup->state_tracker_sz;
+  memcpy(client->state_tracker, setup->state_tracker, client->state_tracker_sz);
   client->in = kr_io2_create();
   client->out = kr_io2_create();
   client->type = setup->type;

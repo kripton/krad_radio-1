@@ -28,11 +28,13 @@ static void web_event(kr_web_event *event) {
   printk("Radio: Web event");
   switch (event->type) {
     case KR_WEB_CLIENT_CREATE:
+      client_setup.type = KR_APP_WEBSOCKET;
       client_setup.in = event->in;
       client_setup.out = event->out;
-      client_setup.in_state_tracker = event->in_state_tracker;
-      client_setup.in_state_tracker_sz = event->in_state_tracker_sz;
+      client_setup.state_tracker = event->state_tracker;
+      client_setup.state_tracker_sz = event->state_tracker_sz;
       client_setup.fd = event->fd;
+      client_setup.input_cb = event->input_cb;
       client_setup.output_cb = event->output_cb;
       kr_app_server_client_create(radio->app, &client_setup);
       break;

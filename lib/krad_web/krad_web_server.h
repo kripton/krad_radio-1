@@ -30,17 +30,18 @@ typedef struct kr_web_server kr_web_server;
 typedef struct kr_web_server_setup kr_web_server_setup;
 typedef struct kr_web_event kr_web_event;
 typedef void (kr_web_event_cb)(kr_web_event *);
-typedef int (kr_web_output_cb)(kr_io2_t *, void *buffer, size_t len);
+typedef ssize_t (kr_web_io_cb)(void *ctx, void *out, size_t max, void *in, size_t len);
 
 struct kr_web_event {
   kr_web_event_type type;
   void *user;
   int fd;
-  kr_web_output_cb *output_cb;
+  void *state_tracker;
+  size_t state_tracker_sz;
   kr_io2_t *in;
   kr_io2_t *out;
-  void *in_state_tracker;
-  size_t in_state_tracker_sz;
+  kr_web_io_cb *input_cb;
+  kr_web_io_cb *output_cb;
 };
 
 struct kr_web_server_setup {
