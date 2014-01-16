@@ -33,8 +33,8 @@ enum krad_interweb_shutdown {
 };
 
 enum kr_web_client_type {
-  KR_WS_UNKNOWN = 0,
-  KR_WS_WS,
+  KR_WS_HTTP = 0,
+  KR_WS_WEBSOCKET,
   KR_WS_FILE,
   KR_WS_STREAM_IN,
   KR_WS_STREAM_OUT,
@@ -177,14 +177,14 @@ int http_app_client_handle(kr_web_client *client) {
 static int handle_client(kr_web_client *client) {
   int ret;
   ret = -1;
-  if (client->type == KR_WS_UNKNOWN) {
-    ret = handle_unknown_client(client);
-    if (client->type == KR_WS_UNKNOWN) {
+  if (client->type == KR_WS_HTTP) {
+    ret = handle_http_request(client);
+    if (client->type == KR_WS_HTTP) {
       return ret;
     }
   }
   switch (client->type) {
-    case KR_WS_WS:
+    case KR_WS_WEBSOCKET:
       ret = handle_websocket_client(client);
       break;
     case KR_WS_FILE:

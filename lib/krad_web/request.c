@@ -5,7 +5,7 @@ void debug_print_headers(kr_web_client *client) {
   printk("%s", headers);
 }
 
-int find_end_of_client_headers(kr_web_client *client) {
+int find_end_of_request_headers(kr_web_client *client) {
   int i;
   uint8_t *buf;
   buf = client->in->rd_buf;
@@ -90,7 +90,7 @@ int handle_get(kr_web_client *client) {
     if (ret < 0) return -1;
     ret = copy_header(client->ws.proto, headers, "Sec-WebSocket-Protocol: ", sizeof(client->ws.proto));
     if (ret < 0) return -1;
-    client->type = KR_WS_WS;
+    client->type = KR_WS_WEBSOCKET;
     kr_io2_pulled(client->in, client->hdr_pos + 1);
     return 0;
   } else {
@@ -144,10 +144,10 @@ int handle_post(kr_web_client *client) {
   return 0;
 }
 
-int handle_unknown_client(kr_web_client *client) {
+int handle_http_request(kr_web_client *client) {
   int ret;
   if (!client->hdrs_recvd) {
-    if (find_end_of_client_headers(client)) {
+    if (find_end_of_request_headers(client)) {
       ret = identify_method(client);
       if (ret < 0) return -1;
       switch (client->verb) {
