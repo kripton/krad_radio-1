@@ -13,9 +13,9 @@ int handle_get_file(kr_web_client *client) {
   char *address;
   kr_web_server *s;
   s = client->server;
-  address = client->address;
+  address = client->http.address;
   if (address[0] == '/') {
-    address = client->address + 1;
+    address = address + 1;
   }
   len = strlen(address);
   for (;;) {
@@ -41,6 +41,6 @@ int handle_get_file(kr_web_client *client) {
     pack_http_404_response(client);
     break;
   }
-  client->drop_after_sync = 1;
+  client->http.drop_after_sync = 1;
   return 0;
 }

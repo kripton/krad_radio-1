@@ -1,9 +1,9 @@
 int find_stream(kr_web_client *client) {
-  if (strncmp(client->address, "/fakestream.bs", 14) == 0) {
+  if (strncmp(client->http.address, "/fakestream.bs", 14) == 0) {
     client->type = KR_WS_GET_STREAM;
     return 1;
   } else {
-    printk("Web Server: Checking for stream %s ... nope", client->address);
+    printk("Web Server: Checking for stream %s ... nope", client->http.address);
   }
   return 0;
 }

@@ -32,7 +32,7 @@ enum krad_interweb_shutdown {
   KR_WEB_SERVER_SHUTINGDOWN,
 };
 
-enum kr_web_client_type {
+typedef enum {
   KR_WS_HTTP = 0,
   KR_WS_WEBSOCKET,
   KR_WS_GET_FILE,
@@ -42,7 +42,7 @@ enum kr_web_client_type {
   KR_WS_PUT_STREAM,
   KR_WS_REST_API,
   KR_REMOTE_LISTEN,
-};
+} kr_web_client_type;
 
 typedef enum {
   KR_WS_NONE = 0,
@@ -56,6 +56,7 @@ typedef enum {
 } kr_http_method;
 
 typedef struct kr_web_client kr_web_client;
+typedef struct kr_http_tracker kr_http_tracker;
 typedef struct kr_websocket_client kr_websocket_client;
 
 struct kr_web_server {
@@ -103,19 +104,22 @@ struct kr_websocket_client {
   char proto[96];
 };
 
-struct kr_web_client {
-  int32_t sd;
-  kr_web_server *server;
-  kr_io2_t *in;
-  kr_io2_t *out;
-  /*  kr_webrtc_user webrtc_user; */
-  int32_t drop_after_sync;
-  int32_t type;
-  uint32_t hdr_le;
-  uint32_t hdr_pos;
+struct kr_http_tracker {
+  uint32_t header_endstate;
+  uint32_t header_pos;
   uint32_t got_headers;
   kr_http_method method;
   char address[128];
+  int32_t drop_after_sync;
+};
+
+struct kr_web_client {
+  int sd;
+  kr_web_server *server;
+  kr_io2_t *in;
+  kr_io2_t *out;
+  kr_web_client_type type;
+  kr_http_tracker http;
   kr_websocket_client ws;
 };
 
@@ -160,7 +164,7 @@ int http_app_client_handle(kr_web_client *client) {
   event.type = KR_WEB_CLIENT_CREATE;
   event.fd = client->sd;
   kr_io2_restart(client->in);
-  kr_io2_pack(client->in, (uint8_t *)(client->address), strlen(client->address));
+  kr_io2_pack(client->in, (uint8_t *)(client->http.address), strlen(client->http.address));
   event.in = client->in;
   pack_http_header(client, "application/json");
   event.out = client->out;
@@ -218,17 +222,9 @@ static void disconnect_client(kr_web_server *server, kr_web_client *client) {
   } else {
     printk("Web Server: looks like a app server client handoff");
   }
-  client->sd = 0;
-  client->type = 0;
-  client->drop_after_sync = 0;
-  client->hdr_le = 0;
-  client->hdr_pos = 0;
-  client->got_headers = 0;
-  client->method = 0;
-  memset(&client->ws, 0, sizeof(kr_websocket_client));
-  memset(client->address, 0, sizeof(client->address));
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
+  memset(client, 0, sizeof(*client));
   printk("Web Server: Client Disconnected");
 }
 
@@ -368,7 +364,7 @@ static void *web_server_loop(void *arg) {
             continue;
           }
           if (!(kr_io2_want_out (client->out))) {
-            if (client->drop_after_sync == 1) {
+            if (client->http.drop_after_sync == 1) {
               disconnect_client(server, client);
               continue;
             }
