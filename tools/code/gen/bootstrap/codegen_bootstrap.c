@@ -1,18 +1,21 @@
 #include "codegen_bootstrap_utils.h"
 
 void print_usage(char *cmd) {
-  printf("syntax:\n%s path prefix suffix\n",cmd);
+  printf("syntax:\n%s path prefix suffix outpath\n",cmd);
 }
 
 int main(int argc, char *argv[]) {
 
   header_data *hdata;
+  char outc[256];
+  char outh[256];
+  char rpath[PATH_MAX];
   int n;
   int i;
   FILE *header;
   FILE *bstrap_file;
 
-  if (argc != 4) {
+  if (argc != 5) {
     print_usage(argv[0]);
     return 0;
   }
@@ -24,8 +27,13 @@ int main(int argc, char *argv[]) {
     hdata[i].targets = calloc(MAX_TARGETS,sizeof(cgen_target));
   }
 
-  header = fopen("bootstrapped.h","w+");
-  bstrap_file = fopen("bootstrapped.c","w+");
+  realpath(argv[4],rpath);
+
+  snprintf(outc,sizeof(outc),"%s/bootstrapped.c",rpath);
+  snprintf(outh,sizeof(outh),"%s/bootstrapped.h",rpath);
+
+  header = fopen(outh,"w+");
+  bstrap_file = fopen(outc,"w+");
 
   if (!header || !bstrap_file) {
     fprintf(stderr,"Invalid output file!\n");
