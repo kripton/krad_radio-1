@@ -111,7 +111,7 @@ AC_PROG_CXX
 
 AC_CONFIG_FILES([Makefile lib/Makefile daemon/Makefile clients/Makefile
                  tests/Makefile tools/code/hextool/Makefile
-                 tools/code/analysis/gather_structs/Makefile
+                 tools/code/analysis/gather_structs/Makefile tools/code/gen/bootstrap/Makefile
                  tools/code/gen/Makefile tools/code/gen/tests/Makefile tools/Makefile])
 
 AC_OUTPUT
