@@ -22,7 +22,7 @@
 #include <netinet/tcp.h>
 #include <ifaddrs.h>
 
-#include "krad_interweb.h"
+#include "krad_web_server.h"
 #include "gen/embed.h"
 
 enum krad_interweb_shutdown {

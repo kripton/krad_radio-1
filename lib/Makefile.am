@@ -59,7 +59,7 @@ krad_opus/krad_opus.c \
 krad_opus/opus_header.c \
 krad_ring/krad_ring.c \
 krad_transponder/krad_transponder.c \
-krad_web/krad_interweb.c \
+krad_web/krad_web_server.c \
 krad_transmitter/krad_transmitter.c \
 krad_ogg/krad_ogg.c \
 krad_ogg/krad_ogg2.c \

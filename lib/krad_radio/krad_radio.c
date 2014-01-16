@@ -2,9 +2,9 @@
 #include "krad_mixer.h"
 #include "krad_compositor.h"
 #include "krad_transponder.h"
-#include "krad_interweb.h"
-#include "krad_router.h"
+#include "krad_web_server.h"
 #include "krad_app_server.h"
+#include "krad_router.h"
 #include "krad_timer.h"
 
 struct kr_radio {
