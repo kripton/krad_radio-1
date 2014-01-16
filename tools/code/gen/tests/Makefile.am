@@ -2,6 +2,7 @@ include $(top_srcdir)/common.mk
 
 sizeof_test_CPPFLAGS = '-I../../analysis/gather_structs/'
 sizeof_test_CPPFLAGS += '-I../'
+sizeof_test_CPPFLAGS += '-I../bootstrap'
 sizeof_test_CPPFLAGS += '-I../../'
 jschema_test_CPPFLAGS = ${sizeof_test_CPPFLAGS}
 
@@ -17,8 +18,8 @@ sizeof_test_SOURCES = ../../analysis/gather_structs/structs_gathering.c \
   ../formats/codegen_helper.c \
   ../formats/codegen_sizeof.c \
   ../formats/codegen_jschema.c \
-  ../codegen_bootstrap_utils.c \
-  ../bootstrapped.c
+  ../bootstrap/codegen_bootstrap_utils.c \
+  ../bootstrap/bootstrapped.c
 
 jschema_test_SOURCES = ../../analysis/gather_structs/structs_gathering.c \
   jschema_test.c \
@@ -30,5 +31,5 @@ jschema_test_SOURCES = ../../analysis/gather_structs/structs_gathering.c \
   ../formats/codegen_helper.c \
   ../formats/codegen_sizeof.c \
   ../formats/codegen_jschema.c \
-  ../codegen_bootstrap_utils.c \
-  ../bootstrapped.c
+  ../bootstrap/codegen_bootstrap_utils.c \
+  ../bootstrap/bootstrapped.c
