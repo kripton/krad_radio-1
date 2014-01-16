@@ -5,7 +5,20 @@ void krad_radio_command_help() {
   printf("\n");
 }
 
-int main (int argc, char *argv[]) {
+int kr_cmd_handle(kr_client *client, char *argv[], int argc) {
+  int ret;
+  ret = -1;
+  if ((client == NULL) || (argc < 1)) return -1;
+  if (argc == 1) {
+    ret = kr_get(client, argv[0]);
+    kr_poll(client, 250);
+    kr_delivery_recv(client);
+    kr_streamer45(client);
+  }
+  return ret;
+}
+
+int main(int argc, char *argv[]) {
   kr_client *client;
   char *sysname;
   int ret;
@@ -80,7 +93,7 @@ int main (int argc, char *argv[]) {
     kr_client_destroy(&client);
     return 1;
   }
-  /* Make magic happen here */
+  kr_cmd_handle(client, argv + 2, argc - 2);
   kr_client_destroy(&client);
   return 0;
 }

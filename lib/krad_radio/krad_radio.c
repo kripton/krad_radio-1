@@ -25,9 +25,9 @@ static void web_event(kr_web_event *event) {
   kr_radio *radio;
   kr_app_server_client_setup client_setup;
   radio = (kr_radio *)event->user;
-  printk("Radio: Web event");
   switch (event->type) {
     case KR_WEB_CLIENT_CREATE:
+      printk("Radio: Web client create event");
       client_setup.fd = event->fd;
       client_setup.in = event->in;
       client_setup.out = event->out;
@@ -44,16 +44,40 @@ static void web_event(kr_web_event *event) {
 }
 
 static void mixer_event(kr_mixer_event *event) {
-  printk("Radio: Mixer event");
+  kr_radio *radio;
+  kr_route_setup route_setup;
+  radio = (kr_radio *)event->user;
+  switch (event->type) {
+    case KR_MIXER_CREATE:
+      printk("Radio: Mixer path create event");
+      route_setup.ptr = radio->mixer;
+      route_setup.name = event->user_path;
+      route_setup.ctx = event->path;
+      route_setup.payload_type = PL_KR_MIXER_PATH_INFO;
+      route_setup.payload.mixer_path_info = event->info;
+      kr_app_server_route_create(radio->app, &route_setup);
+      break;
+    case KR_MIXER_PATCH:
+      printk("Radio: Mixer path patch event");
+      /* update the info struct in the route */
+      break;
+    case KR_MIXER_DESTROY:
+      printk("Radio: Mixer path delete event");
+      /* remove the route */
+      break;
+    default:
+      printke("Radio: Bad event from mixer");
+      break;
+  }
 }
 
 static void compositor_event(kr_compositor_event *event) {
   kr_radio *radio;
   kr_route_setup route_setup;
   radio = (kr_radio *)event->user;
-  printk("Radio: Compositor event");
   switch (event->type) {
     case KR_COMP_CREATE:
+      printk("Radio: Compositor path create event");
       route_setup.ptr = radio->compositor;
       route_setup.name = event->user_path;
       route_setup.ctx = event->path;
@@ -62,13 +86,15 @@ static void compositor_event(kr_compositor_event *event) {
       kr_app_server_route_create(radio->app, &route_setup);
       break;
     case KR_COMP_PATCH:
+      printk("Radio: Compositor path patch event");
       /* update the info struct in the route */
       break;
     case KR_COMP_DESTROY:
+      printk("Radio: Compositor path delete event");
       /* remove the route */
       break;
     default:
-      printke("Bad event from compositor");
+      printke("Radio: Bad event from compositor");
       break;
   }
 }

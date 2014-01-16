@@ -760,6 +760,7 @@ int kr_mixer_path_info_get(kr_mixer_path *unit, kr_mixer_path_info *info) {
 }
 
 int kr_mixer_unlink(kr_mixer_path *path) {
+  kr_mixer_event event;
   if (path == NULL) {
     printke("mixer path unlink called with null value");
     return -1;
@@ -767,11 +768,16 @@ int kr_mixer_unlink(kr_mixer_path *path) {
   if (path->crossfader != NULL) {
     /* FIXME kr_mixer_xf_decouple(path->mixer, path->crossfader); */
   }
+  event.user = path->mixer->user;
+  event.user_path = path->control_user;
+  event.path = path;
+  event.type = KR_MIXER_DESTROY;
+  memset(&event.info, 0, sizeof(event.info));
+  path->mixer->event_cb(&event);
   path->state = KR_MXP_TERM;
   if (path->mixer->clock == NULL) {
     update_state(path->mixer);
   }
-  /* do event callback */
   return 0;
 }
 
