@@ -5,7 +5,7 @@ void debug_print_headers(kr_web_client *client) {
   printk("%s", headers);
 }
 
-int32_t find_end_of_client_headers(kr_web_client *client) {
+int find_end_of_client_headers(kr_web_client *client) {
   int i;
   uint8_t *buf;
   buf = client->in->rd_buf;
@@ -28,23 +28,7 @@ int32_t find_end_of_client_headers(kr_web_client *client) {
   return 0;
 }
 
-int32_t copy_header(char *buf, char *out, uint32_t max, char *header) {
-  char *pos;
-  int32_t len;
-  int32_t hdr_len;
-  hdr_len = strlen(header);
-  pos = strstr(buf, header) + hdr_len;
-  if (pos == NULL) {
-    return -1;
-  }
-  len = strcspn(pos, " \n\r?");
-  len = MIN(len, max - 1);
-  memcpy(out, pos, len);
-  out[len] = '\0';
-  return 0;
-}
-
-int32_t identify_method(kr_web_client *client) {
+int identify_method(kr_web_client *client) {
   uint8_t *buf;
   buf = client->in->rd_buf;
   if (client->hdr_pos < 8) return -1;
@@ -79,25 +63,39 @@ int32_t identify_method(kr_web_client *client) {
   return -1;
 }
 
-int32_t handle_get(kr_web_client *client) {
-  char *buf;
+int copy_header(char *header, char *headers, char *header_name, int max) {
+  char *pos;
+  int32_t len;
+  int32_t name_len;
+  name_len = strlen(header_name);
+  pos = strstr(headers, header_name) + name_len;
+  if (pos == NULL) {
+    return -1;
+  }
+  len = strcspn(pos, " \n\r?");
+  len = MIN(len, max - 1);
+  memcpy(header, pos, len);
+  header[len] = '\0';
+  return 0;
+}
+
+int handle_get(kr_web_client *client) {
+  char *headers;
   int32_t ret;
-  buf = (char *)client->in->rd_buf;
-  if (strstr(buf, "Upgrade: websocket") != NULL) {
-    ret = copy_header(buf, client->get, sizeof(client->get), "GET ");
+  headers = (char *)client->in->rd_buf;
+  if (strstr(headers, "Upgrade: websocket") != NULL) {
+    ret = copy_header(client->get, headers, "GET ", sizeof(client->get));
     if (ret < 0) return -1;
-    ret = copy_header(buf, client->ws.key, sizeof(client->ws.key),
-     "Sec-WebSocket-Key: ");
+    ret = copy_header(client->ws.key, headers, "Sec-WebSocket-Key: ", sizeof(client->ws.key));
     if (ret < 0) return -1;
-    ret = copy_header(buf, client->ws.proto, sizeof(client->ws.proto),
-     "Sec-WebSocket-Protocol: ");
+    ret = copy_header(client->ws.proto, headers, "Sec-WebSocket-Protocol: ", sizeof(client->ws.proto));
     if (ret < 0) return -1;
     client->type = KR_WS_WS;
     kr_io2_pulled(client->in, client->hdr_pos + 1);
     return 0;
   } else {
-    if ((strstr(buf, "GET ") != NULL) && (strstr(buf, " HTTP/1") != NULL)) {
-      ret = copy_header(buf, client->get, sizeof(client->get), "GET ");
+    if ((strstr(headers, "GET ") != NULL) && (strstr(headers, " HTTP/1") != NULL)) {
+      ret = copy_header(client->get, headers, "GET ", sizeof(client->get));
       if (ret < 0) return -1;
       printk("GET IS %s", client->get);
       if (strncmp("/api", client->get, 4) == 0) {
@@ -115,9 +113,9 @@ int32_t handle_get(kr_web_client *client) {
   return -1;
 }
 
-int32_t handle_put(kr_web_client *client) {
+int handle_put(kr_web_client *client) {
   char *buf;
-  int32_t mount_len;
+  int mount_len;
   char *mount_start;
   mount_start = NULL;
   mount_len = 0;
@@ -142,12 +140,12 @@ int32_t handle_put(kr_web_client *client) {
   return 0;
 }
 
-int32_t handle_post(kr_web_client *client) {
+int handle_post(kr_web_client *client) {
   return 0;
 }
 
-int32_t handle_unknown_client(kr_web_client *client) {
-  int32_t ret;
+int handle_unknown_client(kr_web_client *client) {
+  int ret;
   if (!client->hdrs_recvd) {
     if (find_end_of_client_headers(client)) {
       ret = identify_method(client);

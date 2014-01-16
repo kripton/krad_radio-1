@@ -121,7 +121,7 @@ struct kr_web_client {
 static int handle_client(kr_web_client *client);
 static void disconnect_client(kr_web_server *server, kr_web_client *client);
 static kr_web_client *accept_client(kr_web_server *server, int sd);
-static void web_server_update_pollfds(kr_web_server *server);
+static void update_pollfds(kr_web_server *server);
 static void *web_server_loop(void *arg);
 static int kr_web_server_disable(kr_web_server *server);
 static int kr_web_server_run(kr_web_server *server);
@@ -269,7 +269,7 @@ static kr_web_client *accept_client(kr_web_server *server, int sd) {
   return NULL;
 }
 
-static void web_server_update_pollfds(kr_web_server *server) {
+static void update_pollfds(kr_web_server *server) {
   int r;
   int c;
   int s;
@@ -313,7 +313,7 @@ static void *web_server_loop(void *arg) {
   server->shutdown = KR_WEB_SERVER_RUNNING;
   while (!server->shutdown) {
     s = 0;
-    web_server_update_pollfds(server);
+    update_pollfds(server);
     ret = poll(server->sockets, server->socket_count, -1);
     if ((ret < 1) || (server->shutdown) || (server->sockets[s].revents)) {
       break;
