@@ -206,31 +206,31 @@ int websocket_pack(kr_io2_t *out, void *buffer, size_t len) {
   return -1;
 }
 
-int32_t websocket_unpack(kr_web_client *client) {
+int websocket_unpack(kr_web_client *client) {
   int ret;
-    for (;;) {
-      if (client->ws.len == 0) {
-        ret = unpack_frame_header(client);
-        if (ret < 0) {
-          break;
-        }
-      }
-      if (client->ws.len > 0) {
-        ret = unpack_frame_data(client);
-        if (ret <= 0) {
-          break;
-        }
-      } else {
-        ret = 0;
+  for (;;) {
+    if (client->ws.len == 0) {
+      ret = unpack_frame_header(client);
+      if (ret < 0) {
         break;
       }
     }
+    if (client->ws.len > 0) {
+      ret = unpack_frame_data(client);
+      if (ret <= 0) {
+        break;
+      }
+    } else {
+      ret = 0;
+      break;
+    }
+  }
   return ret;
 }
 
-static int32_t build_accept_key(char *resp, char *key) {
+static int build_accept_key(char *resp, char *key) {
   static char *ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-  int32_t ret;
+  int ret;
   char string[128];
   uint8_t hash[20];
   if ((resp == NULL) || (key == NULL)) {
@@ -243,7 +243,7 @@ static int32_t build_accept_key(char *resp, char *key) {
   return ret;
 }
 
-int32_t websocket_app_client(kr_web_client *client) {
+int websocket_app_client(kr_web_client *client) {
   kr_web_server *server;
   kr_web_event event;
   server = client->server;
@@ -260,13 +260,13 @@ int32_t websocket_app_client(kr_web_client *client) {
   return 0;
 }
 
-int32_t handle_websocket(kr_web_client *client) {
-  int32_t pos;
+int handle_websocket(kr_web_client *client) {
+  int pos;
   char *buffer;
   char clientkey[64];
   char acceptkey[64];
   char *headers;
-  int32_t ret;
+  int ret;
   pos = 0;
   headers = (char *)client->in->rd_buf;
   buffer = (char *)client->out->buf;
