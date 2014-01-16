@@ -206,7 +206,7 @@ static uint32_t pack_frame_header(uint8_t *out, uint32_t size) {
   }
 }
 
-int websocket_pack(kr_io2_t *out, uint8_t *buffer, size_t len) {
+int websocket_pack(kr_io2_t *out, void *buffer, size_t len) {
   uint32_t header_len;
   uint8_t header[10];
   if (len > 0) {

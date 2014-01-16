@@ -1,8 +1,8 @@
-static void web_server_pack_headers(kr_web_client *client,
- char *content_type);
+static int pack_http_header(kr_web_client *client, char *mimetype);
+static int pack_http_404_response(kr_web_client *client);
 
-static void web_server_pack_headers(kr_web_client *client, char *content_type) {
-  int32_t pos;
+static int pack_http_header(kr_web_client *client, char *mimetype) {
+  int pos;
   char *buffer;
   pos = 0;
   buffer = (char *)client->out->buf;
@@ -10,13 +10,13 @@ static void web_server_pack_headers(kr_web_client *client, char *content_type) {
   pos += sprintf(buffer + pos, "Status: 200 OK\r\n");
   pos += sprintf(buffer + pos, "Connection: close\r\n");
   pos += sprintf(buffer + pos, "Server: Krad-Radio\r\n");
-  pos += sprintf(buffer + pos, "Content-Type: %s; charset=utf-8\r\n",
-   content_type);
+  pos += sprintf(buffer + pos, "Content-Type: %s; charset=utf-8\r\n", mimetype);
   pos += sprintf(buffer + pos, "\r\n");
   kr_io2_advance(client->out, pos);
+  return pos;
 }
 
-static void web_server_pack_404(kr_web_client *client) {
+static int pack_http_404_response(kr_web_client *client) {
   int32_t pos;
   char *buffer;
   pos = 0;
@@ -29,4 +29,5 @@ static void web_server_pack_404(kr_web_client *client) {
   pos += sprintf(buffer + pos, "\r\n");
   pos += sprintf(buffer + pos, "404 Not Found");
   kr_io2_advance(client->out, pos);
+  return pos;
 }

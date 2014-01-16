@@ -30,8 +30,7 @@ typedef struct kr_app_server_client_setup kr_app_server_client_setup;
 typedef struct kr_app_server kr_app_server;
 typedef struct kr_app_server_client kr_app_server_client;
 
-typedef int (kr_app_server_output_cb)(kr_io2_t *, uint8_t *buffer, size_t len);
-//typedef void (kr_app_server_client_destroy_cb)(void *);
+typedef int (kr_app_server_io_cb)(kr_io2_t *, void *buffer, size_t len);
 
 struct kr_app_server_setup {
   char appname[32];
@@ -59,7 +58,8 @@ struct kr_app_server_client_setup {
   kr_app_client_type type;
   void *in_state_tracker;
   size_t in_state_tracker_sz;
-  kr_app_server_output_cb *output_cb;
+  kr_app_server_io_cb *input_cb;
+  kr_app_server_io_cb *output_cb;
 };
 
 int kr_app_server_client_create(kr_app_server *server,

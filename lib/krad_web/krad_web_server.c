@@ -118,8 +118,6 @@ struct kr_web_client {
   kr_websocket_client ws;
 };
 
-static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz);
-static void web_server_pack_buffer2(kr_io2_t *io, uint8_t *buffer, size_t sz);
 static int handle_client(kr_web_client *client);
 static void disconnect_client(kr_web_server *server, kr_web_client *client);
 static kr_web_client *accept_client(kr_web_server *server, int sd);
@@ -127,14 +125,6 @@ static void web_server_update_pollfds(kr_web_server *server);
 static void *web_server_loop(void *arg);
 static int kr_web_server_disable(kr_web_server *server);
 static int kr_web_server_run(kr_web_server *server);
-
-static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz) {
-  kr_io2_pack(c->out, buffer, sz);
-}
-
-static void web_server_pack_buffer2(kr_io2_t *io, uint8_t *buffer, size_t sz) {
-  kr_io2_pack(io, buffer, sz);
-}
 
 int strmatch(char *string1, char *string2) {
   int len1;
@@ -170,13 +160,13 @@ int http_app_client_handle(kr_web_client *client) {
   event.type = KR_WEB_CLIENT_CREATE;
   event.fd = client->sd;
   kr_io2_restart(client->in);
-  kr_io2_pack(client->in, client->get + 4, strlen(client->get + 4));
+  kr_io2_pack(client->in, (uint8_t *)(client->get + 4), strlen(client->get + 4));
   event.in = client->in;
-  web_server_pack_headers(client, "application/json");
+  pack_http_header(client, "application/json");
   event.out = client->out;
   event.in_state_tracker = NULL;
   event.in_state_tracker_sz = 0;
-  event.output_cb = web_server_pack_buffer2;
+  event.output_cb = kr_io2_pack;
   //event.input_cb = websocket_unpack;
   event.user = server->user;
   server->event_cb(&event);

@@ -80,16 +80,16 @@ void kr_io2_advance(kr_io2_t *io, size_t bytes) {
   io->buf += bytes;
 }
 
-void kr_io2_pack(kr_io2_t *io, void *buffer, size_t len) {
-
+int kr_io2_pack(kr_io2_t *io, void *buffer, size_t len) {
   if (len > io->space) {
     printk("io2_pack len: %zu buf len: %zu new len: %zu size: %zu space: %zu",
             len, io->len, len + io->len, io->size, io->space);
     printke("buffer overpack cancelling!");
-    return;
+    return -1;
   }
-  memcpy (io->buf, buffer, len);
-  kr_io2_advance (io, len);
+  memcpy(io->buf, buffer, len);
+  kr_io2_advance(io, len);
+  return len;
 }
 
 static ssize_t kr_io2_write(kr_io2_t *io) {

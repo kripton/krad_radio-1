@@ -34,7 +34,7 @@ int kr_io2_set_fd(kr_io2_t *io, int fd);
 int kr_io2_want_out(kr_io2_t *io); // buffer has data ready to be written out
 int kr_io2_has_in(kr_io2_t *io); // buffer has data for buffer user to read
 void kr_io2_advance(kr_io2_t *io, size_t bytes); // (output: notify that data has been packed into buffer for output) (input: N data has been read from socket and is ready for user)
-void kr_io2_pack(kr_io2_t *io, void *buffer, size_t len); // pack data into an output buffer
+int kr_io2_pack(kr_io2_t *io, void *buffer, size_t len); // pack data into an output buffer
 int kr_io2_output(kr_io2_t *io); // write as much output buffer as possible
 int kr_io2_sync(kr_io2_t *io); // temp file only kludge
 void kr_io2_pulled(kr_io2_t *io, size_t bytes); // advance the users read pointer by N

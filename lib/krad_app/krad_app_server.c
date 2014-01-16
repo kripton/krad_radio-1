@@ -63,7 +63,8 @@ struct kr_app_server_client {
   kr_io2_t *out;
   uint8_t in_state_tracker[1024];
   size_t in_state_tracker_sz;
-  kr_app_server_output_cb *output_cb;
+  kr_app_server_io_cb *input_cb;
+  kr_app_server_io_cb *output_cb;
 };
 
 static int validate_ebml_client_header(uint8_t *header, size_t sz);

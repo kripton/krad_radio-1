@@ -30,7 +30,7 @@ typedef struct kr_web_server kr_web_server;
 typedef struct kr_web_server_setup kr_web_server_setup;
 typedef struct kr_web_event kr_web_event;
 typedef void (kr_web_event_cb)(kr_web_event *);
-typedef int (kr_web_output_cb)(kr_io2_t *, uint8_t *buffer, size_t len);
+typedef int (kr_web_output_cb)(kr_io2_t *, void *buffer, size_t len);
 
 struct kr_web_event {
   kr_web_event_type type;
