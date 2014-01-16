@@ -8,7 +8,7 @@
 #define WS_PONG_FRM 0x0a  // 00001010
 
 static int unpack_frame_header(kr_web_client *client) {
-  kr_websocket_client *ws;
+  kr_websocket_tracker *ws;
   uint8_t *size_bytes;
   uint8_t payload_sz_8;
   uint64_t payload_sz_64;
@@ -116,7 +116,7 @@ static int unpack_frame_header(kr_web_client *client) {
 }
 
 static int32_t unpack_frame_data(kr_web_client *client) {
-  kr_websocket_client *ws;
+  kr_websocket_tracker *ws;
   int32_t ret;
   int32_t pos;
   int32_t max;
@@ -253,7 +253,7 @@ int32_t websocket_app_client(kr_web_client *client) {
   event.in = client->in;
   event.out = client->out;
   event.in_state_tracker = &client->ws;
-  event.in_state_tracker_sz = sizeof(kr_websocket_client);
+  event.in_state_tracker_sz = sizeof(kr_websocket_tracker);
   event.output_cb = websocket_pack;
   //event.input_cb = websocket_unpack;
   event.user = server->user;
@@ -261,7 +261,7 @@ int32_t websocket_app_client(kr_web_client *client) {
   return 0;
 }
 
-int32_t handle_websocket_client(kr_web_client *client) {
+int32_t handle_websocket(kr_web_client *client) {
   int32_t pos;
   char *buffer;
   char acceptkey[64];

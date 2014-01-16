@@ -57,7 +57,7 @@ typedef enum {
 
 typedef struct kr_web_client kr_web_client;
 typedef struct kr_http_tracker kr_http_tracker;
-typedef struct kr_websocket_client kr_websocket_client;
+typedef struct kr_websocket_tracker kr_websocket_tracker;
 
 struct kr_web_server {
   char sysname[64];
@@ -91,7 +91,7 @@ struct kr_web_server {
   char *htmlfooter;
 };
 
-struct kr_websocket_client {
+struct kr_websocket_tracker {
   uint8_t mask[4];
   uint32_t pos;
   uint64_t len;
@@ -120,7 +120,7 @@ struct kr_web_client {
   kr_io2_t *out;
   kr_web_client_type type;
   kr_http_tracker http;
-  kr_websocket_client ws;
+  kr_websocket_tracker ws;
 };
 
 static int handle_client(kr_web_client *client);
@@ -156,7 +156,7 @@ int strmatch(char *string1, char *string2) {
 /* #include "webrtc.c" */
 #include "file.c"
 
-int http_app_client_handle(kr_web_client *client) {
+int handle_rest_api(kr_web_client *client) {
   /* need to add client type or cb for proto */
   kr_web_server *server;
   kr_web_event event;
@@ -189,7 +189,7 @@ static int handle_client(kr_web_client *client) {
   }
   switch (client->type) {
     case KR_WS_WEBSOCKET:
-      ret = handle_websocket_client(client);
+      ret = handle_websocket(client);
       break;
     case KR_WS_GET_FILE:
       ret = handle_get_file(client);
@@ -201,7 +201,7 @@ static int handle_client(kr_web_client *client) {
       ret = handle_post_file(client);
       break;
     case KR_WS_REST_API:
-      ret = http_app_client_handle(client);
+      ret = handle_rest_api(client);
       break;
     case KR_WS_GET_STREAM:
       ret = handle_get_stream(client);
