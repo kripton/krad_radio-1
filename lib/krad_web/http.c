@@ -146,7 +146,7 @@ int handle_put(kr_web_client *client) {
   if ((mount_len < 5) || (mount_len > 127)) return -1;
   client->http.address[mount_len] = '\0';
   memcpy(client->http.address, mount_start, mount_len);
-  client->type = KR_WS_GET_STREAM;
+  client->type = KR_WS_PUT_STREAM;
   printk("Source/Put client mount is: %s", client->http.address);
   return 0;
 }
