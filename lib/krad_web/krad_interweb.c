@@ -76,7 +76,7 @@ int32_t http_app_client_handle(kr_web_client *client) {
   kr_io2_restart(client->in);
   kr_io2_pack(client->in, client->get + 4, strlen(client->get + 4));
   event.in = client->in;
-  web_server_pack_headers(client, "text/json");
+  web_server_pack_headers(client, "application/json");
   event.out = client->out;
   event.in_state_tracker = NULL;
   event.in_state_tracker_sz = 0;
