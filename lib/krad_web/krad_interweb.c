@@ -25,12 +25,108 @@
 #include "krad_interweb.h"
 #include "gen/embed.h"
 
-static void web_server_update_pollfds(kr_web_server *server);
-static void *web_server_loop(void *arg);
+enum krad_interweb_shutdown {
+  KR_WEB_SERVER_STARTING = -1,
+  KR_WEB_SERVER_RUNNING,
+  KR_WEB_SERVER_DO_SHUTDOWN,
+  KR_WEB_SERVER_SHUTINGDOWN,
+};
+
+enum kr_web_client_type {
+  KR_WS_UNKNOWN = 0,
+  KR_WS_WS,
+  KR_WS_FILE,
+  KR_WS_STREAM_IN,
+  KR_WS_STREAM_OUT,
+  KR_WS_API,
+  KR_REMOTE_LISTEN,
+};
+
+enum kr_web_verb {
+  KR_WS_INVALID = 0,
+  KR_WS_GET,
+  KR_WS_PUT,
+  KR_WS_SOURCE,
+  KR_WS_POST,
+  KR_WS_HEAD,
+  KR_WS_PATCH,
+  KR_WS_OPTIONS,
+};
+
+typedef struct kr_web_client kr_web_client;
+typedef struct kr_websocket_client kr_websocket_client;
+
+struct kr_web_server {
+  char sysname[64];
+  int32_t tcp_sd[MAX_REMOTES];
+  int32_t tcp_port[MAX_REMOTES];
+  char *tcp_interface[MAX_REMOTES];
+  int32_t shutdown;
+  int32_t socket_count;
+  krad_control_t krad_control;
+  kr_web_client *clients;
+  pthread_t thread;
+  struct pollfd sockets[KR_MAX_SDS];
+  int32_t socket_type[KR_MAX_SDS];
+  kr_web_client *sockets_clients[KR_MAX_SDS];
+  void *user;
+  kr_web_event_cb *event_cb;
+  int32_t uberport;
+  char *headcode_source;
+  char *htmlheader_source;
+  char *htmlfooter_source;
+  char *html;
+  int32_t html_len;
+  char *api_js;
+  int32_t api_js_len;
+  char *iface_js;
+  int32_t iface_js_len;
+  char *deviface_js;
+  int32_t deviface_js_len;
+  char *headcode;
+  char *htmlheader;
+  char *htmlfooter;
+};
+
+struct kr_websocket_client {
+  uint8_t mask[4];
+  uint32_t pos;
+  uint64_t len;
+  uint8_t *input;
+  uint32_t input_len;
+  uint8_t *output;
+  uint32_t output_len;
+  uint64_t frames;
+  char key[96];
+  char proto[96];
+};
+
+struct kr_web_client {
+  int32_t sd;
+  kr_web_server *server;
+  kr_io2_t *in;
+  kr_io2_t *out;
+  /*  kr_webrtc_user webrtc_user; */
+  int32_t drop_after_sync;
+  int32_t type;
+  uint32_t hdr_le;
+  uint32_t hdr_pos;
+  uint32_t hdrs_recvd;
+  int32_t verb;
+  char get[96];
+  char mount[128];
+  kr_websocket_client ws;
+};
+
+static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz);
+static void web_server_pack_buffer2(kr_io2_t *io, uint8_t *buffer, size_t sz);
+static int handle_client(kr_web_client *client);
 static void disconnect_client(kr_web_server *server, kr_web_client *client);
 static kr_web_client *accept_client(kr_web_server *server, int sd);
-int32_t web_client_get_stream(kr_web_client *client);
-static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz);
+static void web_server_update_pollfds(kr_web_server *server);
+static void *web_server_loop(void *arg);
+static int kr_web_server_disable(kr_web_server *server);
+static int kr_web_server_run(kr_web_server *server);
 
 static void web_server_pack_buffer(kr_web_client *c, void *buffer, size_t sz) {
   kr_io2_pack(c->out, buffer, sz);
@@ -59,14 +155,14 @@ int strmatch(char *string1, char *string2) {
 
 #include "socket.c"
 #include "websocket.c"
-//#include "webrtc.c"
+/* #include "webrtc.c" */
 #include "setup.c"
 #include "header_out.c"
-#include "request.c"
 #include "stream.c"
+#include "request.c"
 #include "file.c"
 
-int32_t http_app_client_handle(kr_web_client *client) {
+int http_app_client_handle(kr_web_client *client) {
   /* need to add client type or cb for proto */
   kr_web_server *server;
   kr_web_event event;
@@ -88,35 +184,56 @@ int32_t http_app_client_handle(kr_web_client *client) {
   return -1;
 }
 
-int32_t handle_client(kr_web_client *client) {
-  int32_t ret;
+static int handle_client(kr_web_client *client) {
+  int ret;
   ret = -1;
-  if (client->type == INTERWEB_UNKNOWN) {
+  if (client->type == KR_WS_UNKNOWN) {
     ret = handle_unknown_client(client);
-    if (client->type == INTERWEB_UNKNOWN) {
+    if (client->type == KR_WS_UNKNOWN) {
       return ret;
     }
   }
   switch (client->type) {
-    case KR_IWS_WS:
+    case KR_WS_WS:
       ret = handle_websocket_client(client);
       break;
-    case KR_IWS_FILE:
+    case KR_WS_FILE:
       ret = web_file_client_handle(client);
       break;
-    case KR_IWS_API:
+    case KR_WS_API:
       ret = http_app_client_handle(client);
       break;
-    case KR_IWS_STREAM_OUT:
+    case KR_WS_STREAM_OUT:
       ret = web_stream_client_handle(client);
       break;
-    case KR_IWS_STREAM_IN:
+    case KR_WS_STREAM_IN:
       ret = web_stream_in_client_handle(client);
       break;
     default:
       break;
   }
   return ret;
+}
+
+static void disconnect_client(kr_web_server *server, kr_web_client *client) {
+  /*kr_webrtc_unregister(client);*/
+  if (client->sd != -1) {
+    close(client->sd);
+  } else {
+    printk("Web Server: looks like a app server client handoff");
+  }
+  client->sd = 0;
+  client->type = 0;
+  client->drop_after_sync = 0;
+  client->hdr_le = 0;
+  client->hdr_pos = 0;
+  client->hdrs_recvd = 0;
+  client->verb = 0;
+  memset(&client->ws, 0, sizeof(kr_websocket_client));
+  memset(client->get, 0, sizeof(client->get));
+  kr_io2_destroy(&client->in);
+  kr_io2_destroy(&client->out);
+  printk("Web Server: Client Disconnected");
 }
 
 static kr_web_client *accept_client(kr_web_server *server, int sd) {
@@ -162,27 +279,6 @@ static kr_web_client *accept_client(kr_web_server *server, int sd) {
   return NULL;
 }
 
-static void disconnect_client(kr_web_server *server, kr_web_client *client) {
-  /*kr_webrtc_unregister(client);*/
-  if (client->sd != -1) {
-    close(client->sd);
-  } else {
-    printk("Web Server: looks like a app server client handoff");
-  }
-  client->sd = 0;
-  client->type = 0;
-  client->drop_after_sync = 0;
-  client->hdr_le = 0;
-  client->hdr_pos = 0;
-  client->hdrs_recvd = 0;
-  client->verb = 0;
-  memset(&client->ws, 0, sizeof(kr_websocket_client));
-  memset(client->get, 0, sizeof(client->get));
-  kr_io2_destroy(&client->in);
-  kr_io2_destroy(&client->out);
-  printk("Web Server: Client Disconnected");
-}
-
 static void web_server_update_pollfds(kr_web_server *server) {
   int r;
   int c;
@@ -224,7 +320,7 @@ static void *web_server_loop(void *arg) {
   int32_t r;
   int32_t read_ret;
   krad_system_set_thread_name("kr_web");
-  server->shutdown = KRAD_INTERWEB_RUNNING;
+  server->shutdown = KR_WEB_SERVER_RUNNING;
   while (!server->shutdown) {
     s = 0;
     web_server_update_pollfds(server);
@@ -297,12 +393,13 @@ static void *web_server_loop(void *arg) {
       }
     }
   }
-  server->shutdown = KRAD_INTERWEB_SHUTINGDOWN;
+  server->shutdown = KR_WEB_SERVER_SHUTINGDOWN;
   krad_controller_client_close(&server->krad_control);
   return NULL;
 }
 
-void kr_web_server_disable(kr_web_server *server) {
+static int kr_web_server_disable(kr_web_server *server) {
+  if (server == NULL) return -1;
   printk("Web Server: Disabling");
   if (!krad_controller_shutdown(&server->krad_control, &server->thread,
       30)) {
@@ -310,17 +407,24 @@ void kr_web_server_disable(kr_web_server *server) {
   }
   kr_web_server_listen_off(server, "", 0);
   printk("Web Server: Disabled");
+  return 0;
 }
 
-void kr_web_server_destroy(kr_web_server **serv) {
+static int kr_web_server_run(kr_web_server *server) {
+  if (server == NULL) return -1;
+  pthread_create(&server->thread, NULL, web_server_loop, (void *)server);
+  return 0;
+}
+
+int kr_web_server_destroy(kr_web_server **serv) {
   int i;
   kr_web_server *server;
   if ((serv == NULL) || (*serv == NULL)) {
-    return;
+    return -1;
   }
   server = *serv;
   printk("Web Server: Destroying");
-  if (server->shutdown != KRAD_INTERWEB_SHUTINGDOWN) {
+  if (server->shutdown != KR_WEB_SERVER_SHUTINGDOWN) {
     kr_web_server_disable(server);
   }
   for (i = 0; i < KR_WEB_CLIENTS_MAX; i++) {
@@ -333,10 +437,7 @@ void kr_web_server_destroy(kr_web_server **serv) {
   free(server);
   *serv = NULL;
   printk ("Web Server: Destroyed");
-}
-
-void kr_web_server_run(kr_web_server *server) {
-  pthread_create(&server->thread, NULL, web_server_loop, (void *)server);
+  return 0;
 }
 
 kr_web_server *kr_web_server_create(kr_web_server_setup *setup) {
@@ -353,7 +454,7 @@ kr_web_server *kr_web_server_create(kr_web_server_setup *setup) {
   server->htmlfooter_source = setup->htmlfooter;
   server->event_cb = setup->event_cb;
   server->user = setup->user;
-  server->shutdown = KRAD_INTERWEB_STARTING;
+  server->shutdown = KR_WEB_SERVER_STARTING;
   server->clients = kr_allocz(KR_WEB_CLIENTS_MAX, sizeof(kr_web_client));
   web_server_setup_html(server);
   kr_web_server_listen_on(server, NULL, setup->port);

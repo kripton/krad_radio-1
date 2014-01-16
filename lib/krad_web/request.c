@@ -49,31 +49,31 @@ int32_t identify_method(kr_web_client *client) {
   buf = client->in->rd_buf;
   if (client->hdr_pos < 8) return -1;
   if (memcmp(buf, "GET ", 4) == 0) {
-    client->verb = KR_IWS_GET;
+    client->verb = KR_WS_GET;
     return 0;
   }
   if (memcmp(buf, "PUT ", 4) == 0) {
-    client->verb = KR_IWS_PUT;
+    client->verb = KR_WS_PUT;
     return 0;
   }
   if (memcmp(buf, "HEAD ", 5) == 0) {
-    client->verb = KR_IWS_HEAD;
+    client->verb = KR_WS_HEAD;
     return 0;
   }
   if (memcmp(buf, "SOURCE ", 7) == 0) {
-    client->verb = KR_IWS_SOURCE;
+    client->verb = KR_WS_SOURCE;
     return 0;
   }
   if (memcmp(buf, "POST ", 5) == 0) {
-    client->verb = KR_IWS_POST;
+    client->verb = KR_WS_POST;
     return 0;
   }
   if (memcmp(buf, "PATCH ", 6) == 0) {
-    client->verb = KR_IWS_PATCH;
+    client->verb = KR_WS_PATCH;
     return 0;
   }
   if (memcmp(buf, "OPTIONS ", 8) == 0) {
-    client->verb = KR_IWS_OPTIONS;
+    client->verb = KR_WS_OPTIONS;
     return 0;
   }
   return -1;
@@ -92,7 +92,7 @@ int32_t handle_get(kr_web_client *client) {
     ret = copy_header(buf, client->ws.proto, sizeof(client->ws.proto),
      "Sec-WebSocket-Protocol: ");
     if (ret < 0) return -1;
-    client->type = KR_IWS_WS;
+    client->type = KR_WS_WS;
     kr_io2_pulled(client->in, client->hdr_pos + 1);
     return 0;
   } else {
@@ -101,11 +101,11 @@ int32_t handle_get(kr_web_client *client) {
       if (ret < 0) return -1;
       printk("GET IS %s", client->get);
       if (strncmp("/api", client->get, 4) == 0) {
-         client->type = KR_IWS_API;
+         client->type = KR_WS_API;
          printk("Web Server: REST API Client");
       } else {
         if (!web_client_get_stream(client)) {
-          client->type = KR_IWS_FILE;
+          client->type = KR_WS_FILE;
         }
       }
       kr_io2_pulled(client->in, client->hdr_pos);
@@ -123,11 +123,11 @@ int32_t handle_put(kr_web_client *client) {
   mount_len = 0;
   buf = (char *)client->in->rd_buf;
   switch (client->verb) {
-    case KR_IWS_PUT:
+    case KR_WS_PUT:
       mount_start = buf + 4;
       mount_len = strcspn(mount_start, " &?\n\r");
       break;
-    case KR_IWS_SOURCE:
+    case KR_WS_SOURCE:
       mount_start = buf + 7;
       mount_len = strcspn(mount_start, " &?\n\r");
       break;
@@ -137,7 +137,7 @@ int32_t handle_put(kr_web_client *client) {
   if ((mount_len < 5) || (mount_len > 127)) return -1;
   client->mount[mount_len] = '\0';
   memcpy(client->mount, mount_start, mount_len);
-  client->type = KR_IWS_STREAM_IN;
+  client->type = KR_WS_STREAM_IN;
   printk("Source/Put client mount is: %s", client->mount);
   return 0;
 }
@@ -154,14 +154,14 @@ int32_t handle_unknown_client(kr_web_client *client) {
       if (ret < 0) return -1;
       debug_print_headers(client);
       switch (client->verb) {
-        case KR_IWS_GET:
+        case KR_WS_GET:
           ret = handle_get(client);
           return ret;
-        case KR_IWS_POST:
+        case KR_WS_POST:
           ret = handle_post(client);
           return ret;
-        case KR_IWS_SOURCE: /* Fallin thru */
-        case KR_IWS_PUT:
+        case KR_WS_SOURCE: /* Fallin thru */
+        case KR_WS_PUT:
           ret = handle_put(client);
           return ret;
         default:
