@@ -109,7 +109,6 @@ static int unpack_frame_header(kr_web_client *client) {
     return -10;
   }
   ws->pos = 0;
-  ws->frames++;
   //printk("payload size is %"PRIu64"", ws->len);
   kr_io2_pulled(client->in, bytes_read);
   return bytes_read;
@@ -156,21 +155,6 @@ static int32_t unpack_frame_data(kr_web_client *client) {
     ws->pos = 0;
   }
   return pos;
-}
-
-static int32_t build_accept_key(char *resp, char *key) {
-  static char *ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-  int32_t ret;
-  char string[128];
-  uint8_t hash[20];
-  if ((resp == NULL) || (key == NULL)) {
-    return -1;
-  }
-  snprintf(string, sizeof(string), "%s%s", key, ws_guid);
-  string[127] = '\0';
-  kr_sha1((uint8_t *)string, strlen(string), hash);
-  ret = kr_base64((uint8_t *)resp, hash, 20, 64);
-  return ret;
 }
 
 static uint32_t pack_frame_header(uint8_t *out, uint32_t size) {
@@ -244,6 +228,21 @@ int32_t websocket_unpack(kr_web_client *client) {
   return ret;
 }
 
+static int32_t build_accept_key(char *resp, char *key) {
+  static char *ws_guid = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+  int32_t ret;
+  char string[128];
+  uint8_t hash[20];
+  if ((resp == NULL) || (key == NULL)) {
+    return -1;
+  }
+  snprintf(string, sizeof(string), "%s%s", key, ws_guid);
+  string[127] = '\0';
+  kr_sha1((uint8_t *)string, strlen(string), hash);
+  ret = kr_base64((uint8_t *)resp, hash, 20, 64);
+  return ret;
+}
+
 int32_t websocket_app_client(kr_web_client *client) {
   kr_web_server *server;
   kr_web_event event;
@@ -264,11 +263,22 @@ int32_t websocket_app_client(kr_web_client *client) {
 int32_t handle_websocket(kr_web_client *client) {
   int32_t pos;
   char *buffer;
+  char clientkey[64];
   char acceptkey[64];
+  char *headers;
+  int32_t ret;
   pos = 0;
+  headers = (char *)client->in->rd_buf;
   buffer = (char *)client->out->buf;
   memset(acceptkey, 0, sizeof(acceptkey));
-  build_accept_key(acceptkey, client->ws.key);
+  memset(clientkey, 0, sizeof(clientkey));
+  ret = copy_header(clientkey, headers, "Sec-WebSocket-Key: ", sizeof(clientkey));
+  if (ret != 0) {
+    printke("Web Server: Error getting websocket key header");
+    return -1;
+  }
+  build_accept_key(acceptkey, clientkey);
+  kr_io2_pulled(client->in, client->http.header_pos + 1);
   pos += sprintf(buffer + pos, "HTTP/1.1 101 Switching Protocols\r\n");
   pos += sprintf(buffer + pos, "Upgrade: websocket\r\n");
   pos += sprintf(buffer + pos, "Connection: Upgrade\r\n");
@@ -278,8 +288,13 @@ int32_t handle_websocket(kr_web_client *client) {
   kr_io2_advance(client->out, pos);
   set_socket_nodelay(client->sd);
   websocket_app_client(client);
-  //return 0;
   client->sd = -1;
-  /* -1 to get rid of client in web serv */
   return -1;
+}
+
+int websocket_headers_detected(char *headers) {
+  if (strstr(headers, "Upgrade: websocket") != NULL) {
+    return 1;
+  }
+  return 0;
 }

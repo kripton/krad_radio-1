@@ -153,15 +153,9 @@ int handle_put(kr_web_client *client) {
 
 int handle_get(kr_web_client *client) {
   char *headers;
-  int32_t ret;
   headers = (char *)client->in->rd_buf;
-  if (strstr(headers, "Upgrade: websocket") != NULL) {
-    ret = copy_header(client->ws.key, headers, "Sec-WebSocket-Key: ", sizeof(client->ws.key));
-    if (ret < 0) return -1;
-    /*ret = copy_header(client->ws.proto, headers, "Sec-WebSocket-Protocol: ", sizeof(client->ws.proto));
-    if (ret < 0) return -1;*/
+  if (websocket_headers_detected(headers)) {
     client->type = KR_WS_WEBSOCKET;
-    kr_io2_pulled(client->in, client->http.header_pos + 1);
     return 0;
   } else {
     if ((strstr(headers, "GET ") != NULL) && (strstr(headers, " HTTP/1") != NULL)) {

@@ -99,8 +99,6 @@ struct kr_websocket_tracker {
   uint32_t input_len;
   uint8_t *output;
   uint32_t output_len;
-  uint64_t frames;
-  char key[96];
 };
 
 struct kr_http_tracker {
