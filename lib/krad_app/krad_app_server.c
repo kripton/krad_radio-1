@@ -137,11 +137,17 @@ static int validate_ebml_client(kr_app_server_client *client) {
 }
 
 static int pack_crate_rest(uint8_t *buffer, kr_crate2 *crate, size_t max) {
-  return 45;
+  int res;
+  printk("rest crate packing");
+  res = kr_crate2_to_json((char *)buffer, crate, max);
+  return res;
 }
 
 static int pack_crate_websocket(uint8_t *buffer, kr_crate2 *crate, size_t max) {
-  return 666; /* :| */
+  int res;
+  printk("ws crate packing");
+  res = kr_crate2_to_json((char *)buffer, crate, max);
+  return res;
 }
 
 static int pack_crate_ebml(uint8_t *buffer, kr_crate2 *crate, size_t max) {
@@ -163,13 +169,14 @@ static int unpack_crate_rest(kr_crate2 *crate, kr_io2_t *in) {
   if (!(kr_io2_has_in(in))) {
     return 0;
   }
-  //ret = kr_crate2_fr_json(in->rd_buf, crate, in->len);
-  ret = 45; /*streamer*/
-  if (ret == 0) {
+  ret = kr_crate2_fr_json((char *)in->rd_buf, crate);
+
+  if (ret > 0) {
     char string[8192];
     ret = kr_crate2_to_text(string, crate, sizeof(string));
     if (ret > 0) {
-      printk("App Server: %"PRIu64" byte crate: (from json+rest)\n%s\n", string);
+      printk("App Server: %"PRIu64" byte crate: (from json+rest)\n%s\n", ret);
+      printk("%s",string);
     }
     //kr_io2_pulled(in, ebml.pos);
     return 1;
@@ -182,13 +189,13 @@ static int unpack_crate_websocket(kr_crate2 *crate, kr_io2_t *in) {
   if (!(kr_io2_has_in(in))) {
     return 0;
   }
-  //ret = kr_crate2_fr_json(in->rd_buf, crate, in->len);
-  ret = 45; /*streamer*/
-  if (ret == 0) {
+  ret = kr_crate2_fr_json((char *)in->rd_buf, crate);
+  if (ret > 0) {
     char string[8192];
     ret = kr_crate2_to_text(string, crate, sizeof(string));
     if (ret > 0) {
-      printk("App Server: %"PRIu64" byte crate: (from json+websocket)\n%s\n", string);
+      printk("App Server: %"PRIu64" byte crate: (from json+websocket)\n%s\n", ret);
+      printk("%s",string);
     }
     //kr_io2_pulled(in, ebml.pos);
     return 1;
