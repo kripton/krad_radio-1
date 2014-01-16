@@ -195,6 +195,23 @@ int test_x11_get(kr_client *client) {
   return ret;
 }
 
+int make_masterbus(kr_client *client) {
+  int ret;
+  kr_crate2 crate;
+  memset(&crate, 0, sizeof(crate));
+  kr_mixer_path_info *masterbus;
+  strcpy(crate.address, "/mixer/Master");
+  crate.method = KR_PUT;
+  crate.payload_type = PL_KR_MIXER_PATH_INFO;
+  masterbus = &crate.payload.mixer_path_info;
+  masterbus->channels = 2;
+  masterbus->volume[0] = 50.0;
+  masterbus->volume[1] = 50.0;
+  masterbus->type = KR_MXR_BUS;
+  ret = kr_crate_send(client, &crate);
+  return ret;
+}
+
 int run_test(kr_client *client, char *test) {
   int ret;
   ret = -1;
@@ -205,13 +222,19 @@ int run_test(kr_client *client, char *test) {
     ret = test_x11_input_create(client, 0);
     if (ret != 0) return ret;
   }
+  if ((strlen(test) == strlen("masterbus")) && (strcmp(test, "masterbus") == 0)) {
+    ret = make_masterbus(client);
+    if (ret != 0) return ret;
+  }
   if ((strlen(test) == strlen("getx11")) && (strcmp(test, "getx11") == 0)) {
     ret = test_x11_get(client);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("jack")) && (strcmp(test, "jack") == 0)) {
+  if ((strlen(test) == strlen("jackin")) && (strcmp(test, "jackin") == 0)) {
     ret = test_jack_input_create(client);
     if (ret != 0) return ret;
+  }
+  if ((strlen(test) == strlen("jackout")) && (strcmp(test, "jackout") == 0)) {
     ret = test_jack_output_create(client);
     if (ret != 0) return ret;
   }

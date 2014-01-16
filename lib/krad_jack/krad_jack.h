@@ -59,6 +59,7 @@ typedef void (kr_jack_path_audio_cb)(kr_jack_path_audio_cb_arg *);
 struct kr_jack_setup {
   char client_name[64];
   char server_name[64];
+  kr_jack_info info;
   void *user;
   kr_jack_event_cb *event_cb;
 };

@@ -44,7 +44,6 @@ struct kr_mixer_path_audio_cb_arg {
 
 struct kr_mixer_io_path_setup {
   kr_mixer_path_info info;
-  kr_mixer_bus *bus;
   void *user;
   kr_mixer_path_audio_cb *audio_cb;
 };

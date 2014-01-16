@@ -1,5 +1,7 @@
 #include "krad_mixer.h"
 
+typedef struct kr_mixer_io_path_setup kr_mixer_path_setup;
+
 typedef enum {
   KR_MXP_NIL,
   KR_MXP_READY,
@@ -21,6 +23,7 @@ struct kr_mixer {
   kr_mixer_event_cb *event_cb;
   void *user;
   void *clock;
+  kr_mixer_bus *master;
 };
 
 struct kr_mixer_crossfader {
@@ -90,6 +93,7 @@ static int path_setup_info_check(kr_mixer_path_info *info);
 static int path_setup_check(kr_mixer_io_path_setup *setup);
 static void path_sfx_create(kr_mixer_path *path);
 static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup);
+static kr_mixer_path *make_path(kr_mixer *mixer, kr_mixer_path_setup *setup);
 //static void kr_mixer_channel_copy(kr_mixer_path *path, int in_chan, int out_chan);
 //static void kr_mixer_channel_move(kr_mixer_path *path, int in_chan, int out_chan);
 
@@ -605,7 +609,7 @@ static int path_setup_info_check(kr_mixer_path_info *info) {
   return 0;
 }
 
-static int path_setup_check(kr_mixer_io_path_setup *setup) {
+static int path_setup_check(kr_mixer_path_setup *setup) {
   if (setup->user == NULL) return -2;
   if ((setup->info.type != KR_MXR_BUS) && (setup->audio_cb == NULL)) return -4;
   if ((setup->info.type == KR_MXR_BUS) && (setup->audio_cb != NULL)) return -5;
@@ -636,7 +640,7 @@ static void path_sfx_create(kr_mixer_path *path) {
   kr_sfx_ctl(path->sfx, &cmd);
 }
 
-static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup) {
+static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   int c;
   kr_mixer_event event;
   path->crossfader = NULL;
@@ -647,7 +651,7 @@ static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup) {
   if (path->type == KR_MXR_BUS) {
     path->bus = NULL;
   } else {
-    path->bus = setup->bus;
+    path->bus = path->mixer->master;
   }
   for (c = 0; c < KR_MXR_MAX_CHANNELS; c++) {
     if (c < path->channels) {
@@ -771,7 +775,7 @@ int kr_mixer_unlink(kr_mixer_path *path) {
   return 0;
 }
 
-kr_mixer_path *kr_mixer_mkio(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
+static kr_mixer_path *make_path(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   int ret;
   kr_mixer_path *path;
   if ((mixer == NULL) || (setup == NULL)) return NULL;
@@ -790,8 +794,25 @@ kr_mixer_path *kr_mixer_mkio(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
   return path;
 }
 
+kr_mixer_path *kr_mixer_mkio(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
+  if ((mixer == NULL) || (setup == NULL)) return NULL;
+  return make_path(mixer, setup);
+}
+
 int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
-  return -1;
+  kr_mixer_path *path;
+  kr_mixer_path_setup setup;
+  if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
+  setup.info = *info;
+  setup.user = user;
+  setup.audio_cb = NULL;
+  path = make_path(mixer, &setup);
+  if (path == NULL) return -2;
+  if (mixer->master == NULL) {
+    /* FIXME hrm?? */
+    mixer->master = path;
+  }
+  return 0;
 }
 
 int kr_mixer_destroy(kr_mixer *mixer) {
