@@ -101,16 +101,15 @@ struct kr_websocket_tracker {
   uint32_t output_len;
   uint64_t frames;
   char key[96];
-  char proto[96];
 };
 
 struct kr_http_tracker {
-  uint32_t header_endstate;
-  uint32_t header_pos;
-  uint32_t got_headers;
+  uint16_t header_pos;
+  uint8_t header_endstate;
+  uint8_t got_headers;
   kr_http_method method;
   char address[128];
-  int32_t drop_after_sync;
+  uint8_t drop_after_sync;
 };
 
 struct kr_web_client {
