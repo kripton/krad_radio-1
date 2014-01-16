@@ -17,6 +17,10 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_app_server_setup";
     case CGEN_KR_APP_SERVER_INFO:
       return "kr_app_server_info";
+    case CGEN_KR_APP_CLIENT_TYPE:
+      return "kr_app_client_type";
+    case CGEN_KR_APP_SERVER_CLIENT_SETUP:
+      return "kr_app_server_client_setup";
     case CGEN_KR_ROUTER_INFO:
       return "kr_router_info";
     case CGEN_KR_ROUTER_MAP_INFO:
@@ -439,6 +443,10 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_wayland_path_info";
     case CGEN_KRAD_INTERWEB_SHUTDOWN:
       return "krad_interweb_shutdown";
+    case CGEN_KR_WEB_EVENT_TYPE:
+      return "kr_web_event_type";
+    case CGEN_KR_WEB_EVENT:
+      return "kr_web_event";
     case CGEN_KR_WEB_SERVER_SETUP:
       return "kr_web_server_setup";
     case CGEN_KR_WEBRTC_USER:
@@ -496,6 +504,12 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_app_server_info")) {
     return CGEN_KR_APP_SERVER_INFO;
+  }
+  if (!strcmp(string,"kr_app_client_type")) {
+    return CGEN_KR_APP_CLIENT_TYPE;
+  }
+  if (!strcmp(string,"kr_app_server_client_setup")) {
+    return CGEN_KR_APP_SERVER_CLIENT_SETUP;
   }
   if (!strcmp(string,"kr_router_info")) {
     return CGEN_KR_ROUTER_INFO;
@@ -1130,6 +1144,12 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_interweb_shutdown")) {
     return CGEN_KRAD_INTERWEB_SHUTDOWN;
   }
+  if (!strcmp(string,"kr_web_event_type")) {
+    return CGEN_KR_WEB_EVENT_TYPE;
+  }
+  if (!strcmp(string,"kr_web_event")) {
+    return CGEN_KR_WEB_EVENT;
+  }
   if (!strcmp(string,"kr_web_server_setup")) {
     return CGEN_KR_WEB_SERVER_SETUP;
   }
@@ -1223,6 +1243,9 @@ int codegen_is_union(char *type) {
 
 int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_app_method")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_app_client_type")) {
     return 1;
   }
   if (!strcmp(type,"kr_easing")) {
@@ -1379,6 +1402,9 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"krad_interweb_shutdown")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_web_event_type")) {
     return 1;
   }
   if (!strcmp(type,"kr_webrtc_signal_type")) {
