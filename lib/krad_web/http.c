@@ -1,7 +1,7 @@
 static int pack_http_header(kr_web_client *client, char *mimetype);
 static int pack_http_404_response(kr_web_client *client);
 
-void debug_print_headers(kr_web_client *client) {
+void print_headers(kr_web_client *client) {
   char *headers;
   headers = (char *)client->in->rd_buf;
   printk("Headers length: %d", client->hdr_pos);
@@ -38,6 +38,7 @@ static int pack_http_404_response(kr_web_client *client) {
   kr_io2_advance(client->out, pos);
   return pos;
 }
+
 int find_end_of_request_headers(kr_web_client *client) {
   int i;
   uint8_t *buf;
@@ -53,7 +54,7 @@ int find_end_of_request_headers(kr_web_client *client) {
       }
       if (client->hdr_le == 2) {
         buf[client->hdr_pos] = '\0';
-        client->hdrs_recvd = 1;
+        client->got_headers = 1;
         return 1;
       }
     }
@@ -85,35 +86,35 @@ int get_address_method(kr_web_client *client) {
   if (memcmp(headers, "GET ", 4) == 0) {
     ret = copy_header(client->address, headers, "GET ", sizeof(client->address));
     if (ret < 0) return -1;
-    client->verb = KR_WS_GET;
+    client->method = KR_WS_GET;
     return 0;
   }
   if (memcmp(headers, "PUT ", 4) == 0) {
     ret = copy_header(client->address, headers, "PUT ", sizeof(client->address));
     if (ret < 0) return -1;
-    client->verb = KR_WS_PUT;
+    client->method = KR_WS_PUT;
     return 0;
   }
   if (memcmp(headers, "HEAD ", 5) == 0) {
-    client->verb = KR_WS_HEAD;
+    client->method = KR_WS_HEAD;
     return 0;
   }
   if (memcmp(headers, "SOURCE ", 7) == 0) {
     ret = copy_header(client->address, headers, "SOURCE ", sizeof(client->address));
     if (ret < 0) return -1;
-    client->verb = KR_WS_SOURCE;
+    client->method = KR_WS_SOURCE;
     return 0;
   }
   if (memcmp(headers, "POST ", 5) == 0) {
-    client->verb = KR_WS_POST;
+    client->method = KR_WS_POST;
     return 0;
   }
   if (memcmp(headers, "PATCH ", 6) == 0) {
-    client->verb = KR_WS_PATCH;
+    client->method = KR_WS_PATCH;
     return 0;
   }
   if (memcmp(headers, "OPTIONS ", 8) == 0) {
-    client->verb = KR_WS_OPTIONS;
+    client->method = KR_WS_OPTIONS;
     return 0;
   }
   return -1;
@@ -135,11 +136,11 @@ int handle_get(kr_web_client *client) {
     if ((strstr(headers, "GET ") != NULL) && (strstr(headers, " HTTP/1") != NULL)) {
       printk("GET %s", client->address);
       if (strncmp("/api", client->address, 4) == 0) {
-         client->type = KR_WS_API;
+         client->type = KR_WS_REST_API;
          printk("Web Server: REST API Client");
       } else {
-        if (!web_client_get_stream(client)) {
-          client->type = KR_WS_FILE;
+        if (!find_stream(client)) {
+          client->type = KR_WS_GET_FILE;
         }
       }
       kr_io2_pulled(client->in, client->hdr_pos);
@@ -156,7 +157,7 @@ int handle_put(kr_web_client *client) {
   mount_start = NULL;
   mount_len = 0;
   buf = (char *)client->in->rd_buf;
-  switch (client->verb) {
+  switch (client->method) {
     case KR_WS_PUT:
       mount_start = buf + 4;
       mount_len = strcspn(mount_start, " &?\n\r");
@@ -169,10 +170,10 @@ int handle_put(kr_web_client *client) {
       return -1;
   }
   if ((mount_len < 5) || (mount_len > 127)) return -1;
-  client->mount[mount_len] = '\0';
-  memcpy(client->mount, mount_start, mount_len);
-  client->type = KR_WS_STREAM_IN;
-  printk("Source/Put client mount is: %s", client->mount);
+  client->address[mount_len] = '\0';
+  memcpy(client->address, mount_start, mount_len);
+  client->type = KR_WS_GET_STREAM;
+  printk("Source/Put client mount is: %s", client->address);
   return 0;
 }
 
@@ -182,11 +183,11 @@ int handle_post(kr_web_client *client) {
 
 int handle_http_request(kr_web_client *client) {
   int ret;
-  if (!client->hdrs_recvd) {
+  if (!client->got_headers) {
     if (find_end_of_request_headers(client)) {
       ret = get_address_method(client);
       if (ret < 0) return -1;
-      switch (client->verb) {
+      switch (client->method) {
         case KR_WS_GET:
           ret = handle_get(client);
           return ret;
@@ -198,14 +199,13 @@ int handle_http_request(kr_web_client *client) {
           ret = handle_put(client);
           return ret;
         default:
-          debug_print_headers(client);
+          print_headers(client);
           return -1;
       }
     }
   }
-  if ((!client->hdrs_recvd) && (client->in->len >= 4096)) {
-    printk("Web Server: No end to headers in sight after %d bytes",
-     client->in->len);
+  if ((!client->got_headers) && (client->in->len >= 4096)) {
+    printke("Web Server: Request headers too long %d bytes", client->in->len);
     return -1;
   }
   return 0;

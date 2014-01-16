@@ -35,15 +35,17 @@ enum krad_interweb_shutdown {
 enum kr_web_client_type {
   KR_WS_HTTP = 0,
   KR_WS_WEBSOCKET,
-  KR_WS_FILE,
-  KR_WS_STREAM_IN,
-  KR_WS_STREAM_OUT,
-  KR_WS_API,
+  KR_WS_GET_FILE,
+  KR_WS_PUT_FILE,
+  KR_WS_POST_FILE,
+  KR_WS_GET_STREAM,
+  KR_WS_PUT_STREAM,
+  KR_WS_REST_API,
   KR_REMOTE_LISTEN,
 };
 
-enum kr_web_verb {
-  KR_WS_INVALID = 0,
+typedef enum {
+  KR_WS_NONE = 0,
   KR_WS_GET,
   KR_WS_PUT,
   KR_WS_SOURCE,
@@ -51,7 +53,7 @@ enum kr_web_verb {
   KR_WS_HEAD,
   KR_WS_PATCH,
   KR_WS_OPTIONS,
-};
+} kr_http_method;
 
 typedef struct kr_web_client kr_web_client;
 typedef struct kr_websocket_client kr_websocket_client;
@@ -111,10 +113,9 @@ struct kr_web_client {
   int32_t type;
   uint32_t hdr_le;
   uint32_t hdr_pos;
-  uint32_t hdrs_recvd;
-  int32_t verb;
-  char address[96];
-  char mount[128];
+  uint32_t got_headers;
+  kr_http_method method;
+  char address[128];
   kr_websocket_client ws;
 };
 
@@ -145,10 +146,10 @@ int strmatch(char *string1, char *string2) {
 
 #include "setup.c"
 #include "socket.c"
+#include "stream.c"
 #include "http.c"
 #include "websocket.c"
 /* #include "webrtc.c" */
-#include "stream.c"
 #include "file.c"
 
 int http_app_client_handle(kr_web_client *client) {
@@ -186,17 +187,23 @@ static int handle_client(kr_web_client *client) {
     case KR_WS_WEBSOCKET:
       ret = handle_websocket_client(client);
       break;
-    case KR_WS_FILE:
-      ret = web_file_client_handle(client);
+    case KR_WS_GET_FILE:
+      ret = handle_get_file(client);
       break;
-    case KR_WS_API:
+    case KR_WS_PUT_FILE:
+      ret = handle_put_file(client);
+      break;
+    case KR_WS_POST_FILE:
+      ret = handle_post_file(client);
+      break;
+    case KR_WS_REST_API:
       ret = http_app_client_handle(client);
       break;
-    case KR_WS_STREAM_OUT:
-      ret = web_stream_client_handle(client);
+    case KR_WS_GET_STREAM:
+      ret = handle_get_stream(client);
       break;
-    case KR_WS_STREAM_IN:
-      ret = web_stream_in_client_handle(client);
+    case KR_WS_PUT_STREAM:
+      ret = handle_put_stream(client);
       break;
     default:
       break;
@@ -216,8 +223,8 @@ static void disconnect_client(kr_web_server *server, kr_web_client *client) {
   client->drop_after_sync = 0;
   client->hdr_le = 0;
   client->hdr_pos = 0;
-  client->hdrs_recvd = 0;
-  client->verb = 0;
+  client->got_headers = 0;
+  client->method = 0;
   memset(&client->ws, 0, sizeof(kr_websocket_client));
   memset(client->address, 0, sizeof(client->address));
   kr_io2_destroy(&client->in);

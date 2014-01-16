@@ -1,4 +1,14 @@
-int web_file_client_handle(kr_web_client *client) {
+int handle_post_file(kr_web_client *client) {
+
+  return 0;
+}
+
+int handle_put_file(kr_web_client *client) {
+
+  return 0;
+}
+
+int handle_get_file(kr_web_client *client) {
   int len;
   char *address;
   kr_web_server *s;
