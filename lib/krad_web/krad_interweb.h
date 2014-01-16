@@ -36,9 +36,6 @@ typedef struct kr_web_event kr_web_event;
 typedef void (kr_web_event_cb)(kr_web_event *);
 typedef int (kr_web_output_cb)(kr_io2_t *, uint8_t *buffer, size_t len);
 
-typedef struct kr_webrtc_user kr_webrtc_user;
-typedef struct kr_webrtc_signal kr_webrtc_signal;
-
 typedef enum {
   KR_WEB_CLIENT_CREATE = 1,
   KR_WEB_STREAM_MONKEY,
@@ -64,24 +61,6 @@ struct kr_web_server_setup {
   char *htmlfooter;
   void *user;
   kr_web_event_cb *event_cb;
-};
-
-struct kr_webrtc_user {
-  int active;
-  char name[KR_WEBRTC_NAME_MAX];
-};
-
-enum kr_webrtc_signal_type {
-  CALL = 1,
-  ANSWER,
-  HANGUP
-};
-
-struct kr_webrtc_signal {
-  char from[KR_WEBRTC_NAME_MAX];
-  char to[KR_WEBRTC_NAME_MAX];
-  int32_t signal_type;
-  char sdp[4096];
 };
 
 struct kr_web_server {
@@ -155,7 +134,7 @@ struct kr_web_client {
   kr_web_server *server;
   kr_io2_t *in;
   kr_io2_t *out;
-  kr_webrtc_user webrtc_user;
+/*  kr_webrtc_user webrtc_user;*/
   int32_t drop_after_sync;
   int32_t type;
   uint32_t hdr_le;
@@ -167,20 +146,11 @@ struct kr_web_client {
   kr_websocket_client ws;
 };
 
-void kr_webrtc_register(kr_web_client *client, char *name);
-void kr_webrtc_unregister(kr_web_client *client);
-void kr_webrtc_list_users(kr_web_client *client);
-void kr_webrtc_call(kr_web_client *client, char *to, char *from, char *sdp);
-void kr_webrtc_answer(kr_web_client *client, char *to, char *from, char *sdp);
-void kr_webrtc_candidate(kr_web_client *client, char *to, char *from,
- char *candidate);
-
 int32_t kr_web_server_listen_off(kr_web_server *server, char *interface, int32_t port);
 int32_t kr_web_server_listen_on(kr_web_server *server, char *interface, int32_t port);
-
 void kr_web_server_disable(kr_web_server *server);
-void kr_web_server_destroy(kr_web_server **server);
 void kr_web_server_run(kr_web_server *server);
+void kr_web_server_destroy(kr_web_server **server);
 kr_web_server *kr_web_server_create(kr_web_server_setup *setup);
 
 #endif

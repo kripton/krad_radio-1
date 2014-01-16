@@ -1,3 +1,32 @@
+typedef struct kr_webrtc_user kr_webrtc_user;
+typedef struct kr_webrtc_signal kr_webrtc_signal;
+
+struct kr_webrtc_user {
+  int active;
+  char name[KR_WEBRTC_NAME_MAX];
+};
+
+enum kr_webrtc_signal_type {
+  CALL = 1,
+  ANSWER,
+  HANGUP
+};
+
+struct kr_webrtc_signal {
+  char from[KR_WEBRTC_NAME_MAX];
+  char to[KR_WEBRTC_NAME_MAX];
+  int32_t signal_type;
+  char sdp[4096];
+};
+
+void kr_webrtc_register(kr_web_client *client, char *name);
+void kr_webrtc_unregister(kr_web_client *client);
+void kr_webrtc_list_users(kr_web_client *client);
+void kr_webrtc_call(kr_web_client *client, char *to, char *from, char *sdp);
+void kr_webrtc_answer(kr_web_client *client, char *to, char *from, char *sdp);
+void kr_webrtc_candidate(kr_web_client *client, char *to, char *from,
+ char *candidate);
+
 void kr_webrtc_register(kr_web_client *client, char *name) {
   int i;
   char json[256];
