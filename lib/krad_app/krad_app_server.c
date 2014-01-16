@@ -585,6 +585,7 @@ int kr_app_server_client_create(kr_app_server *server,
     printke("App Server: too many new clients");
     return -5;
   }
+  client->type = KR_APP_CLIENT_REMOTE;
   client->sd = setup->fd;
   client->input_cb = setup->input_cb;
   client->output_cb = setup->output_cb;
