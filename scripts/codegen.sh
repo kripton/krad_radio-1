@@ -26,11 +26,13 @@ function update_embedded {
 }
 
 function run_codegen_precheck {
-  if [ ! -f "tools/code/gen/codegen_auto" ]; then
-    cd tools/code/gen/
-    make
-    cd ../../../
-  fi
+  cd tools/code/gen/bootstrap
+  rm bootstrapped.c
+  rm bootstrapped.h
+  make
+  cd ../
+  make
+  cd ../../../
 }
 
 function run_codegen {
