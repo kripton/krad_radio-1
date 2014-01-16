@@ -150,7 +150,6 @@ int handle_unknown_client(kr_web_client *client) {
     if (find_end_of_client_headers(client)) {
       ret = identify_method(client);
       if (ret < 0) return -1;
-      debug_print_headers(client);
       switch (client->verb) {
         case KR_WS_GET:
           ret = handle_get(client);
@@ -163,6 +162,7 @@ int handle_unknown_client(kr_web_client *client) {
           ret = handle_put(client);
           return ret;
         default:
+          debug_print_headers(client);
           return -1;
       }
     }
