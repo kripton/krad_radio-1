@@ -1,3 +1,6 @@
+static int pack_http_header(kr_web_client *client, char *mimetype);
+static int pack_http_404_response(kr_web_client *client);
+
 void debug_print_headers(kr_web_client *client) {
   char *headers;
   headers = (char *)client->in->rd_buf;
@@ -5,6 +8,36 @@ void debug_print_headers(kr_web_client *client) {
   printk("%s", headers);
 }
 
+static int pack_http_header(kr_web_client *client, char *mimetype) {
+  int pos;
+  char *buffer;
+  pos = 0;
+  buffer = (char *)client->out->buf;
+  pos += sprintf(buffer + pos, "HTTP/1.0 200 OK\r\n");
+  pos += sprintf(buffer + pos, "Status: 200 OK\r\n");
+  pos += sprintf(buffer + pos, "Connection: close\r\n");
+  pos += sprintf(buffer + pos, "Server: Krad-Radio\r\n");
+  pos += sprintf(buffer + pos, "Content-Type: %s; charset=utf-8\r\n", mimetype);
+  pos += sprintf(buffer + pos, "\r\n");
+  kr_io2_advance(client->out, pos);
+  return pos;
+}
+
+static int pack_http_404_response(kr_web_client *client) {
+  int32_t pos;
+  char *buffer;
+  pos = 0;
+  buffer = (char *)client->out->buf;
+  pos += sprintf(buffer + pos, "HTTP/1.1 404 Not Found\r\n");
+  pos += sprintf(buffer + pos, "Status: 404 Not Found\r\n");
+  pos += sprintf(buffer + pos, "Connection: close\r\n");
+  pos += sprintf(buffer + pos, "Server: Krad-Radio\r\n");
+  pos += sprintf(buffer + pos, "Content-Type: text/html; charset=utf-8\r\n");
+  pos += sprintf(buffer + pos, "\r\n");
+  pos += sprintf(buffer + pos, "404 Not Found");
+  kr_io2_advance(client->out, pos);
+  return pos;
+}
 int find_end_of_request_headers(kr_web_client *client) {
   int i;
   uint8_t *buf;
@@ -28,41 +61,6 @@ int find_end_of_request_headers(kr_web_client *client) {
   return 0;
 }
 
-int identify_method(kr_web_client *client) {
-  uint8_t *buf;
-  buf = client->in->rd_buf;
-  if (client->hdr_pos < 8) return -1;
-  if (memcmp(buf, "GET ", 4) == 0) {
-    client->verb = KR_WS_GET;
-    return 0;
-  }
-  if (memcmp(buf, "PUT ", 4) == 0) {
-    client->verb = KR_WS_PUT;
-    return 0;
-  }
-  if (memcmp(buf, "HEAD ", 5) == 0) {
-    client->verb = KR_WS_HEAD;
-    return 0;
-  }
-  if (memcmp(buf, "SOURCE ", 7) == 0) {
-    client->verb = KR_WS_SOURCE;
-    return 0;
-  }
-  if (memcmp(buf, "POST ", 5) == 0) {
-    client->verb = KR_WS_POST;
-    return 0;
-  }
-  if (memcmp(buf, "PATCH ", 6) == 0) {
-    client->verb = KR_WS_PATCH;
-    return 0;
-  }
-  if (memcmp(buf, "OPTIONS ", 8) == 0) {
-    client->verb = KR_WS_OPTIONS;
-    return 0;
-  }
-  return -1;
-}
-
 int copy_header(char *header, char *headers, char *header_name, int max) {
   char *pos;
   int32_t len;
@@ -79,13 +77,53 @@ int copy_header(char *header, char *headers, char *header_name, int max) {
   return 0;
 }
 
+int get_address_method(kr_web_client *client) {
+  int ret;
+  char *headers;
+  headers = (char *)client->in->rd_buf;
+  if (client->hdr_pos < 8) return -1;
+  if (memcmp(headers, "GET ", 4) == 0) {
+    ret = copy_header(client->address, headers, "GET ", sizeof(client->address));
+    if (ret < 0) return -1;
+    client->verb = KR_WS_GET;
+    return 0;
+  }
+  if (memcmp(headers, "PUT ", 4) == 0) {
+    ret = copy_header(client->address, headers, "PUT ", sizeof(client->address));
+    if (ret < 0) return -1;
+    client->verb = KR_WS_PUT;
+    return 0;
+  }
+  if (memcmp(headers, "HEAD ", 5) == 0) {
+    client->verb = KR_WS_HEAD;
+    return 0;
+  }
+  if (memcmp(headers, "SOURCE ", 7) == 0) {
+    ret = copy_header(client->address, headers, "SOURCE ", sizeof(client->address));
+    if (ret < 0) return -1;
+    client->verb = KR_WS_SOURCE;
+    return 0;
+  }
+  if (memcmp(headers, "POST ", 5) == 0) {
+    client->verb = KR_WS_POST;
+    return 0;
+  }
+  if (memcmp(headers, "PATCH ", 6) == 0) {
+    client->verb = KR_WS_PATCH;
+    return 0;
+  }
+  if (memcmp(headers, "OPTIONS ", 8) == 0) {
+    client->verb = KR_WS_OPTIONS;
+    return 0;
+  }
+  return -1;
+}
+
 int handle_get(kr_web_client *client) {
   char *headers;
   int32_t ret;
   headers = (char *)client->in->rd_buf;
   if (strstr(headers, "Upgrade: websocket") != NULL) {
-    ret = copy_header(client->get, headers, "GET ", sizeof(client->get));
-    if (ret < 0) return -1;
     ret = copy_header(client->ws.key, headers, "Sec-WebSocket-Key: ", sizeof(client->ws.key));
     if (ret < 0) return -1;
     ret = copy_header(client->ws.proto, headers, "Sec-WebSocket-Protocol: ", sizeof(client->ws.proto));
@@ -95,10 +133,8 @@ int handle_get(kr_web_client *client) {
     return 0;
   } else {
     if ((strstr(headers, "GET ") != NULL) && (strstr(headers, " HTTP/1") != NULL)) {
-      ret = copy_header(client->get, headers, "GET ", sizeof(client->get));
-      if (ret < 0) return -1;
-      printk("GET IS %s", client->get);
-      if (strncmp("/api", client->get, 4) == 0) {
+      printk("GET %s", client->address);
+      if (strncmp("/api", client->address, 4) == 0) {
          client->type = KR_WS_API;
          printk("Web Server: REST API Client");
       } else {
@@ -148,7 +184,7 @@ int handle_http_request(kr_web_client *client) {
   int ret;
   if (!client->hdrs_recvd) {
     if (find_end_of_request_headers(client)) {
-      ret = identify_method(client);
+      ret = get_address_method(client);
       if (ret < 0) return -1;
       switch (client->verb) {
         case KR_WS_GET:

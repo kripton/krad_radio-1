@@ -113,7 +113,7 @@ struct kr_web_client {
   uint32_t hdr_pos;
   uint32_t hdrs_recvd;
   int32_t verb;
-  char get[96];
+  char address[96];
   char mount[128];
   kr_websocket_client ws;
 };
@@ -143,13 +143,12 @@ int strmatch(char *string1, char *string2) {
   return 0;
 }
 
+#include "setup.c"
 #include "socket.c"
+#include "http.c"
 #include "websocket.c"
 /* #include "webrtc.c" */
-#include "setup.c"
-#include "header_out.c"
 #include "stream.c"
-#include "request.c"
 #include "file.c"
 
 int http_app_client_handle(kr_web_client *client) {
@@ -160,7 +159,7 @@ int http_app_client_handle(kr_web_client *client) {
   event.type = KR_WEB_CLIENT_CREATE;
   event.fd = client->sd;
   kr_io2_restart(client->in);
-  kr_io2_pack(client->in, (uint8_t *)(client->get + 4), strlen(client->get + 4));
+  kr_io2_pack(client->in, (uint8_t *)(client->address), strlen(client->address));
   event.in = client->in;
   pack_http_header(client, "application/json");
   event.out = client->out;
@@ -220,7 +219,7 @@ static void disconnect_client(kr_web_server *server, kr_web_client *client) {
   client->hdrs_recvd = 0;
   client->verb = 0;
   memset(&client->ws, 0, sizeof(kr_websocket_client));
-  memset(client->get, 0, sizeof(client->get));
+  memset(client->address, 0, sizeof(client->address));
   kr_io2_destroy(&client->in);
   kr_io2_destroy(&client->out);
   printk("Web Server: Client Disconnected");
