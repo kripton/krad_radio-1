@@ -119,14 +119,14 @@ static int validate_local_client(kr_app_server_client *client) {
   if (ret > 0) {
     kr_io2_pulled(client->in, ret);
     client->type = KR_APP_CLIENT_LOCAL_VALID;
-    printk("client is valid");
+    /*printk("client is valid");*/
     kr_ebml2_set_buffer(&ebml, client->out->buf, client->out->space);
     kr_ebml_pack_header(&ebml, KR_APP_SERVER_DOCTYPE, KR_APP_DOCTYPE_VERSION,
      KR_APP_DOCTYPE_READ_VERSION);
     if (ebml.pos < 1) {
       printke("App Server: Error packing client header");
     } else {
-      printk("packed server header %d", ret);
+      /*printk("packed server header %d", ret);*/
       kr_io2_advance(client->out, ret);
       return 1;
     }
@@ -137,7 +137,6 @@ static int validate_local_client(kr_app_server_client *client) {
 
 static int pack_crate_remote(uint8_t *buffer, kr_crate2 *crate, size_t max) {
   int res;
-  printk("ws crate packing");
   res = kr_crate2_to_json((char *)buffer, crate, max);
   return res;
 }
@@ -145,7 +144,6 @@ static int pack_crate_remote(uint8_t *buffer, kr_crate2 *crate, size_t max) {
 static int pack_crate_local(uint8_t *buffer, kr_crate2 *crate, size_t max) {
   kr_ebml2_t ebml;
   uint8_t *ebml_crate;
-  printk("crate packing");
   kr_ebml2_set_buffer(&ebml, buffer, max);
   kr_ebml2_start_element(&ebml, KR_EID_CRATE, &ebml_crate);
   kr_crate2_to_ebml(&ebml, crate);
@@ -156,23 +154,25 @@ static int pack_crate_local(uint8_t *buffer, kr_crate2 *crate, size_t max) {
 static int unpack_crate_remote(kr_crate2 *crate, kr_app_server_client *client) {
   int ret;
   char json[8192];
-  printk("unpack crate remote");
+  /*printk("unpack crate remote");*/
   if (!(kr_io2_has_in(client->in))) {
     return 0;
   }
   ret = client->input_cb(&client->state_tracker, json, sizeof(json), client->in->rd_buf, client->in->len);
-  printk("input bytes: %d", ret);
+  /*printk("input bytes: %d", ret);*/
   if (ret < 1) return 0;
   kr_io2_pulled(client->in, ret);
-  printk("Trying: \n%s\n", json);
+  /*printk("Trying: \n%s\n", json);*/
   ret = kr_crate2_fr_json(json, crate);
   if (ret > 0) {
+    /*
     char string[8192];
     ret = kr_crate2_to_text(string, crate, sizeof(string));
     if (ret > 0) {
       printk("App Server: %"PRIu64" byte crate: (from json+web)\n%s\n", ret);
       printk("%s",string);
     }
+    */
     return 1;
   } else {
     printk("Misunderstood: \n%s\n", json);
@@ -202,11 +202,13 @@ static int unpack_crate_local(kr_crate2 *crate, kr_io2_t *in) {
   if (element == KR_EID_CRATE) {
     ret = kr_crate2_fr_ebml(&ebml, crate);
     if (ret == 0) {
+      /*
       char string[8192];
       ret = kr_crate2_to_text(string, crate, sizeof(string));
       if (ret > 0) {
         printk("App Server: %"PRIu64" byte crate: \n%s\n", size, string);
       }
+      */
       kr_io2_pulled(in, ebml.pos);
       return 1;
     }
@@ -235,7 +237,7 @@ static int handle_client(kr_app_server *server, kr_app_server_client *client) {
       }
       break;
     default:
-      printke("App Server: Unimplmented protocal type");
+      printke("App Server: Handle client fail");
       return -1;
   }
   if (ret > 0) {
@@ -306,7 +308,7 @@ int32_t json_hello(kr_app_server_client *client) {
   ssize_t ret;
   char json[128];
   snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
-   "\"info\":\"sysname\",\"infoval\":\"%s\"}]", "bongohat");
+   "\"info\":\"sysname\",\"infoval\":\"%s\"}]\n", "bongohat");
   ret = client->output_cb(client->state_tracker, client->out->buf, client->out->space, (uint8_t *)json, strlen(json));
   if (ret > 0) {
     kr_io2_advance(client->out, ret);
@@ -330,7 +332,7 @@ static void accept_remote_client(kr_app_server *server) {
     printke("App Server: Error reading from eventfd");
     return;
   }
-  printk("App Server: %"PRIu64" new client from ws", u);
+  /*printk("App Server: %"PRIu64" new client from ws", u);*/
   if (u == 0) return;
   client = NULL;
   new_client = NULL;
@@ -355,7 +357,7 @@ static void accept_remote_client(kr_app_server *server) {
   json_hello(client);
   if (kr_io2_want_out(client->out)) {
     ev.events = EPOLLIN | EPOLLOUT;
-    printk("App Server: Yes we want out");
+    /*printk("App Server: Yes we want out");*/
   }
   ev.data.ptr = client;
   ret = epoll_ctl(server->pd, EPOLL_CTL_ADD, client->sd, &ev);
@@ -366,7 +368,7 @@ static void accept_remote_client(kr_app_server *server) {
     return;
   }
   server->num_clients++;
-  printk("App Server: Websocket client accepted");
+  printk("App Server: Remote client accepted");
   free(new_client);
   server->new_clients[i] = NULL;
 }
@@ -376,7 +378,7 @@ static int handle_app_events(kr_app_server *server) {
   int fd;
   int n;
   int i;
-  printk("App Server: Got app event");
+  /*printk("App Server: Got app event");*/
   struct epoll_event events[KR_APP_EVENTS_MAX];
   n = epoll_wait(server->app_pd, events, KR_APP_EVENTS_MAX, -1);
   if (n < 1) {
@@ -398,7 +400,7 @@ static int handle_app_events(kr_app_server *server) {
       server->state = KR_APP_DO_SHUTDOWN;
     }
     if (fd == server->efd) {
-      printk("App Server: Must be a new client from remote!");
+      /*printk("App Server: Must be a new client from remote!");*/
       accept_remote_client(server);
     }
   }
@@ -432,7 +434,7 @@ static void *server_loop(void *arg) {
         handle_app_events(server);
         continue;
       }
-      printk("App Server: Got client event");
+      /*printk("App Server: Got client event");*/
       client = events[i].data.ptr;
       server->current_client = client;
       if (events[i].events & EPOLLIN) {
@@ -444,9 +446,8 @@ static void *server_loop(void *arg) {
               disconnect_client(server, client);
               continue;
             } else {
-              printk("client check");
               if (kr_io2_want_out(client->out)) {
-                printk("client did want out");
+                /*printk("client did want out");*/
                 memset(&ev, 0, sizeof(struct epoll_event));
                 ev.events = EPOLLIN | EPOLLOUT;
                 ev.data.ptr = client;

@@ -153,6 +153,32 @@ int strmatch(char *string1, char *string2) {
 /* #include "webrtc.c" */
 #include "file.c"
 
+ssize_t rest_pack(void *ctx, void *out, size_t max, void *in, size_t len) {
+  /*
+  uint32_t header_len;
+  uint32_t total_len;
+  uint8_t header[10];
+  */
+  if (len < 1) return -1;
+  if (max < len) return -2;
+  //if (ctx == NULL) return -3;
+  if (out == NULL) return -4;
+  if (in == NULL) return -5;
+  /*
+  header_len = pack_frame_header(header, len);
+  total_len = header_len + len;
+  if (max < total_len) {
+    printke("Websocket client: No space to pack buffer");
+    return -6;
+  }
+  memcpy(out, header, header_len);
+  memcpy(out + header_len, in, len);
+  return total_len;
+  */
+  memcpy(out, in, len);
+  return len;
+}
+
 int handle_rest_api(kr_web_client *client) {
   /* need to add client type or cb for proto */
   kr_web_server *server;
@@ -167,8 +193,8 @@ int handle_rest_api(kr_web_client *client) {
   event.out = client->out;
   event.state_tracker = NULL;
   event.state_tracker_sz = 0;
-  //event.output_cb = kr_io2_pack;
-  //event.input_cb = websocket_unpack;
+  event.output_cb = rest_pack;
+  //event.input_cb = rest_unpack;
   event.user = server->user;
   server->event_cb(&event);
   client->sd = -1;
