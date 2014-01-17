@@ -52,7 +52,7 @@ typedef enum {
 } kr_mixer_control;
 
 typedef enum {
-  KR_MXR_INPUT,
+  KR_MXR_INPUT = 1,
   KR_MXR_BUS,
   KR_MXR_OUTPUT
 } kr_mixer_path_type;

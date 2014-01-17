@@ -217,7 +217,8 @@ static void path_io_create(kr_xpdr_path *path, kr_xpdr_path_io_info *info) {
       memcpy(&mp_setup.info, &info->info.mixer_path_info,
        sizeof(kr_mixer_path_info));
       mp_setup.audio_cb = xpdr_mixer_path_audio_cb;
-      mp_setup.user = path;
+      mp_setup.audio_user = path;
+      mp_setup.control_user = path->user;
       io->mixer_path = kr_mixer_mkio(mixer, &mp_setup);
       if (io->mixer_path == NULL) {
         printke("mixer mkpath returned NULL");

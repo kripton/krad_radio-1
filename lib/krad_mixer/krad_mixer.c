@@ -610,10 +610,15 @@ static int path_setup_info_check(kr_mixer_path_info *info) {
 }
 
 static int path_setup_check(kr_mixer_path_setup *setup) {
-  if (setup->user == NULL) return -2;
-  if ((setup->info.type != KR_MXR_BUS) && (setup->audio_cb == NULL)) return -4;
-  if ((setup->info.type == KR_MXR_BUS) && (setup->audio_cb != NULL)) return -5;
-  if (path_setup_info_check(&setup->info)) return -4;
+  if (setup->info.type == KR_MXR_BUS) {
+    if (setup->audio_cb != NULL) return -1;
+    if (setup->audio_user != NULL) return -2;
+  } else {
+    if (setup->audio_cb == NULL) return -3;
+    if (setup->audio_user == NULL) return -4;
+  }
+  if (setup->control_user == NULL) return -5;
+  if (path_setup_info_check(&setup->info)) return -6;
   return 0;
 }
 
@@ -647,7 +652,8 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   path->channels = setup->info.channels;
   path->type = setup->info.type;
   path->audio_cb = setup->audio_cb;
-  path->control_user = setup->user;
+  path->audio_user = setup->audio_user;
+  path->control_user = setup->control_user;
   if (path->type == KR_MXR_BUS) {
     path->bus = NULL;
   } else {
@@ -725,33 +731,36 @@ int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch) {
   return -2;
 }
 
-int kr_mixer_path_info_get(kr_mixer_path *unit, kr_mixer_path_info *info) {
+int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info) {
   int i;
   kr_sfx_cmd cmd;
-  if ((unit == NULL) || (info == NULL)) return -1;
-  info->channels = unit->channels;
+  if ((path == NULL) || (info == NULL)) return -1;
+  strcpy(info->bus, "Master");
+  info->channels = path->channels;
+  info->delay = path->delay;
+  info->type = path->type;
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    info->volume[i] = unit->volume[i];
-    info->map[i] = unit->map[i];
-    info->mixmap[i] = unit->mixmap[i];
-    info->rms[i] = unit->avg[i];
-    info->peak[i] = unit->peak_last[i];
+    info->volume[i] = path->volume[i];
+    info->map[i] = path->map[i];
+    info->mixmap[i] = path->mixmap[i];
+    info->rms[i] = path->avg[i];
+    info->peak[i] = path->peak_last[i];
   }
   cmd.control = KR_SFX_GET_INFO;
   cmd.effect = KR_SFX_EQ;
   cmd.user = &info->eq;
-  kr_sfx_ctl(unit->sfx, &cmd);
+  kr_sfx_ctl(path->sfx, &cmd);
   cmd.effect = KR_SFX_LOWPASS;
   cmd.user = &info->lowpass;
-  kr_sfx_ctl(unit->sfx, &cmd);
+  kr_sfx_ctl(path->sfx, &cmd);
   cmd.effect = KR_SFX_HIGHPASS;
   cmd.user = &info->highpass;
-  kr_sfx_ctl(unit->sfx, &cmd);
+  kr_sfx_ctl(path->sfx, &cmd);
   cmd.effect = KR_SFX_ANALOG;
   cmd.user = &info->analog;
-  kr_sfx_ctl(unit->sfx, &cmd);
-  if ((unit->crossfader != NULL) && (unit->crossfader->path[0] == unit)) {
-    info->fade = unit->crossfader->fade;
+  kr_sfx_ctl(path->sfx, &cmd);
+  if ((path->crossfader != NULL) && (path->crossfader->path[0] == path)) {
+    info->fade = path->crossfader->fade;
   } else {
     info->crossfade_group[0] = '\0';
     info->fade = 0.0f;
@@ -810,7 +819,8 @@ int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
   kr_mixer_path_setup setup;
   if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
   setup.info = *info;
-  setup.user = user;
+  setup.control_user = user;
+  setup.audio_user = NULL;
   setup.audio_cb = NULL;
   path = make_path(mixer, &setup);
   if (path == NULL) return -2;
