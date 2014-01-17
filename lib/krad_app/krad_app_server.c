@@ -308,7 +308,7 @@ int32_t json_hello(kr_app_server_client *client) {
   ssize_t ret;
   char json[128];
   snprintf(json, sizeof(json), "[{\"com\":\"kradradio\","
-   "\"info\":\"sysname\",\"infoval\":\"%s\"}]\n", "bongohat");
+   "\"info\":\"sysname\",\"infoval\":\"%s\"}]", "bongohat");
   ret = client->output_cb(client->state_tracker, client->out->buf, client->out->space, (uint8_t *)json, strlen(json));
   if (ret > 0) {
     kr_io2_advance(client->out, ret);
@@ -354,7 +354,10 @@ static void accept_remote_client(kr_app_server *server) {
   memcpy(client, new_client, sizeof(kr_app_server_client));
   memset(&ev, 0, sizeof(struct epoll_event));
   ev.events = EPOLLIN;
-  json_hello(client);
+  if (client->state_tracker != NULL) {
+    json_hello(client);
+  }
+  handle_client(server, client);
   if (kr_io2_want_out(client->out)) {
     ev.events = EPOLLIN | EPOLLOUT;
     /*printk("App Server: Yes we want out");*/

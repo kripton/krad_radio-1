@@ -179,6 +179,15 @@ ssize_t rest_pack(void *ctx, void *out, size_t max, void *in, size_t len) {
   return len;
 }
 
+ssize_t rest_unpack(void *ctx, void *out, size_t max, void *in, size_t len) {
+  kr_crate2 crate;
+  memset(&crate, 0, sizeof(crate));
+  strcpy(crate.address, in + 4);
+  crate.method = KR_GET;
+  kr_crate2_to_json(out, &crate, max);
+  return len;
+}
+
 int handle_rest_api(kr_web_client *client) {
   /* need to add client type or cb for proto */
   kr_web_server *server;
@@ -187,14 +196,14 @@ int handle_rest_api(kr_web_client *client) {
   event.type = KR_WEB_CLIENT_CREATE;
   event.fd = client->sd;
   kr_io2_restart(client->in);
-  kr_io2_pack(client->in, (uint8_t *)(client->http.address), strlen(client->http.address));
+  kr_io2_pack(client->in, (uint8_t *)(client->http.address), strlen(client->http.address) + 1);
   event.in = client->in;
   pack_http_header(client, "application/json");
   event.out = client->out;
   event.state_tracker = NULL;
   event.state_tracker_sz = 0;
   event.output_cb = rest_pack;
-  //event.input_cb = rest_unpack;
+  event.input_cb = rest_unpack;
   event.user = server->user;
   server->event_cb(&event);
   client->sd = -1;
