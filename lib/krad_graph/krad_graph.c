@@ -13,7 +13,7 @@ int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
     if (!graph->edges[i].from && !graph->edges[i].to) {
       graph->edges[i].from = from;
       graph->edges[i].to = to;
-      break;
+      return 0;
     }
   }
 
@@ -72,7 +72,7 @@ kr_graph *kr_graph_create(kr_graph_setup *setup) {
   if (setup == NULL) return NULL;
 
   graph = calloc(1,sizeof(kr_graph));
-  
+
   return graph;
 }
 
