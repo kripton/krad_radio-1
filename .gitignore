@@ -124,4 +124,5 @@ tests/kr_adpmon_test
 tests/kr_helpers_test
 tests/kr_ebml_serial_test
 tests/kr_alsa_test
+tests/kr_graph_test
 tools/code/gen/bootstrap/codegen_bootstrap

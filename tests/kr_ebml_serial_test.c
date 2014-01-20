@@ -11,14 +11,12 @@ static void get_transponder_path_info(kr_transponder_path_info *info) {
   channels = 2;
   test_name = "Music";
   bus_name = "Master";
-  strcpy(info->name, test_name);
   info->input.type = KR_XPDR_ADAPTER;
   info->input.info.adapter_path_info.api = KR_ADP_JACK;
   strcpy(info->input.info.adapter_path_info.info.jack.name, test_name);
   info->input.info.adapter_path_info.info.jack.channels = channels;
   info->input.info.adapter_path_info.info.jack.direction = KR_JACK_INPUT;
   info->output.type = KR_XPDR_MIXER;
-  strcpy(info->output.info.mixer_path_info.name, test_name);
   strcpy(info->output.info.mixer_path_info.bus, bus_name);
   info->output.info.mixer_path_info.channels = channels;
   info->output.info.mixer_path_info.type = KR_MXR_INPUT;
