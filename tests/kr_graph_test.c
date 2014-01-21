@@ -1,4 +1,9 @@
 #include "krad_graph.h"
+#include "krad_timer.h"
+
+void print_usage(const char *cmd) {
+  printf("Usage:\n  %s num_of_vertices num_of_edges\n",cmd);
+}
 
 char *kr_graph_vertex_type_to_str(kr_vertex_type type) {
   switch (type) {
@@ -17,8 +22,8 @@ void print_graph_info(kr_graph *graph) {
   for (i = j = 0; i < MAX_VERTICES; i++) {
     if (graph->vertices[i].type) {
       j++;
-      printf("  vertex %d of type %s\n",
-        j-1,kr_graph_vertex_type_to_str(graph->vertices[i].type));
+      printf("  vertex %p of type %s\n",
+        &graph->vertices[i],kr_graph_vertex_type_to_str(graph->vertices[i].type));
     }
   }
 
@@ -34,15 +39,70 @@ void print_graph_info(kr_graph *graph) {
         kr_graph_vertex_type_to_str(graph->edges[i].to->type), graph->edges[i].to);
     }
   }
+}
 
+unsigned int randr(unsigned int min, unsigned int max) {
+  double scaled = (double)rand()/RAND_MAX;
+  return (max - min +1)*scaled + min;
+}
+
+int random_vertices_gen(kr_graph *graph, int n, kr_vertex **vertices) {
+  int i;
+  int k;
+  for (i = k = 0; i < n; i++) {
+    vertices[k] = kr_graph_vertex_create(graph,randr(1,3));
+    if (vertices[k]) {
+      k++;
+    }
+  }
+  return k;
+}
+
+int random_edges_gen(kr_graph *graph, int n, int vcount, kr_vertex **vertices) {
+  int i;
+  int j;
+  int k;
+  int l;
+
+  for (i = l = 0; i < n; i++) {
+    j = randr(0,vcount-1);
+    k = randr(0,vcount-1);
+    //printf("Generating random edge from %p to %p\n",vertices[k],vertices[j]);
+    if (!kr_graph_edge_create(graph,vertices[j],vertices[k])) {
+      l++;
+    }
+  }
+
+  return l;
 }
 
 int main(int argc, char const *argv[]) {
   kr_graph *graph;
+  kr_timer *timer;
   kr_graph_setup graph_setup;
-  kr_vertex *vertices[5];
+  kr_vertex *vertices[MAX_VERTICES];
+  int vertex_count;
+  int edge_count;
+
+  if (argc != 3) {
+    print_usage(argv[0]);
+    return 0;
+  }
+
+  if (atoi(argv[1]) > MAX_VERTICES) {
+    fprintf(stderr, "MAX_VERTICES (%d) exceeded\n",MAX_VERTICES);
+    return 1;
+  }
+
+  if (atoi(argv[2]) > MAX_EDGES) {
+    fprintf(stderr, "MAX_EDGES (%d) exceeded\n",MAX_EDGES);
+    return 1;
+  }
 
   memset(&graph_setup,0,sizeof(kr_graph_setup));
+
+  timer = kr_timer_create();
+  kr_timer_start(timer);
 
   graph = kr_graph_create(&graph_setup);
 
@@ -51,48 +111,29 @@ int main(int argc, char const *argv[]) {
     return 1;
   }
 
-  printf("graph created successfully!\n");
-  printf("graph info: \n");
+  printf("graph created successfully!\n\n");
 
-  print_graph_info(graph);
+  vertex_count = random_vertices_gen(graph,atoi(argv[1]),vertices);
+  printf("Generated %d random vertices\n\n",vertex_count);
 
-  printf("creating some vertices in our graph...\n");
+  kr_timer_status(timer);
 
-  vertices[0] = kr_graph_vertex_create(graph,KR_INPUT);
-  vertices[1] = kr_graph_vertex_create(graph,KR_INPUT);
-  vertices[2] = kr_graph_vertex_create(graph,KR_BUS);
-  vertices[3] = kr_graph_vertex_create(graph,KR_BUS);
-  vertices[4] = kr_graph_vertex_create(graph,KR_OUTPUT);
+  edge_count = random_edges_gen(graph,atoi(argv[2]),vertex_count,vertices);
 
-  printf("graph info: \n");
+  printf("\nGenerated %d random edges\n\n",edge_count);
 
-  print_graph_info(graph);
+  kr_timer_status(timer);
 
- // printf("destroying a %s vertex\n",kr_graph_vertex_type_to_str(vertices[2]->type));
-
-//  kr_graph_vertex_destroy(graph,vertices[2]);
-
-  printf("graph info: \n");
-  print_graph_info(graph);
-
-  printf("connecting some vertices together\n");
-  int monkey = 1;
-  if (monkey) {
-    kr_graph_edge_create(graph,vertices[2],vertices[3]);
-  }
-  kr_graph_edge_create(graph,vertices[4],vertices[0]);
-  kr_graph_edge_create(graph,vertices[4],vertices[3]);
-  kr_graph_edge_create(graph,vertices[3],vertices[1]);
-  kr_graph_edge_create(graph,vertices[3],vertices[2]);
-  kr_graph_edge_create(graph,vertices[3],vertices[2]);
-  kr_graph_edge_create(graph,vertices[2],vertices[3]); /* this gets denied if monkey = 0 */
-
-  printf("graph info: \n");
-
-  print_graph_info(graph);
+  //printf("graph info: \n\n");
+  //print_graph_info(graph);
 
   printf("destroying graph now.\n");
   kr_graph_destroy(graph);
+
+  kr_timer_status(timer);
+
+  kr_timer_finish(timer);
+  kr_timer_destroy(timer);
 
   return 0;
 }
