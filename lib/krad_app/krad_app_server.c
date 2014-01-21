@@ -609,6 +609,8 @@ int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
   switch (client->type) {
     case KR_APP_CLIENT_REMOTE:
       ret = pack_crate_remote(client->out->buf, crate, client->out->space);
+      /* Kludge don't send null for rest */
+      if (ret > 1) ret--;
       break;
     case KR_APP_CLIENT_LOCAL_VALID:
       ret = pack_crate_local(client->out->buf, crate, client->out->space);
