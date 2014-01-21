@@ -16,7 +16,7 @@ void print_graph_info(kr_graph *graph) {
 
   for (i = j = 0; i < MAX_VERTICES; i++) {
     if (graph->vertices[i].type) {
-      j++;    
+      j++;
       printf("  vertex %d of type %s\n",
         j-1,kr_graph_vertex_type_to_str(graph->vertices[i].type));
     }
@@ -29,9 +29,9 @@ void print_graph_info(kr_graph *graph) {
 
   for (i = 0; i < MAX_EDGES; i++) {
     if (graph->edges[i].from && graph->edges[i].to) {
-      printf("  we have an edge from a %s to a %s\n",
-        kr_graph_vertex_type_to_str(graph->edges[i].from->type),
-        kr_graph_vertex_type_to_str(graph->edges[i].to->type));
+      printf("  we have an edge from a %s %p to %s %p\n",
+        kr_graph_vertex_type_to_str(graph->edges[i].from->type), graph->edges[i].from,
+        kr_graph_vertex_type_to_str(graph->edges[i].to->type), graph->edges[i].to);
     }
   }
 
@@ -68,18 +68,24 @@ int main(int argc, char const *argv[]) {
 
   print_graph_info(graph);
 
-  printf("destroying a %s vertex\n",kr_graph_vertex_type_to_str(vertices[2]->type));
+ // printf("destroying a %s vertex\n",kr_graph_vertex_type_to_str(vertices[2]->type));
 
-  kr_graph_vertex_destroy(graph,vertices[2]);
+//  kr_graph_vertex_destroy(graph,vertices[2]);
 
   printf("graph info: \n");
   print_graph_info(graph);
 
   printf("connecting some vertices together\n");
-
+  int monkey = 1;
+  if (monkey) {
+    kr_graph_edge_create(graph,vertices[2],vertices[3]);
+  }
   kr_graph_edge_create(graph,vertices[4],vertices[0]);
   kr_graph_edge_create(graph,vertices[4],vertices[3]);
   kr_graph_edge_create(graph,vertices[3],vertices[1]);
+  kr_graph_edge_create(graph,vertices[3],vertices[2]);
+  kr_graph_edge_create(graph,vertices[3],vertices[2]);
+  kr_graph_edge_create(graph,vertices[2],vertices[3]); /* this gets denied if monkey = 0 */
 
   printf("graph info: \n");
 
@@ -87,6 +93,6 @@ int main(int argc, char const *argv[]) {
 
   printf("destroying graph now.\n");
   kr_graph_destroy(graph);
-  
+
   return 0;
 }

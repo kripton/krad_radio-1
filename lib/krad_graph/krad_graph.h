@@ -36,7 +36,7 @@ typedef struct {
   int outputs;
   int buses;
 } kr_graph_setup;
- 
+
 int kr_graph_edge_destroy(kr_graph *graph, kr_vertex *to, kr_vertex *from);
 int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from);
 int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex);

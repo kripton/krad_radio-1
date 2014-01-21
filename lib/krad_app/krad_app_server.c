@@ -119,14 +119,12 @@ static int validate_local_client(kr_app_server_client *client) {
   if (ret > 0) {
     kr_io2_pulled(client->in, ret);
     client->type = KR_APP_CLIENT_LOCAL_VALID;
-    /*printk("client is valid");*/
     kr_ebml2_set_buffer(&ebml, client->out->buf, client->out->space);
     kr_ebml_pack_header(&ebml, KR_APP_SERVER_DOCTYPE, KR_APP_DOCTYPE_VERSION,
      KR_APP_DOCTYPE_READ_VERSION);
     if (ebml.pos < 1) {
       printke("App Server: Error packing client header");
     } else {
-      /*printk("packed server header %d", ret);*/
       kr_io2_advance(client->out, ret);
       return 1;
     }
@@ -154,25 +152,14 @@ static int pack_crate_local(uint8_t *buffer, kr_crate2 *crate, size_t max) {
 static int unpack_crate_remote(kr_crate2 *crate, kr_app_server_client *client) {
   int ret;
   char json[8192];
-  /*printk("unpack crate remote");*/
   if (!(kr_io2_has_in(client->in))) {
     return 0;
   }
   ret = client->input_cb(&client->state_tracker, json, sizeof(json), client->in->rd_buf, client->in->len);
-  /*printk("input bytes: %d", ret);*/
   if (ret < 1) return 0;
   kr_io2_pulled(client->in, ret);
-  /*printk("Trying: \n%s\n", json);*/
   ret = kr_crate2_fr_json(json, crate);
   if (ret > 0) {
-    /*
-    char string[8192];
-    ret = kr_crate2_to_text(string, crate, sizeof(string));
-    if (ret > 0) {
-      printk("App Server: %"PRIu64" byte crate: (from json+web)\n%s\n", ret);
-      printk("%s",string);
-    }
-    */
     return 1;
   } else {
     printk("Misunderstood: \n%s\n", json);
@@ -202,13 +189,6 @@ static int unpack_crate_local(kr_crate2 *crate, kr_io2_t *in) {
   if (element == KR_EID_CRATE) {
     ret = kr_crate2_fr_ebml(&ebml, crate);
     if (ret == 0) {
-      /*
-      char string[8192];
-      ret = kr_crate2_to_text(string, crate, sizeof(string));
-      if (ret > 0) {
-        printk("App Server: %"PRIu64" byte crate: \n%s\n", size, string);
-      }
-      */
       kr_io2_pulled(in, ebml.pos);
       return 1;
     }
@@ -354,7 +334,7 @@ static void accept_remote_client(kr_app_server *server) {
   memcpy(client, new_client, sizeof(kr_app_server_client));
   memset(&ev, 0, sizeof(struct epoll_event));
   ev.events = EPOLLIN;
-  if (client->state_tracker != NULL) {
+  if (client->state_tracker_sz > 0) {
     json_hello(client);
   }
   handle_client(server, client);
@@ -477,6 +457,12 @@ static void *server_loop(void *arg) {
           ret = kr_io2_output(client->out);
           if (ret != 0) {
             printke("App Server: panic drop");
+            disconnect_client(server, client);
+            continue;
+          }
+          if ((client->type == KR_APP_CLIENT_REMOTE)
+           && (client->state_tracker_sz == 0)) {
+            printk("App Server: Dropping REST client after io drain");
             disconnect_client(server, client);
             continue;
           }
