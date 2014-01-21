@@ -47,6 +47,9 @@ kr_json_serial_test_CFLAGS =
 kr_json_serial_test_CFLAGS += -DKR_GIT_VERSION=\"$(KR_GIT_VERSION)\"
 kr_json_serial_test_LDFLAGS = ../lib/krad_radio/libkradclient.la
 
-kr_graph_test_SOURCES = ../lib/krad_graph/krad_graph.c kr_graph_test.c
+kr_graph_test_SOURCES = ../lib/krad_system/krad_system.c \
+  ../lib/krad_mem/krad_mem.c \
+  ../lib/krad_chronometer/krad_timer.c \
+  ../lib/krad_graph/krad_graph.c kr_graph_test.c
 
 .PHONY: all
