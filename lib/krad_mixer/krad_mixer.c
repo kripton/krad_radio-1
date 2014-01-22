@@ -90,7 +90,7 @@ static void mixer_process(kr_mixer *mixer, uint32_t frames);
 static uint32_t ms_to_cycles(kr_mixer *mixer, int ms);
 //static void kr_mixer_xf_decouple(kr_mixer *mixer, kr_mixer_crossfader *crossfader);
 //static void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *l, kr_mixer_path *r);
-static void path_release(kr_mixer *mixer, kr_mixer_path *path);
+static void path_release(kr_mixer_path *path);
 static int path_setup_info_check(kr_mixer_path_info *info);
 static int path_setup_check(kr_mixer_io_path_setup *setup);
 static void path_sfx_create(kr_mixer_path *path);
@@ -330,7 +330,7 @@ static void update_state(kr_mixer *mixer) {
         path->state = KR_MXP_ACTIVE;
         break;
       case KR_MXP_TERM:
-        path_release(mixer,path);
+        path_release(path);
         break;
       default:
         break;
@@ -576,7 +576,7 @@ void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *path1,
 }
 */
 
-static void path_release(kr_mixer *mixer, kr_mixer_path *path) {
+static void path_release(kr_mixer_path *path) {
   int c;
   path->delay = 0;
   path->delay_actual = 0;
@@ -588,7 +588,7 @@ static void path_release(kr_mixer *mixer, kr_mixer_path *path) {
     path->sfx = NULL;
   }
   path->state = KR_MXP_NIL;
-  kr_graph_vertex_destroy(mixer->mixer_graph,path->graph_vrt);
+  kr_graph_vertex_destroy(path->mixer->mixer_graph,path->graph_vrt);
   kr_pool_recycle(path->mixer->path_pool, path);
 }
 
