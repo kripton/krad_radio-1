@@ -857,8 +857,9 @@ int kr_mixer_destroy(kr_mixer *mixer) {
   } else {
     /* FIXME maybe we need to wait maybe not well see (dobut it) */
   }
-  kr_pool_destroy(mixer->path_pool);
+
   kr_graph_destroy(mixer->mixer_graph);
+  kr_pool_destroy(mixer->path_pool);
   printk("Mixer: Destroyed");
   return 0;
 }
