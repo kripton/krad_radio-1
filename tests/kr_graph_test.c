@@ -42,8 +42,16 @@ void print_graph_info(kr_graph *graph) {
 }
 
 unsigned int randr(unsigned int min, unsigned int max) {
-  double scaled = (double)rand()/RAND_MAX;
-  return (max - min +1)*scaled + min;
+
+  struct timeval tv;
+  double scale;
+
+  gettimeofday(&tv, NULL);
+  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
+
+  scale = (double)abs(min - max) / RAND_MAX;
+
+  return min + floor(rand() * scale);;
 }
 
 int random_vertices_gen(kr_graph *graph, int n, kr_vertex **vertices) {
@@ -67,7 +75,7 @@ int random_edges_gen(kr_graph *graph, int n, int vcount, kr_vertex **vertices) {
   for (i = l = 0; i < n; i++) {
     j = randr(0,vcount-1);
     k = randr(0,vcount-1);
-    //printf("Generating random edge from %p to %p\n",vertices[k],vertices[j]);
+    printf("Generating random edge from %p to %p\n",vertices[k],vertices[j]);
     if (!kr_graph_edge_create(graph,vertices[j],vertices[k])) {
       l++;
     }
