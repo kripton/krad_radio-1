@@ -18,6 +18,7 @@ typedef struct kr_mixer_setup kr_mixer_setup;
 #include "krad_pool.h"
 #include "krad_av.h"
 #include "krad_sfx.h"
+#include "krad_graph.h"
 
 typedef enum {
   KR_MIXER_CREATE = 1,

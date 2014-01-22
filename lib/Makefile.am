@@ -63,7 +63,8 @@ krad_web/krad_web_server.c \
 krad_transmitter/krad_transmitter.c \
 krad_ogg/krad_ogg.c \
 krad_ogg/krad_ogg2.c \
-krad_udp/krad_udp.c
+krad_udp/krad_udp.c \
+krad_graph/krad_graph.c
 
 if HAVE_JACK
 krad_radio_libkradradio_la_SOURCES += krad_jack/krad_jack.c
@@ -142,6 +143,7 @@ krad_radio/krad_radio_common.c \
 krad_mixer/krad_mixer_common.c \
 krad_compositor/krad_compositor_common.c \
 krad_sfx/krad_sfx_common.c \
+krad_graph/krad_graph.c \
 gen/gen.c
 
 kradradioincludedir = $(includedir)/krad

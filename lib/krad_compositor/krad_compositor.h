@@ -26,6 +26,7 @@ struct kr_compositor_control_easers {
 #include "krad_text.h"
 #include "krad_sprite.h"
 #include "krad_vector.h"
+#include "krad_graph.h"
 
 #define KR_COMPOSITOR_WIDTH_DEF 640
 #define KR_COMPOSITOR_HEIGHT_DEF 360
@@ -67,6 +68,7 @@ struct kr_compositor {
   void *user;
   kr_compositor_event_cb *event_cb;
   FT_Library ftlib;
+  kr_graph *comp_graph;
 };
 
 typedef enum {

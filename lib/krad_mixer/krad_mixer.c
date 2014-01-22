@@ -24,6 +24,7 @@ struct kr_mixer {
   void *user;
   void *clock;
   kr_mixer_bus *master;
+  kr_graph *mixer_graph;
 };
 
 struct kr_mixer_crossfader {
@@ -60,6 +61,7 @@ struct kr_mixer_path {
   void *control_user;
   kr_mixer *mixer;
   kr_sfx *sfx;
+  kr_vertex *graph_vrt;
 };
 
 /*
@@ -806,6 +808,7 @@ static kr_mixer_path *make_path(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   }
   path->mixer = mixer;
   path_create(path, setup);
+  path->graph_vrt = kr_graph_vertex_create(mixer->mixer_graph,setup->info.type);
   return path;
 }
 
@@ -862,6 +865,7 @@ kr_mixer *kr_mixer_create(kr_mixer_setup *setup) {
   kr_mixer *mixer;
   kr_pool *pool;
   kr_pool_setup pool_setup;
+  kr_graph_setup graph_setup;
   if (setup == NULL) return NULL;
   printk("Mixer: Creating");
   pool_setup.shared = 0;
@@ -876,6 +880,7 @@ kr_mixer *kr_mixer_create(kr_mixer_setup *setup) {
   mixer->user = setup->user;
   mixer->event_cb = setup->event_cb;
   mixer->path_count = setup->path_count;
+  mixer->mixer_graph = kr_graph_create(&graph_setup);
   /* FIXME defaults */
   mixer->period_size = KR_MXR_PERIOD_DEF;
   mixer->new_period_size = mixer->period_size;

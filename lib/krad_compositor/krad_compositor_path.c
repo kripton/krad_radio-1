@@ -11,6 +11,7 @@ struct kr_compositor_path {
   kr_easer crop_height_easer;
   kr_convert converter;
   kr_perspective *perspective;
+  kr_vertex *graph_vrt;
 };
 
 static void path_tick(kr_compositor_path *path);
@@ -223,6 +224,7 @@ kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
   }
   path->compositor = compositor;
   path_create(path, setup);
+  path->graph_vrt = kr_graph_vertex_create(compositor->comp_graph,setup->info.type);
   return path;
 }
 

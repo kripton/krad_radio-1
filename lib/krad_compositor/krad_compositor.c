@@ -208,6 +208,7 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   kr_compositor *com;
   kr_pool *pool;
   kr_pool_setup pool_setup;
+  kr_graph_setup graph_setup;
   if (setup == NULL) return NULL;
   printk("Compositor: Creating");
   pool_setup.shared = 0;
@@ -230,6 +231,7 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   com->image.pps[0] = com->image.w * 4;
   com->image.fmt = PIX_FMT_RGB32;
   com->image_pool = kr_image_pool_create(&com->image, DEFAULT_COMPOSITOR_BUFFER_FRAMES);
+  com->comp_graph = kr_graph_create(&graph_setup);
   printk("Compositor: Created");
   return com;
 }
