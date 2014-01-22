@@ -200,6 +200,7 @@ int kr_compositor_destroy(kr_compositor *com) {
   FT_Done_FreeType(com->ftlib);
   kr_pool_destroy(com->image_pool);
   kr_pool_destroy(com->path_pool);
+  kr_graph_destroy(com->comp_graph);
   printk("Compositor: Destroyed");
   return 0;
 }

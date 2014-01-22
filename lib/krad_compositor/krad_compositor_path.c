@@ -239,6 +239,7 @@ void cmper_path_release(kr_compositor *compositor, kr_compositor_path *path) {
   if (path->info.type == KR_CMP_OUTPUT) {
     compositor->info.outputs--;
   }
+  kr_graph_vertex_destroy(compositor->comp_graph,path->graph_vrt);
   kr_pool_recycle(path->compositor->path_pool, path);
 }
 
