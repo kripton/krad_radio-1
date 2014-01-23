@@ -23,11 +23,11 @@ static int visit(kr_graph *graph, uint8_t v, uint8_t *marked) {
   
   for (i = 0; i < MAX_VERTICES; i++) {
     if (adj[i]) {
-      if (marked[adj[i]] == 1) {
+      if (marked[i] == 1) {
         return 1;
       }
-      else if (marked[adj[i]] == 0) {
-        if (visit(graph,adj[i],marked)) return 1;
+      else if (marked[i] == 0) {
+        if (visit(graph,i,marked)) return 1;
       }
     }
   }
