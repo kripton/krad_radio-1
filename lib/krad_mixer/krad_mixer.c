@@ -684,6 +684,7 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.path = path;
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
+  path->graph_vrt = kr_graph_vertex_create(path->mixer->mixer_graph,setup->info.type);
   path->mixer->event_cb(&event);
 }
 
@@ -809,7 +810,6 @@ static kr_mixer_path *make_path(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   }
   path->mixer = mixer;
   path_create(path, setup);
-  path->graph_vrt = kr_graph_vertex_create(mixer->mixer_graph,setup->info.type);
   return path;
 }
 

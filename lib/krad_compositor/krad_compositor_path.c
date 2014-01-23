@@ -195,6 +195,7 @@ static void path_create(kr_compositor_path *path,
   event.path = path;
   event.type = KR_COMP_CREATE;
   event.info = path->info;
+  path->graph_vrt = kr_graph_vertex_create(path->compositor->comp_graph,setup->info.type);
   path->compositor->event_cb(&event);
 }
 
@@ -224,7 +225,6 @@ kr_compositor_path *kr_compositor_mkio(kr_compositor *compositor,
   }
   path->compositor = compositor;
   path_create(path, setup);
-  path->graph_vrt = kr_graph_vertex_create(compositor->comp_graph,setup->info.type);
   return path;
 }
 
