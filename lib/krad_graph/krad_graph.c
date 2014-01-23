@@ -8,27 +8,27 @@ static int vertex_index(kr_graph *graph, kr_vertex *v) {
       return i;
     }
   }
-  
+
   return -1;
 }
 
 static int visit(kr_graph *graph, uint8_t v, uint8_t *marked) {
   uint16_t i;
-  uint16_t n;
   uint16_t *adj;
   kr_vertex *ve;
 
   marked[v] = 1;
   ve = &graph->vertices[v];
   adj = ve->adj;
-  n = ve->adj_count;
   
-  for (i = 0; i < n; i++) {
-    if (marked[adj[i]] == 1) {
-      return 1;
-    }
-    else if (marked[adj[i]] == 0) {
-      if (visit(graph,adj[i],marked)) return 1;
+  for (i = 0; i < MAX_VERTICES; i++) {
+    if (adj[i]) {
+      if (marked[adj[i]] == 1) {
+        return 1;
+      }
+      else if (marked[adj[i]] == 0) {
+        if (visit(graph,adj[i],marked)) return 1;
+      }
     }
   }
 
@@ -61,7 +61,7 @@ int kr_graph_edge_destroy(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
   for (i = 0; i < MAX_EDGES; i++) {
     if (graph->edges[i].from == from && graph->edges[i].to == to) {
       memset(&graph->edges[i],0,sizeof(kr_edge));
-      from->adj[from->adj_count--] = 0;
+      from->adj[vertex_index(graph,to)]--;
       return 0;
     }
   }
@@ -80,7 +80,7 @@ int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
     if (!graph->edges[i].from && !graph->edges[i].to) {
       graph->edges[i].from = from;
       graph->edges[i].to = to;
-      from->adj[from->adj_count++] = vertex_index(graph,to);
+      from->adj[vertex_index(graph,to)]++;
       if (kr_graph_is_cyclic(graph)) {
         printf("Cycle detected!\n");
         kr_graph_edge_destroy(graph,to,from);

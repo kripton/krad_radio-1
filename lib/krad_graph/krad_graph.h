@@ -22,8 +22,7 @@ typedef struct {
 } kr_edge;
 
 struct kr_vertex {
-  uint16_t adj[MAX_EDGES-1];
-  uint16_t adj_count;
+  uint16_t adj[MAX_VERTICES];
   kr_vertex_type type;
 };
 
