@@ -1,41 +1,27 @@
 #include "krad_graph.h"
 
 static int vertex_index(kr_graph *graph, kr_vertex *v) {
-  int i;
+  int8_t i;
 
   for (i = 0; i < MAX_VERTICES; i++) {
     if (graph->vertices[i].type && (&graph->vertices[i] == v)) {
       return i;
     }
   }
-
+  
   return -1;
 }
 
-static int kr_vertex_adj(kr_graph *graph, kr_vertex *v, int *adj) {
-  int n;
-  int i;
-  n = 0;
-
-  for (i = 0; i < MAX_EDGES; i++) {
-    if (graph->edges[i].to && graph->edges[i].from) {
-      if (graph->edges[i].from == v) {
-        adj[n++] = vertex_index(graph,graph->edges[i].to);
-        if (adj[n-1] < 0) n--;
-      }
-    }
-  }
-
-  return n;
-}
-
-static int visit(kr_graph *graph, int v, uint8_t *marked) {
-  int i;
-  int n;
-  int adj[MAX_EDGES];
+static int visit(kr_graph *graph, uint8_t v, uint8_t *marked) {
+  uint16_t i;
+  uint16_t n;
+  uint16_t *adj;
+  kr_vertex *ve;
 
   marked[v] = 1;
-  n = kr_vertex_adj(graph,&graph->vertices[v],adj);
+  ve = &graph->vertices[v];
+  adj = ve->adj;
+  n = ve->adj_count;
   
   for (i = 0; i < n; i++) {
     if (marked[adj[i]] == 1) {
@@ -52,7 +38,7 @@ static int visit(kr_graph *graph, int v, uint8_t *marked) {
  
 static int kr_graph_is_cyclic(kr_graph *graph) {
   uint8_t marked[MAX_VERTICES];
-  int i;
+  uint8_t i;
 
   memset(marked,0,sizeof(marked));
 
@@ -63,16 +49,19 @@ static int kr_graph_is_cyclic(kr_graph *graph) {
       }
     }
   }
+
   return 0;
 }
 
 int kr_graph_edge_destroy(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
-  int i;
+  uint16_t i;
+
   if (!graph || !to || !from) return 1;
 
   for (i = 0; i < MAX_EDGES; i++) {
     if (graph->edges[i].from == from && graph->edges[i].to == to) {
       memset(&graph->edges[i],0,sizeof(kr_edge));
+      from->adj[from->adj_count--] = 0;
       return 0;
     }
   }
@@ -81,7 +70,7 @@ int kr_graph_edge_destroy(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
 }
 
 int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
-  int i;
+  uint16_t i;
   if (graph == NULL) return 1;
   if (to == from) return 1;
   if (to == NULL || from == NULL) return 1;
@@ -91,6 +80,7 @@ int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
     if (!graph->edges[i].from && !graph->edges[i].to) {
       graph->edges[i].from = from;
       graph->edges[i].to = to;
+      from->adj[from->adj_count++] = vertex_index(graph,to);
       if (kr_graph_is_cyclic(graph)) {
         printf("Cycle detected!\n");
         kr_graph_edge_destroy(graph,to,from);
@@ -100,12 +90,11 @@ int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
       }
     }
   }
-  
   return 1;
 }
 
 kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type) {
-  int i;
+  uint8_t i;
 
   if (graph == NULL || type == 0) return NULL;
 
@@ -120,7 +109,7 @@ kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type) {
 }
 
 int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex) {
-  int i;
+  uint16_t i;
 
   if (graph == NULL || vertex == NULL) return 1;
 

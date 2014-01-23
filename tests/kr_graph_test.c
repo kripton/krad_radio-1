@@ -132,8 +132,8 @@ int main(int argc, char const *argv[]) {
 
   kr_timer_status(timer);
 
-  //printf("graph info: \n\n");
-  //print_graph_info(graph);
+  printf("graph info: \n\n");
+  print_graph_info(graph);
 
   printf("destroying graph now.\n");
   kr_graph_destroy(graph);
