@@ -68,7 +68,7 @@ struct kr_compositor {
   void *user;
   kr_compositor_event_cb *event_cb;
   FT_Library ftlib;
-  kr_graph *comp_graph;
+  kr_graph *graph;
 };
 
 typedef enum {

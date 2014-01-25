@@ -24,7 +24,7 @@ struct kr_mixer {
   void *user;
   void *clock;
   kr_mixer_bus *master;
-  kr_graph *mixer_graph;
+  kr_graph *graph;
 };
 
 struct kr_mixer_crossfader {
@@ -61,7 +61,7 @@ struct kr_mixer_path {
   void *control_user;
   kr_mixer *mixer;
   kr_sfx *sfx;
-  kr_vertex *graph_vrt;
+  kr_vertex *vertex;
 };
 
 /*
@@ -588,7 +588,7 @@ static void path_release(kr_mixer_path *path) {
     path->sfx = NULL;
   }
   path->state = KR_MXP_NIL;
-  kr_graph_vertex_destroy(path->mixer->mixer_graph,path->graph_vrt);
+  kr_graph_vertex_destroy(path->mixer->graph, path->vertex);
   kr_pool_recycle(path->mixer->path_pool, path);
 }
 
@@ -684,7 +684,7 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.path = path;
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
-  path->graph_vrt = kr_graph_vertex_create(path->mixer->mixer_graph,setup->info.type);
+  path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info.type);
   path->mixer->event_cb(&event);
 }
 
@@ -858,7 +858,7 @@ int kr_mixer_destroy(kr_mixer *mixer) {
     /* FIXME maybe we need to wait maybe not well see (dobut it) */
   }
 
-  kr_graph_destroy(mixer->mixer_graph);
+  kr_graph_destroy(mixer->graph);
   kr_pool_destroy(mixer->path_pool);
   printk("Mixer: Destroyed");
   return 0;
@@ -883,7 +883,8 @@ kr_mixer *kr_mixer_create(kr_mixer_setup *setup) {
   mixer->user = setup->user;
   mixer->event_cb = setup->event_cb;
   mixer->path_count = setup->path_count;
-  mixer->mixer_graph = kr_graph_create(&graph_setup);
+  memset(&graph_setup, 0, sizeof(graph_setup));
+  mixer->graph = kr_graph_create(&graph_setup);
   /* FIXME defaults */
   mixer->period_size = KR_MXR_PERIOD_DEF;
   mixer->new_period_size = mixer->period_size;

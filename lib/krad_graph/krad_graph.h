@@ -1,7 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
-#include <string.h>
 #ifndef KRAD_GRAPH_H
 #define KRAD_GRAPH_H
 #define MAX_VERTICES 64

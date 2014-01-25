@@ -11,7 +11,7 @@ struct kr_compositor_path {
   kr_easer crop_height_easer;
   kr_convert converter;
   kr_perspective *perspective;
-  kr_vertex *graph_vrt;
+  kr_vertex *vertex;
 };
 
 static void path_tick(kr_compositor_path *path);
@@ -195,7 +195,7 @@ static void path_create(kr_compositor_path *path,
   event.path = path;
   event.type = KR_COMP_CREATE;
   event.info = path->info;
-  path->graph_vrt = kr_graph_vertex_create(path->compositor->comp_graph,setup->info.type);
+  path->vertex = kr_graph_vertex_create(path->compositor->graph, setup->info.type);
   path->compositor->event_cb(&event);
 }
 
@@ -239,7 +239,7 @@ void cmper_path_release(kr_compositor *compositor, kr_compositor_path *path) {
   if (path->info.type == KR_CMP_OUTPUT) {
     compositor->info.outputs--;
   }
-  kr_graph_vertex_destroy(path->compositor->comp_graph,path->graph_vrt);
+  kr_graph_vertex_destroy(path->compositor->graph, path->vertex);
   kr_pool_recycle(path->compositor->path_pool, path);
 }
 
