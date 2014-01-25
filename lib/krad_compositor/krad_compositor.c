@@ -1,4 +1,29 @@
+#include "krad_pool.h"
+#include "krad_image_pool.h"
+#include "krad_easing.h"
+#include "krad_text.h"
+#include "krad_sprite.h"
+#include "krad_vector.h"
+#include "krad_graph.h"
+
 #include "krad_compositor.h"
+
+struct kr_compositor {
+  cairo_t *cr;
+  cairo_surface_t *cst;
+  kr_image image;
+  kr_image_pool *image_pool;
+  kr_compositor_info info;
+  kr_pool *sprite_pool;
+  kr_pool *text_pool;
+  kr_pool *vector_pool;
+  kr_pool *path_pool;
+  void *user;
+  kr_compositor_event_cb *event_cb;
+  FT_Library ftlib;
+  kr_graph *graph;
+};
+
 #include "krad_compositor_path.c"
 
 static void tick(kr_compositor *compositor);

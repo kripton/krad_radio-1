@@ -15,10 +15,7 @@ typedef struct kr_mixer_setup kr_mixer_setup;
 #define KR_MXR_MAX_MINIWINS 192
 
 #include "krad_mixer_common.h"
-#include "krad_pool.h"
 #include "krad_av.h"
-#include "krad_sfx.h"
-#include "krad_graph.h"
 
 typedef enum {
   KR_MIXER_CREATE = 1,

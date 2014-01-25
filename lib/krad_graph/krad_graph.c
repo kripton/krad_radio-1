@@ -34,7 +34,7 @@ static int visit(kr_graph *graph, uint8_t v, uint8_t *marked) {
   marked[v] = 2;
   return 0;
 }
- 
+
 static int kr_graph_is_cyclic(kr_graph *graph) {
   uint8_t marked[MAX_VERTICES];
   uint8_t i;

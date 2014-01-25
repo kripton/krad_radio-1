@@ -1,3 +1,4 @@
+#include "biquad.h"
 #include "krad_analog.h"
 
 #define EPS 0.000000001f

@@ -18,15 +18,8 @@ struct kr_compositor_control_easers {
   kr_easer opacity;
 };
 
-#include "krad_pool.h"
-#include "krad_image_pool.h"
-#include "krad_easing.h"
 #include "krad_compositor_common.h"
 #include "krad_compositor_path.h"
-#include "krad_text.h"
-#include "krad_sprite.h"
-#include "krad_vector.h"
-#include "krad_graph.h"
 
 #define KR_COMPOSITOR_WIDTH_DEF 640
 #define KR_COMPOSITOR_HEIGHT_DEF 360
@@ -53,22 +46,6 @@ struct kr_compositor_setup {
   uint32_t fps_den;
   void *user;
   kr_compositor_event_cb *event_cb;
-};
-
-struct kr_compositor {
-  cairo_t *cr;
-  cairo_surface_t *cst;
-  kr_image image;
-  kr_image_pool *image_pool;
-  kr_compositor_info info;
-  kr_pool *sprite_pool;
-  kr_pool *text_pool;
-  kr_pool *vector_pool;
-  kr_pool *path_pool;
-  void *user;
-  kr_compositor_event_cb *event_cb;
-  FT_Library ftlib;
-  kr_graph *graph;
 };
 
 typedef enum {

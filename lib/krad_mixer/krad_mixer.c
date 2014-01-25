@@ -1,3 +1,6 @@
+#include "krad_pool.h"
+#include "krad_sfx.h"
+#include "krad_graph.h"
 #include "krad_mixer.h"
 
 typedef struct kr_mixer_io_path_setup kr_mixer_path_setup;
