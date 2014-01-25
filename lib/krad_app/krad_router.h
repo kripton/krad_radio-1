@@ -16,6 +16,7 @@ typedef struct kr_route kr_route;
 typedef struct kr_name kr_name;
 
 typedef int (kr_router_map_create_handler)(void *, void *, void *);
+typedef int (kr_router_map_create2_handler)(void *, void *, void *, void *, void *);
 typedef int (kr_router_map_patch_handler)(void *, void *);
 typedef int (kr_router_map_destroy_handler)(void *);
 typedef int (kr_router_response_handler)(void *, kr_crate2 *crate);
@@ -32,6 +33,7 @@ struct kr_router_map_setup {
   const char *prefix;
   void *ptr; /* for create */
   kr_router_map_create_handler *create;
+  kr_router_map_create2_handler *create2;
   kr_router_map_patch_handler *patch;
   kr_router_map_destroy_handler *destroy;
 };

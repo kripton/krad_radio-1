@@ -17,8 +17,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_app_server_setup";
     case CGEN_KR_APP_SERVER_INFO:
       return "kr_app_server_info";
-    case CGEN_KR_APP_CLIENT_TYPE:
-      return "kr_app_client_type";
     case CGEN_KR_APP_SERVER_CLIENT_SETUP:
       return "kr_app_server_client_setup";
     case CGEN_KR_ROUTER_INFO:
@@ -55,8 +53,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_control_easers";
     case CGEN_KR_COMPOSITOR_SETUP:
       return "kr_compositor_setup";
-    case CGEN_KR_COMPOSITOR:
-      return "kr_compositor";
     case CGEN_KR_COMPOSITOR_EVENT_TYPE:
       return "kr_compositor_event_type";
     case CGEN_KR_COMPOSITOR_EVENT:
@@ -121,6 +117,16 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_fc2_St";
     case CGEN_KRAD_FLAC_ST:
       return "krad_flac_St";
+    case CGEN_KR_VERTEX_TYPE:
+      return "kr_vertex_type";
+    case CGEN_KR_EDGE:
+      return "kr_edge";
+    case CGEN_KR_VERTEX:
+      return "kr_vertex";
+    case CGEN_KR_GRAPH:
+      return "kr_graph";
+    case CGEN_KR_GRAPH_SETUP:
+      return "kr_graph_setup";
     case CGEN_KR_FILE:
       return "kr_file";
     case CGEN_KRAD_IO_MODE_T:
@@ -179,8 +185,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_mixer_path_type";
     case CGEN_KR_MIXER_ADV_CTL:
       return "kr_mixer_adv_ctl";
-    case CGEN_KR_MIXER_INFO:
-      return "kr_mixer_info";
     case CGEN_KR_MIXER_PATH_INFO:
       return "kr_mixer_path_info";
     case CGEN_KR_MIXER_PATH_PATCH:
@@ -441,30 +445,12 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_wayland_info";
     case CGEN_KR_WAYLAND_PATH_INFO:
       return "kr_wayland_path_info";
-    case CGEN_KRAD_INTERWEB_SHUTDOWN:
-      return "krad_interweb_shutdown";
     case CGEN_KR_WEB_EVENT_TYPE:
       return "kr_web_event_type";
     case CGEN_KR_WEB_EVENT:
       return "kr_web_event";
     case CGEN_KR_WEB_SERVER_SETUP:
       return "kr_web_server_setup";
-    case CGEN_KR_WEBRTC_USER:
-      return "kr_webrtc_user";
-    case CGEN_KR_WEBRTC_SIGNAL_TYPE:
-      return "kr_webrtc_signal_type";
-    case CGEN_KR_WEBRTC_SIGNAL:
-      return "kr_webrtc_signal";
-    case CGEN_KR_WEB_SERVER:
-      return "kr_web_server";
-    case CGEN_KR_WEB_CLIENT_TYPE:
-      return "kr_web_client_type";
-    case CGEN_KR_WEB_VERB:
-      return "kr_web_verb";
-    case CGEN_KR_WEBSOCKET_CLIENT:
-      return "kr_websocket_client";
-    case CGEN_KR_WEB_CLIENT:
-      return "kr_web_client";
     case CGEN_KR_X11:
       return "kr_x11";
     case CGEN_KR_X11_PATH:
@@ -504,9 +490,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_app_server_info")) {
     return CGEN_KR_APP_SERVER_INFO;
-  }
-  if (!strcmp(string,"kr_app_client_type")) {
-    return CGEN_KR_APP_CLIENT_TYPE;
   }
   if (!strcmp(string,"kr_app_server_client_setup")) {
     return CGEN_KR_APP_SERVER_CLIENT_SETUP;
@@ -561,9 +544,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_compositor_setup")) {
     return CGEN_KR_COMPOSITOR_SETUP;
-  }
-  if (!strcmp(string,"kr_compositor")) {
-    return CGEN_KR_COMPOSITOR;
   }
   if (!strcmp(string,"kr_compositor_event_type")) {
     return CGEN_KR_COMPOSITOR_EVENT_TYPE;
@@ -661,6 +641,21 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_flac_St")) {
     return CGEN_KRAD_FLAC_ST;
   }
+  if (!strcmp(string,"kr_vertex_type")) {
+    return CGEN_KR_VERTEX_TYPE;
+  }
+  if (!strcmp(string,"kr_edge")) {
+    return CGEN_KR_EDGE;
+  }
+  if (!strcmp(string,"kr_vertex")) {
+    return CGEN_KR_VERTEX;
+  }
+  if (!strcmp(string,"kr_graph")) {
+    return CGEN_KR_GRAPH;
+  }
+  if (!strcmp(string,"kr_graph_setup")) {
+    return CGEN_KR_GRAPH_SETUP;
+  }
   if (!strcmp(string,"kr_file")) {
     return CGEN_KR_FILE;
   }
@@ -747,9 +742,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_mixer_adv_ctl")) {
     return CGEN_KR_MIXER_ADV_CTL;
-  }
-  if (!strcmp(string,"kr_mixer_info")) {
-    return CGEN_KR_MIXER_INFO;
   }
   if (!strcmp(string,"kr_mixer_path_info")) {
     return CGEN_KR_MIXER_PATH_INFO;
@@ -1141,9 +1133,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_wayland_path_info")) {
     return CGEN_KR_WAYLAND_PATH_INFO;
   }
-  if (!strcmp(string,"krad_interweb_shutdown")) {
-    return CGEN_KRAD_INTERWEB_SHUTDOWN;
-  }
   if (!strcmp(string,"kr_web_event_type")) {
     return CGEN_KR_WEB_EVENT_TYPE;
   }
@@ -1152,30 +1141,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_web_server_setup")) {
     return CGEN_KR_WEB_SERVER_SETUP;
-  }
-  if (!strcmp(string,"kr_webrtc_user")) {
-    return CGEN_KR_WEBRTC_USER;
-  }
-  if (!strcmp(string,"kr_webrtc_signal_type")) {
-    return CGEN_KR_WEBRTC_SIGNAL_TYPE;
-  }
-  if (!strcmp(string,"kr_webrtc_signal")) {
-    return CGEN_KR_WEBRTC_SIGNAL;
-  }
-  if (!strcmp(string,"kr_web_server")) {
-    return CGEN_KR_WEB_SERVER;
-  }
-  if (!strcmp(string,"kr_web_client_type")) {
-    return CGEN_KR_WEB_CLIENT_TYPE;
-  }
-  if (!strcmp(string,"kr_web_verb")) {
-    return CGEN_KR_WEB_VERB;
-  }
-  if (!strcmp(string,"kr_websocket_client")) {
-    return CGEN_KR_WEBSOCKET_CLIENT;
-  }
-  if (!strcmp(string,"kr_web_client")) {
-    return CGEN_KR_WEB_CLIENT;
   }
   if (!strcmp(string,"kr_x11")) {
     return CGEN_KR_X11;
@@ -1245,9 +1210,6 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_app_method")) {
     return 1;
   }
-  if (!strcmp(type,"kr_app_client_type")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_easing")) {
     return 1;
   }
@@ -1276,6 +1238,9 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"krad_container_type_t")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_vertex_type")) {
     return 1;
   }
   if (!strcmp(type,"krad_io_mode_t")) {
@@ -1401,19 +1366,7 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_wayland_event_type")) {
     return 1;
   }
-  if (!strcmp(type,"krad_interweb_shutdown")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_web_event_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_webrtc_signal_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_web_client_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_web_verb")) {
     return 1;
   }
   if (!strcmp(type,"krad_xmms_playback_cmd_t")) {

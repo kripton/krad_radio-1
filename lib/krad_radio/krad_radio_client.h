@@ -133,7 +133,6 @@ struct kr_unit_control_St {
 typedef union {
   void *actual;
   kr_tag *tag;
-  kr_mixer_info *mixer;
   kr_mixer_path_info *portgroup;
   kr_compositor_info *compositor;
   kr_sprite_info *sprite;
@@ -145,7 +144,6 @@ typedef union {
 typedef union {
   char actual;
   kr_tag tag;
-  kr_mixer_info mixer;
   kr_mixer_path_info portgroup;
   kr_compositor_info compositor;
   kr_sprite_info sprite;

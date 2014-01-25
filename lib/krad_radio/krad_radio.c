@@ -109,6 +109,7 @@ static int setup_maps(kr_radio *radio) {
   setup.prefix = "/mixer";
   setup.ptr = radio->mixer;
   setup.create = (kr_router_map_create_handler *)kr_mixer_mkbus;
+  setup.create2 = (kr_router_map_create2_handler *)kr_mixer_splice;
   setup.patch = (kr_router_map_patch_handler *)kr_mixer_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_mixer_unlink;
   map = kr_app_server_map_create(radio->app, &setup);

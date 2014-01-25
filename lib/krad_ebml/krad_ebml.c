@@ -377,7 +377,7 @@ int kr_ebml_pack_header(kr_ebml *ebml, char *doctype, uint32_t version, uint32_t
   kr_ebml_pack_uint8(ebml, EID_DOCTYPEVERSION, version);
   kr_ebml_pack_uint8(ebml, EID_DOCTYPEREADVERSION, read_version);
   kr_ebml2_finish_element(ebml, header);
-  return 0; /* FIXME: err checkme */
+  return ebml->pos; /* FIXME: err checkme */
 }
 
 int kr_ebml2_set_buffer(kr_ebml *ebml, uint8_t *buffer, size_t len) {

@@ -24,8 +24,8 @@
 #include "gen/krad_mixer_common_to_text.h"
 #include "gen/krad_mixer_common_helpers.h"
 
-typedef struct kr_mixer_info kr_mixer_info;
 typedef struct kr_mixer_path_info kr_mixer_path_info;
+typedef struct kr_mixer_path_info kr_mixer_source_info;
 typedef struct kr_mixer_path_info kr_mixer_input_info;
 typedef struct kr_mixer_path_info kr_mixer_bus_info;
 typedef struct kr_mixer_path_info kr_mixer_output_info;
@@ -52,7 +52,8 @@ typedef enum {
 } kr_mixer_control;
 
 typedef enum {
-  KR_MXR_INPUT = 1,
+  KR_MXR_SOURCE = 1,
+  KR_MXR_INPUT,
   KR_MXR_BUS,
   KR_MXR_OUTPUT
 } kr_mixer_path_type;
@@ -63,20 +64,7 @@ typedef enum {
   KR_MXR_CLOCK_SET
 } kr_mixer_adv_ctl;
 
-struct kr_mixer_info {
-  uint32_t period_size; /* 1024, 32, 4096 */
-  uint32_t sample_rate; /* 44100, 8000, 192000 */
-  uint32_t inputs; /* 0, 0, 32 */
-  uint32_t buses; /* 0, 0, 64 */
-  uint32_t outputs; /* 0, 0, 32 */
-  uint64_t frames;
-  uint64_t timecode;
-  char clock[32];
-};
-
 struct kr_mixer_path_info {
-  char bus[64];
-  char crossfade_group[64];
   kr_mixer_channels channels;
   kr_mixer_path_type type;
   float fade;
@@ -97,9 +85,5 @@ struct kr_mixer_path_patch {
   float val;
   int ms;
 };
-
-char *kr_mixer_channeltostr(int channel);
-char *kr_mixer_ctltostr(kr_mixer_control control);
-char *kr_mixer_pathtypetostr(kr_mixer_path_type type);
 
 #endif

@@ -3,10 +3,11 @@
 
 typedef struct kr_mixer kr_mixer;
 typedef struct kr_mixer_path kr_mixer_path;
+typedef struct kr_mixer_path kr_mixer_source;
 typedef struct kr_mixer_path kr_mixer_input;
 typedef struct kr_mixer_path kr_mixer_bus;
 typedef struct kr_mixer_path kr_mixer_output;
-typedef struct kr_mixer_crossfader kr_mixer_crossfader;
+/*typedef struct kr_mixer_crossfader kr_mixer_crossfader;*/
 typedef struct kr_mixer_io_path_setup kr_mixer_io_path_setup;
 typedef struct kr_mixer_path_audio_cb_arg kr_mixer_path_audio_cb_arg;
 typedef struct kr_mixer_event kr_mixer_event;
@@ -42,8 +43,8 @@ struct kr_mixer_path_audio_cb_arg {
 
 struct kr_mixer_io_path_setup {
   kr_mixer_path_info info;
-  void *audio_user;
   void *control_user;
+  void *audio_user;
   kr_mixer_path_audio_cb *audio_cb;
 };
 
@@ -60,8 +61,9 @@ int kr_mixer_process(kr_mixer *mixer);
 int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch);
 int kr_mixer_path_info_get(kr_mixer_path *unit, kr_mixer_path_info *info);
 int kr_mixer_unlink(kr_mixer_path *path);
-kr_mixer_path *kr_mixer_mkio(kr_mixer *mixer, kr_mixer_io_path_setup *setup);
+kr_mixer_path *kr_mixer_mkso(kr_mixer *mixer, kr_mixer_io_path_setup *setup);
 int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user);
+int kr_mixer_splice(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user);
 int kr_mixer_destroy(kr_mixer *mixer);
 kr_mixer *kr_mixer_create(kr_mixer_setup *setup);
 

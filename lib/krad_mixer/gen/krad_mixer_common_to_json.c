@@ -76,32 +76,6 @@ int kr_mixer_adv_ctl_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
-int kr_mixer_info_to_json(char *json, void *st, int32_t max) {
-  int res;
-  struct kr_mixer_info *actual;
-
-  res = 0;
-
-  if ((json == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_mixer_info *)st;
-
-  res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"period_size\" : %u,",actual->period_size);
-  res += snprintf(&json[res],max-res,"\"sample_rate\" : %u,",actual->sample_rate);
-  res += snprintf(&json[res],max-res,"\"inputs\" : %u,",actual->inputs);
-  res += snprintf(&json[res],max-res,"\"buses\" : %u,",actual->buses);
-  res += snprintf(&json[res],max-res,"\"outputs\" : %u,",actual->outputs);
-  res += snprintf(&json[res],max-res,"\"frames\" : %ju,",actual->frames);
-  res += snprintf(&json[res],max-res,"\"timecode\" : %ju,",actual->timecode);
-  res += snprintf(&json[res],max-res,"\"clock\" : \"%s\"",actual->clock);
-  res += snprintf(&json[res],max-res,"}");
-
-  return res;
-}
-
 int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int i;
@@ -117,8 +91,6 @@ int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   actual = (struct kr_mixer_path_info *)st;
 
   res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"bus\" : \"%s\",",actual->bus);
-  res += snprintf(&json[res],max-res,"\"crossfade_group\" : \"%s\",",actual->crossfade_group);
   res += snprintf(&json[res],max-res,"\"channels\": ");
   uber.actual = &(actual->channels);
   uber.type = JSON_KR_MIXER_CHANNELS;

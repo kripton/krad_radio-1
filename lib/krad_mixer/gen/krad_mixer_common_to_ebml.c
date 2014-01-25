@@ -68,30 +68,6 @@ int kr_mixer_adv_ctl_to_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_mixer_info_to_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  struct kr_mixer_info *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (struct kr_mixer_info *)st;
-
-  res += kr_ebml_pack_uint32(ebml, 0xe1, actual->period_size);
-  res += kr_ebml_pack_uint32(ebml, 0xe1, actual->sample_rate);
-  res += kr_ebml_pack_uint32(ebml, 0xe1, actual->inputs);
-  res += kr_ebml_pack_uint32(ebml, 0xe1, actual->buses);
-  res += kr_ebml_pack_uint32(ebml, 0xe1, actual->outputs);
-  res += kr_ebml_pack_uint64(ebml, 0xe1, actual->frames);
-  res += kr_ebml_pack_uint64(ebml, 0xe1, actual->timecode);
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->clock);
-
-  return res;
-}
-
 int kr_mixer_path_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int i;
@@ -106,8 +82,6 @@ int kr_mixer_path_info_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
 
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->bus);
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->crossfade_group);
   uber.actual = &(actual->channels);
   uber.type = EBML_KR_MIXER_CHANNELS;
   res += info_pack_to_ebml(&ebml[res],&uber);

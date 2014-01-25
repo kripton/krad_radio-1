@@ -10,22 +10,19 @@ static int test_jack_input_create(kr_client *client) {
   int ret;
   kr_xpdr_path_info info;
   char *name;
-  char *bus_name;
   int channels;
   /* init function? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   channels = 2;
   name = "Music";
-  bus_name = "Master";
   info.input.type = KR_XPDR_ADAPTER;
   info.input.info.adapter_path_info.api = KR_ADP_JACK;
   strcpy(info.input.info.adapter_path_info.info.jack.name, name);
   info.input.info.adapter_path_info.info.jack.channels = channels;
   info.input.info.adapter_path_info.info.jack.direction = KR_JACK_INPUT;
   info.output.type = KR_XPDR_MIXER;
-  strcpy(info.output.info.mixer_path_info.bus, bus_name);
   info.output.info.mixer_path_info.channels = channels;
-  info.output.info.mixer_path_info.type = KR_MXR_INPUT;
+  info.output.info.mixer_path_info.type = KR_MXR_SOURCE;
   ret = kr_xpdr_mkpath(client, name, &info);
   return ret;
 }
@@ -34,15 +31,12 @@ static int test_jack_output_create(kr_client *client) {
   int ret;
   kr_xpdr_path_info info;
   char *name;
-  char *bus_name;
   int channels;
   /* init func? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   channels = 2;
   name = "Main";
-  bus_name = "Master";
   info.input.type = KR_XPDR_MIXER;
-  strcpy(info.input.info.mixer_path_info.bus, bus_name);
   info.input.info.mixer_path_info.channels = channels;
   info.input.info.mixer_path_info.type = KR_MXR_OUTPUT;
   info.output.type = KR_XPDR_ADAPTER;
@@ -212,6 +206,40 @@ int make_masterbus(kr_client *client) {
   return ret;
 }
 
+int make_musicbus(kr_client *client) {
+  int ret;
+  kr_crate2 crate;
+  memset(&crate, 0, sizeof(crate));
+  kr_mixer_path_info *bus;
+  strcpy(crate.address, "/mixer/Music");
+  crate.method = KR_PUT;
+  crate.payload_type = PL_KR_MIXER_PATH_INFO;
+  bus = &crate.payload.mixer_path_info;
+  bus->channels = 2;
+  bus->volume[0] = 55.0;
+  bus->volume[1] = 55.0;
+  bus->type = KR_MXR_BUS;
+  ret = kr_crate_send(client, &crate);
+  return ret;
+}
+
+int make_musicmaster(kr_client *client) {
+  int ret;
+  kr_crate2 crate;
+  memset(&crate, 0, sizeof(crate));
+  kr_mixer_path_info *in;
+  strcpy(crate.address, "/mixer/Master/Music");
+  crate.method = KR_PUT;
+  crate.payload_type = PL_KR_MIXER_PATH_INFO;
+  in = &crate.payload.mixer_path_info;
+  in->channels = 2;
+  in->volume[0] = 65.0;
+  in->volume[1] = 65.0;
+  in->type = KR_MXR_INPUT;
+  ret = kr_crate_send(client, &crate);
+  return ret;
+}
+
 int run_test(kr_client *client, char *test) {
   int ret;
   ret = -1;
@@ -224,6 +252,14 @@ int run_test(kr_client *client, char *test) {
   }
   if ((strlen(test) == strlen("masterbus")) && (strcmp(test, "masterbus") == 0)) {
     ret = make_masterbus(client);
+    if (ret != 0) return ret;
+  }
+  if ((strlen(test) == strlen("musicbus")) && (strcmp(test, "musicbus") == 0)) {
+    ret = make_musicbus(client);
+    if (ret != 0) return ret;
+  }
+  if ((strlen(test) == strlen("musicmaster")) && (strcmp(test, "musicmaster") == 0)) {
+    ret = make_musicmaster(client);
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("getx11")) && (strcmp(test, "getx11") == 0)) {

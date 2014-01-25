@@ -31,6 +31,7 @@ struct kr_router_map {
   char prefix[32];
   void *ptr; /* for create */
   kr_router_map_create_handler *create;
+  kr_router_map_create2_handler *create2;
   kr_router_map_patch_handler *patch;
   kr_router_map_destroy_handler *destroy;
 };
@@ -194,6 +195,7 @@ kr_route *kr_route_create(kr_router *router, kr_route_setup *setup) {
   if (route == NULL) return NULL;
   memset(route, 0, sizeof(kr_route));
   route->map = map;
+  route->ptr = setup->ctx; /* tricky ! */
   strncpy(route->name, setup->name->name, sizeof(route->name));
   setup->name->use++;
   route->payload_type = setup->payload_type;
@@ -219,13 +221,15 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
   address_sliced sliced;
   kr_router_map *map;
   kr_route *route;
+  kr_route *route2;
   kr_name *name;
+  char temp[64];
   if ((router == NULL) || (crate == NULL)) return -1;
   i = 0;
   printk("Routing: %s", crate->address);
   slice_address(&sliced, crate->address);
   if (sliced.slices < 1) return -1;
-  if (sliced.slices > 2) {
+  if (sliced.slices > 3) {
     printke("to many slices in address");
     return -2;
   }
@@ -262,6 +266,19 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         router->response(router->user, &outcrate);
         return 0;
       }
+      if ((crate->method == KR_GET) && (sliced.slices == 3)) {
+        printk("Found route! GET %s from %s %s!", sliced.slice[2],
+         sliced.slice[1], sliced.slice[0]);
+        snprintf(temp, sizeof(temp), "%s/%s", sliced.slice[1], sliced.slice[2]);
+        route = find_route(router, map, temp);
+        if (route == NULL) return 0;
+        outcrate.method = crate->method;
+        strcpy(outcrate.address, crate->address);
+        outcrate.payload_type = route->payload_type;
+        outcrate.payload = route->payload;
+        router->response(router->user, &outcrate);
+        return 0;
+      }
       if ((crate->method == KR_PATCH) && (sliced.slices == 2)) {
         printk("Found route! PATCH for %s on %s!", sliced.slice[1],
          sliced.slice[0]);
@@ -289,6 +306,20 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         ret = map->create(map->ptr, (void *)&crate->payload, name);
         return ret;
       }
+      if ((crate->method == KR_PUT) && (sliced.slices == 3)) {
+        printk("Found route! put %s in %s from %s!", sliced.slice[2],
+         sliced.slice[1], sliced.slice[0]);
+        route = find_route(router, map, sliced.slice[1]);
+        if (route == NULL) return 0;
+        route2 = find_route(router, map, sliced.slice[2]);
+        if (route2 == NULL) return 0;
+        snprintf(temp, sizeof(temp), "%s/%s", sliced.slice[1], sliced.slice[2]);
+        name = create_name(router, temp);
+        if (!name) return -6;
+        //printk("I will call %p with %p - %p - %p - %p!", map->create2, map->ptr, route->ptr, route2->ptr, name);
+        ret = map->create2(map->ptr, (void *)&crate->payload, route->ptr, route2->ptr, name);
+        return ret;
+      }
       printke("hrm wtf!");
       return -4;
     }
@@ -314,6 +345,7 @@ kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setu
   strncpy(map->prefix, setup->prefix, sizeof(map->prefix));
   map->ptr = setup->ptr;
   map->create = setup->create;
+  map->create2 = setup->create2;
   map->patch = setup->patch;
   map->destroy = setup->destroy;
   printk("Router: Added map for: %s", map->prefix);

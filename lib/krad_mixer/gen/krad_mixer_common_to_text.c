@@ -68,30 +68,6 @@ int kr_mixer_adv_ctl_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
-int kr_mixer_info_to_text(char *text, void *st, int32_t max) {
-  int res;
-  struct kr_mixer_info *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_mixer_info *)st;
-
-  res += snprintf(&text[res],max-res,"period_size : %u \n",actual->period_size);
-  res += snprintf(&text[res],max-res,"sample_rate : %u \n",actual->sample_rate);
-  res += snprintf(&text[res],max-res,"inputs : %u \n",actual->inputs);
-  res += snprintf(&text[res],max-res,"buses : %u \n",actual->buses);
-  res += snprintf(&text[res],max-res,"outputs : %u \n",actual->outputs);
-  res += snprintf(&text[res],max-res,"frames : %ju \n",actual->frames);
-  res += snprintf(&text[res],max-res,"timecode : %ju \n",actual->timecode);
-  res += snprintf(&text[res],max-res,"clock : %s \n",actual->clock);
-
-  return res;
-}
-
 int kr_mixer_path_info_to_text(char *text, void *st, int32_t max) {
   uber_St uber;
   int i;
@@ -106,8 +82,6 @@ int kr_mixer_path_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_mixer_path_info *)st;
 
-  res += snprintf(&text[res],max-res,"bus : %s \n",actual->bus);
-  res += snprintf(&text[res],max-res,"crossfade_group : %s \n",actual->crossfade_group);
   uber.actual = &(actual->channels);
   uber.type = TEXT_KR_MIXER_CHANNELS;
   res += info_pack_to_text(&text[res],&uber,max-res);

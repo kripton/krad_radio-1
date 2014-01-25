@@ -125,8 +125,9 @@ static int validate_local_client(kr_app_server_client *client) {
     if (ebml.pos < 1) {
       printke("App Server: Error packing client header");
     } else {
-      kr_io2_advance(client->out, ret);
-      return 1;
+      printk("ret is %d ebmlpos is %d", ret, ebml.pos);
+      kr_io2_advance(client->out, ebml.pos);
+      return 0;
     }
   }
   printke("App Server: Invalid client!");
@@ -197,7 +198,6 @@ static int unpack_crate_local(kr_crate2 *crate, kr_io2_t *in) {
 }
 
 static int handle_client(kr_app_server *server, kr_app_server_client *client) {
-  int ret;
   kr_crate2 crate;
   switch (client->type) {
     case KR_APP_CLIENT_REMOTE:
@@ -211,18 +211,13 @@ static int handle_client(kr_app_server *server, kr_app_server_client *client) {
       }
       break;
     case KR_APP_CLIENT_LOCAL_NEW:
-      ret = validate_local_client(client);
-      if (ret != 1) {
+      if (validate_local_client(client)) {
         return 1;
       }
       break;
     default:
       printke("App Server: Handle client fail");
       return -1;
-  }
-  if (ret > 0) {
-    kr_io2_advance(client->out, ret);
-    return 0;
   }
   return 0;
 }

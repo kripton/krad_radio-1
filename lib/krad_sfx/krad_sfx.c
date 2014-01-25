@@ -35,6 +35,7 @@ static void effect_add(kr_sfx *sfx, kr_sfx_effect_type effect);
 static void effect_remove(kr_sfx *sfx, kr_sfx_effect_type effect);
 static void effect_control(kr_sfx *sfx, kr_sfx_effect_type effect, int control_id,
  char *control_str, float value, int duration, kr_easing easing, void *user);
+static int kr_sfxeftctlstr(kr_sfx_effect_type type, char *string);
 static int effect_info(kr_sfx *sfx, kr_sfx_effect_type effect, void *effect_info);
 
 kr_sfx *kr_sfx_create(kr_sfx_setup *setup) {
@@ -166,6 +167,43 @@ void effect_remove(kr_sfx *sfx, kr_sfx_effect_type effect) {
       break;
     }
   }
+}
+
+static int kr_sfxeftctlstr(kr_sfx_effect_type type, char *string) {
+  if (type == KR_SFX_EQ) {
+    if ((strlen(string) == 2) && (strncmp(string, "db", 2) == 0)) {
+      return KR_SFX_DB;
+    }
+    if ((strlen(string) == 2) && (strncmp(string, "hz", 2) == 0)) {
+      return KR_SFX_HZ;
+    }
+    if ((strlen(string) == 2) && (strncmp(string, "bw", 2) == 0)) {
+      return KR_SFX_BW;
+    }
+    if ((strlen(string) == 9) && (strncmp(string, "bandwidth", 9) == 0)) {
+      return KR_SFX_BW;
+    }
+  }
+  if (((type == KR_SFX_LOWPASS) || (type == KR_SFX_HIGHPASS))) {
+    if ((strlen(string) == 2) && (strncmp(string, "hz", 2) == 0)) {
+      return KR_SFX_HZ;
+    }
+    if ((strlen(string) == 2) && (strncmp(string, "bw", 2) == 0)) {
+      return KR_SFX_BW;
+    }
+    if ((strlen(string) == 9) && (strncmp(string, "bandwidth", 9) == 0)) {
+      return KR_SFX_BW;
+    }
+  }
+  if (type == KR_SFX_ANALOG) {
+    if ((strlen(string) == 5) && (strncmp(string, "blend", 5) == 0)) {
+      return KR_SFX_BLEND;
+    }
+    if ((strlen(string) == 5) && (strncmp(string, "drive", 5) == 0)) {
+      return KR_SFX_DRIVE;
+    }
+  }
+  return 0;
 }
 
 static void effect_control(kr_sfx *sfx, kr_sfx_effect_type effect, int control_id,

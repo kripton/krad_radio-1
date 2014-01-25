@@ -44,7 +44,6 @@ krad_sfx/krad_eq.c \
 krad_sfx/krad_analog.c \
 krad_sfx/krad_pass.c \
 krad_sfx/krad_hardlimiter.c \
-krad_sfx/krad_sfx_common.c \
 krad_sfx/krad_sfx.c \
 krad_app/krad_app_server.c \
 krad_tags/krad_tags.c \
@@ -140,9 +139,7 @@ krad_mixer/krad_mixer_client.c \
 krad_compositor/krad_compositor_client.c \
 krad_transponder/krad_transponder_client.c \
 krad_radio/krad_radio_common.c \
-krad_mixer/krad_mixer_common.c \
 krad_compositor/krad_compositor_common.c \
-krad_sfx/krad_sfx_common.c \
 krad_graph/krad_graph.c \
 gen/gen.c
 

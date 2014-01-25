@@ -51,7 +51,6 @@ typedef enum {
   TEXT_KR_MIXER_CONTROL,
   TEXT_KR_MIXER_PATH_TYPE,
   TEXT_KR_MIXER_ADV_CTL,
-  TEXT_KR_MIXER_INFO,
   TEXT_KR_MIXER_PATH_INFO,
   TEXT_KR_MIXER_PATH_PATCH,
   TEXT_KR_NIL,
@@ -91,7 +90,7 @@ typedef enum {
 } text_enum;
 
 enum {
-  TEXT_ENUM_LAST = 69
+  TEXT_ENUM_LAST = 68
 };
 
 typedef enum {
@@ -127,7 +126,6 @@ typedef enum {
   JSON_KR_MIXER_CONTROL,
   JSON_KR_MIXER_PATH_TYPE,
   JSON_KR_MIXER_ADV_CTL,
-  JSON_KR_MIXER_INFO,
   JSON_KR_MIXER_PATH_INFO,
   JSON_KR_MIXER_PATH_PATCH,
   JSON_KR_NIL,
@@ -167,7 +165,7 @@ typedef enum {
 } json_enum;
 
 enum {
-  JSON_ENUM_LAST = 69
+  JSON_ENUM_LAST = 68
 };
 
 typedef enum {
@@ -203,7 +201,6 @@ typedef enum {
   DEJSON_KR_MIXER_CONTROL,
   DEJSON_KR_MIXER_PATH_TYPE,
   DEJSON_KR_MIXER_ADV_CTL,
-  DEJSON_KR_MIXER_INFO,
   DEJSON_KR_MIXER_PATH_INFO,
   DEJSON_KR_MIXER_PATH_PATCH,
   DEJSON_KR_NIL,
@@ -243,7 +240,7 @@ typedef enum {
 } dejson_enum;
 
 enum {
-  DEJSON_ENUM_LAST = 69
+  DEJSON_ENUM_LAST = 68
 };
 
 typedef enum {
@@ -281,7 +278,6 @@ typedef enum {
   EBML_KR_MIXER_CONTROL,
   EBML_KR_MIXER_PATH_TYPE,
   EBML_KR_MIXER_ADV_CTL,
-  EBML_KR_MIXER_INFO,
   EBML_KR_MIXER_PATH_INFO,
   EBML_KR_MIXER_PATH_PATCH,
   EBML_KR_NIL,
@@ -321,7 +317,7 @@ typedef enum {
 } ebml_enum;
 
 enum {
-  EBML_ENUM_LAST = 71
+  EBML_ENUM_LAST = 70
 };
 
 typedef enum {
@@ -357,7 +353,6 @@ typedef enum {
   DEBML_KR_MIXER_CONTROL,
   DEBML_KR_MIXER_PATH_TYPE,
   DEBML_KR_MIXER_ADV_CTL,
-  DEBML_KR_MIXER_INFO,
   DEBML_KR_MIXER_PATH_INFO,
   DEBML_KR_MIXER_PATH_PATCH,
   DEBML_KR_NIL,
@@ -397,7 +392,7 @@ typedef enum {
 } debml_enum;
 
 enum {
-  DEBML_ENUM_LAST = 69
+  DEBML_ENUM_LAST = 68
 };
 
 typedef enum {
@@ -433,7 +428,6 @@ typedef enum {
   HELPERS_KR_MIXER_CONTROL,
   HELPERS_KR_MIXER_PATH_TYPE,
   HELPERS_KR_MIXER_ADV_CTL,
-  HELPERS_KR_MIXER_INFO,
   HELPERS_KR_MIXER_PATH_INFO,
   HELPERS_KR_MIXER_PATH_PATCH,
   HELPERS_KR_NIL,
@@ -473,7 +467,7 @@ typedef enum {
 } helpers_enum;
 
 enum {
-  HELPERS_ENUM_LAST = 69
+  HELPERS_ENUM_LAST = 68
 };
 
 

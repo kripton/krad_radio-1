@@ -3,7 +3,14 @@
 #include "krad_graph.h"
 #include "krad_mixer.h"
 
-typedef struct kr_mixer_io_path_setup kr_mixer_path_setup;
+typedef struct {
+  kr_mixer_path_info *info;
+  void *control_user;
+  void *audio_user;
+  kr_mixer_path_audio_cb *audio_cb;
+  kr_mixer_path *from;
+  kr_mixer_path *to;
+} kr_mixer_path_setup;
 
 typedef enum {
   KR_MXP_NIL,
@@ -20,13 +27,12 @@ struct kr_mixer {
   int avg_window_size;
   uint32_t path_count;
   kr_pool *path_pool;
-  kr_mixer_crossfader *crossfader;
+/*  kr_mixer_crossfader *crossfader; */
   int frames_since_peak_read;
   int frames_per_peak_broadcast;
   kr_mixer_event_cb *event_cb;
   void *user;
   void *clock;
-  kr_mixer_bus *master;
   kr_graph *graph;
 };
 
@@ -38,9 +44,10 @@ struct kr_mixer_crossfader {
 
 struct kr_mixer_path {
   kr_mixer_path_type type;
-  kr_mixer_bus *bus;
+  kr_mixer_path *from;
+  kr_mixer_path *to;
   kr_mixer_channels channels;
-  kr_mixer_crossfader *crossfader;
+/*  kr_mixer_crossfader *crossfader;*/
   kr_easer volume_easer;
   int map[KR_MXR_MAX_CHANNELS];
   int mixmap[KR_MXR_MAX_CHANNELS];
@@ -58,7 +65,7 @@ struct kr_mixer_path {
   float **mapped_samples[KR_MXR_MAX_CHANNELS];
   int delay;
   int delay_actual;
-  int state;
+  mixer_path_state state;
   kr_mixer_path_audio_cb *audio_cb;
   void *audio_user;
   void *control_user;
@@ -94,10 +101,10 @@ static uint32_t ms_to_cycles(kr_mixer *mixer, int ms);
 //static void kr_mixer_xf_decouple(kr_mixer *mixer, kr_mixer_crossfader *crossfader);
 //static void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *l, kr_mixer_path *r);
 static void path_release(kr_mixer_path *path);
-static int path_setup_info_check(kr_mixer_path_info *info);
-static int path_setup_check(kr_mixer_io_path_setup *setup);
+static int path_info_check(kr_mixer_path_info *info);
+static int path_setup_check(kr_mixer_path_setup *setup);
 static void path_sfx_create(kr_mixer_path *path);
-static void path_create(kr_mixer_path *path, kr_mixer_io_path_setup *setup);
+static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup);
 static kr_mixer_path *make_path(kr_mixer *mixer, kr_mixer_path_setup *setup);
 //static void kr_mixer_channel_copy(kr_mixer_path *path, int in_chan, int out_chan);
 //static void kr_mixer_channel_move(kr_mixer_path *path, int in_chan, int out_chan);
@@ -372,6 +379,7 @@ static void set_crossfade(kr_mixer_path *path, float value) {
 */
 
 static void set_volume(kr_mixer_path *path, float value) {
+  /*
   int c;
   int i;
   float volume_temp;
@@ -379,14 +387,13 @@ static void set_volume(kr_mixer_path *path, float value) {
   i = 0;
   volume_temp = (value/100.0f);
   volume_temp *= volume_temp;
-  /* FIXME input gets bus volume, bus gets higher level bus vol */
+  //FIXME input gets bus volume, bus gets higher level bus vol
   if ((path->type == KR_MXR_INPUT) || (1 == 2)) {
-    volume_temp = volume_temp * path->bus->volume_actual[0];
-    /* FIXME
+   // volume_temp = volume_temp * path->bus->volume_actual[0];
+    //FIXME
     if (path->crossfader != NULL) {
       volume_temp = volume_temp * get_crossfade(path);
     }
-    */
   }
   for (c = 0; c < path->channels; c++) {
     path->volume[c] = value;
@@ -404,31 +411,36 @@ static void set_volume(kr_mixer_path *path, float value) {
       }
     }
   }
+  */
 }
 
 static void set_channel_volume(kr_mixer_path *path, int channel, float value) {
+    /*
   float volume_temp;
   if (path->type == KR_MXR_INPUT) {
     path->volume[channel] = value;
     volume_temp = (path->volume[channel]/100.0f);
     volume_temp *= volume_temp;
     volume_temp = volume_temp * path->bus->volume_actual[0];
+    */
     /*
     if (path->crossfader != NULL) {
       volume_temp = volume_temp * get_crossfade(path);
     }
     */
+    /*
     path->new_volume_actual[channel] = volume_temp;
   }
+    */
 }
 
 static void mixer_process(kr_mixer *mixer, uint32_t nframes) {
   int i;
-  int bi;
+  //int bi;
   kr_mixer_path *path;
-  kr_mixer_path *bus;
+  //kr_mixer_path *bus;
   i = 0;
-  bi = 0;
+  //bi = 0;
   update_state(mixer);
   /* Pull input audio */
   while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
@@ -448,6 +460,7 @@ static void mixer_process(kr_mixer *mixer, uint32_t nframes) {
     }
   }
   /* Mix, process and compute metrics */
+  /*
   while ((bus = kr_pool_iterate_active(mixer->path_pool, &bi))) {
     if ((bus->state) && (bus->type == KR_MXR_BUS)) {
       while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
@@ -458,7 +471,9 @@ static void mixer_process(kr_mixer *mixer, uint32_t nframes) {
       }
     }
   }
+  */
   /* Copy output and process */
+  /*
   while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
     if ((path->state == KR_MXP_ACTIVE)
      && (path->type == KR_MXR_OUTPUT) && (path->bus != NULL)) {
@@ -467,6 +482,7 @@ static void mixer_process(kr_mixer *mixer, uint32_t nframes) {
       limit(path, nframes);
     }
   }
+  */
   /* Push output */
   while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
     if ((path->state == KR_MXP_ACTIVE) && (path->type == KR_MXR_OUTPUT)) {
@@ -595,12 +611,13 @@ static void path_release(kr_mixer_path *path) {
   kr_pool_recycle(path->mixer->path_pool, path);
 }
 
-static int path_setup_info_check(kr_mixer_path_info *info) {
+static int path_info_check(kr_mixer_path_info *info) {
   if (info->channels < 1) return -1;
   if (info->channels > KR_MXR_MAX_CHANNELS) return -1;
-  if ((info->type != KR_MXR_INPUT)
-      && (info->type != KR_MXR_BUS)
-      && (info->type != KR_MXR_OUTPUT)) {
+  if ((info->type != KR_MXR_SOURCE)
+   && (info->type != KR_MXR_INPUT)
+   && (info->type != KR_MXR_BUS)
+   && (info->type != KR_MXR_OUTPUT)) {
     return -4;
   }
   /* FIXME check all the things
@@ -616,7 +633,8 @@ static int path_setup_info_check(kr_mixer_path_info *info) {
 }
 
 static int path_setup_check(kr_mixer_path_setup *setup) {
-  if (setup->info.type == KR_MXR_BUS) {
+  if ((setup->info->type == KR_MXR_INPUT)
+   || (setup->info->type == KR_MXR_BUS)) {
     if (setup->audio_cb != NULL) return -1;
     if (setup->audio_user != NULL) return -2;
   } else {
@@ -624,7 +642,7 @@ static int path_setup_check(kr_mixer_path_setup *setup) {
     if (setup->audio_user == NULL) return -4;
   }
   if (setup->control_user == NULL) return -5;
-  if (path_setup_info_check(&setup->info)) return -6;
+  if (path_info_check(setup->info)) return -6;
   return 0;
 }
 
@@ -654,16 +672,18 @@ static void path_sfx_create(kr_mixer_path *path) {
 static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   int c;
   kr_mixer_event event;
-  path->crossfader = NULL;
-  path->channels = setup->info.channels;
-  path->type = setup->info.type;
+  //path->crossfader = NULL;
+  path->channels = setup->info->channels;
+  path->type = setup->info->type;
   path->audio_cb = setup->audio_cb;
   path->audio_user = setup->audio_user;
   path->control_user = setup->control_user;
-  if (path->type == KR_MXR_BUS) {
-    path->bus = NULL;
+  if (path->type == KR_MXR_INPUT) {
+    path->from = setup->from;
+    path->to = setup->to;
   } else {
-    path->bus = path->mixer->master;
+    path->from = NULL;
+    path->to = NULL;
   }
   for (c = 0; c < KR_MXR_MAX_CHANNELS; c++) {
     if (c < path->channels) {
@@ -674,7 +694,7 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
     }
     path->map[c] = c;
     path->mapped_samples[c] = &path->samples[c];
-    path->volume[c] = setup->info.volume[c];
+    path->volume[c] = setup->info->volume[c];
     path->volume_actual[c] = (float)(path->volume[c]/100.0f);
     path->volume_actual[c] *= path->volume_actual[c];
     path->new_volume_actual[c] = path->volume_actual[c];
@@ -687,7 +707,7 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.path = path;
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
-  path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info.type);
+  path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info->type);
   path->mixer->event_cb(&event);
 }
 
@@ -719,13 +739,13 @@ int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch) {
   }
   /* FIXME Add bus to bus and output to output crossfading */
   if ((path->type == KR_MXR_INPUT) && (path->type != KR_MXR_BUS)) {
-    if ((strncmp(patch->ctl, "crossfade", 9) == 0) && (strlen(patch->ctl) == 9)) {
-      if (path->crossfader != NULL) {
-        //path_set_crossfade (path, value);
-        kr_easer_set(&path->crossfader->easer, patch->val, duration, EASEINOUTSINE, NULL);
-      }
-      return 0;
-    }
+//    if ((strncmp(patch->ctl, "crossfade", 9) == 0) && (strlen(patch->ctl) == 9)) {
+//      if (path->crossfader != NULL) {
+//        //path_set_crossfade (path, value);
+//        kr_easer_set(&path->crossfader->easer, patch->val, duration, EASEINOUTSINE, NULL);
+//      }
+//      return 0;
+//    }
     if (strncmp(patch->ctl, "volume_left", 11) == 0) {
       set_channel_volume(path, 0, patch->val);
       return 0;
@@ -742,7 +762,7 @@ int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info) {
   int i;
   kr_sfx_cmd cmd;
   if ((path == NULL) || (info == NULL)) return -1;
-  strcpy(info->bus, "Master");
+ // strcpy(info->bus, "Master");
   info->channels = path->channels;
   info->delay = path->delay;
   info->type = path->type;
@@ -766,12 +786,14 @@ int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info) {
   cmd.effect = KR_SFX_ANALOG;
   cmd.user = &info->analog;
   kr_sfx_ctl(path->sfx, &cmd);
+  /*
   if ((path->crossfader != NULL) && (path->crossfader->path[0] == path)) {
     info->fade = path->crossfader->fade;
   } else {
     info->crossfade_group[0] = '\0';
     info->fade = 0.0f;
   }
+  */
   return 0;
 }
 
@@ -781,9 +803,9 @@ int kr_mixer_unlink(kr_mixer_path *path) {
     printke("mixer path unlink called with null value");
     return -1;
   }
-  if (path->crossfader != NULL) {
+  //if (path->crossfader != NULL) {
     /* FIXME kr_mixer_xf_decouple(path->mixer, path->crossfader); */
-  }
+  //}
   event.user = path->mixer->user;
   event.user_path = path->control_user;
   event.path = path;
@@ -816,25 +838,41 @@ static kr_mixer_path *make_path(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   return path;
 }
 
-kr_mixer_path *kr_mixer_mkio(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
+kr_mixer_path *kr_mixer_mkso(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
+  kr_mixer_path_setup path_setup;
   if ((mixer == NULL) || (setup == NULL)) return NULL;
-  return make_path(mixer, setup);
+  path_setup.info = &setup->info;
+  path_setup.control_user = setup->control_user;
+  path_setup.audio_user = setup->audio_user;
+  path_setup.audio_cb = setup->audio_cb;
+  return make_path(mixer, &path_setup);
 }
 
 int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
   kr_mixer_path *path;
   kr_mixer_path_setup setup;
   if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
-  setup.info = *info;
+  setup.info = info;
   setup.control_user = user;
   setup.audio_user = NULL;
   setup.audio_cb = NULL;
   path = make_path(mixer, &setup);
   if (path == NULL) return -2;
-  if (mixer->master == NULL) {
-    /* FIXME hrm?? */
-    mixer->master = path;
-  }
+  return 0;
+}
+
+int kr_mixer_splice(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user) {
+  kr_mixer_path *path;
+  kr_mixer_path_setup setup;
+  if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
+  setup.info = info;
+  setup.control_user = user;
+  setup.audio_user = NULL;
+  setup.audio_cb = NULL;
+  setup.from = from;
+  setup.to = to;
+  path = make_path(mixer, &setup);
+  if (path == NULL) return -2;
   return 0;
 }
 
