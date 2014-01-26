@@ -159,7 +159,7 @@ kr_radio *kr_radio_create(char *sysname) {
     mixer_setup.event_cb = mixer_event;
     radio->mixer = kr_mixer_create(&mixer_setup);
     if (radio->mixer) {
-      kr_compositor_setup_init(&compositor_setup);
+      memset(&compositor_setup, 0, sizeof(kr_compositor_setup));
       compositor_setup.event_cb = compositor_event;
       compositor_setup.user = radio;
       radio->compositor = kr_compositor_create(&compositor_setup);

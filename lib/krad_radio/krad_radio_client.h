@@ -134,7 +134,6 @@ typedef union {
   void *actual;
   kr_tag *tag;
   kr_mixer_path_info *portgroup;
-  kr_compositor_info *compositor;
   kr_sprite_info *sprite;
   kr_text_info *text;
   kr_vector_info *vector;
@@ -145,7 +144,6 @@ typedef union {
   char actual;
   kr_tag tag;
   kr_mixer_path_info portgroup;
-  kr_compositor_info compositor;
   kr_sprite_info sprite;
   kr_text_info text;
   kr_vector_info vector;

@@ -184,12 +184,6 @@ static void path_create(kr_compositor_path *path,
   path->control_user = setup->control_user;
   path->frame_cb = setup->frame_cb;
   kr_image_convert_init(&path->converter);
-  if (path->info.type == KR_CMP_INPUT) {
-    path->compositor->info.inputs++;
-  }
-  if (path->info.type == KR_CMP_OUTPUT) {
-    path->compositor->info.outputs++;
-  }
   event.user = path->compositor->user;
   event.user_path = path->control_user;
   event.path = path;
@@ -233,12 +227,6 @@ void cmper_path_release(kr_compositor *compositor, kr_compositor_path *path) {
     kr_perspective_destroy(&path->perspective);
   }
   kr_image_convert_clear(&path->converter);
-  if (path->info.type == KR_CMP_INPUT) {
-    compositor->info.inputs--;
-  }
-  if (path->info.type == KR_CMP_OUTPUT) {
-    compositor->info.outputs--;
-  }
   kr_graph_vertex_destroy(path->compositor->graph, path->vertex);
   kr_pool_recycle(path->compositor->path_pool, path);
 }

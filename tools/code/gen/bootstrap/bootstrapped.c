@@ -57,8 +57,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_event_type";
     case CGEN_KR_COMPOSITOR_EVENT:
       return "kr_compositor_event";
-    case CGEN_KR_COMPOSITOR_SETTING:
-      return "kr_compositor_setting";
     case CGEN_KR_COMPOSITOR_PATH_TYPE:
       return "kr_compositor_path_type";
     case CGEN_KR_COMPOSITOR_SUBUNIT_TYPE:
@@ -77,8 +75,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_vector_info";
     case CGEN_KR_COMPOSITOR_PATH_INFO:
       return "kr_compositor_path_info";
-    case CGEN_KR_COMPOSITOR_INFO:
-      return "kr_compositor_info";
     case CGEN_KR_COMPOSITOR_PATH_PATCH:
       return "kr_compositor_path_patch";
     case CGEN_COMPOSITOR_PATH_STATE:
@@ -551,9 +547,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_compositor_event")) {
     return CGEN_KR_COMPOSITOR_EVENT;
   }
-  if (!strcmp(string,"kr_compositor_setting")) {
-    return CGEN_KR_COMPOSITOR_SETTING;
-  }
   if (!strcmp(string,"kr_compositor_path_type")) {
     return CGEN_KR_COMPOSITOR_PATH_TYPE;
   }
@@ -580,9 +573,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_compositor_path_info")) {
     return CGEN_KR_COMPOSITOR_PATH_INFO;
-  }
-  if (!strcmp(string,"kr_compositor_info")) {
-    return CGEN_KR_COMPOSITOR_INFO;
   }
   if (!strcmp(string,"kr_compositor_path_patch")) {
     return CGEN_KR_COMPOSITOR_PATH_PATCH;

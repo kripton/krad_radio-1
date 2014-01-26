@@ -13,7 +13,6 @@ struct kr_compositor {
   cairo_surface_t *cst;
   kr_image image;
   kr_image_pool *image_pool;
-  kr_compositor_info info;
   kr_pool *sprite_pool;
   kr_pool *text_pool;
   kr_pool *vector_pool;
@@ -26,7 +25,6 @@ struct kr_compositor {
 
 #include "krad_compositor_path.c"
 
-static void tick(kr_compositor *compositor);
 static void setup(kr_compositor *compositor);
 static void composite(kr_compositor *compositor);
 static void output(kr_compositor *compositor);
@@ -36,24 +34,6 @@ static void subunits_free(kr_compositor *compositor);
 static void subunits_create(kr_compositor *compositor);
 static void subunits_state_update(kr_compositor *compositor);
 
-static void kr_compositor_render_no_input(kr_compositor *compositor) {
-  int f;
-  f = compositor->info.frames;
-  cairo_save(compositor->cr);
-  if ((compositor->info.frames % 24) < 12) {
-    cairo_set_source_rgba(compositor->cr, RED, 0.0f + ((f % 12) * 0.09f));
-  } else {
-    cairo_set_source_rgba(compositor->cr, RED, 1.0f + ((f % 12) * -0.09f));
-  }
-  cairo_select_font_face(compositor->cr, "", CAIRO_FONT_SLANT_NORMAL,
-   CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(compositor->cr, 42.0);
-  cairo_move_to(compositor->cr, 64, 64 + 42);
-  cairo_show_text(compositor->cr, "KR: No Input!");
-  cairo_stroke(compositor->cr);
-  cairo_restore(compositor->cr);
-}
-
 static void kr_compositor_clear_frame(kr_compositor *compositor) {
   cairo_save(compositor->cr);
   cairo_set_source_rgba(compositor->cr, BGCOLOR_CLR);
@@ -62,14 +42,7 @@ static void kr_compositor_clear_frame(kr_compositor *compositor) {
   cairo_restore(compositor->cr);
 }
 
-static void tick(kr_compositor *com) {
-  com->info.timecode = round(1000000000 * com->info.frames
-   / com->info.fps_numerator * com->info.fps_denominator / 1000000);
-  com->info.frames++;
-}
-
 static void setup(kr_compositor *compositor) {
-  tick(compositor);
   while (!kr_image_pool_getimage(compositor->image_pool, &compositor->image)) {
     printke("Compositor wanted a frame but could not get one right away!");
     usleep(5000);
@@ -86,12 +59,6 @@ static void composite(kr_compositor *com) {
   void *overlay;
   i = 0;
   kr_compositor_clear_frame(com);
-  if ((com->info.inputs == 0)
-   && (com->info.sprites == 0)
-   && (com->info.texts == 0)
-   && (com->info.vectors == 0)) {
-    kr_compositor_render_no_input(com);
-  }
   while ((path = kr_pool_iterate_active(com->path_pool, &i))) {
     if (path_type_get(path) == KR_CMP_INPUT) {
       path_render(path, &com->image, com->cr);
@@ -128,6 +95,7 @@ static void cleanup(kr_compositor *compositor) {
   subunits_state_update(compositor);
 }
 
+/*
 int kr_compositor_process(kr_compositor *compositor) {
   if (compositor == NULL) return -1;
   setup(compositor);
@@ -136,7 +104,7 @@ int kr_compositor_process(kr_compositor *compositor) {
   cleanup(compositor);
   return 0;
 }
-
+*/
 static void subunits_state_update(kr_compositor *compositor) {
   /*
   int i;
@@ -169,21 +137,6 @@ static void subunits_state_update(kr_compositor *compositor) {
     }
   }
   */
-}
-
-int kr_compositor_ctl(kr_compositor *com, kr_compositor_setting *setting) {
-
-  return 0;
-}
-
-static void resolution_set(kr_compositor *com, uint32_t w, uint32_t h) {
-  com->info.width = w;
-  com->info.height = h;
-}
-
-static void frame_rate_set(kr_compositor *cmpr, int num, int den) {
-  cmpr->info.fps_numerator = num;
-  cmpr->info.fps_denominator = den;
 }
 
 static void subunits_free(kr_compositor *com) {
@@ -248,12 +201,10 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   com->path_pool = pool;
   com->user = setup->user;
   com->event_cb = setup->event_cb;
-  resolution_set(com, setup->width, setup->height);
-  frame_rate_set(com, setup->fps_num, setup->fps_den);
   FT_Init_FreeType(&com->ftlib);
   subunits_create(com);
-  com->image.w = com->info.width;
-  com->image.h = com->info.height;
+  com->image.w = KR_COMPOSITOR_WIDTH_DEF;
+  com->image.h = KR_COMPOSITOR_HEIGHT_DEF;
   com->image.pps[0] = com->image.w * 4;
   com->image.fmt = PIX_FMT_RGB32;
   com->image_pool = kr_image_pool_create(&com->image, DEFAULT_COMPOSITOR_BUFFER_FRAMES);
@@ -261,18 +212,4 @@ kr_compositor *kr_compositor_create(kr_compositor_setup *setup) {
   com->graph = kr_graph_create(&graph_setup);
   printk("Compositor: Created");
   return com;
-}
-
-int kr_compositor_info_get(kr_compositor *com, kr_compositor_info *info) {
-  if ((com == NULL) || (info == NULL)) return -1;
-  *info = com->info;
-  return 0;
-}
-
-void kr_compositor_setup_init(kr_compositor_setup *setup) {
-  if (setup == NULL) return;
-  setup->fps_num = KR_COMPOSITOR_FPS_NUM_DEF;
-  setup->fps_den = KR_COMPOSITOR_FPS_DEN_DEF;
-  setup->width = KR_COMPOSITOR_WIDTH_DEF;
-  setup->height = KR_COMPOSITOR_HEIGHT_DEF;
 }

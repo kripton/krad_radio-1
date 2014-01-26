@@ -196,33 +196,6 @@ int kr_compositor_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_compositor_info_fr_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  struct kr_compositor_info *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (struct kr_compositor_info *)st;
-
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->width);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->height);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->fps_numerator);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->fps_denominator);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->sprites);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->vectors);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->texts);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->inputs);
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->outputs);
-  res += kr_ebml2_unpack_element_uint64(ebml, NULL, &actual->frames);
-  res += kr_ebml2_unpack_element_uint64(ebml, NULL, &actual->timecode);
-
-  return res;
-}
-
 int kr_compositor_path_patch_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;

@@ -23,11 +23,8 @@ struct kr_compositor_control_easers {
 
 #define KR_COMPOSITOR_WIDTH_DEF 640
 #define KR_COMPOSITOR_HEIGHT_DEF 360
-#define KR_COMPOSITOR_FPS_DEF 30
-#define KR_COMPOSITOR_FPS_NUM_DEF KR_COMPOSITOR_FPS_DEF * 1000
-#define KR_COMPOSITOR_FPS_DEN_DEF 1 * 1000
 
-#define DEFAULT_COMPOSITOR_BUFFER_FRAMES 20
+#define DEFAULT_COMPOSITOR_BUFFER_FRAMES 4
 #define KC_MAX_PORTS 32
 #define KC_MAX_SPRITES 32
 #define KC_MAX_TEXTS 32
@@ -40,10 +37,6 @@ struct kr_compositor_control_easers {
 #define BGCOLOR_CLR 0.0, 0.0, 0.0, 1.0
 
 struct kr_compositor_setup {
-  uint32_t width;
-  uint32_t height;
-  uint32_t fps_num;
-  uint32_t fps_den;
   void *user;
   kr_compositor_event_cb *event_cb;
 };
@@ -65,17 +58,5 @@ struct kr_compositor_event {
 
 int kr_compositor_destroy(kr_compositor *compositor);
 kr_compositor *kr_compositor_create(kr_compositor_setup *setup);
-void kr_compositor_setup_init(kr_compositor_setup *setup);
-int kr_compositor_info_get(kr_compositor *com, kr_compositor_info *info);
-
-/* Goes away sometime soon */
-int kr_compositor_process(kr_compositor *compositor);
-
-typedef struct {
-
-
-} kr_compositor_setting;
-
-int kr_compositor_ctl(kr_compositor *com, kr_compositor_setting *setting);
 
 #endif

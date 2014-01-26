@@ -17,6 +17,6 @@ void xpdr_adapter_path_av_cb(kr_adapter_path_av_cb_arg *arg) {
   path->image = arg->image;
   if ((path->info.output.type == KR_XPDR_ADAPTER)
    && (path->info.output.info.adapter_path_info.api == KR_ADP_WAYLAND)) {
-    kr_compositor_process(path->xpdr->compositor);
+    //kr_compositor_process(path->xpdr->compositor);
   }
 }

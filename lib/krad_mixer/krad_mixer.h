@@ -54,10 +54,6 @@ struct kr_mixer_setup {
   kr_mixer_event_cb *event_cb;
 };
 
-/* go away */
-int kr_mixer_process(kr_mixer *mixer);
-/* end go away */
-
 int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch);
 int kr_mixer_path_info_get(kr_mixer_path *unit, kr_mixer_path_info *info);
 int kr_mixer_unlink(kr_mixer_path *path);

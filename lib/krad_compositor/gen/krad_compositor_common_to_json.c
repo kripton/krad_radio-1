@@ -224,35 +224,6 @@ int kr_compositor_path_info_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
-int kr_compositor_info_to_json(char *json, void *st, int32_t max) {
-  int res;
-  struct kr_compositor_info *actual;
-
-  res = 0;
-
-  if ((json == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_compositor_info *)st;
-
-  res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"width\" : %u,",actual->width);
-  res += snprintf(&json[res],max-res,"\"height\" : %u,",actual->height);
-  res += snprintf(&json[res],max-res,"\"fps_numerator\" : %u,",actual->fps_numerator);
-  res += snprintf(&json[res],max-res,"\"fps_denominator\" : %u,",actual->fps_denominator);
-  res += snprintf(&json[res],max-res,"\"sprites\" : %u,",actual->sprites);
-  res += snprintf(&json[res],max-res,"\"vectors\" : %u,",actual->vectors);
-  res += snprintf(&json[res],max-res,"\"texts\" : %u,",actual->texts);
-  res += snprintf(&json[res],max-res,"\"inputs\" : %u,",actual->inputs);
-  res += snprintf(&json[res],max-res,"\"outputs\" : %u,",actual->outputs);
-  res += snprintf(&json[res],max-res,"\"frames\" : %ju,",actual->frames);
-  res += snprintf(&json[res],max-res,"\"timecode\" : %ju",actual->timecode);
-  res += snprintf(&json[res],max-res,"}");
-
-  return res;
-}
-
 int kr_compositor_path_patch_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;

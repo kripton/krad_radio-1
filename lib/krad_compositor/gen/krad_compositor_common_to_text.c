@@ -196,33 +196,6 @@ int kr_compositor_path_info_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
-int kr_compositor_info_to_text(char *text, void *st, int32_t max) {
-  int res;
-  struct kr_compositor_info *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_compositor_info *)st;
-
-  res += snprintf(&text[res],max-res,"width : %u \n",actual->width);
-  res += snprintf(&text[res],max-res,"height : %u \n",actual->height);
-  res += snprintf(&text[res],max-res,"fps_numerator : %u \n",actual->fps_numerator);
-  res += snprintf(&text[res],max-res,"fps_denominator : %u \n",actual->fps_denominator);
-  res += snprintf(&text[res],max-res,"sprites : %u \n",actual->sprites);
-  res += snprintf(&text[res],max-res,"vectors : %u \n",actual->vectors);
-  res += snprintf(&text[res],max-res,"texts : %u \n",actual->texts);
-  res += snprintf(&text[res],max-res,"inputs : %u \n",actual->inputs);
-  res += snprintf(&text[res],max-res,"outputs : %u \n",actual->outputs);
-  res += snprintf(&text[res],max-res,"frames : %ju \n",actual->frames);
-  res += snprintf(&text[res],max-res,"timecode : %ju \n",actual->timecode);
-
-  return res;
-}
-
 int kr_compositor_path_patch_to_text(char *text, void *st, int32_t max) {
   uber_St uber;
   int res;
