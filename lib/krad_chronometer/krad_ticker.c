@@ -2,14 +2,18 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/epoll.h>
+#include <sys/timerfd.h>
+#include "krad_system.h"
 #include "krad_ticker.h"
 
 struct kr_ticker {
-  struct timespec start_time;
-  struct timespec wakeup_time;
-  uint64_t period_time_ns;
-  uint64_t total_periods;
-  uint64_t total_ms;
+  int fd;
+  int pd;
+  struct timespec start;
+  uint64_t tick_ns;
+  uint64_t ticks;
 };
 
 static inline uint64_t ts_to_nsec(struct timespec ts) {
@@ -23,45 +27,70 @@ static inline struct timespec nsec_to_ts(uint64_t nsecs) {
   return ts;
 }
 
-struct timespec timespec_add_ns(struct timespec ts, uint64_t ns) {
+struct timespec kr_ticker_add_ns(struct timespec ts, uint64_t ns) {
   uint64_t nsecs = ts_to_nsec(ts);
   nsecs += ns;
   return nsec_to_ts(nsecs);
 }
 
-struct timespec timespec_add_ms(struct timespec ts, uint64_t ms) {
-  return timespec_add_ns(ts, ms * 1000000);
+struct timespec kr_ticker_add_ms(struct timespec ts, uint64_t ms) {
+  return kr_ticker_add_ns(ts, ms * 1000000);
 }
 
-void krad_ticker_destroy(krad_ticker_t *ticker) {
+int kr_ticker_destroy(kr_ticker *ticker) {
+  if (ticker == NULL) return -1;
+  if (ticker->fd != -1) close(ticker->fd);
+  ticker->fd = -1;
+  if (ticker->pd != -1) close(ticker->fd);
+  ticker->pd = -1;
   free(ticker);
+  return 0;
 }
 
-krad_ticker_t *krad_ticker_create(int numerator, int denominator) {
-  krad_ticker_t *ticker;
-  ticker = kr_allocz (1, sizeof (krad_ticker_t));
-  ticker->period_time_ns = (1000000000 / numerator) * denominator;
+kr_ticker *kr_ticker_create(int num, int den) {
+  kr_ticker *ticker;
+  struct epoll_event ev;
+  int ret;
+  ticker = kr_allocz(1, sizeof(kr_ticker));
+  ticker->tick_ns = (1000000000 / num) * den;
+  ticker->fd = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
+  ticker->pd = epoll_create1(EPOLL_CLOEXEC);
+  ev.events = EPOLLIN;
+  ev.data.fd = ticker->fd;
+  ret = epoll_ctl(ticker->pd, EPOLL_CTL_ADD, ev.data.fd, &ev);
+  if ((ret != 0) && (ticker->pd != -1) && (ticker->fd != -1)) {
+    printke("Ticker: epoll timerfd fail");
+    kr_ticker_destroy(ticker);
+    return NULL;
+  }
   return ticker;
 }
 
+/*
 krad_ticker_t *krad_ticker_throttle_create() {
   krad_ticker_t *ticker;
   ticker = kr_allocz(1, sizeof (krad_ticker_t));
   return ticker;
 }
+*/
 
-void krad_ticker_start(krad_ticker_t *ticker) {
-  ticker->total_periods = 0;
-  clock_gettime(CLOCK_MONOTONIC, &ticker->start_time);
+int kr_ticker_start(kr_ticker *ticker) {
+  if (ticker == NULL) return -1;
+  ticker->ticks = 0;
+  clock_gettime(CLOCK_MONOTONIC, &ticker->start);
+  return 0;
 }
 
-void krad_ticker_start_at(krad_ticker_t *ticker, struct timespec start_time) {
-  ticker->total_periods = 0;
-  memcpy (&ticker->start_time, &start_time, sizeof(struct timespec));
-  krad_ticker_wait (ticker);
+int kr_ticker_start_at(kr_ticker *ticker, struct timespec start_time) {
+  if (ticker == NULL) return -1;
+  ticker->ticks = 0;
+  memcpy(&ticker->start, &start_time, sizeof(struct timespec));
+  kr_ticker_wait(ticker);
+  return 0;
 }
 
-void krad_ticker_throttle (krad_ticker_t *ticker, uint64_t ms) {
+/*
+void krad_ticker_throttle(krad_ticker_t *ticker, uint64_t ms) {
   ticker->total_ms += ms;
   ticker->wakeup_time = timespec_add_ms (ticker->start_time, ticker->total_ms);
   if (clock_nanosleep (CLOCK_MONOTONIC,
@@ -71,16 +100,35 @@ void krad_ticker_throttle (krad_ticker_t *ticker, uint64_t ms) {
     failfast ("Krad Ticker: error while clock nanosleeping");
   }
 }
+*/
+int kr_ticker_wait(kr_ticker *ticker) {
+  int ret;
+  ssize_t s;
+  int n;
+  uint64_t exp;
+  struct itimerspec new_wakeup;
+  struct timespec wakeup;
+  struct epoll_event events[4];
+  if (ticker == NULL) return -1;
+  wakeup = kr_ticker_add_ns(ticker->start, ticker->tick_ns * ticker->ticks);
+  if (0){
+    if (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &wakeup, NULL)) {
+      failfast("Ticker: error while clock nanosleeping");
+    }
+  } else {
+    memset(&new_wakeup, 0, sizeof(new_wakeup));
+    new_wakeup.it_value = wakeup;
+    ret = timerfd_settime(ticker->fd, TFD_TIMER_ABSTIME, &new_wakeup, NULL);
+    if (ret == -1) return -2;
 
-void krad_ticker_wait (krad_ticker_t *ticker) {
-  ticker->wakeup_time = timespec_add_ns (ticker->start_time,
-                                         ticker->period_time_ns *
-                                         ticker->total_periods);
-  if (clock_nanosleep (CLOCK_MONOTONIC,
-                       TIMER_ABSTIME,
-                       &ticker->wakeup_time,
-                       NULL)) {
-    failfast ("Krad Ticker: error while clock nanosleeping");
+    n = epoll_wait(ticker->pd, events, 4, -1);
+    if (n < 1) return -3;
+    if (ticker->fd != events[0].data.fd) {
+      return -4;
+    }
   }
-  ticker->total_periods++;
+  s = read(ticker->fd, &exp, sizeof(uint64_t));
+  if (s != sizeof(uint64_t)) return -5;
+  ticker->ticks++;
+  return 0;
 }

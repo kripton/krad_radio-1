@@ -14,8 +14,8 @@ int x11_adapter_process(kr_adapter_path *path) {
   den = 1;
   krad_system_set_thread_name("kr_x11");
   memset(&image, 0, sizeof(kr_image));
-  ticker = krad_ticker_create(num, den);
-  krad_ticker_start(ticker);
+  ticker = kr_ticker_create(num, den);
+  kr_ticker_start(ticker);
   for(;;) {
     ret = kr_x11_capture(path->adapter->handle.x11, &image);
     if (ret > 0) {
@@ -24,9 +24,9 @@ int x11_adapter_process(kr_adapter_path *path) {
       cb_arg.image = image;
       cb_arg.path->av_cb(&cb_arg);
     }
-    krad_ticker_wait(ticker);
+    kr_ticker_wait(ticker);
   }
-  krad_ticker_destroy(ticker);
+  kr_ticker_destroy(ticker);
   return 0;
 }
 

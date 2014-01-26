@@ -62,7 +62,7 @@ kr_x11_stream *kr_x11_stream_create(kr_x11_stream_params *params) {
 
 void kr_x11_stream_run(kr_x11_stream *x11s) {
   kr_codeme_t *vcodeme;
-  krad_ticker_t *ticker;
+  kr_ticker *ticker;
   int32_t ret;
   kr_image x11_image;
   kr_image scaled_image;
@@ -90,8 +90,8 @@ void kr_x11_stream_run(kr_x11_stream *x11s) {
   vcodeme = kr_codeme_kludge_create();
   kr_x11_enable_capture(x11s->x11, x11s->params->window_id);
   x11s->timer = kr_timer_create();
-  ticker = krad_ticker_create(x11s->params->fps_num, x11s->params->fps_den);
-  krad_ticker_start(ticker);
+  ticker = kr_ticker_create(x11s->params->fps_num, x11s->params->fps_den);
+  kr_ticker_start(ticker);
   kr_timer_start(x11s->timer);
   while (!destruct) {
     if (!kr_x11_capture(x11s->x11, &x11_image)) {
@@ -106,12 +106,13 @@ void kr_x11_stream_run(kr_x11_stream *x11s) {
     }
     printf("\rKrad X11 Stream Frame# %12"PRIu64"", x11s->frames++);
     fflush(stdout);
+    kr_ticker_wait(ticker);
   }
   kr_codeme_kludge_destroy(&vcodeme);
   free(pixels);
   kr_image_convert_clear(&conv);
   kr_timer_destroy(x11s->timer);
-  krad_ticker_destroy(ticker);
+  kr_ticker_destroy(ticker);
 }
 
 void kr_x11_stream_activate(kr_x11_stream_params *params) {
