@@ -154,6 +154,7 @@ void effect_remove(kr_sfx *sfx, kr_sfx_effect_type effect) {
             break;
           case KR_SFX_LOWPASS:
             kr_pass_destroy(sfx->effect[e].ctx[c].lowpass);
+            break;
           case KR_SFX_HIGHPASS:
             kr_pass_destroy(sfx->effect[e].ctx[c].highpass);
             break;
