@@ -126,4 +126,7 @@ tests/kr_ebml_serial_test
 tests/kr_alsa_test
 tests/kr_graph_test
 tests/kr_thread_test
+tests/kr_crypto_test
 tools/code/gen/bootstrap/codegen_bootstrap
+tests/cert/server.key
+tests/cert/server.crt

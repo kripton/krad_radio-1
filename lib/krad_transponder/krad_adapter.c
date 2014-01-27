@@ -77,7 +77,6 @@ void adapter_path_process_thread_start(kr_adapter_path *path) {
 static int path_setup_check(kr_adapter_path_setup *setup);
 static void path_create(kr_adapter_path *path, kr_adapter_path_setup *setup);
 static void path_destroy(kr_adapter_path *path);
-static int path_prepare(kr_adapter_path *path);
 
 static int path_setup_check(kr_adapter_path_setup *setup) {
   if (setup == NULL) return -1;
@@ -144,30 +143,6 @@ static void path_destroy(kr_adapter_path *path) {
     default:
       break;
   }
-}
-
-/* FIXME get rid of this prepare jank */
-static int path_prepare(kr_adapter_path *path) {
-  switch (path->info.api) {
-    case KR_ADP_JACK:
-      kr_jack_path_prepare(path->api_path.jack);
-      return 1;
-    default:
-      break;
-  }
-  return 0;
-}
-
-int kr_adapter_prepare(kr_adapter *adapter) {
-  int i;
-  int processed;
-  processed = 0;
-  for (i = 0; i < KR_ADAPTER_PATHS_MAX; i++) {
- //   if (adapter->path[i] != NULL) {
- //     processed += path_prepare(adapter->path[i]);
- //   }
-  }
-  return processed;
 }
 
 int kr_adapter_unlink(kr_adapter_path *path) {

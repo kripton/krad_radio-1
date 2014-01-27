@@ -3,11 +3,15 @@ include $(top_srcdir)/common.mk
 bin_PROGRAMS = kr_cbor_test kr_pool_test kr_v4l2_test kr_alsa_test
 #bin_PROGRAMS += kr_helpers_test kr_ebml_serial_test kr_json_serial_test
 bin_PROGRAMS += kr_graph_test
-bin_PROGRAMS += kr_thread_test
+bin_PROGRAMS += kr_thread_test kr_crypto_test
 
 if HAVE_WAYLAND
   bin_PROGRAMS += kr_wayland_test
 endif
+
+kr_crypto_test_SOURCES = kr_crypto_test.c
+kr_crypto_test_CFLAGS =
+kr_crypto_test_LDFLAGS = -lssl
 
 kr_thread_test_SOURCES = kr_thread_test.c
 kr_thread_test_CFLAGS =
