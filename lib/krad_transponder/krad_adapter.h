@@ -58,12 +58,8 @@ struct kr_adapter_setup {
   kr_adapter_event_cb *ev_cb;
 };
 
-int kr_adapter_prepare(kr_adapter *adapter);
-
 int kr_adapter_unlink(kr_adapter_path *path);
-kr_adapter_path *kr_adapter_mkpath(kr_adapter *adapter,
- kr_adapter_path_setup *setup);
-
+kr_adapter_path *kr_adapter_mkpath(kr_adapter *a, kr_adapter_path_setup *s);
 int kr_adapter_get_info(kr_adapter *adapter, kr_adapter_info *info);
 int kr_adapter_destroy(kr_adapter *adapter);
 kr_adapter *kr_adapter_create(kr_adapter_setup *setup);

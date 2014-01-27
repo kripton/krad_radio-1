@@ -42,16 +42,12 @@ void jack_adapter_destroy(kr_adapter *adapter) {
 }
 
 void jack_adapter_create(kr_adapter *adapter) {
-
   kr_jack_setup jack_setup;
-
   snprintf(jack_setup.client_name,
    sizeof(adapter->info.api_info.jack.client_name), "kradradio");
   snprintf(jack_setup.server_name,
    sizeof(adapter->info.api_info.jack.server_name), "%s", "");
-
   memcpy(&jack_setup.info, &adapter->info.api_info.jack, sizeof(kr_jack_info));
-
   jack_setup.user = adapter;
   jack_setup.event_cb = jack_adapter_event_cb;
   adapter->handle.jack = kr_jack_create(&jack_setup);

@@ -19,39 +19,32 @@ struct kr_jack {
 
 static int xrun_cb(void *arg);
 static void shutdown_cb(void *arg);
-static int process_cb(jack_nframes_t nframes, void *arg);
+static int jack_process(jack_nframes_t nframes, void *arg);
+static int path_setup_info_check(kr_jack_path_info *info);
+static int path_setup_check(kr_jack_path_setup *setup);
+static int jack_setup_check(kr_jack_setup *setup);
 
 static int xrun_cb(void *arg) {
-
   kr_jack *jack = (kr_jack *)arg;
-
   jack->info.xruns++;
   printke("Krad Jack: %s xrun number %d!", jack->info.client_name,
    jack->info.xruns);
-
   return 0;
 }
 
 static void shutdown_cb(void *arg) {
-
   kr_jack *jack = (kr_jack *)arg;
-
   jack->info.state = KR_JACK_OFFLINE;
   printke("Krad Jack: shutdown callback, oh dear!");
 }
 
-static int process_cb(jack_nframes_t nframes, void *arg) {
-
+static int jack_process(jack_nframes_t nframes, void *arg) {
   kr_jack *jack;
-  kr_jack_event_cb_arg cb_arg;
-
   jack = (kr_jack *)arg;
-
   if (jack->set_thread_name == 0) {
-    krad_system_set_thread_name("kr_jack_io");
+    //krad_system_set_thread_name("kr_jack_io");
     jack->set_thread_name = 1;
   }
-
   jack->info.frames += nframes;
   if (jack->info.period_size != nframes) {
     printke("whoa doggie period size changed w/o warning! %u -> %u",
@@ -59,25 +52,17 @@ static int process_cb(jack_nframes_t nframes, void *arg) {
     jack->info.period_size = nframes;
     /* callback event?? */
   }
-
-  cb_arg.user = jack->user;
-  cb_arg.event = KR_JACK_PROCESS;
-  jack->event_cb(&cb_arg);
-
   return 0;
 }
 
 int kr_jack_path_prepare(kr_jack_path *path) {
-
   kr_jack_path_audio_cb_arg cb_arg;
   int i;
-
   cb_arg.user = path->user;
   cb_arg.path = path;
   cb_arg.audio.channels = path->info.channels;
   cb_arg.audio.rate = path->jack->info.sample_rate;
   cb_arg.audio.count = path->jack->info.period_size;
-
   if (path->info.direction == KR_JACK_INPUT) {
     cb_arg.event = KR_JACK_AUDIO_INPUT;
   } else {
@@ -91,115 +76,25 @@ int kr_jack_path_prepare(kr_jack_path *path) {
   return 0;
 }
 
-/*
-void kr_jack_port_registration_callback(jack_port_id_t portid, int regged,
- void *arg) {
-
-  kr_jack *jack = (kr_jack *)arg;
-
-  jack_port_t *port;
-
-  port = jack_port_by_id (jack->client, portid);
-
-  if (regged == 1) {
-    //printk("Krad Jack: %s registered", jack_port_name (port));
-    if (jack_port_is_mine(jack->client, port) == 0) {
-      kr_jack_check_connection(jack, (char *)jack_port_name(port));
+static void *process_thread(void *arg) {
+  kr_jack *jack;
+  jack_nframes_t frames;
+  int status;
+  jack = (kr_jack *)arg;
+  status = 0;
+  static int test = 0;
+  for (;;) {
+    frames = jack_cycle_wait(jack->client);
+    status = jack_process(frames, jack);
+    jack_cycle_signal(jack->client, status);
+    test++;
+    if (status) {
+      break;
     }
-  } else {
-    //printk("Krad Jack: %s unregistered", jack_port_name (port));
-  }
-}
-
-void kr_jack_port_connection_callback(jack_port_id_t a, jack_port_id_t b,
- int connect, void *arg) {
-
-  kr_jack *jack = (kr_jack *)arg;
-
-  jack_port_t *ports[2];
-
-  ports[0] = jack_port_by_id (jack->client, a);
-  ports[1] = jack_port_by_id (jack->client, b);
-
-  if (connect == 1) {
-    //printk("Krad Jack: %s connected to %s ", jack_port_name (ports[0]),
-    //jack_port_name(ports[1]));
-  } else {
-    //printk("Krad Jack: %s disconnected from %s ", jack_port_name (ports[0]),
-    //jack_port_name (ports[1]));
-  }
-}
-*/
-/*
-void kr_jack_portgroup_plug(kr_jack_portgroup *portgroup, char *remote_name) {
-
-  const char **ports;
-  int flags;
-  int c;
-
-  flags = 0;
-
-  if (strlen(remote_name) == 0) {
-    return;
-  }
-
-  ports = jack_get_ports(portgroup->kr_jack->client, remote_name,
-   JACK_DEFAULT_AUDIO_TYPE, flags);
-
-  if (ports) {
-    for (c = 0; c < portgroup->channels; c++) {
-      if (ports[c]) {
-        //kr_jack_stay_connection(portgroup->kr_jack,
-        //(char *)jack_port_name(portgroup->ports[c]), (char *)ports[c]);
-        if (portgroup->direction == KR_AIN) {
-          //printk("Krad Jack: Plugging %s to %s", ports[c],
-          //jack_port_name(portgroup->ports[c]));
-          jack_connect(portgroup->kr_jack->client, ports[c],
-           jack_port_name(portgroup->ports[c]));
-        } else {
-          //printk("Krad Jack: Plugging %s to %s",
-          // jack_port_name(portgroup->ports[c]), ports[c]);
-          jack_connect(portgroup->kr_jack->client,
-           jack_port_name(portgroup->ports[c]), ports[c]);
-        }
-      } else {
-        return;
-      }
+    if (test > 6000) {
+      status = 1;
     }
   }
-}
-
-void kr_jack_portgroup_unplug(kr_jack_portgroup *portgroup, char *name) {
-
-  int c;
-
-  for (c = 0; c < portgroup->channels; c++) {
-    //kr_jack_unstay_connection(portgroup->kr_jack,
-    // (char *)jack_port_name(portgroup->ports[c]), name);
-    jack_port_disconnect(portgroup->kr_jack->client, portgroup->ports[c]);
-  }
-}
-*/
-
-int kr_jack_unlink(kr_jack_path *path) {
-
-  int c;
-  int ret;
-
-  if (path == NULL) return -1;
-
-  printk("JACK path unlink called for %s", path->info.name);
-
-  for (c = 0; c < path->info.channels; c++) {
-    ret = jack_port_unregister(path->jack->client, path->ports[c]);
-    if (ret != 0) {
-      //FIXME watcha gonna do bout that? deal with it?
-    }
-    path->ports[c] = NULL;
-  }
-
-  free(path);
-  printk("JACK path unlink finished");
   return 0;
 }
 
@@ -211,12 +106,10 @@ static int path_setup_info_check(kr_jack_path_info *info) {
    && (info->direction != KR_JACK_OUTPUT)) {
     return -2;
   }
-
   if (memchr(info->name + 1, '\0', sizeof(info->name) - 1) == NULL) {
     return -3;
   }
   if (strlen(info->name) == 0) return -4;
-
   return 0;
 }
 
@@ -231,34 +124,51 @@ static int path_setup_check(kr_jack_path_setup *setup) {
   return 0;
 }
 
-kr_jack_path *kr_jack_mkpath(kr_jack *jack, kr_jack_path_setup *setup) {
+static int jack_setup_check(kr_jack_setup *setup) {
+  if (setup->user == NULL) return -1;
+  if (setup->event_cb == NULL) return -2;
+  /* FIXME check server / client name */
+  return 0;
+}
 
+int kr_jack_unlink(kr_jack_path *path) {
+  int c;
+  int ret;
+  if (path == NULL) return -1;
+  printk("JACK path unlink called for %s", path->info.name);
+  for (c = 0; c < path->info.channels; c++) {
+    ret = jack_port_unregister(path->jack->client, path->ports[c]);
+    if (ret != 0) {
+      //FIXME watcha gonna do bout that? deal with it?
+    }
+    path->ports[c] = NULL;
+  }
+  free(path);
+  printk("JACK path unlink finished");
+  return 0;
+}
+
+kr_jack_path *kr_jack_mkpath(kr_jack *jack, kr_jack_path_setup *setup) {
   int c;
   kr_jack_path *path;
   int port_flags;
   char *port_suffix;
   char port_name[192];
-
   if ((jack == NULL) || (setup == NULL)) return NULL;
-
   if (path_setup_check(setup)) {
     printke("jack path setup failed check");
     return NULL;
   }
-
   path = kr_allocz(1, sizeof(kr_jack_path));
-
   path->jack = jack;
   path->user = setup->user;
   path->audio_cb = setup->audio_cb;
   path->event_cb = setup->event_cb;
   memcpy(&path->info, &setup->info, sizeof(kr_jack_path_info));
-
   if (jack->info.state != KR_JACK_ONLINE) {
     printke("Not creating JACK API ports because jack server is offline");
     return path;
   }
-
   if (path->info.direction == KR_JACK_INPUT) {
     port_flags = JackPortIsInput;
     port_suffix = "audio_in";
@@ -266,28 +176,22 @@ kr_jack_path *kr_jack_mkpath(kr_jack *jack, kr_jack_path_setup *setup) {
     port_flags = JackPortIsOutput;
     port_suffix = "audio_out";
   }
-
   printk("JACK mkpath: %s (%d chan)", path->info.name, path->info.channels);
-
   for (c = 0; c < path->info.channels; c++) {
     snprintf(port_name, sizeof(port_name), "%s/%s %d", path->info.name,
      port_suffix, c + 1);
     path->ports[c] = jack_port_register(path->jack->client, port_name,
      JACK_DEFAULT_AUDIO_TYPE, port_flags, 0);
-
     if (path->ports[c] == NULL) {
       printke("JACK: port register failure: %s", port_name);
       //FIXME fail better
     }
   }
-
   return path;
 }
 
 int kr_jack_destroy(kr_jack *jack) {
-
   printk("Jack destroy started");
-
   if (jack == NULL) return -1;
   if (jack->client != NULL) {
     jack_client_close(jack->client);
@@ -305,33 +209,20 @@ int kr_jack_destroy(kr_jack *jack) {
   return 0;
 }
 
-static int jack_setup_check(kr_jack_setup *setup) {
-
-  if (setup->user == NULL) return -1;
-  if (setup->event_cb == NULL) return -2;
-  /* FIXME check server / client name */
-  return 0;
-}
-
 kr_jack *kr_jack_create(kr_jack_setup *setup) {
-
   kr_jack *jack;
   char *name;
   char old_thread_name[16];
   jack_status_t status;
   jack_options_t options;
-
   if (setup == NULL) return NULL;
   if (jack_setup_check(setup)) return NULL;
-
   memset(old_thread_name, 0, sizeof(old_thread_name));
   jack = kr_allocz(1, sizeof(kr_jack));
-
   strncpy(jack->info.client_name, setup->client_name,
    sizeof(jack->info.client_name));
   jack->event_cb = setup->event_cb;
   jack->user = setup->user;
-
   if ((setup->server_name[0] != '\0')
    && (memchr(setup->server_name + 1, '\0', sizeof(setup->server_name) - 1)
     != NULL)) {
@@ -342,7 +233,6 @@ kr_jack *kr_jack_create(kr_jack_setup *setup) {
     jack->info.server_name[0] = '\0';
     options = JackNoStartServer;
   }
-
   kr_systm_get_thread_name(old_thread_name);
   krad_system_set_thread_name("kr_jack");
   jack->client = jack_client_open(jack->info.client_name, options, &status,
@@ -354,30 +244,26 @@ kr_jack *kr_jack_create(kr_jack_setup *setup) {
     }
     return jack;
   }
-
   if (status & JackNameNotUnique) {
     name = jack_get_client_name(jack->client);
     strncpy(jack->info.client_name, name, sizeof(jack->info.client_name));
     printke("Krad Jack: unique name `%s' assigned", jack->info.client_name);
   }
-
   jack->info.sample_rate = jack_get_sample_rate(jack->client);
   jack->info.period_size = jack_get_buffer_size(jack->client);
-  jack_set_process_callback(jack->client, process_cb, jack);
+  //jack_set_process_callback(jack->client, jack_process, jack);
+  jack_set_process_thread(jack->client, process_thread, jack);
   jack_on_shutdown(jack->client, shutdown_cb, jack);
-  jack_set_xrun_callback (jack->client, xrun_cb, jack);
+  //jack_set_xrun_callback (jack->client, xrun_cb, jack);
   /* FIXME sample rate / period size callbacks */
   //jack_set_port_registration_callback(jack->client, port_registration, jack);
   //jack_set_port_connect_callback(jack->client, port_connection, jack);
-
   if (jack_activate(jack->client)) {
     jack->info.state = KR_JACK_OFFLINE;
   } else {
     jack->info.state = KR_JACK_ONLINE;
   }
-
   krad_system_set_thread_name(old_thread_name);
-
   return jack;
 }
 
@@ -386,22 +272,17 @@ int kr_jack_detect() {
 }
 
 int kr_jack_detect_server_name(char *name) {
-
   jack_client_t *client;
   jack_options_t options;
   jack_status_t status;
   char client_name[128];
-
   sprintf(client_name, "kr_jack_detect_%d", rand());
-
   if (name != NULL) {
     options = JackNoStartServer | JackServerName;
   } else {
     options = JackNoStartServer;
   }
-
   client = jack_client_open(client_name, options, &status, name);
-
   if (client == NULL) {
     return 0;
   } else {
