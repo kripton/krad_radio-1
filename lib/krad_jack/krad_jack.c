@@ -1,3 +1,13 @@
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <memory.h>
+#include <stdint.h>
+#include <limits.h>
+
+#include "krad_pool.h"
 #include "krad_jack.h"
 
 struct kr_jack_path {
@@ -11,15 +21,19 @@ struct kr_jack_path {
 
 struct kr_jack {
   jack_client_t *client;
-  kr_jack_info info;
+  kr_pool *path_pool;
   int set_thread_name;
   void *user;
   kr_jack_event_cb *event_cb;
+  kr_jack_info info;
 };
 
 static int xrun_cb(void *arg);
 static void shutdown_cb(void *arg);
-static int jack_process(jack_nframes_t nframes, void *arg);
+static int jack_check(kr_jack *jack, jack_nframes_t nframes);
+static int path_process(kr_jack_path *path);
+static int jack_process(kr_jack *jack);
+static void *process_thread(void *arg);
 static int path_setup_info_check(kr_jack_path_info *info);
 static int path_setup_check(kr_jack_path_setup *setup);
 static int jack_setup_check(kr_jack_setup *setup);
@@ -38,9 +52,7 @@ static void shutdown_cb(void *arg) {
   printke("Krad Jack: shutdown callback, oh dear!");
 }
 
-static int jack_process(jack_nframes_t nframes, void *arg) {
-  kr_jack *jack;
-  jack = (kr_jack *)arg;
+static int jack_check(kr_jack *jack, jack_nframes_t nframes) {
   if (jack->set_thread_name == 0) {
     //krad_system_set_thread_name("kr_jack_io");
     jack->set_thread_name = 1;
@@ -55,7 +67,7 @@ static int jack_process(jack_nframes_t nframes, void *arg) {
   return 0;
 }
 
-int kr_jack_path_prepare(kr_jack_path *path) {
+static int path_process(kr_jack_path *path) {
   kr_jack_path_audio_cb_arg cb_arg;
   int i;
   cb_arg.user = path->user;
@@ -76,6 +88,16 @@ int kr_jack_path_prepare(kr_jack_path *path) {
   return 0;
 }
 
+static int jack_process(kr_jack *jack) {
+  int i;
+  kr_jack_path *path;
+  i = 0;
+  while ((path = kr_pool_iterate_active(jack->path_pool, &i))) {
+    path_process(path);
+  }
+  return 0;
+}
+
 static void *process_thread(void *arg) {
   kr_jack *jack;
   jack_nframes_t frames;
@@ -85,7 +107,11 @@ static void *process_thread(void *arg) {
   static int test = 0;
   for (;;) {
     frames = jack_cycle_wait(jack->client);
-    status = jack_process(frames, jack);
+    status = jack_check(jack, frames);
+    if (status) {
+      break;
+    }
+    status = jack_process(jack);
     jack_cycle_signal(jack->client, status);
     test++;
     if (status) {
@@ -134,7 +160,9 @@ static int jack_setup_check(kr_jack_setup *setup) {
 int kr_jack_unlink(kr_jack_path *path) {
   int c;
   int ret;
+  kr_jack *jack;
   if (path == NULL) return -1;
+  jack = path->jack;
   printk("JACK path unlink called for %s", path->info.name);
   for (c = 0; c < path->info.channels; c++) {
     ret = jack_port_unregister(path->jack->client, path->ports[c]);
@@ -143,7 +171,7 @@ int kr_jack_unlink(kr_jack_path *path) {
     }
     path->ports[c] = NULL;
   }
-  free(path);
+  kr_pool_recycle(jack->path_pool, path);
   printk("JACK path unlink finished");
   return 0;
 }
@@ -159,7 +187,7 @@ kr_jack_path *kr_jack_mkpath(kr_jack *jack, kr_jack_path_setup *setup) {
     printke("jack path setup failed check");
     return NULL;
   }
-  path = kr_allocz(1, sizeof(kr_jack_path));
+  path = kr_pool_slice(jack->path_pool);
   path->jack = jack;
   path->user = setup->user;
   path->audio_cb = setup->audio_cb;
@@ -204,13 +232,15 @@ int kr_jack_destroy(kr_jack *jack) {
   } else {
     printke("JACK had %u xruns by destroy :/", jack->info.xruns);
   }
-  free(jack);
+  kr_pool_destroy(jack->path_pool);
   printk("Jack destroy complete");
   return 0;
 }
 
 kr_jack *kr_jack_create(kr_jack_setup *setup) {
   kr_jack *jack;
+  kr_pool *pool;
+  kr_pool_setup pool_setup;
   char *name;
   char old_thread_name[16];
   jack_status_t status;
@@ -218,7 +248,15 @@ kr_jack *kr_jack_create(kr_jack_setup *setup) {
   if (setup == NULL) return NULL;
   if (jack_setup_check(setup)) return NULL;
   memset(old_thread_name, 0, sizeof(old_thread_name));
-  jack = kr_allocz(1, sizeof(kr_jack));
+  pool_setup.shared = 0;
+  pool_setup.overlay = NULL;
+  pool_setup.overlay_sz = sizeof(*jack);
+  pool_setup.size = sizeof(kr_jack_path);
+  pool_setup.slices = 64; /* FIXME */
+  pool = kr_pool_create(&pool_setup);
+  jack = kr_pool_overlay_get(pool);
+  memset(jack, 0, sizeof(*jack));
+  jack->path_pool = pool;
   strncpy(jack->info.client_name, setup->client_name,
    sizeof(jack->info.client_name));
   jack->event_cb = setup->event_cb;
@@ -254,7 +292,7 @@ kr_jack *kr_jack_create(kr_jack_setup *setup) {
   //jack_set_process_callback(jack->client, jack_process, jack);
   jack_set_process_thread(jack->client, process_thread, jack);
   jack_on_shutdown(jack->client, shutdown_cb, jack);
-  //jack_set_xrun_callback (jack->client, xrun_cb, jack);
+  jack_set_xrun_callback (jack->client, xrun_cb, jack);
   /* FIXME sample rate / period size callbacks */
   //jack_set_port_registration_callback(jack->client, port_registration, jack);
   //jack_set_port_connect_callback(jack->client, port_connection, jack);

@@ -1,15 +1,6 @@
 #ifndef KRAD_JACK_H
 #define KRAD_JACK_H
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <memory.h>
-#include <stdint.h>
-#include <limits.h>
-
 #include <jack/jack.h>
 
 #include "krad_system.h"
@@ -75,7 +66,6 @@ int kr_jack_unlink(kr_jack_path *path);
 kr_jack_path *kr_jack_mkpath(kr_jack *jack, kr_jack_path_setup *setup);
 int kr_jack_destroy(kr_jack *jack);
 kr_jack *kr_jack_create(kr_jack_setup *setup);
-
 int kr_jack_detect();
 int kr_jack_detect_server_name(char *name);
 
