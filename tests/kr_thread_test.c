@@ -15,6 +15,7 @@
 typedef void (thread_func)(void *arg);
 typedef struct kr_thread_params kr_thread_params;
 typedef struct kr_thread kr_thread;
+typedef struct kr_harness kr_harness;
 
 struct kr_thread_params {
   thread_func *fn;
@@ -26,6 +27,11 @@ struct kr_thread {
   void *stack;
   pid_t tid;
   kr_thread_params params;
+};
+
+struct kr_harness {
+  kr_thread thread;
+
 };
 
 static void thread_exit() {

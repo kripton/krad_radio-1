@@ -1,4 +1,5 @@
 #include "krad_adapter.h"
+#include "krad_pool.h"
 
 typedef union {
   void *exists;
@@ -35,7 +36,7 @@ struct kr_adapter_path {
 struct kr_adapter {
   kr_adapter_info info;
   kr_adapter_handle handle;
-  kr_adapter_path *path[KR_ADAPTER_PATHS_MAX];
+  kr_pool *path_pool;
   void *user;
   kr_adapter_event_cb *ev_cb;
   kr_adapter_process_function *process_function;
@@ -145,20 +146,6 @@ static void path_destroy(kr_adapter_path *path) {
   }
 }
 
-static kr_adapter_path *path_alloc(kr_adapter *adapter) {
-
-  int i;
-
-  for (i = 0; i < KR_ADAPTER_PATHS_MAX; i++) {
-    if (adapter->path[i] == NULL) {
-      adapter->path[i] = kr_allocz(1, sizeof(kr_adapter_path));
-      adapter->path[i]->adapter = adapter;
-      return adapter->path[i];
-    }
-  }
-  return NULL;
-}
-
 /* FIXME get rid of this prepare jank */
 static int path_prepare(kr_adapter_path *path) {
   switch (path->info.api) {
@@ -176,28 +163,20 @@ int kr_adapter_prepare(kr_adapter *adapter) {
   int processed;
   processed = 0;
   for (i = 0; i < KR_ADAPTER_PATHS_MAX; i++) {
-    if (adapter->path[i] != NULL) {
-      processed += path_prepare(adapter->path[i]);
-    }
+ //   if (adapter->path[i] != NULL) {
+ //     processed += path_prepare(adapter->path[i]);
+ //   }
   }
   return processed;
 }
 
 int kr_adapter_unlink(kr_adapter_path *path) {
-  int i;
   kr_adapter *adapter;
   if (path == NULL) return -1;
   adapter = path->adapter;
-  for (i = 0; i < KR_ADAPTER_PATHS_MAX; i++) {
-    if (adapter->path[i] == NULL) continue;
-    if (adapter->path[i] == path) {
-      path_destroy(path);
-      free(path);
-      adapter->path[i] = NULL;
-      return 0;
-    }
-  }
-  return -1;
+  path_destroy(path);
+  kr_pool_recycle(adapter->path_pool, path);
+  return 0;
 }
 
 kr_adapter_path *kr_adapter_mkpath(kr_adapter *adapter,
@@ -209,8 +188,9 @@ kr_adapter_path *kr_adapter_mkpath(kr_adapter *adapter,
   if (adapter->handle.exists == NULL) return NULL;
   if (adapter->info.api != setup->info.api) return NULL;
   if (path_setup_check(setup)) return NULL;
-  path = path_alloc(adapter);
+  path = kr_pool_slice(adapter->path_pool);
   if (path == NULL) return NULL;
+  path->adapter = adapter;
   path_create(path, setup);
   return path;
 }
@@ -224,12 +204,12 @@ int kr_adapter_get_info(kr_adapter *adapter, kr_adapter_info *info) {
 
 int kr_adapter_destroy(kr_adapter *adapter) {
   int i;
+  kr_adapter_path *path;
   if (adapter == NULL) return -1;
   printk("Adapter destroy started");
-  for (i = 0; i < KR_ADAPTER_PATHS_MAX; i++) {
-    if (adapter->path[i] != NULL) {
-      kr_adapter_unlink(adapter->path[i]);
-    }
+  i = 0;
+  while ((path = kr_pool_iterate_active(adapter->path_pool, &i))) {
+    kr_adapter_unlink(path);
   }
   switch (adapter->info.api) {
     case KR_ADP_WAYLAND:
@@ -256,15 +236,25 @@ int kr_adapter_destroy(kr_adapter *adapter) {
     default:
       break;
   }
-  free(adapter);
+  kr_pool_destroy(adapter->path_pool);
   printk("Adapter destroy completed");
   return 0;
 }
 
 kr_adapter *kr_adapter_create(kr_adapter_setup *setup) {
   kr_adapter *adapter;
+  kr_pool *pool;
+  kr_pool_setup pool_setup;
   if (setup == NULL) return NULL;
-  adapter = kr_allocz(1, sizeof(kr_adapter));
+  pool_setup.shared = 0;
+  pool_setup.overlay = NULL;
+  pool_setup.overlay_sz = sizeof(*adapter);
+  pool_setup.size = sizeof(kr_adapter_path);
+  pool_setup.slices = KR_ADAPTER_PATHS_MAX;
+  pool = kr_pool_create(&pool_setup);
+  adapter = kr_pool_overlay_get(pool);
+  memset(adapter, 0, sizeof(*adapter));
+  adapter->path_pool = pool;
   adapter->user = setup->user;
   adapter->ev_cb = setup->ev_cb;
   memcpy(&adapter->info, &setup->info, sizeof(kr_adapter_info));
