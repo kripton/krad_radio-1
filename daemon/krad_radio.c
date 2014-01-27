@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
   if (!kr_sysname_valid(argv[1])) exit(1);
   sigemptyset(&mask);
   sigfillset(&mask);
-  if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0) {
+  if (sigprocmask(SIG_BLOCK, &mask, NULL) != 0) {
     failfast("Daemon: Could not set signal mask!");
   }
   sfd = signalfd(-1, &mask, SFD_CLOEXEC);
