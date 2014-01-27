@@ -80,6 +80,9 @@ static int path_process(kr_jack_path *path) {
   } else {
     cb_arg.event = KR_JACK_AUDIO_OUTPUT;
   }
+  if (path->ports[path->info.channels - 1] == NULL) {
+    return 0;
+  }
   for (i = 0; i < path->info.channels; i++) {
     cb_arg.audio.samples[i] = jack_port_get_buffer(path->ports[i],
      path->jack->info.period_size);
