@@ -1,6 +1,9 @@
 #ifndef KRAD_MIXER_H
 #define KRAD_MIXER_H
 
+#include "krad_mixer_common.h"
+#include "krad_av.h"
+
 typedef struct kr_mixer kr_mixer;
 typedef struct kr_mixer_path kr_mixer_path;
 typedef struct kr_mixer_path kr_mixer_source;
@@ -12,19 +15,14 @@ typedef struct kr_mixer_path_audio_cb_arg kr_mixer_path_audio_cb_arg;
 typedef struct kr_mixer_event kr_mixer_event;
 typedef struct kr_mixer_setup kr_mixer_setup;
 
-#define KR_MXR_MAX_MINIWINS 192
-
-#include "krad_mixer_common.h"
-#include "krad_av.h"
+typedef void (kr_mixer_event_cb)(kr_mixer_event *);
+typedef void (kr_mixer_path_audio_cb)(kr_mixer_path_audio_cb_arg *);
 
 typedef enum {
   KR_MIXER_CREATE = 1,
   KR_MIXER_PATCH,
   KR_MIXER_DESTROY
 } kr_mixer_event_type;
-
-typedef void (kr_mixer_event_cb)(kr_mixer_event *);
-typedef void (kr_mixer_path_audio_cb)(kr_mixer_path_audio_cb_arg *);
 
 struct kr_mixer_event {
   kr_mixer_path *path;

@@ -45,8 +45,6 @@ struct kr_mixer_path {
   float new_volume_actual[KR_MXR_MAX_CHANNELS];
   int last_sign[KR_MXR_MAX_CHANNELS];
   int win;
-  int winss[KR_MXR_MAX_MINIWINS];
-  float wins[KR_MXR_MAX_CHANNELS][KR_MXR_MAX_MINIWINS];
   float avg[KR_MXR_MAX_CHANNELS];
   float peak[KR_MXR_MAX_CHANNELS];
   float peak_last[KR_MXR_MAX_CHANNELS];
@@ -514,7 +512,12 @@ static void path_release(kr_mixer_path *path) {
     path->sfx = NULL;
   }
   path->state = KR_MXP_NIL;
-  kr_graph_vertex_destroy(path->mixer->graph, path->vertex);
+  if (path->type == KR_MXR_INPUT) {
+    kr_graph_edge_destroy(path->mixer->graph, path->to->vertex, path->from->vertex);
+  } else {
+    kr_graph_vertex_destroy(path->mixer->graph, path->vertex);
+    path->vertex = NULL;
+  }
   kr_pool_recycle(path->mixer->path_pool, path);
 }
 
@@ -615,7 +618,11 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.path = path;
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
-  path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info->type, path);
+  if (path->type == KR_MXR_INPUT) {
+    kr_graph_edge_create(path->mixer->graph, path->to->vertex, path->from->vertex, path);
+  } else {
+    path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info->type, path);
+  }
   path->mixer->event_cb(&event);
 }
 
