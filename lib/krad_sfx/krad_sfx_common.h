@@ -30,7 +30,8 @@ typedef enum {
   KR_SFX_EQ,
   KR_SFX_LOWPASS,
   KR_SFX_HIGHPASS,
-  KR_SFX_ANALOG
+  KR_SFX_ANALOG,
+  KR_SFX_VOLUME
 } kr_sfx_effect_type;
 
 typedef enum {
@@ -47,6 +48,7 @@ typedef struct kr_eq_band_info kr_eq_band_info;
 typedef struct kr_lowpass_info kr_lowpass_info;
 typedef struct kr_highpass_info kr_highpass_info;
 typedef struct kr_analog_info kr_analog_info;
+typedef struct kr_volume_info kr_volume_info;
 
 struct kr_eq_band_info {
   float db;
@@ -66,6 +68,10 @@ struct kr_lowpass_info {
 struct kr_highpass_info {
   float bw;
   float hz;
+};
+
+struct kr_volume_info {
+  float level;
 };
 
 struct kr_analog_info {

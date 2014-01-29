@@ -40,6 +40,7 @@ krad_compositor/krad_compositor.c \
 krad_osc/krad_osc.c \
 krad_calc/krad_sha1.c \
 krad_sfx/krad_eq.c \
+krad_sfx/krad_volume.c \
 krad_sfx/krad_analog.c \
 krad_sfx/krad_pass.c \
 krad_sfx/krad_hardlimiter.c \

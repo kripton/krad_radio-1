@@ -1,4 +1,5 @@
 #include "krad_sfx_common.h"
+#include "krad_volume.h"
 #include "krad_eq.h"
 #include "krad_pass.h"
 #include "krad_analog.h"
