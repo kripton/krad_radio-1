@@ -49,41 +49,129 @@ static int kr_graph_is_cyclic(kr_graph *graph) {
   return 0;
 }
 
-int kr_graph_edge_destroy(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
-  uint16_t i;
-  if (!graph || !to || !from) return 1;
-  for (i = 0; i < MAX_EDGES; i++) {
-    if (graph->edges[i].from == from && graph->edges[i].to == to) {
-      memset(&graph->edges[i],0,sizeof(kr_edge));
-      from->adj[vertex_index(graph,to)]--;
-      return 0;
+static int get_in_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max) {
+    uint16_t i;
+    int count;
+    for (i = count = 0; i < MAX_EDGES; i++) {
+      if (graph->edges[i].to == vertex) {
+        if (graph->edges[i].user) {
+          user[count++] = graph->edges[i].user;
+        }
+      }
     }
-  }
-  return 1;
+    return count;
 }
 
-int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, void *user) {
+static int get_out_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max) {
+    uint16_t i;
+    int count;
+    for (i = count = 0; i < MAX_EDGES; i++) {
+      if (graph->edges[i].from == vertex) {
+        if (graph->edges[i].user) {
+          user[count++] = graph->edges[i].user;
+        }
+      }
+    }
+    return count;
+}
+
+int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex, 
+  int dir, void **user, int max) {
+  int count;
+
+  if (max == 0) return 0;
+
+  count = 0;
+
+  if (dir == IN) {
+    count = get_in_edges(graph,vertex,user,max);
+  } else if (dir == OUT) {
+    count = get_out_edges(graph,vertex,user,max);
+  } else {
+    count += get_in_edges(graph,vertex,user,max);
+    count += get_out_edges(graph,vertex,user,max);
+  }
+
+  return count;
+}
+
+int kr_vertex_deps(kr_graph *graph, kr_vertex *vertex, 
+  kr_vertex **deps, int max) {
+  kr_vertex *vertices[MAX_VERTICES];
+  kr_vertex *done[MAX_VERTICES];
+  uint16_t k;
+  int16_t i;
+  int16_t count;
+
+  if (max == 0) return 0;
+
+  k = 0;
+  count = 0;
+  vertices[k++] = vertex;
+
+  while (k) {
+    vertex = vertices[--k];
+    for (i = 0; i < MAX_VERTICES; i++) {
+      if (vertex->deps[i]) {
+        done[count++] = &graph->vertices[i];
+        vertices[k++] = &graph->vertices[i];
+      }
+    }
+  }
+
+  k = 0;
+
+  for (i = count-1; i >= 0; i--) {
+    if (k >= max) return k;
+    deps[k++] = done[i];
+  }
+
+  return k;
+}
+
+static int kr_graph_edge_destroy_internal(kr_graph *graph, kr_edge *edge) {
+  if(!edge->to || !edge->from) {
+    memset(edge,0,sizeof(kr_edge));
+    return 1;
+  } else {
+    if (graph->edge_destroy_cb) {
+      graph->edge_destroy_cb(edge->user);
+    }
+    edge->from->adj[vertex_index(graph,edge->to)]--;
+    edge->to->deps[vertex_index(graph,edge->from)]--;
+    memset(edge,0,sizeof(kr_edge));
+    return 0;
+  }
+}
+
+int kr_graph_edge_destroy(kr_graph *graph, kr_edge *edge) {
+  if (!graph || !edge) return 1;
+  return kr_graph_edge_destroy_internal(graph,edge);
+}
+
+kr_edge *kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, void *user) {
   uint16_t i;
-  if (graph == NULL) return 1;
-  if (to == from) return 1;
-  if (to == NULL || from == NULL) return 1;
-  if (to->type == 0 || from->type == 0) return 1;
+  if (graph == NULL) return NULL;
+  if (to == from) return NULL;
+  if (to == NULL || from == NULL) return NULL;
+  if (to->type == 0 || from->type == 0) return NULL;
   for (i = 0; i < MAX_EDGES; i++) {
     if (!graph->edges[i].from && !graph->edges[i].to) {
       graph->edges[i].from = from;
       graph->edges[i].to = to;
       graph->edges[i].user = user;
       from->adj[vertex_index(graph,to)]++;
+      to->deps[vertex_index(graph,from)]++;
       if (kr_graph_is_cyclic(graph)) {
         printf("Cycle detected!\n");
-        kr_graph_edge_destroy(graph,to,from);
-        return 1;
+        kr_graph_edge_destroy(graph,&graph->edges[i]);
+        return NULL;
       } else {
-        return 0;
+        return &graph->edges[i];
       }
     }
   }
-  return 1;
+  return NULL;
 }
 
 kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *user) {
@@ -99,22 +187,30 @@ kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *us
   return NULL;
 }
 
-int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex) {
+static int kr_graph_vertex_destroy_internal(kr_graph *graph, kr_vertex *vertex) {
   uint16_t i;
-  if (graph == NULL || vertex == NULL) return 1;
   for (i = 0; i < MAX_EDGES; i++) {
     if (graph->edges[i].from == vertex || graph->edges[i].to == vertex) {
-      memset(&graph->edges[i],0,sizeof(kr_edge));
+      if (kr_graph_edge_destroy_internal(graph,&graph->edges[i])) {
+        return 1;
+      }
     }
   }
   memset(vertex,0,sizeof(kr_vertex));
   return 0;
 }
 
+int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex) {
+  if (graph == NULL || vertex == NULL) return 1;
+  return kr_graph_vertex_destroy_internal(graph,vertex);
+}
+
 kr_graph *kr_graph_create(kr_graph_setup *setup) {
   kr_graph *graph;
   if (setup == NULL) return NULL;
   graph = calloc(1,sizeof(kr_graph));
+  graph->edge_destroy_cb = setup->edge_destroy_cb;
+  graph->vertex_process_cb = setup->vertex_process_cb;
   return graph;
 }
 

@@ -1,6 +1,19 @@
 #include "krad_graph.h"
 #include "krad_timer.h"
 
+unsigned int randr(unsigned int min, unsigned int max) {
+
+  struct timeval tv;
+  double scale;
+
+  gettimeofday(&tv, NULL);
+  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
+
+  scale = (double)abs(min - max) / RAND_MAX;
+
+  return min + floor(rand() * scale);;
+}
+
 void print_usage(const char *cmd) {
   printf("Usage:\n  %s num_of_vertices num_of_edges\n",cmd);
 }
@@ -41,17 +54,24 @@ void print_graph_info(kr_graph *graph) {
   }
 }
 
-unsigned int randr(unsigned int min, unsigned int max) {
+void print_random_deps_info(kr_graph *graph, kr_vertex **vertices, int vertex_count) {
+    int v;
+    int dep_count;
+    int i;
 
-  struct timeval tv;
-  double scale;
-
-  gettimeofday(&tv, NULL);
-  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
-
-  scale = (double)abs(min - max) / RAND_MAX;
-
-  return min + floor(rand() * scale);;
+    if (vertex_count) {
+      v = randr(0,vertex_count);
+      kr_vertex *deps[vertex_count];
+      dep_count = kr_vertex_deps(graph,vertices[v],deps,vertex_count);
+      if (dep_count) {
+        printf("Found %d deps for %p\n",dep_count,vertices[v]);
+        for (i = 0; i < dep_count; i++) {
+          printf("  %p\n",deps[i]);
+        }
+      } else {
+        printf("No deps for %p\n",vertices[v]);
+      }
+    }
 }
 
 int random_vertices_gen(kr_graph *graph, int n, kr_vertex **vertices) {
@@ -135,6 +155,8 @@ int main(int argc, char const *argv[]) {
   printf("graph info: \n\n");
   print_graph_info(graph);
 
+  print_random_deps_info(graph,vertices,vertex_count);
+  
   printf("destroying graph now.\n");
   kr_graph_destroy(graph);
 
