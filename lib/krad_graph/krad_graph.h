@@ -16,11 +16,13 @@ typedef enum {
 typedef struct {
   kr_vertex *from;
   kr_vertex *to;
+  void *user;
 } kr_edge;
 
 struct kr_vertex {
   uint16_t adj[MAX_VERTICES];
   kr_vertex_type type;
+  void *user;
 };
 
 struct kr_graph {
@@ -35,9 +37,9 @@ typedef struct {
 } kr_graph_setup;
 
 int kr_graph_edge_destroy(kr_graph *graph, kr_vertex *to, kr_vertex *from);
-int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from);
+int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, void *user);
 int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex);
-kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type);
+kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *user);
 kr_graph *kr_graph_create(kr_graph_setup *setup);
 int kr_graph_destroy(kr_graph *graph);
 

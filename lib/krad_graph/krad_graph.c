@@ -62,7 +62,7 @@ int kr_graph_edge_destroy(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
   return 1;
 }
 
-int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
+int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, void *user) {
   uint16_t i;
   if (graph == NULL) return 1;
   if (to == from) return 1;
@@ -72,6 +72,7 @@ int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
     if (!graph->edges[i].from && !graph->edges[i].to) {
       graph->edges[i].from = from;
       graph->edges[i].to = to;
+      graph->edges[i].user = user;
       from->adj[vertex_index(graph,to)]++;
       if (kr_graph_is_cyclic(graph)) {
         printf("Cycle detected!\n");
@@ -85,12 +86,13 @@ int kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from) {
   return 1;
 }
 
-kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type) {
+kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *user) {
   uint8_t i;
   if (graph == NULL || type == 0) return NULL;
   for (i = 0; i < MAX_VERTICES; i++) {
     if (graph->vertices[i].type == 0) {
       graph->vertices[i].type = type;
+      graph->vertices[i].user = user;
       return &graph->vertices[i];
     }
   }

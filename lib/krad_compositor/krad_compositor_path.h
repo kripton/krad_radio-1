@@ -38,6 +38,9 @@ void cmper_path_release(kr_compositor *compositor, kr_compositor_path *path);
 int path_render(kr_compositor_path *path, kr_image *image, cairo_t *cr);
 /* end internalish */
 
+
+int kr_compositor_process(kr_compositor_path *path);
+
 int kr_compositor_path_info_get(kr_compositor_path *path,
  kr_compositor_path_info *info);
 

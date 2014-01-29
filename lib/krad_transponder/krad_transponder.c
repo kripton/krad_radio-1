@@ -92,6 +92,12 @@ static void xpdr_adapter_event_cb(kr_adapter_event_cb_arg *arg) {
   i = 0;
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
     if (path->info.output.type == KR_XPDR_ADAPTER) {
+      if (path->info.output.type == KR_XPDR_COMPOSITOR) {
+        kr_compositor_path_process(path->input.compositor_path);
+      }
+      if (path->info.input.type == KR_XPDR_MIXER) {
+        kr_mixer_path_process(path->input.mixer_path);
+      }
       test++;
     }
   }

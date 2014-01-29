@@ -37,7 +37,6 @@ struct kr_mixer_path {
   kr_mixer_path *from;
   kr_mixer_path *to;
   kr_mixer_channels channels;
-/*  kr_mixer_crossfader *crossfader;*/
   kr_easer volume_easer;
   int map[KR_MXR_MAX_CHANNELS];
   int mixmap[KR_MXR_MAX_CHANNELS];
@@ -64,11 +63,6 @@ struct kr_mixer_path {
   kr_vertex *vertex;
 };
 
-/*
-static float get_fade_in(float crossfade_value);
-static float get_fade_out(float crossfade_value);
-static float get_crossfade(kr_mixer_path *path);
-*/
 static void apply_effects(kr_mixer_path *path, int nframes);
 static void apply_volume(kr_mixer_path *path, int nframes);
 static void clear_frames(kr_mixer_path *path, uint32_t nframes);
@@ -83,44 +77,14 @@ static void mix_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n);
 static void update_controls(kr_mixer *mixer);
 static void update_state(kr_mixer *mixer);
 static void update_volume(kr_mixer_path *path);
-/* static void set_crossfade(kr_mixer_path *path, float value); */
 static void set_volume(kr_mixer_path *path, float value);
 static void set_channel_volume(kr_mixer_path *path, int channel, float value);
-static void mixer_process(kr_mixer *mixer, uint32_t frames);
-//static void kr_mixer_xf_decouple(kr_mixer *mixer, kr_mixer_crossfader *crossfader);
-//static void kr_mixer_xf_couple(kr_mixer *mixer, kr_mixer_path *l, kr_mixer_path *r);
 static void path_release(kr_mixer_path *path);
 static int path_info_check(kr_mixer_path_info *info);
 static int path_setup_check(kr_mixer_path_setup *setup);
 static void path_sfx_create(kr_mixer_path *path);
 static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup);
 static kr_mixer_path *make_path(kr_mixer *mixer, kr_mixer_path_setup *setup);
-//static void kr_mixer_channel_copy(kr_mixer_path *path, int in_chan, int out_chan);
-//static void kr_mixer_channel_move(kr_mixer_path *path, int in_chan, int out_chan);
-
-//#include "metering.c"
-/*
-static float get_fade_in(float crossfade_value) {
-  return 1.0f - get_fade_out(crossfade_value);
-}
-
-static float get_fade_out(float crossfade_value) {
-  float fade_out;
-  fade_out = cos (3.14159f*0.5f*((crossfade_value + 100.0f) + 0.5f)/200.0f);
-  return fade_out * fade_out;
-}
-
-static float get_crossfade(kr_mixer_path *path) {
-  if (path->crossfader->path[0] == path) {
-    return get_fade_out(path->crossfader->fade);
-  } else if (path->crossfader->path[1] == path) {
-    return get_fade_in(path->crossfader->fade);
-  }
-
-  failfast("failed to get path for crossfade!");
-  return 0.0f;
-}
-*/
 
 static void apply_effects(kr_mixer_path *port, int nframes) {
   // FIXME hrm we count on thems being the same btw in them effects lookout
@@ -285,30 +249,12 @@ static void mix_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n) {
 }
 
 static void update_controls(kr_mixer *mixer) {
-  //int p;
   int i;
   void *client;
   kr_mixer_path *path;
-  //kr_mixer_crossfader *crossfader;
   i = 0;
   client = NULL;
   path = NULL;
-  //crossfader = NULL;
-  /*
-  for (p = 0; p < mixer->path_count / 2; p++) {
-    crossfader = &mixer->crossfader[p];
-    if ((crossfader != NULL) && (crossfader->path[0] != NULL)
-     && (crossfader->path[1] != NULL)) {
-      if (kr_easer_active(&crossfader->easer)) {
-        set_crossfade(crossfader->path[0], kr_easer_process(&crossfader->easer,
-         crossfader->fade, &client));
-       // krad_radio_broadcast_subpath_control(mixer->broadcaster,
-       // &crossfader->path[0]->address, KR_CROSSFADE,
-       // crossfader->fade, client);
-      }
-    }
-  }
-  */
   while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
     if ((path->state == KR_MXP_ACTIVE)
      && (kr_easer_active(&path->volume_easer))) {
@@ -338,15 +284,6 @@ static void update_state(kr_mixer *mixer) {
         break;
     }
   }
-/*  if (mixer->new_sample_rate != mixer->sample_rate) {
-    mixer->sample_rate = mixer->new_sample_rate;
-    while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-      cmd.control = KR_SFX_SET_SAMPLERATE;
-      cmd.sample_rate= mixer->sample_rate;
-      kr_sfx_ctl(path->sfx, &cmd);
-    }
-  }
-*/
   update_controls(mixer);
 }
 
@@ -356,20 +293,6 @@ static void update_volume(kr_mixer_path *path) {
     set_channel_volume(path, c, path->volume[c]);
   }
 }
-
-/*
-static void set_crossfade(kr_mixer_path *path, float value) {
-  kr_mixer_crossfader *crossfader;
-  if (path->crossfader != NULL) {
-    crossfader = path->crossfader;
-    if ((crossfader->path[0] != NULL) && (crossfader->path[1] != NULL)) {
-      crossfader->fade = value;
-      update_volume(crossfader->path[0]);
-      update_volume(crossfader->path[1]);
-    }
-  }
-}
-*/
 
 static void set_volume(kr_mixer_path *path, float value) {
   /*
@@ -427,14 +350,18 @@ static void set_channel_volume(kr_mixer_path *path, int channel, float value) {
     */
 }
 
-static void mixer_process(kr_mixer *mixer, uint32_t nframes) {
+int kr_mixer_process(kr_mixer_path *path) {
   int i;
+  int nframes;
   //int bi;
-  kr_mixer_path *path;
+  kr_mixer *mixer;
   //kr_mixer_path *bus;
   i = 0;
   //bi = 0;
+  if (path == NULL) return -1;
+  mixer = path->mixer;
   update_state(mixer);
+  nframes = 32; /*TEMP */
   /* Pull input audio */
   while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
     if ((path->state == KR_MXP_ACTIVE) && (path->type == KR_MXR_INPUT)) {
@@ -688,7 +615,7 @@ static void path_create(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.path = path;
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
-  path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info->type);
+  path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info->type, path);
   path->mixer->event_cb(&event);
 }
 

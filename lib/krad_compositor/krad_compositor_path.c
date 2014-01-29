@@ -189,7 +189,7 @@ static void path_create(kr_compositor_path *path,
   event.path = path;
   event.type = KR_COMP_CREATE;
   event.info = path->info;
-  path->vertex = kr_graph_vertex_create(path->compositor->graph, setup->info.type);
+  path->vertex = kr_graph_vertex_create(path->compositor->graph, setup->info.type, path);
   path->compositor->event_cb(&event);
 }
 
@@ -313,5 +313,11 @@ int kr_compositor_path_ctl(kr_compositor_path *p, kr_compositor_path_patch *s) {
     default:
       break;
   }
+  return 0;
+}
+
+int kr_compositor_process(kr_compositor_path *path) {
+  if (path == NULL) return -1;
+
   return 0;
 }
