@@ -26,21 +26,11 @@ typedef struct {
   kr_mixer_path *to;
 } kr_mixer_path_setup;
 
-/*
- * Mixer: Paths, Samples, Mixing
- * SFX: SFX += Volume + Rematrixing + Delaying
- */
-
 struct kr_mixer_path {
   kr_mixer_path_type type;
   kr_mixer_channels channels;
   kr_mixer_path *from;
   kr_mixer_path *to;
-
-  int map[KR_MXR_MAX_CHANNELS];
-  int mixmap[KR_MXR_MAX_CHANNELS];
-  float **mapped_samples[KR_MXR_MAX_CHANNELS];
-
   float *samples[KR_MXR_MAX_CHANNELS];
   mixer_path_state state;
   kr_mixer_path_audio_cb *audio_cb;
@@ -162,15 +152,6 @@ static void mix_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n) {
     for (c = 0; c < dest->channels; c++) {
       for (s = 0; s < n; s++) {
         dest->samples[c][s] += src->samples[c][s];
-      }
-    }
-  } else {
-    //up mix
-    for (c = 0; c < dest->channels; c++) {
-      if (src->mixmap[c] != -1) {
-        for (s = 0; s < n; s++) {
-          dest->samples[c][s] += src->samples[src->mixmap[c]][s];
-        }
       }
     }
   }
@@ -360,18 +341,6 @@ static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
     path->to = NULL;
   }
   for (c = 0; c < KR_MXR_MAX_CHANNELS; c++) {
-    if (c < path->channels) {
-      /* FIXME take mapping from setup */
-      path->mixmap[c] = c;
-    } else {
-      path->mixmap[c] = -1;
-    }
-    path->map[c] = c;
-    path->mapped_samples[c] = &path->samples[c];
-    //path->volume[c] = setup->info->volume[c];
-    //path->volume_actual[c] = (float)(path->volume[c]/100.0f);
-    //path->volume_actual[c] *= path->volume_actual[c];
-    //path->new_volume_actual[c] = path->volume_actual[c];
     path->samples[c] = kr_allocz(1, KR_MXR_PERIOD_MAX * sizeof(float));
   }
   path_sfx_create(path);
@@ -509,7 +478,6 @@ int kr_mixer_destroy(kr_mixer *mixer) {
       kr_mixer_unlink(path);
     }
   }
-  update_state(mixer);
   kr_graph_destroy(mixer->graph);
   kr_pool_destroy(mixer->path_pool);
   printk("Mixer: Destroyed");
