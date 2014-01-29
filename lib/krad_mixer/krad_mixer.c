@@ -39,6 +39,7 @@ struct kr_mixer_path {
   kr_mixer *mixer;
   kr_sfx *sfx;
   kr_vertex *vertex;
+  kr_edge *edge;
 };
 
 static void limit_samples(float **samples, int nc, int ns);
@@ -215,7 +216,7 @@ static void path_release(kr_mixer_path *path) {
   }
   path->state = KR_MXP_NIL;
   if (path->type == KR_MXR_INPUT) {
-    kr_graph_edge_destroy(path->mixer->graph, path->to->vertex, path->from->vertex);
+    kr_graph_edge_destroy(path->mixer->graph, path->edge);
   } else {
     kr_graph_vertex_destroy(path->mixer->graph, path->vertex);
     path->vertex = NULL;
@@ -286,13 +287,6 @@ static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   path->audio_cb = setup->audio_cb;
   path->audio_user = setup->audio_user;
   path->control_user = setup->control_user;
-  if (path->type == KR_MXR_INPUT) {
-    path->from = setup->from;
-    path->to = setup->to;
-  } else {
-    path->from = NULL;
-    path->to = NULL;
-  }
   for (c = 0; c < KR_MXR_MAX_CHANNELS; c++) {
     path->samples[c] = kr_allocz(1, KR_MXR_PERIOD_MAX * sizeof(float));
   }
@@ -304,7 +298,7 @@ static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
   if (path->type == KR_MXR_INPUT) {
-    kr_graph_edge_create(path->mixer->graph, path->to->vertex, path->from->vertex, path);
+    kr_graph_edge_create(path->mixer->graph, setup->to->vertex, setup->from->vertex, path);
   } else {
     path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info->type, path);
   }
