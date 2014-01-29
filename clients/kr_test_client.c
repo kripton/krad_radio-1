@@ -199,8 +199,6 @@ int make_masterbus(kr_client *client) {
   crate.payload_type = PL_KR_MIXER_PATH_INFO;
   masterbus = &crate.payload.mixer_path_info;
   masterbus->channels = 2;
-  masterbus->volume[0] = 50.0;
-  masterbus->volume[1] = 50.0;
   masterbus->type = KR_MXR_BUS;
   ret = kr_crate_send(client, &crate);
   return ret;
@@ -216,8 +214,6 @@ int make_musicbus(kr_client *client) {
   crate.payload_type = PL_KR_MIXER_PATH_INFO;
   bus = &crate.payload.mixer_path_info;
   bus->channels = 2;
-  bus->volume[0] = 55.0;
-  bus->volume[1] = 55.0;
   bus->type = KR_MXR_BUS;
   ret = kr_crate_send(client, &crate);
   return ret;
@@ -233,8 +229,6 @@ int make_musicmaster(kr_client *client) {
   crate.payload_type = PL_KR_MIXER_PATH_INFO;
   in = &crate.payload.mixer_path_info;
   in->channels = 2;
-  in->volume[0] = 65.0;
-  in->volume[1] = 65.0;
   in->type = KR_MXR_INPUT;
   ret = kr_crate_send(client, &crate);
   return ret;

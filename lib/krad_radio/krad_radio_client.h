@@ -99,7 +99,6 @@ typedef union {
 
 typedef union {
   uint32_t unit_control;
-  kr_mixer_control portgroup_control;
   kr_sfx_effect_control effect_control;
   kr_compositor_control compositor_control;
   kr_transponder_control_t transponder_control;

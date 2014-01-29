@@ -10,4 +10,5 @@ int kr_eq_band_info_to_ebml(kr_ebml *ebml, void *st);
 int kr_eq_info_to_ebml(kr_ebml *ebml, void *st);
 int kr_lowpass_info_to_ebml(kr_ebml *ebml, void *st);
 int kr_highpass_info_to_ebml(kr_ebml *ebml, void *st);
+int kr_volume_info_to_ebml(kr_ebml *ebml, void *st);
 int kr_analog_info_to_ebml(kr_ebml *ebml, void *st);

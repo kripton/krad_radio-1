@@ -19,25 +19,6 @@ int kr_mixer_channels_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
-int kr_mixer_control_to_json(char *json, void *st, int32_t max) {
-  char *type;
-  int res;
-  kr_mixer_control *actual;
-
-  res = 0;
-
-  if ((json == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (kr_mixer_control *)st;
-
-  type = kr_strfr_kr_mixer_control(*actual);
-  res += snprintf(&json[res],max-res,"\"%s\"",type);
-
-  return res;
-}
-
 int kr_mixer_path_type_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
@@ -57,28 +38,8 @@ int kr_mixer_path_type_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
-int kr_mixer_adv_ctl_to_json(char *json, void *st, int32_t max) {
-  char *type;
-  int res;
-  kr_mixer_adv_ctl *actual;
-
-  res = 0;
-
-  if ((json == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (kr_mixer_adv_ctl *)st;
-
-  type = kr_strfr_kr_mixer_adv_ctl(*actual);
-  res += snprintf(&json[res],max-res,"\"%s\"",type);
-
-  return res;
-}
-
 int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
-  int i;
   int res;
   struct kr_mixer_path_info *actual;
 
@@ -91,63 +52,16 @@ int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   actual = (struct kr_mixer_path_info *)st;
 
   res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"channels\": ");
-  uber.actual = &(actual->channels);
-  uber.type = JSON_KR_MIXER_CHANNELS;
-  res += info_pack_to_json(&json[res],&uber,max-res);
-  res += snprintf(&json[res],max-res,",");
   res += snprintf(&json[res],max-res,"\"type\": ");
   uber.actual = &(actual->type);
   uber.type = JSON_KR_MIXER_PATH_TYPE;
   res += info_pack_to_json(&json[res],&uber,max-res);
   res += snprintf(&json[res],max-res,",");
-  res += snprintf(&json[res],max-res,"\"fade\" : %0.2f,",actual->fade);
-  res += snprintf(&json[res],max-res,"\"volume\" : [");
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&json[res],max-res,"%0.2f",actual->volume[i]);
-    if (i != (KR_MXR_MAX_CHANNELS - 1)) {
-      res += snprintf(&json[res],max-res,",");
-    }
-  }
-  res += snprintf(&json[res],max-res,"]");
+  res += snprintf(&json[res],max-res,"\"channels\": ");
+  uber.actual = &(actual->channels);
+  uber.type = JSON_KR_MIXER_CHANNELS;
+  res += info_pack_to_json(&json[res],&uber,max-res);
   res += snprintf(&json[res],max-res,",");
-  res += snprintf(&json[res],max-res,"\"map\" : [");
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&json[res],max-res,"%d",actual->map[i]);
-    if (i != (KR_MXR_MAX_CHANNELS - 1)) {
-      res += snprintf(&json[res],max-res,",");
-    }
-  }
-  res += snprintf(&json[res],max-res,"]");
-  res += snprintf(&json[res],max-res,",");
-  res += snprintf(&json[res],max-res,"\"mixmap\" : [");
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&json[res],max-res,"%d",actual->mixmap[i]);
-    if (i != (KR_MXR_MAX_CHANNELS - 1)) {
-      res += snprintf(&json[res],max-res,",");
-    }
-  }
-  res += snprintf(&json[res],max-res,"]");
-  res += snprintf(&json[res],max-res,",");
-  res += snprintf(&json[res],max-res,"\"rms\" : [");
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&json[res],max-res,"%0.2f",actual->rms[i]);
-    if (i != (KR_MXR_MAX_CHANNELS - 1)) {
-      res += snprintf(&json[res],max-res,",");
-    }
-  }
-  res += snprintf(&json[res],max-res,"]");
-  res += snprintf(&json[res],max-res,",");
-  res += snprintf(&json[res],max-res,"\"peak\" : [");
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&json[res],max-res,"%0.2f",actual->peak[i]);
-    if (i != (KR_MXR_MAX_CHANNELS - 1)) {
-      res += snprintf(&json[res],max-res,",");
-    }
-  }
-  res += snprintf(&json[res],max-res,"]");
-  res += snprintf(&json[res],max-res,",");
-  res += snprintf(&json[res],max-res,"\"delay\" : %d,",actual->delay);
   res += snprintf(&json[res],max-res,"\"lowpass\": ");
   uber.actual = &(actual->lowpass);
   uber.type = JSON_KR_LOWPASS_INFO;
@@ -166,6 +80,11 @@ int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   res += snprintf(&json[res],max-res,"\"eq\": ");
   uber.actual = &(actual->eq);
   uber.type = JSON_KR_EQ_INFO;
+  res += info_pack_to_json(&json[res],&uber,max-res);
+  res += snprintf(&json[res],max-res,",");
+  res += snprintf(&json[res],max-res,"\"volume\": ");
+  uber.actual = &(actual->volume);
+  uber.type = JSON_KR_VOLUME_INFO;
   res += info_pack_to_json(&json[res],&uber,max-res);
   res += snprintf(&json[res],max-res,"}");
 

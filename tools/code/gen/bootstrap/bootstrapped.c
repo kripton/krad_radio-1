@@ -131,8 +131,8 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_io2_St";
     case CGEN_KR_STREAM:
       return "kr_stream";
-    case CGEN_KR_JACK_EVENT:
-      return "kr_jack_event";
+    case CGEN_KR_JACK_EVENT_TYPE:
+      return "kr_jack_event_type";
     case CGEN_KR_JACK_PATH_EVENT_CB_ARG:
       return "kr_jack_path_event_cb_arg";
     case CGEN_KR_JACK_PATH_AUDIO_CB_ARG:
@@ -175,12 +175,8 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_mixer_setup";
     case CGEN_KR_MIXER_CHANNELS:
       return "kr_mixer_channels";
-    case CGEN_KR_MIXER_CONTROL:
-      return "kr_mixer_control";
     case CGEN_KR_MIXER_PATH_TYPE:
       return "kr_mixer_path_type";
-    case CGEN_KR_MIXER_ADV_CTL:
-      return "kr_mixer_adv_ctl";
     case CGEN_KR_MIXER_PATH_INFO:
       return "kr_mixer_path_info";
     case CGEN_KR_MIXER_PATH_PATCH:
@@ -327,6 +323,8 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_lowpass_info";
     case CGEN_KR_HIGHPASS_INFO:
       return "kr_highpass_info";
+    case CGEN_KR_VOLUME_INFO:
+      return "kr_volume_info";
     case CGEN_KR_ANALOG_INFO:
       return "kr_analog_info";
     case CGEN_TONE_T:
@@ -343,6 +341,10 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_theora_encoder_St";
     case CGEN_KRAD_THEORA_DECODER_ST:
       return "krad_theora_decoder_St";
+    case CGEN_KR_ADAPTER_EVENT_TYPE:
+      return "kr_adapter_event_type";
+    case CGEN_KR_ADAPTER_PATH_EVENT_TYPE:
+      return "kr_adapter_path_event_type";
     case CGEN_KR_ADAPTER_PATH_EVENT_CB_ARG:
       return "kr_adapter_path_event_cb_arg";
     case CGEN_KR_ADAPTER_PATH_AV_CB_ARG:
@@ -369,8 +371,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_image";
     case CGEN_KR_AUDIO:
       return "kr_audio";
-    case CGEN_KR_SLICE_ST:
-      return "kr_slice_St";
     case CGEN_KR_TRANSPONDER_EVENT_TYPE:
       return "kr_transponder_event_type";
     case CGEN_KR_TRANSPONDER_EVENT:
@@ -658,8 +658,8 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_stream")) {
     return CGEN_KR_STREAM;
   }
-  if (!strcmp(string,"kr_jack_event")) {
-    return CGEN_KR_JACK_EVENT;
+  if (!strcmp(string,"kr_jack_event_type")) {
+    return CGEN_KR_JACK_EVENT_TYPE;
   }
   if (!strcmp(string,"kr_jack_path_event_cb_arg")) {
     return CGEN_KR_JACK_PATH_EVENT_CB_ARG;
@@ -724,14 +724,8 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_mixer_channels")) {
     return CGEN_KR_MIXER_CHANNELS;
   }
-  if (!strcmp(string,"kr_mixer_control")) {
-    return CGEN_KR_MIXER_CONTROL;
-  }
   if (!strcmp(string,"kr_mixer_path_type")) {
     return CGEN_KR_MIXER_PATH_TYPE;
-  }
-  if (!strcmp(string,"kr_mixer_adv_ctl")) {
-    return CGEN_KR_MIXER_ADV_CTL;
   }
   if (!strcmp(string,"kr_mixer_path_info")) {
     return CGEN_KR_MIXER_PATH_INFO;
@@ -952,6 +946,9 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_highpass_info")) {
     return CGEN_KR_HIGHPASS_INFO;
   }
+  if (!strcmp(string,"kr_volume_info")) {
+    return CGEN_KR_VOLUME_INFO;
+  }
   if (!strcmp(string,"kr_analog_info")) {
     return CGEN_KR_ANALOG_INFO;
   }
@@ -975,6 +972,12 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"krad_theora_decoder_St")) {
     return CGEN_KRAD_THEORA_DECODER_ST;
+  }
+  if (!strcmp(string,"kr_adapter_event_type")) {
+    return CGEN_KR_ADAPTER_EVENT_TYPE;
+  }
+  if (!strcmp(string,"kr_adapter_path_event_type")) {
+    return CGEN_KR_ADAPTER_PATH_EVENT_TYPE;
   }
   if (!strcmp(string,"kr_adapter_path_event_cb_arg")) {
     return CGEN_KR_ADAPTER_PATH_EVENT_CB_ARG;
@@ -1014,9 +1017,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_audio")) {
     return CGEN_KR_AUDIO;
-  }
-  if (!strcmp(string,"kr_slice_St")) {
-    return CGEN_KR_SLICE_ST;
   }
   if (!strcmp(string,"kr_transponder_event_type")) {
     return CGEN_KR_TRANSPONDER_EVENT_TYPE;
@@ -1236,7 +1236,7 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"krad_io_mode_t")) {
     return 1;
   }
-  if (!strcmp(type,"kr_jack_event")) {
+  if (!strcmp(type,"kr_jack_event_type")) {
     return 1;
   }
   if (!strcmp(type,"kr_jack_direction")) {
@@ -1257,13 +1257,7 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_mixer_channels")) {
     return 1;
   }
-  if (!strcmp(type,"kr_mixer_control")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_mixer_path_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_mixer_adv_ctl")) {
     return 1;
   }
   if (!strcmp(type,"kr_muxer_transport_type")) {
@@ -1324,6 +1318,12 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_sfx_effect_control")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_adapter_event_type")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_adapter_path_event_type")) {
     return 1;
   }
   if (!strcmp(type,"kr_adapter_path_direction")) {

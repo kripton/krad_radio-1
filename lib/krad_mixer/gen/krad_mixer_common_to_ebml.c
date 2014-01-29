@@ -17,23 +17,6 @@ int kr_mixer_channels_to_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_mixer_control_to_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  kr_mixer_control *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (kr_mixer_control *)st;
-
-  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
-
-  return res;
-}
-
 int kr_mixer_path_type_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_mixer_path_type *actual;
@@ -51,26 +34,8 @@ int kr_mixer_path_type_to_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_mixer_adv_ctl_to_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  kr_mixer_adv_ctl *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (kr_mixer_adv_ctl *)st;
-
-  res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
-
-  return res;
-}
-
 int kr_mixer_path_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
-  int i;
   int res;
   struct kr_mixer_path_info *actual;
 
@@ -82,29 +47,12 @@ int kr_mixer_path_info_to_ebml(kr_ebml *ebml, void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
 
-  uber.actual = &(actual->channels);
-  uber.type = EBML_KR_MIXER_CHANNELS;
-  res += info_pack_to_ebml(&ebml[res],&uber);
   uber.actual = &(actual->type);
   uber.type = EBML_KR_MIXER_PATH_TYPE;
   res += info_pack_to_ebml(&ebml[res],&uber);
-  res += kr_ebml_pack_float(ebml, 0xe1, actual->fade);
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += kr_ebml_pack_float(ebml, 0xe1, actual->volume[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += kr_ebml_pack_int32(ebml, 0xe1, actual->map[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += kr_ebml_pack_int32(ebml, 0xe1, actual->mixmap[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += kr_ebml_pack_float(ebml, 0xe1, actual->rms[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += kr_ebml_pack_float(ebml, 0xe1, actual->peak[i]);
-  }
-  res += kr_ebml_pack_int32(ebml, 0xe1, actual->delay);
+  uber.actual = &(actual->channels);
+  uber.type = EBML_KR_MIXER_CHANNELS;
+  res += info_pack_to_ebml(&ebml[res],&uber);
   uber.actual = &(actual->lowpass);
   uber.type = EBML_KR_LOWPASS_INFO;
   res += info_pack_to_ebml(&ebml[res],&uber);
@@ -116,6 +64,9 @@ int kr_mixer_path_info_to_ebml(kr_ebml *ebml, void *st) {
   res += info_pack_to_ebml(&ebml[res],&uber);
   uber.actual = &(actual->eq);
   uber.type = EBML_KR_EQ_INFO;
+  res += info_pack_to_ebml(&ebml[res],&uber);
+  uber.actual = &(actual->volume);
+  uber.type = EBML_KR_VOLUME_INFO;
   res += info_pack_to_ebml(&ebml[res],&uber);
 
   return res;

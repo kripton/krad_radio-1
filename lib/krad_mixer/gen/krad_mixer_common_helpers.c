@@ -80,51 +80,6 @@ int kr_strto_kr_mixer_channels(char *string) {
   return -1;
 }
 
-int kr_mixer_control_to_index(int val) {
-  switch (val) {
-    case KR_VOLUME:
-      return 0;
-    case KR_CROSSFADE:
-      return 1;
-    case KR_PEAK:
-      return 2;
-    case KR_CROSSFADE_GROUP:
-      return 3;
-  }
-  return -1;
-}
-
-char *kr_strfr_kr_mixer_control(int val) {
-  switch (val) {
-    case KR_VOLUME:
-      return "kr_volume";
-    case KR_CROSSFADE:
-      return "kr_crossfade";
-    case KR_PEAK:
-      return "kr_peak";
-    case KR_CROSSFADE_GROUP:
-      return "kr_crossfade_group";
-  }
-  return NULL;
-}
-
-int kr_strto_kr_mixer_control(char *string) {
-  if (!strcmp(string,"kr_volume")) {
-    return KR_VOLUME;
-  }
-  if (!strcmp(string,"kr_crossfade")) {
-    return KR_CROSSFADE;
-  }
-  if (!strcmp(string,"kr_peak")) {
-    return KR_PEAK;
-  }
-  if (!strcmp(string,"kr_crossfade_group")) {
-    return KR_CROSSFADE_GROUP;
-  }
-
-  return -1;
-}
-
 int kr_mixer_path_type_to_index(int val) {
   switch (val) {
     case KR_MXR_SOURCE:
@@ -170,48 +125,8 @@ int kr_strto_kr_mixer_path_type(char *string) {
   return -1;
 }
 
-int kr_mixer_adv_ctl_to_index(int val) {
-  switch (val) {
-    case KR_MXR_SAMPLERATE_SET:
-      return 0;
-    case KR_MXR_PERIOD_SIZE_SET:
-      return 1;
-    case KR_MXR_CLOCK_SET:
-      return 2;
-  }
-  return -1;
-}
-
-char *kr_strfr_kr_mixer_adv_ctl(int val) {
-  switch (val) {
-    case KR_MXR_SAMPLERATE_SET:
-      return "kr_mxr_samplerate_set";
-    case KR_MXR_PERIOD_SIZE_SET:
-      return "kr_mxr_period_size_set";
-    case KR_MXR_CLOCK_SET:
-      return "kr_mxr_clock_set";
-  }
-  return NULL;
-}
-
-int kr_strto_kr_mixer_adv_ctl(char *string) {
-  if (!strcmp(string,"kr_mxr_samplerate_set")) {
-    return KR_MXR_SAMPLERATE_SET;
-  }
-  if (!strcmp(string,"kr_mxr_period_size_set")) {
-    return KR_MXR_PERIOD_SIZE_SET;
-  }
-  if (!strcmp(string,"kr_mxr_clock_set")) {
-    return KR_MXR_CLOCK_SET;
-  }
-
-  return -1;
-}
-
 int kr_mixer_path_info_init(void *st) {
   struct kr_mixer_path_info *actual;
-
-  int i;
 
   if (st == NULL) {
     return -1;
@@ -219,20 +134,11 @@ int kr_mixer_path_info_init(void *st) {
 
   actual = (struct kr_mixer_path_info *)st;
   memset(actual, 0, sizeof(struct kr_mixer_path_info));
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
   kr_lowpass_info_init(&actual->lowpass);
   kr_highpass_info_init(&actual->highpass);
   kr_analog_info_init(&actual->analog);
   kr_eq_info_init(&actual->eq);
+  kr_volume_info_init(&actual->volume);
 
   return 0;
 }
@@ -240,27 +146,16 @@ int kr_mixer_path_info_init(void *st) {
 int kr_mixer_path_info_valid(void *st) {
   struct kr_mixer_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_mixer_path_info *)st;
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
   kr_lowpass_info_valid(&actual->lowpass);
   kr_highpass_info_valid(&actual->highpass);
   kr_analog_info_valid(&actual->analog);
   kr_eq_info_valid(&actual->eq);
+  kr_volume_info_valid(&actual->volume);
 
   return 0;
 }
@@ -268,28 +163,17 @@ int kr_mixer_path_info_valid(void *st) {
 int kr_mixer_path_info_random(void *st) {
   struct kr_mixer_path_info *actual;
 
-  int i;
-
   if (st == NULL) {
     return -1;
   }
 
   actual = (struct kr_mixer_path_info *)st;
   memset(actual, 0, sizeof(struct kr_mixer_path_info));
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-  }
   kr_lowpass_info_random(&actual->lowpass);
   kr_highpass_info_random(&actual->highpass);
   kr_analog_info_random(&actual->analog);
   kr_eq_info_random(&actual->eq);
+  kr_volume_info_random(&actual->volume);
 
   return 0;
 }

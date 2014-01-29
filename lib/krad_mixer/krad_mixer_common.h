@@ -11,9 +11,6 @@
 #define KR_MXR_SRATE_DEF 48000
 #define KR_MXR_PERIOD_DEF 1024
 
-#define KR_MXR_DEF_MBUS_LVL 75.0f
-#define KR_MXR_RMS_WINDOW_MS 100
-
 #include "krad_sfx_common.h"
 #include "krad_easing_common.h"
 
@@ -31,7 +28,6 @@ typedef struct kr_mixer_path_info kr_mixer_bus_info;
 typedef struct kr_mixer_path_info kr_mixer_output_info;
 typedef struct kr_mixer_path_patch kr_mixer_path_patch;
 
-
 typedef enum {
   NIL,
   MONO,
@@ -45,39 +41,20 @@ typedef enum {
 } kr_mixer_channels;
 
 typedef enum {
-  KR_VOLUME = 1,
-  KR_CROSSFADE,
-  KR_PEAK,
-  KR_CROSSFADE_GROUP
-} kr_mixer_control;
-
-typedef enum {
   KR_MXR_SOURCE = 1,
   KR_MXR_INPUT,
   KR_MXR_BUS,
   KR_MXR_OUTPUT
 } kr_mixer_path_type;
 
-typedef enum {
-  KR_MXR_SAMPLERATE_SET = 100,
-  KR_MXR_PERIOD_SIZE_SET,
-  KR_MXR_CLOCK_SET
-} kr_mixer_adv_ctl;
-
 struct kr_mixer_path_info {
-  kr_mixer_channels channels;
   kr_mixer_path_type type;
-  float fade;
-  float volume[KR_MXR_MAX_CHANNELS];
-  int map[KR_MXR_MAX_CHANNELS];
-  int mixmap[KR_MXR_MAX_CHANNELS];
-  float rms[KR_MXR_MAX_CHANNELS];
-  float peak[KR_MXR_MAX_CHANNELS];
-  int delay;
+  kr_mixer_channels channels;
   kr_lowpass_info lowpass;
   kr_highpass_info highpass;
   kr_analog_info analog;
   kr_eq_info eq;
+  kr_volume_info volume;
 };
 
 struct kr_mixer_path_patch {

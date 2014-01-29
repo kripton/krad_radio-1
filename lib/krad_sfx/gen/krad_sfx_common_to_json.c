@@ -148,6 +148,25 @@ int kr_highpass_info_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
+int kr_volume_info_to_json(char *json, void *st, int32_t max) {
+  int res;
+  struct kr_volume_info *actual;
+
+  res = 0;
+
+  if ((json == NULL) || (st == NULL) || (max < 1)) {
+    return -1;
+  }
+
+  actual = (struct kr_volume_info *)st;
+
+  res += snprintf(&json[res],max-res,"{");
+  res += snprintf(&json[res],max-res,"\"level\" : %0.2f",actual->level);
+  res += snprintf(&json[res],max-res,"}");
+
+  return res;
+}
+
 int kr_analog_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_analog_info *actual;

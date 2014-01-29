@@ -85,6 +85,8 @@ int kr_sfx_effect_type_to_index(int val) {
       return 3;
     case KR_SFX_ANALOG:
       return 4;
+    case KR_SFX_VOLUME:
+      return 5;
   }
   return -1;
 }
@@ -101,6 +103,8 @@ char *kr_strfr_kr_sfx_effect_type(int val) {
       return "kr_sfx_highpass";
     case KR_SFX_ANALOG:
       return "kr_sfx_analog";
+    case KR_SFX_VOLUME:
+      return "kr_sfx_volume";
   }
   return NULL;
 }
@@ -120,6 +124,9 @@ int kr_strto_kr_sfx_effect_type(char *string) {
   }
   if (!strcmp(string,"kr_sfx_analog")) {
     return KR_SFX_ANALOG;
+  }
+  if (!strcmp(string,"kr_sfx_volume")) {
+    return KR_SFX_VOLUME;
   }
 
   return -1;
@@ -310,6 +317,33 @@ int kr_highpass_info_valid(void *st) {
 }
 
 int kr_highpass_info_random(void *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+
+  return 0;
+}
+
+int kr_volume_info_init(void *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+
+  return 0;
+}
+
+int kr_volume_info_valid(void *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+
+  return 0;
+}
+
+int kr_volume_info_random(void *st) {
   if (st == NULL) {
     return -1;
   }

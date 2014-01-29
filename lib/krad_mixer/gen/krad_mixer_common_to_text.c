@@ -17,23 +17,6 @@ int kr_mixer_channels_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
-int kr_mixer_control_to_text(char *text, void *st, int32_t max) {
-  int res;
-  kr_mixer_control *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (kr_mixer_control *)st;
-
-  res += snprintf(&text[res],max-res,"kr_mixer_control : %u \n",*actual);
-
-  return res;
-}
-
 int kr_mixer_path_type_to_text(char *text, void *st, int32_t max) {
   int res;
   kr_mixer_path_type *actual;
@@ -51,26 +34,8 @@ int kr_mixer_path_type_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
-int kr_mixer_adv_ctl_to_text(char *text, void *st, int32_t max) {
-  int res;
-  kr_mixer_adv_ctl *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (kr_mixer_adv_ctl *)st;
-
-  res += snprintf(&text[res],max-res,"kr_mixer_adv_ctl : %u \n",*actual);
-
-  return res;
-}
-
 int kr_mixer_path_info_to_text(char *text, void *st, int32_t max) {
   uber_St uber;
-  int i;
   int res;
   struct kr_mixer_path_info *actual;
 
@@ -82,29 +47,12 @@ int kr_mixer_path_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_mixer_path_info *)st;
 
-  uber.actual = &(actual->channels);
-  uber.type = TEXT_KR_MIXER_CHANNELS;
-  res += info_pack_to_text(&text[res],&uber,max-res);
   uber.actual = &(actual->type);
   uber.type = TEXT_KR_MIXER_PATH_TYPE;
   res += info_pack_to_text(&text[res],&uber,max-res);
-  res += snprintf(&text[res],max-res,"fade : %0.2f \n",actual->fade);
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&text[res],max-res,"volume[%d] : %0.2f \n",i,actual->volume[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&text[res],max-res,"map[%d] : %d \n",i,actual->map[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&text[res],max-res,"mixmap[%d] : %d \n",i,actual->mixmap[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&text[res],max-res,"rms[%d] : %0.2f \n",i,actual->rms[i]);
-  }
-  for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    res += snprintf(&text[res],max-res,"peak[%d] : %0.2f \n",i,actual->peak[i]);
-  }
-  res += snprintf(&text[res],max-res,"delay : %d \n",actual->delay);
+  uber.actual = &(actual->channels);
+  uber.type = TEXT_KR_MIXER_CHANNELS;
+  res += info_pack_to_text(&text[res],&uber,max-res);
   uber.actual = &(actual->lowpass);
   uber.type = TEXT_KR_LOWPASS_INFO;
   res += info_pack_to_text(&text[res],&uber,max-res);
@@ -116,6 +64,9 @@ int kr_mixer_path_info_to_text(char *text, void *st, int32_t max) {
   res += info_pack_to_text(&text[res],&uber,max-res);
   uber.actual = &(actual->eq);
   uber.type = TEXT_KR_EQ_INFO;
+  res += info_pack_to_text(&text[res],&uber,max-res);
+  uber.actual = &(actual->volume);
+  uber.type = TEXT_KR_VOLUME_INFO;
   res += info_pack_to_text(&text[res],&uber,max-res);
 
   return res;

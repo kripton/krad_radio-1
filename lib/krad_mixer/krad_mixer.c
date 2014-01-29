@@ -340,6 +340,8 @@ static void path_sfx_create(kr_mixer_path *path) {
   kr_sfx_ctl(path->sfx, &cmd);
   cmd.effect = KR_SFX_ANALOG;
   kr_sfx_ctl(path->sfx, &cmd);
+  cmd.effect = KR_SFX_VOLUME;
+  kr_sfx_ctl(path->sfx, &cmd);
 }
 
 static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
@@ -416,16 +418,9 @@ int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info) {
   int i;
   kr_sfx_cmd cmd;
   if ((path == NULL) || (info == NULL)) return -1;
- // strcpy(info->bus, "Master");
   info->channels = path->channels;
-  info->delay = 0;//path->delay;
   info->type = path->type;
   for (i = 0; i < KR_MXR_MAX_CHANNELS; i++) {
-    info->volume[i] = 0;//path->volume[i];
-    info->map[i] = path->map[i];
-    info->mixmap[i] = path->mixmap[i];
-    info->rms[i] = 0;//path->avg[i];
-    info->peak[i] = 0;//path->peak_last[i];
   }
   cmd.control = KR_SFX_GET_INFO;
   cmd.effect = KR_SFX_EQ;
@@ -439,6 +434,9 @@ int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info) {
   kr_sfx_ctl(path->sfx, &cmd);
   cmd.effect = KR_SFX_ANALOG;
   cmd.user = &info->analog;
+  kr_sfx_ctl(path->sfx, &cmd);
+  cmd.effect = KR_SFX_VOLUME;
+  cmd.user = &info->volume;
   kr_sfx_ctl(path->sfx, &cmd);
   return 0;
 }

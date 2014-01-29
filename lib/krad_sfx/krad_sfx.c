@@ -7,6 +7,7 @@ typedef union {
   kr_lowpass_info *lp;
   kr_highpass_info *hp;
   kr_analog_info *analog;
+  kr_volume_info *volume;
 } kr_sfx_effect_info;
 
 typedef union {
@@ -14,6 +15,7 @@ typedef union {
   kr_lowpass *lowpass;
   kr_highpass *highpass;
   kr_analog *analog;
+  kr_volume *volume;
 } kr_sfx_effect_ctx;
 
 struct kr_sfx_effect {
@@ -78,6 +80,9 @@ void kr_sfx_process(kr_sfx *sfx, float **input, float **output, int nframes) {
           case KR_SFX_ANALOG:
             kr_analog_process2(sfx->effect[e].ctx[c].analog, input[c], output[c], nframes, c == 0);
             break;
+          case KR_SFX_VOLUME:
+            kr_volume_process2(sfx->effect[e].ctx[c].volume, input[c], output[c], nframes, c == 0);
+            break;
         }
       }
     }
@@ -103,6 +108,10 @@ static void set_sample_rate(kr_sfx *sfx, uint32_t sample_rate) {
             break;
           case KR_SFX_ANALOG:
             kr_analog_set_sample_rate(sfx->effect[e].ctx[c].analog, sfx->sample_rate);
+            break;
+          case KR_SFX_VOLUME:
+            /* FIXME Uncertain purpose at this time */
+            kr_volume_set_sample_rate(sfx->effect[e].ctx[c].volume, sfx->sample_rate);
             break;
         }
       }
@@ -132,6 +141,9 @@ static void effect_add(kr_sfx *sfx, kr_sfx_effect_type effect) {
          case KR_SFX_ANALOG:
            sfx->effect[e].ctx[c].analog = kr_analog_create(sfx->sample_rate);
            break;
+         case KR_SFX_VOLUME:
+           sfx->effect[e].ctx[c].volume = kr_volume_create(sfx->sample_rate);
+           break;
         }
       }
       sfx->effect[e].active = 1;
@@ -160,6 +172,9 @@ void effect_remove(kr_sfx *sfx, kr_sfx_effect_type effect) {
             break;
           case KR_SFX_ANALOG:
             kr_analog_destroy(sfx->effect[e].ctx[c].analog);
+            break;
+          case KR_SFX_VOLUME:
+            kr_volume_destroy(sfx->effect[e].ctx[c].volume);
             break;
         }
         sfx->effect[e].ctx[c].eq = NULL;
@@ -260,6 +275,14 @@ static void effect_control(kr_sfx *sfx, kr_sfx_effect_type effect, int control_i
                 break;
             }
             break;
+          case KR_SFX_VOLUME:
+            switch (control) {
+              case KR_SFX_DB:
+                kr_volume_set_level(sfx->effect[e].ctx[c].volume,
+                 value, duration, easing, user);
+                break;
+            }
+            break;
         }
       }
     }
@@ -287,6 +310,10 @@ static int effect_info(kr_sfx *sfx, kr_sfx_effect_type effect, void *info) {
         case KR_SFX_ANALOG:
           ei.analog = (kr_analog_info *)info;
           kr_analog_info_get(sfx->effect[e].ctx[0].analog, ei.analog);
+          return 0;
+        case KR_SFX_VOLUME:
+          ei.volume = (kr_volume_info *)info;
+          kr_volume_info_get(sfx->effect[e].ctx[0].volume, ei.volume);
           return 0;
        default:
           break;

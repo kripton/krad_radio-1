@@ -129,6 +129,23 @@ int kr_highpass_info_fr_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
+int kr_volume_info_fr_ebml(kr_ebml *ebml, void *st) {
+  int res;
+  struct kr_volume_info *actual;
+
+  res = 0;
+
+  if ((ebml == NULL) || (st == NULL)) {
+    return -1;
+  }
+
+  actual = (struct kr_volume_info *)st;
+
+  res += kr_ebml2_unpack_element_float(ebml, NULL, &actual->level);
+
+  return res;
+}
+
 int kr_analog_info_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   struct kr_analog_info *actual;

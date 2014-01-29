@@ -10,4 +10,5 @@ int kr_eq_band_info_to_json(char *json, void *st, int32_t max);
 int kr_eq_info_to_json(char *json, void *st, int32_t max);
 int kr_lowpass_info_to_json(char *json, void *st, int32_t max);
 int kr_highpass_info_to_json(char *json, void *st, int32_t max);
+int kr_volume_info_to_json(char *json, void *st, int32_t max);
 int kr_analog_info_to_json(char *json, void *st, int32_t max);
