@@ -85,15 +85,18 @@ static void copy_samples(float **dst, float **src, int nc, int ns) {
 static void transport(kr_mixer_path *path) {
   kr_mixer_path_audio_cb_arg cb_arg;
   cb_arg.audio.channels = path->channels;
-  cb_arg.audio.count = path->nframes;
+  if (path->type == KR_MXR_OUTPUT) {
+    cb_arg.audio.count = path->nframes;
+  }
   //FIXME
   cb_arg.audio.rate = 48000;
   cb_arg.user = path->audio_user;
   path->audio_cb(&cb_arg);
-  if (path->type == KR_MXR_INPUT) {
-    copy_samples(path->samples, cb_arg.audio.samples, path->channels, cb_arg.audio.count);
+  if (path->type == KR_MXR_SOURCE) {
+    path->nframes = cb_arg.audio.count;
+    copy_samples(path->samples, cb_arg.audio.samples, path->channels, path->nframes);
   } else {
-    copy_samples(cb_arg.audio.samples, path->samples, path->channels, cb_arg.audio.count);
+    copy_samples(cb_arg.audio.samples, path->samples, path->channels, path->nframes);
   }
 }
 
@@ -128,7 +131,7 @@ static void update_state(kr_mixer *mixer) {
 static int kr_mixer_process_path(kr_mixer_path *path) {
   int i;
   int e;
-  kr_mixer_path *input;
+  kr_mixer_path *streamer45;
   kr_mixer *mixer;
   i = 0;
   void *user[16];
@@ -138,6 +141,14 @@ static int kr_mixer_process_path(kr_mixer_path *path) {
   if (path->type == KR_MXR_SOURCE) {
     transport(path);
     kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
+    e = kr_graph_in_out_edges(mixer->graph, path->vertex, -45, user, 16);
+    for (i = 0; i < e; i++) {
+      streamer45 = (kr_mixer_path *)user[i];
+      copy_samples(streamer45->samples, path->samples, path->channels, path->nframes);
+      streamer45->nframes = path->nframes;
+      kr_sfx_process(streamer45->sfx, streamer45->samples, streamer45->samples, streamer45->nframes);
+    }
+    //  printk("source had %d edges", e);
     return 0;
   }
   /*
@@ -148,22 +159,32 @@ static int kr_mixer_process_path(kr_mixer_path *path) {
   }
   */
   if (path->type == KR_MXR_BUS) {
-    clear_samples(path->samples, path->channels, path->nframes);
-    e = kr_graph_in_out_edges(mixer->graph, path->vertex, IN, user, 16);
+    //clear_samples(path->samples, path->channels, path->nframes);
+    e = kr_graph_in_out_edges(mixer->graph, path->vertex, -45, user, 16);
     for (i = 0; i < e; i++) {
-      input = (kr_mixer_path *)user[i];
-      sum_samples(path->samples, input->samples, path->channels, path->nframes);
+      streamer45 = (kr_mixer_path *)user[i];
+      path->nframes = streamer45->nframes;
+      if (i == 0) {
+        clear_samples(path->samples, path->channels, path->nframes);
+      }
+      sum_samples(path->samples, streamer45->samples, path->channels, path->nframes);
     }
+    //  printk("bus had %d edges", e);
     kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
     return 0;
   }
   if (path->type == KR_MXR_OUTPUT) {
-    clear_samples(path->samples, path->channels, path->nframes);
-    e = kr_graph_in_out_edges(mixer->graph, path->vertex, IN, user, 16);
+    //clear_samples(path->samples, path->channels, path->nframes);
+    e = kr_graph_in_out_edges(mixer->graph, path->vertex, -45, user, 16);
     for (i = 0; i < e; i++) {
-      input = (kr_mixer_path *)user[i];
-      sum_samples(path->samples, input->samples, path->channels, path->nframes);
+      streamer45 = (kr_mixer_path *)user[i];
+      path->nframes = streamer45->nframes;
+      if (i == 0) {
+        clear_samples(path->samples, path->channels, path->nframes);
+      }
+      sum_samples(path->samples, streamer45->samples, path->channels, path->nframes);
     }
+    //  printk("output had %d edges", e);
     kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
     limit_samples(path->samples, path->channels, path->nframes);
     transport(path);

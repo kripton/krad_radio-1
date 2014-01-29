@@ -24,9 +24,8 @@ kr_volume *kr_volume_create(int sample_rate) {
   kr_volume *volume;
   volume = kr_allocz(1, sizeof(kr_volume));
   volume->sample_rate = sample_rate;
-  volume->level = 100.0f;
-  volume->level_actual = 0.0f;
-  volume->new_level_actual = 1.0f;
+  kr_volume_set_level(volume, 100.0f, 100, EASEINOUTSINE, NULL);
+  printk("volume create");
   return volume;
 }
 
@@ -45,11 +44,9 @@ void kr_volume_process2(kr_volume *volume, float *src, float *dst, int ns, int b
       // krad_radio_broadcast_subunit_control(volume->mixer->broadcaster,
       //  &volume->address, BLEND, volume->blend, ptr);
     }
+  printk("volume %feascreate", volume->level);
     volume->new_level_actual = volume->level/100.0f;
     volume->new_level_actual *= volume->new_level_actual;
-  }
-  if (volume->level == 100.0f) {
-    return;
   }
   sign = 0;
   if (volume->new_level_actual == volume->level_actual) {
@@ -92,5 +89,7 @@ void kr_volume_process2(kr_volume *volume, float *src, float *dst, int ns, int b
 int kr_volume_info_get(kr_volume *volume, kr_volume_info *info) {
   if ((volume == NULL) || (info == NULL)) return -1;
   info->level = volume->level;
+  printk("volume level %f", volume->level);
+  printk("volume actual level %f", volume->level_actual);
   return 0;
 }

@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-#define KR_SFX_MAX 4
+#define KR_SFX_MAX 6
 #define KR_SFX_MAX_CHANNELS 8
 #define KR_EQ_MAX_BANDS 32
 
