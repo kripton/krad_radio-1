@@ -19,10 +19,20 @@ typedef struct kr_adapter_path_setup kr_adapter_path_setup;
 #include "krad_x11.h"
 #include "krad_alsa.h"
 
+typedef enum {
+  KR_ADAPTER_PROCESS, /* Process all paths: jack,alsa,decklink */
+  KR_ADAPTER_DISCONNECTED,
+  KR_ADAPTER_RECONNECTED
+} kr_adapter_event_type;
+
+typedef enum {
+  KR_ADAPTER_PATH_PROCESS, /* Process path: wayland,x11,krad - v4l2*(could work either way) */
+} kr_adapter_path_event_type;
+
 typedef struct {
   kr_adapter_path *path;
   void *user;
-  /* ADAPTER PATH EVENT INFO */
+  kr_adapter_path_event_type type;
 } kr_adapter_path_event_cb_arg;
 
 typedef struct {
@@ -36,7 +46,7 @@ typedef struct {
 typedef struct {
   kr_adapter *adapter;
   void *user;
-  /* ADAPTER EVENT INFO */
+  kr_adapter_event_type type;
 } kr_adapter_event_cb_arg;
 
 typedef int (kr_adapter_process_function)(kr_adapter *);

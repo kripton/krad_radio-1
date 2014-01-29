@@ -17,14 +17,14 @@ typedef enum {
 } kr_adapter_path_direction;
 
 typedef enum {
-  KR_ADP_JACK,        /*     A  MP  I/O ePush/ePull              */
-  KR_ADP_WAYLAND,     /* V      MP  Output iPush, ePull pos      */
-  KR_ADP_V4L2,        /* V      SP  Input ePush                  */
-  KR_ADP_DECKLINK,    /* V + A  MP  Input ePush                  */
-  KR_ADP_X11,         /* V      MP  Input iPull                  */
-  KR_ADP_ALSA,        /*     A  MP  I/O ePush/ePull              */
-  KR_ADP_KRAD,       /* V + A  MP  I/O ANY ePush/ePull          */
-  KR_ADP_ENCODER,     /* V + A  SP  Output iPush only            */
+  KR_ADP_JACK,      /*   A  M  IO  */
+  KR_ADP_WAYLAND,   /*  V   M   O  */
+  KR_ADP_V4L2,      /*  V   S  I   */
+  KR_ADP_DECKLINK,  /*  VA  M  I   */
+  KR_ADP_X11,       /*  V   M  I   */
+  KR_ADP_ALSA,      /*   A  M  IO  */
+  KR_ADP_KRAD,      /*  VA  M  IO  */
+  KR_ADP_ENCODER,   /*  VA  S  O   */
 } kr_adapter_api;
 
 typedef union {

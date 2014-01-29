@@ -19,27 +19,27 @@ typedef struct kr_jack_path kr_jack_output;
 typedef enum {
   KR_JACK_SHUTDOWN,
   KR_JACK_PROCESS,
-  KR_JACK_AUDIO_INPUT,
-  KR_JACK_AUDIO_OUTPUT,
+//  KR_JACK_AUDIO_INPUT,
+//  KR_JACK_AUDIO_OUTPUT,
   KR_JACK_INFO, /* FIXME what info.. how to get .. */
   KR_JACK_PATH_INFO /* FIXME what info.. how to get .. */
-} kr_jack_event;
+} kr_jack_event_type;
 
 typedef struct {
-  kr_jack_event event;
+  kr_jack_event_type event;
   void *user;
   kr_jack_path *path;
 } kr_jack_path_event_cb_arg;
 
 typedef struct {
-  kr_jack_event event;
+  kr_jack_event_type event;
   void *user;
   kr_jack_path *path;
   kr_audio audio;
 } kr_jack_path_audio_cb_arg;
 
 typedef struct {
-  kr_jack_event event;
+  kr_jack_event_type type;
   void *user;
 } kr_jack_event_cb_arg;
 

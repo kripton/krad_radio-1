@@ -69,22 +69,17 @@ static int jack_check(kr_jack *jack, jack_nframes_t nframes) {
 
 static int path_process(kr_jack_path *path) {
   kr_jack_path_audio_cb_arg cb_arg;
-  int i;
+  int c;
+  cb_arg.audio.rate = path->jack->info.sample_rate;
+  cb_arg.audio.count = path->jack->info.period_size;
   cb_arg.user = path->user;
   cb_arg.path = path;
   cb_arg.audio.channels = path->info.channels;
-  cb_arg.audio.rate = path->jack->info.sample_rate;
-  cb_arg.audio.count = path->jack->info.period_size;
-  if (path->info.direction == KR_JACK_INPUT) {
-    cb_arg.event = KR_JACK_AUDIO_INPUT;
-  } else {
-    cb_arg.event = KR_JACK_AUDIO_OUTPUT;
-  }
   if (path->ports[path->info.channels - 1] == NULL) {
     return 0;
   }
-  for (i = 0; i < path->info.channels; i++) {
-    cb_arg.audio.samples[i] = jack_port_get_buffer(path->ports[i],
+  for (c = 0; c < path->info.channels; c++) {
+    cb_arg.audio.samples[c] = jack_port_get_buffer(path->ports[c],
      path->jack->info.period_size);
   }
   path->audio_cb(&cb_arg);
@@ -94,10 +89,14 @@ static int path_process(kr_jack_path *path) {
 static int jack_process(kr_jack *jack) {
   int i;
   kr_jack_path *path;
+  kr_jack_event_cb_arg event;
+  event.user = jack->user;
+  event.type = KR_JACK_PROCESS;
   i = 0;
   while ((path = kr_pool_iterate_active(jack->path_pool, &i))) {
     path_process(path);
   }
+  jack->event_cb(&event);
   return 0;
 }
 

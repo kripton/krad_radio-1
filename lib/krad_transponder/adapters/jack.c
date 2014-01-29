@@ -18,6 +18,10 @@ void jack_adapter_event_cb(kr_jack_event_cb_arg *arg) {
   kr_adapter_event_cb_arg cb_arg;
   cb_arg.adapter = (kr_adapter *)arg->user;
   cb_arg.user = cb_arg.adapter->user;
+  cb_arg.type = 0;
+  if (arg->type == KR_JACK_PROCESS) {
+    cb_arg.type = KR_ADAPTER_PROCESS;
+  }
   cb_arg.adapter->ev_cb(&cb_arg);
 }
 

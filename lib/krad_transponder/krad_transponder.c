@@ -32,8 +32,6 @@ struct kr_transponder {
   kr_transponder_event_cb *event_cb;
 };
 
-#include "krad_transponder_processor.c"
-
 static kr_adapter *adapter_find(kr_xpdr *xpdr, kr_adapter_path_setup *ps);
 static kr_adapter *adapter_create(kr_xpdr *xpdr, kr_adapter_path_setup *ps);
 static kr_adapter *adapter_get(kr_xpdr *xpdr, kr_adapter_path_setup *ps);
@@ -44,17 +42,62 @@ static int path_create(kr_xpdr_path *path);
 static void path_io_destroy(kr_xpdr_path_io *io, kr_xpdr_path_io_type type);
 static void path_destroy(kr_xpdr_path *path);
 
+void xpdr_compositor_path_frame_cb(kr_compositor_path_frame_cb_arg *arg) {
+  kr_xpdr_path *path;
+  path = (kr_xpdr_path *)arg->user;
+  arg->image = path->image;
+}
+
+void xpdr_mixer_path_audio_cb(kr_mixer_path_audio_cb_arg *arg) {
+  kr_xpdr_path *path;
+  path = (kr_xpdr_path *)arg->user;
+  arg->audio = path->audio;
+}
+
+void xpdr_adapter_path_av_cb(kr_adapter_path_av_cb_arg *arg) {
+  kr_xpdr_path *path;
+  path = (kr_xpdr_path *)arg->user;
+  path->audio = arg->audio;
+  path->image = arg->image;
+}
+
 static void xpdr_adapter_path_event_cb(kr_adapter_path_event_cb_arg *arg) {
   printk("yay adapter path event!");
 }
 
 static void xpdr_adapter_event_cb(kr_adapter_event_cb_arg *arg) {
-/*
   kr_xpdr *xpdr;
+  kr_transponder_path *path;
   kr_adapter_info info;
+  int i;
   uint32_t ret;
   xpdr = (kr_xpdr *)arg->user;
-*/
+  /* Created / destroyed? or is that on transponder ? */
+  if (arg->type == KR_ADAPTER_DISCONNECTED) {
+    printk("Adapter Disconnected");
+    return;
+  }
+  if (arg->type == KR_ADAPTER_RECONNECTED) {
+    printk("Adapter Reconnected");
+    return;
+  }
+  if (arg->type != KR_ADAPTER_PROCESS) {
+    printk("Wasn't a process event");
+    return;
+  }
+  kr_adapter_get_info(arg->adapter, &info);
+  /* I think we should trigger all of the mixer ports that are connected
+   * to this adapter path */
+  int test = 0;
+  i = 0;
+  while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
+    if (path->info.output.type == KR_XPDR_ADAPTER) {
+      test++;
+    }
+  }
+  if (info.api == KR_ADP_JACK) {
+    printk("it was a jack proccess callback.. with %d outs", test);
+  }
 }
 
 static kr_adapter *adapter_find(kr_xpdr *xpdr, kr_adapter_path_setup *ps) {
