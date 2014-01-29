@@ -58,7 +58,7 @@ int random_vertices_gen(kr_graph *graph, int n, kr_vertex **vertices) {
   int i;
   int k;
   for (i = k = 0; i < n; i++) {
-    vertices[k] = kr_graph_vertex_create(graph,randr(1,3));
+    vertices[k] = kr_graph_vertex_create(graph,randr(1,4),NULL);
     if (vertices[k]) {
       k++;
     }
@@ -73,10 +73,10 @@ int random_edges_gen(kr_graph *graph, int n, int vcount, kr_vertex **vertices) {
   int l;
 
   for (i = l = 0; i < n; i++) {
-    j = randr(0,vcount-1);
-    k = randr(0,vcount-1);
+    j = randr(0,vcount);
+    k = randr(0,vcount);
     printf("Generating random edge from %p to %p\n",vertices[k],vertices[j]);
-    if (!kr_graph_edge_create(graph,vertices[j],vertices[k])) {
+    if (!kr_graph_edge_create(graph,vertices[j],vertices[k],NULL)) {
       l++;
     }
   }
