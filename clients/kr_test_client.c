@@ -14,7 +14,7 @@ static int test_jack_input_create(kr_client *client) {
   /* init function? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   channels = 2;
-  name = "Music";
+  name = "Music1";
   info.input.type = KR_XPDR_ADAPTER;
   info.input.info.adapter_path_info.api = KR_ADP_JACK;
   strcpy(info.input.info.adapter_path_info.info.jack.name, name);
@@ -234,6 +234,21 @@ int make_musicmaster(kr_client *client) {
   return ret;
 }
 
+int make_jackinout(kr_client *client) {
+  int ret;
+  kr_crate2 crate;
+  memset(&crate, 0, sizeof(crate));
+  kr_mixer_path_info *in;
+  strcpy(crate.address, "/mixer/Main/Music1");
+  crate.method = KR_PUT;
+  crate.payload_type = PL_KR_MIXER_PATH_INFO;
+  in = &crate.payload.mixer_path_info;
+  in->channels = 2;
+  in->type = KR_MXR_INPUT;
+  ret = kr_crate_send(client, &crate);
+  return ret;
+}
+
 int run_test(kr_client *client, char *test) {
   int ret;
   ret = -1;
@@ -266,6 +281,10 @@ int run_test(kr_client *client, char *test) {
   }
   if ((strlen(test) == strlen("jackout")) && (strcmp(test, "jackout") == 0)) {
     ret = test_jack_output_create(client);
+    if (ret != 0) return ret;
+  }
+  if ((strlen(test) == strlen("jackinout")) && (strcmp(test, "jackinout") == 0)) {
+    ret = make_jackinout(client);
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("v4l2")) && (strcmp(test, "v4l2") == 0)) {

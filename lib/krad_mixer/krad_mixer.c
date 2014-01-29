@@ -184,6 +184,7 @@ int kr_mixer_process(kr_mixer_path *path) {
   //kr_mixer_path *bus;
   i = 0;
   //bi = 0;
+  return 0;
   if (path == NULL) return -1;
   mixer = path->mixer;
   update_state(mixer);

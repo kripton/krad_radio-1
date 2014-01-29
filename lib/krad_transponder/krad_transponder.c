@@ -101,9 +101,6 @@ static void xpdr_adapter_event_cb(kr_adapter_event_cb_arg *arg) {
       test++;
     }
   }
-  if (info.api == KR_ADP_JACK) {
-    printk("it was a jack proccess callback.. with %d outs", test);
-  }
 }
 
 static kr_adapter *adapter_find(kr_xpdr *xpdr, kr_adapter_path_setup *ps) {
