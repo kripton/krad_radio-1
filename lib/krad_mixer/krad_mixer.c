@@ -130,7 +130,7 @@ static void update_state(kr_mixer *mixer) {
   }
 }
 
-int kr_mixer_process(kr_mixer_path *path) {
+static int kr_mixer_process_path(kr_mixer_path *path) {
   //int i;
   int nframes;
   //int bi;
@@ -149,7 +149,7 @@ int kr_mixer_process(kr_mixer_path *path) {
     return 0;
   }
   if (path->type == KR_MXR_INPUT) {
-    //copy_samples(path->to, path->frome, path->channels, nframes);
+    copy_samples(path->to->samples, path->from->samples, path->channels, nframes);
     apply_effects(path, nframes);
     return 0;
   }
@@ -168,6 +168,40 @@ int kr_mixer_process(kr_mixer_path *path) {
     return 0;
   }
   return -1;
+}
+
+static int kr_mixer_process_stupid(kr_mixer *mixer) {
+  int i;
+  kr_mixer_path *path;
+  i = 0;
+  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
+    if (path->type == KR_MXR_SOURCE) {
+      kr_mixer_process_path(path);
+    }
+  }
+  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
+    if (path->type == KR_MXR_INPUT) {
+      kr_mixer_process_path(path);
+    }
+  }
+  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
+    if (path->type == KR_MXR_BUS) {
+      kr_mixer_process_path(path);
+    }
+  }
+  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
+    if (path->type == KR_MXR_OUTPUT) {
+      kr_mixer_process_path(path);
+    }
+  }
+  return 0;
+}
+
+int kr_mixer_process(kr_mixer_path *path) {
+  int ret;
+  if (path == NULL) return -1;
+  ret = kr_mixer_process_stupid(path->mixer);
+  return ret;
 }
 
 static void path_release(kr_mixer_path *path) {
