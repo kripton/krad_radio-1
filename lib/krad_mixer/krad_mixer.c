@@ -45,8 +45,8 @@ struct kr_mixer_path {
 static void limit_samples(float **samples, int nc, int ns);
 static void clear_samples(float **dst, int nc, int ns);
 static void copy_samples(float **dst, float **src, int nc, int ns);
-static void transport(kr_mixer_path *path);
 static void sum_samples(float **dst, float **src, int nc, int ns);
+static void transport(kr_mixer_path *path);
 static void update_state(kr_mixer *mixer);
 static void path_release(kr_mixer_path *path);
 static int path_info_check(kr_mixer_path_info *info);
@@ -82,6 +82,16 @@ static void copy_samples(float **dst, float **src, int nc, int ns) {
   }
 }
 
+static void sum_samples(float **dst, float **src, int nc, int ns) {
+  int c;
+  int s;
+  for (c = 0; c < nc; c++) {
+    for (s = 0; s < ns; s++) {
+      dst[c][s] += src[c][s];
+    }
+  }
+}
+
 static void transport(kr_mixer_path *path) {
   kr_mixer_path_audio_cb_arg cb_arg;
   cb_arg.audio.channels = path->channels;
@@ -97,16 +107,6 @@ static void transport(kr_mixer_path *path) {
     copy_samples(path->samples, cb_arg.audio.samples, path->channels, path->nframes);
   } else {
     copy_samples(cb_arg.audio.samples, path->samples, path->channels, path->nframes);
-  }
-}
-
-static void sum_samples(float **dst, float **src, int nc, int ns) {
-  int c;
-  int s;
-  for (c = 0; c < nc; c++) {
-    for (s = 0; s < ns; s++) {
-      dst[c][s] += src[c][s];
-    }
   }
 }
 
