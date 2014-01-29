@@ -41,15 +41,12 @@ struct kr_mixer_path {
   kr_vertex *vertex;
 };
 
-static void apply_effects(kr_mixer_path *path, int nframes);
-static void clear_frames(kr_mixer_path *path, uint32_t nframes);
-static void import_frames(kr_mixer_path *dest, kr_audio *src);
-static void export_frames(kr_audio *dest, kr_mixer_path *src);
-static void transport(kr_mixer_path *path, uint32_t nframes);
-static void limit(kr_mixer_path *path, uint32_t nframes);
+static void limit_samples(float **samples, int nc, int ns);
+static void clear_samples(float **dst, int nc, int ns);
 static void copy_samples(float **dst, float **src, int nc, int ns);
-static void copy_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n);
-static void mix_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n);
+static void transport(kr_mixer_path *path, int nframes);
+static void apply_effects(kr_mixer_path *path, int nframes);
+static void sum_samples(float **dst, float **src, int nc, int ns);
 static void update_state(kr_mixer *mixer);
 static void path_release(kr_mixer_path *path);
 static int path_info_check(kr_mixer_path_info *info);
@@ -58,70 +55,20 @@ static void path_sfx_create(kr_mixer_path *path);
 static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup);
 static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup);
 
-static void apply_effects(kr_mixer_path *port, int nframes) {
-  // FIXME hrm we count on thems being the same btw in them effects lookout
-  kr_sfx_process(port->sfx, port->samples, port->samples, nframes);
-}
-
-static void clear_frames(kr_mixer_path *path, uint32_t nframes) {
+static void limit_samples(float **samples, int nc, int ns) {
   int c;
-  int s;
-  for (c = 0; c < path->channels; c++) {
-    for (s = 0; s < nframes; s++) {
-      path->samples[c][s] = 0.0f;
-    }
+  for (c = 0; c < nc; c++) {
+    krad_hardlimit(samples[c], ns);
   }
 }
 
-static void import_frames(kr_mixer_path *dest, kr_audio *src) {
+static void clear_samples(float **dst, int nc, int ns) {
   int s;
   int c;
-  int frames;
-  int channels;
-  //frames = MIN(dest->mixer->period_size, src->count);
-  /* hrm FIXME */
-  frames = src->count;
-  channels = MIN(dest->channels, src->channels);
-  for (c = 0; c < channels; c++) {
-    for (s = 0; s < frames; s++) {
-      dest->samples[c][s] = src->samples[c][s];
+  for (c = 0; c < nc; c++) {
+    for (s = 0; s < ns; s++) {
+      dst[c][s] = 0.0f;
     }
-  }
-}
-
-static void export_frames(kr_audio *dest, kr_mixer_path *src) {
-  int s;
-  int c;
-  int frames;
-  int channels;
-  frames = dest->count;
-  channels = dest->channels;
-  for (c = 0; c < channels; c++) {
-    for (s = 0; s < frames; s++) {
-      dest->samples[c][s] = src->samples[c][s];
-    }
-  }
-}
-
-static void transport(kr_mixer_path *path, uint32_t nframes) {
-  kr_mixer_path_audio_cb_arg cb_arg;
-  cb_arg.audio.channels = path->channels;
-  cb_arg.audio.count = nframes;
-  //FIXME
-  cb_arg.audio.rate = 48000;
-  cb_arg.user = path->audio_user;
-  path->audio_cb(&cb_arg);
-  if (path->type == KR_MXR_INPUT) {
-    import_frames(path, &cb_arg.audio);
-  } else {
-    export_frames(&cb_arg.audio, path);
-  }
-}
-
-static void limit(kr_mixer_path *path, uint32_t nframes) {
-  int c;
-  for (c = 0; c < path->channels; c++) {
-    krad_hardlimit(path->samples[c], nframes);
   }
 }
 
@@ -135,24 +82,32 @@ static void copy_samples(float **dst, float **src, int nc, int ns) {
   }
 }
 
-static void copy_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n) {
-  int s;
-  int c;
-  for (c = 0; c < dest->channels; c++) {
-    for (s = 0; s < n; s++) {
-      dest->samples[c][s] = src->samples[c][s];
-    }
+static void transport(kr_mixer_path *path, int ns) {
+  kr_mixer_path_audio_cb_arg cb_arg;
+  cb_arg.audio.channels = path->channels;
+  cb_arg.audio.count = ns;
+  //FIXME
+  cb_arg.audio.rate = 48000;
+  cb_arg.user = path->audio_user;
+  path->audio_cb(&cb_arg);
+  if (path->type == KR_MXR_INPUT) {
+    copy_samples(path->samples, cb_arg.audio.samples, path->channels, ns);
+  } else {
+    copy_samples(cb_arg.audio.samples, path->samples, path->channels, ns);
   }
 }
 
-static void mix_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n) {
+static void apply_effects(kr_mixer_path *port, int nframes) {
+  // FIXME hrm we count on thems being the same btw in them effects lookout
+  kr_sfx_process(port->sfx, port->samples, port->samples, nframes);
+}
+
+static void sum_samples(float **dst, float **src, int nc, int ns) {
   int c;
   int s;
-  if (dest->channels == src->channels) {
-    for (c = 0; c < dest->channels; c++) {
-      for (s = 0; s < n; s++) {
-        dest->samples[c][s] += src->samples[c][s];
-      }
+  for (c = 0; c < nc; c++) {
+    for (s = 0; s < ns; s++) {
+      dst[c][s] += src[c][s];
     }
   }
 }
@@ -160,7 +115,6 @@ static void mix_frames(kr_mixer_path *dest, kr_mixer_path *src, uint32_t n) {
 static void update_state(kr_mixer *mixer) {
   int i;
   kr_mixer_path *path;
-  kr_sfx_cmd cmd;
   i = 0;
   while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
     switch (path->state) {
@@ -177,79 +131,43 @@ static void update_state(kr_mixer *mixer) {
 }
 
 int kr_mixer_process(kr_mixer_path *path) {
-  int i;
+  //int i;
   int nframes;
   //int bi;
   kr_mixer *mixer;
   //kr_mixer_path *bus;
-  i = 0;
+  //i = 0;
   //bi = 0;
-  return 0;
   if (path == NULL) return -1;
   mixer = path->mixer;
   update_state(mixer);
   nframes = 32; /*TEMP */
-  /* Pull input audio */
-  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-    if ((path->state == KR_MXP_ACTIVE) && (path->type == KR_MXR_INPUT)) {
-      transport(path, nframes);
-    }
+
+  if (path->type == KR_MXR_SOURCE) {
+    transport(path, nframes);
+    apply_effects(path, nframes);
+    return 0;
   }
-  /* Process input and compute metrics */
-  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-    if ((path->state == KR_MXP_ACTIVE) && (path->type == KR_MXR_INPUT)) {
-      apply_effects(path, nframes);
-      //compute_meters(path, nframes);
-    }
+  if (path->type == KR_MXR_INPUT) {
+    //copy_samples(path->to, path->frome, path->channels, nframes);
+    apply_effects(path, nframes);
+    return 0;
   }
-  /* Mix, process and compute metrics */
-  /*
-  while ((bus = kr_pool_iterate_active(mixer->path_pool, &bi))) {
-    if ((bus->state) && (bus->type == KR_MXR_BUS)) {
-      while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-        if ((path->state == KR_MXP_ACTIVE) && (path->bus == bus)
-         && (path->type == KR_MXR_INPUT)) {
-          mix_frames(bus, path, nframes);
-        }
-      }
-    }
+  if (path->type == KR_MXR_BUS) {
+    clear_samples(path->samples, path->channels, nframes);
+    //sum_samples(path->samples, float **src, path->channels, nframes);
+    apply_effects(path, nframes);
+    return 0;
   }
-  */
-  /* Copy output and process */
-  /*
-  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-    if ((path->state == KR_MXP_ACTIVE)
-     && (path->type == KR_MXR_OUTPUT) && (path->bus != NULL)) {
-      copy_frames(path, path->bus, nframes);
-      limit(path, nframes);
-    }
+  if (path->type == KR_MXR_OUTPUT) {
+    clear_samples(path->samples, path->channels, nframes);
+    //sum_samples(path->samples, float **src, path->channels, nframes);
+    apply_effects(path, nframes);
+    limit_samples(path->samples, path->channels, nframes);
+    transport(path, nframes);
+    return 0;
   }
-  */
-  /* Push output */
-  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-    if ((path->state == KR_MXP_ACTIVE) && (path->type == KR_MXR_OUTPUT)) {
-      transport(path, nframes);
-    }
-  }
-  /* Compute metrics */
-  /*
-  compute_meters(mixer->..., nframes);
-  mixer->frames_since_peak_read += nframes;
-  if (mixer->frames_since_peak_read >= mixer->frames_per_peak_broadcast) {
-    mixer->frames_since_peak_read = 0;
-    while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-      if (path->state == KR_MXP_ACTIVE) {
-        //update_meter_readings(path);
-      }
-    }
-  }
-  */
-  /* Clear mixes for next cycle */
-  while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
-    if ((path->state == KR_MXP_ACTIVE) && (path->type == KR_MXR_BUS)) {
-      clear_frames(path, nframes);
-    }
-  }
+  return -1;
 }
 
 static void path_release(kr_mixer_path *path) {
@@ -379,7 +297,6 @@ static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {
 }
 
 int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch) {
-  int duration;
   if (path == NULL) return -1;
   return -2;
 }

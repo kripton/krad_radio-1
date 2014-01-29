@@ -70,7 +70,6 @@ static void xpdr_adapter_event_cb(kr_adapter_event_cb_arg *arg) {
   kr_transponder_path *path;
   kr_adapter_info info;
   int i;
-  uint32_t ret;
   xpdr = (kr_xpdr *)arg->user;
   /* Created / destroyed? or is that on transponder ? */
   if (arg->type == KR_ADAPTER_DISCONNECTED) {

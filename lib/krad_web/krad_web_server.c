@@ -145,11 +145,13 @@ int strmatch(char *string1, char *string2) {
   return 0;
 }
 
+#include "http.h"
+
 #include "setup.c"
 #include "socket.c"
 #include "stream.c"
-#include "http.c"
 #include "websocket.c"
+#include "http.c"
 /* #include "webrtc.c" */
 #include "file.c"
 
