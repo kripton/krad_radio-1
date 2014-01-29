@@ -30,6 +30,8 @@ struct kr_mixer_path {
   kr_mixer_path_type type;
   kr_mixer_channels channels;
   float *samples[KR_MXR_MAX_CHANNELS];
+  int nframes;
+  int sample_rate;
   mixer_path_state state;
   kr_mixer_path_audio_cb *audio_cb;
   void *audio_user;
@@ -43,8 +45,7 @@ struct kr_mixer_path {
 static void limit_samples(float **samples, int nc, int ns);
 static void clear_samples(float **dst, int nc, int ns);
 static void copy_samples(float **dst, float **src, int nc, int ns);
-static void transport(kr_mixer_path *path, int nframes);
-static void apply_effects(kr_mixer_path *path, int nframes);
+static void transport(kr_mixer_path *path);
 static void sum_samples(float **dst, float **src, int nc, int ns);
 static void update_state(kr_mixer *mixer);
 static void path_release(kr_mixer_path *path);
@@ -81,24 +82,19 @@ static void copy_samples(float **dst, float **src, int nc, int ns) {
   }
 }
 
-static void transport(kr_mixer_path *path, int ns) {
+static void transport(kr_mixer_path *path) {
   kr_mixer_path_audio_cb_arg cb_arg;
   cb_arg.audio.channels = path->channels;
-  cb_arg.audio.count = ns;
+  cb_arg.audio.count = path->nframes;
   //FIXME
   cb_arg.audio.rate = 48000;
   cb_arg.user = path->audio_user;
   path->audio_cb(&cb_arg);
   if (path->type == KR_MXR_INPUT) {
-    copy_samples(path->samples, cb_arg.audio.samples, path->channels, ns);
+    copy_samples(path->samples, cb_arg.audio.samples, path->channels, cb_arg.audio.count);
   } else {
-    copy_samples(cb_arg.audio.samples, path->samples, path->channels, ns);
+    copy_samples(cb_arg.audio.samples, path->samples, path->channels, cb_arg.audio.count);
   }
-}
-
-static void apply_effects(kr_mixer_path *port, int nframes) {
-  // FIXME hrm we count on thems being the same btw in them effects lookout
-  kr_sfx_process(port->sfx, port->samples, port->samples, nframes);
 }
 
 static void sum_samples(float **dst, float **src, int nc, int ns) {
@@ -132,7 +128,6 @@ static void update_state(kr_mixer *mixer) {
 static int kr_mixer_process_path(kr_mixer_path *path) {
   int i;
   int e;
-  int nframes;
   kr_mixer_path *input;
   kr_mixer *mixer;
   i = 0;
@@ -140,39 +135,38 @@ static int kr_mixer_process_path(kr_mixer_path *path) {
   if (path == NULL) return -1;
   mixer = path->mixer;
   update_state(mixer);
-  nframes = 32; /*TEMP */
   if (path->type == KR_MXR_SOURCE) {
-    transport(path, nframes);
-    apply_effects(path, nframes);
+    transport(path);
+    kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
     return 0;
   }
   /*
   if (path->type == KR_MXR_INPUT) {
-    //copy_samples(path->to->samples, path->from->samples, path->channels, nframes);
-    apply_effects(path, nframes);
+    //copy_samples(path->to->samples, path->from->samples, path->channels, path->nframes);
+    kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
     return 0;
   }
   */
   if (path->type == KR_MXR_BUS) {
-    clear_samples(path->samples, path->channels, nframes);
+    clear_samples(path->samples, path->channels, path->nframes);
     e = kr_graph_in_out_edges(mixer->graph, path->vertex, IN, user, 16);
     for (i = 0; i < e; i++) {
       input = (kr_mixer_path *)user[i];
-      sum_samples(path->samples, input->samples, path->channels, nframes);
+      sum_samples(path->samples, input->samples, path->channels, path->nframes);
     }
-    apply_effects(path, nframes);
+    kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
     return 0;
   }
   if (path->type == KR_MXR_OUTPUT) {
-    clear_samples(path->samples, path->channels, nframes);
+    clear_samples(path->samples, path->channels, path->nframes);
     e = kr_graph_in_out_edges(mixer->graph, path->vertex, IN, user, 16);
     for (i = 0; i < e; i++) {
       input = (kr_mixer_path *)user[i];
-      sum_samples(path->samples, input->samples, path->channels, nframes);
+      sum_samples(path->samples, input->samples, path->channels, path->nframes);
     }
-    apply_effects(path, nframes);
-    limit_samples(path->samples, path->channels, nframes);
-    transport(path, nframes);
+    kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
+    limit_samples(path->samples, path->channels, path->nframes);
+    transport(path);
     return 0;
   }
   return -1;
