@@ -29,8 +29,6 @@ typedef struct {
 struct kr_mixer_path {
   kr_mixer_path_type type;
   kr_mixer_channels channels;
-  kr_mixer_path *from;
-  kr_mixer_path *to;
   float *samples[KR_MXR_MAX_CHANNELS];
   mixer_path_state state;
   kr_mixer_path_audio_cb *audio_cb;
@@ -132,37 +130,46 @@ static void update_state(kr_mixer *mixer) {
 }
 
 static int kr_mixer_process_path(kr_mixer_path *path) {
-  //int i;
+  int i;
+  int e;
   int nframes;
-  //int bi;
+  kr_mixer_path *input;
   kr_mixer *mixer;
-  //kr_mixer_path *bus;
-  //i = 0;
-  //bi = 0;
+  i = 0;
+  void *user[16];
   if (path == NULL) return -1;
   mixer = path->mixer;
   update_state(mixer);
   nframes = 32; /*TEMP */
-
   if (path->type == KR_MXR_SOURCE) {
     transport(path, nframes);
     apply_effects(path, nframes);
     return 0;
   }
+  /*
   if (path->type == KR_MXR_INPUT) {
-    copy_samples(path->to->samples, path->from->samples, path->channels, nframes);
+    //copy_samples(path->to->samples, path->from->samples, path->channels, nframes);
     apply_effects(path, nframes);
     return 0;
   }
+  */
   if (path->type == KR_MXR_BUS) {
     clear_samples(path->samples, path->channels, nframes);
-    //sum_samples(path->samples, float **src, path->channels, nframes);
+    e = kr_graph_in_out_edges(mixer->graph, path->vertex, IN, user, 16);
+    for (i = 0; i < e; i++) {
+      input = (kr_mixer_path *)user[i];
+      sum_samples(path->samples, input->samples, path->channels, nframes);
+    }
     apply_effects(path, nframes);
     return 0;
   }
   if (path->type == KR_MXR_OUTPUT) {
     clear_samples(path->samples, path->channels, nframes);
-    //sum_samples(path->samples, float **src, path->channels, nframes);
+    e = kr_graph_in_out_edges(mixer->graph, path->vertex, IN, user, 16);
+    for (i = 0; i < e; i++) {
+      input = (kr_mixer_path *)user[i];
+      sum_samples(path->samples, input->samples, path->channels, nframes);
+    }
     apply_effects(path, nframes);
     limit_samples(path->samples, path->channels, nframes);
     transport(path, nframes);
