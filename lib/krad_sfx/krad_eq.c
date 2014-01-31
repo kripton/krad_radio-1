@@ -41,21 +41,17 @@ void kr_eq_band_set_hz(kr_eq *eq, int band_num, float hz, int duration,
 
 void kr_eq_process2(kr_eq *eq, float *input, float *output, int num_samples,
  int broadcast) {
-
   int b, s;
   int recompute;
   int recompute_default;
   void *ptr;
-
   ptr = NULL;
-
   if (eq->new_sample_rate != eq->sample_rate) {
     eq->sample_rate = eq->new_sample_rate;
     recompute_default = 1;
   } else {
     recompute_default = 0;
   }
-
   for (b = 0; b < KR_EQ_MAX_BANDS; b++) {
     //if ((kr_eq->band[b].db == 0.0f) && (!kr_eq->band[b].krad_easing_db.active)) {
     //  continue;
@@ -101,16 +97,12 @@ void kr_eq_set_sample_rate(kr_eq *eq, int sample_rate) {
 }
 
 kr_eq *kr_eq_create(int sample_rate) {
-
   int b;
   float hz;
   kr_eq *eq;
-
   eq = kr_allocz(1, sizeof(kr_eq));
-
   eq->new_sample_rate = sample_rate;
   eq->sample_rate = eq->new_sample_rate;
-
   hz = 30.0;
   for (b = 0; b < KR_EQ_MAX_BANDS; b++) {
     eq->band[b].db = 0.0f,

@@ -113,7 +113,6 @@ int path_render(kr_compositor_path *path, kr_image *dst, cairo_t *cr) {
     }
     return 0;
   }
-
 /*image = subimage(path_scratch_image, params);*/
   image = *dst;
   image.px = scratch;
@@ -133,11 +132,9 @@ int path_render(kr_compositor_path *path, kr_image *dst, cairo_t *cr) {
     printke("kr_image convert returned %d :/", ret);
     return -1;
   }
-
   cairo_save(cr);
   src = cairo_image_surface_create_for_data(image.px, CAIRO_FORMAT_ARGB32,
    image.w, image.h, image.pps[0]);
-
   if (path->info.controls.rotation != 0.0f) {
     cairo_translate (cr, path->info.controls.x, path->info.controls.y);
     cairo_translate(cr, (int)(image.w) / 2.0, (int)(image.h) / 2.0);
