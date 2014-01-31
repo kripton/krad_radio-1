@@ -1,5 +1,30 @@
 #include "krad_mixer_common_helpers.h"
 
+kr_mixer_path_info_member kr_mixer_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_mixer_path_info_type",len)) {
+    return KR_MIXER_PATH_INFO_TYPE;
+  }
+  if (!strncmp(string,"kr_mixer_path_info_channels",len)) {
+    return KR_MIXER_PATH_INFO_CHANNELS;
+  }
+  if (!strncmp(string,"kr_mixer_path_info_lowpass",len)) {
+    return KR_MIXER_PATH_INFO_LOWPASS;
+  }
+  if (!strncmp(string,"kr_mixer_path_info_highpass",len)) {
+    return KR_MIXER_PATH_INFO_HIGHPASS;
+  }
+  if (!strncmp(string,"kr_mixer_path_info_analog",len)) {
+    return KR_MIXER_PATH_INFO_ANALOG;
+  }
+  if (!strncmp(string,"kr_mixer_path_info_eq",len)) {
+    return KR_MIXER_PATH_INFO_EQ;
+  }
+  if (!strncmp(string,"kr_mixer_path_info_volume",len)) {
+    return KR_MIXER_PATH_INFO_VOLUME;
+  }
+  return -1;
+}
+
 int kr_mixer_channels_to_index(int val) {
   switch (val) {
     case NIL:
@@ -76,7 +101,6 @@ int kr_strto_kr_mixer_channels(char *string) {
   if (!strcmp(string,"eight")) {
     return EIGHT;
   }
-
   return -1;
 }
 
@@ -121,7 +145,6 @@ int kr_strto_kr_mixer_path_type(char *string) {
   if (!strcmp(string,"kr_mxr_output")) {
     return KR_MXR_OUTPUT;
   }
-
   return -1;
 }
 

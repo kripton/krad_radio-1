@@ -1,5 +1,59 @@
 #include "krad_jack_common_helpers.h"
 
+kr_jack_setup_info_member kr_jack_setup_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_jack_setup_info_client_name",len)) {
+    return KR_JACK_SETUP_INFO_CLIENT_NAME;
+  }
+  if (!strncmp(string,"kr_jack_setup_info_server_name",len)) {
+    return KR_JACK_SETUP_INFO_SERVER_NAME;
+  }
+  return -1;
+}
+
+kr_jack_info_member kr_jack_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_jack_info_client_name",len)) {
+    return KR_JACK_INFO_CLIENT_NAME;
+  }
+  if (!strncmp(string,"kr_jack_info_server_name",len)) {
+    return KR_JACK_INFO_SERVER_NAME;
+  }
+  if (!strncmp(string,"kr_jack_info_state",len)) {
+    return KR_JACK_INFO_STATE;
+  }
+  if (!strncmp(string,"kr_jack_info_inputs",len)) {
+    return KR_JACK_INFO_INPUTS;
+  }
+  if (!strncmp(string,"kr_jack_info_outputs",len)) {
+    return KR_JACK_INFO_OUTPUTS;
+  }
+  if (!strncmp(string,"kr_jack_info_sample_rate",len)) {
+    return KR_JACK_INFO_SAMPLE_RATE;
+  }
+  if (!strncmp(string,"kr_jack_info_period_size",len)) {
+    return KR_JACK_INFO_PERIOD_SIZE;
+  }
+  if (!strncmp(string,"kr_jack_info_xruns",len)) {
+    return KR_JACK_INFO_XRUNS;
+  }
+  if (!strncmp(string,"kr_jack_info_frames",len)) {
+    return KR_JACK_INFO_FRAMES;
+  }
+  return -1;
+}
+
+kr_jack_path_info_member kr_jack_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_jack_path_info_name",len)) {
+    return KR_JACK_PATH_INFO_NAME;
+  }
+  if (!strncmp(string,"kr_jack_path_info_channels",len)) {
+    return KR_JACK_PATH_INFO_CHANNELS;
+  }
+  if (!strncmp(string,"kr_jack_path_info_direction",len)) {
+    return KR_JACK_PATH_INFO_DIRECTION;
+  }
+  return -1;
+}
+
 int kr_jack_direction_to_index(int val) {
   switch (val) {
     case KR_JACK_INPUT:
@@ -27,7 +81,6 @@ int kr_strto_kr_jack_direction(char *string) {
   if (!strcmp(string,"kr_jack_output")) {
     return KR_JACK_OUTPUT;
   }
-
   return -1;
 }
 
@@ -58,7 +111,6 @@ int kr_strto_kr_jack_state(char *string) {
   if (!strcmp(string,"kr_jack_online")) {
     return KR_JACK_ONLINE;
   }
-
   return -1;
 }
 

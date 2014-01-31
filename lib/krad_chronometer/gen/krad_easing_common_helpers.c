@@ -69,7 +69,6 @@ int kr_strto_kr_easing(char *string) {
   if (!strcmp(string,"easeinoutelastic")) {
     return EASEINOUTELASTIC;
   }
-
   return -1;
 }
 

@@ -1,5 +1,34 @@
 #include "krad_v4l2_common_helpers.h"
 
+kr_v4l2_info_member kr_v4l2_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_v4l2_info_dev",len)) {
+    return KR_V4L2_INFO_DEV;
+  }
+  if (!strncmp(string,"kr_v4l2_info_priority",len)) {
+    return KR_V4L2_INFO_PRIORITY;
+  }
+  if (!strncmp(string,"kr_v4l2_info_state",len)) {
+    return KR_V4L2_INFO_STATE;
+  }
+  if (!strncmp(string,"kr_v4l2_info_mode",len)) {
+    return KR_V4L2_INFO_MODE;
+  }
+  return -1;
+}
+
+kr_v4l2_open_info_member kr_v4l2_open_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_v4l2_open_info_dev",len)) {
+    return KR_V4L2_OPEN_INFO_DEV;
+  }
+  if (!strncmp(string,"kr_v4l2_open_info_priority",len)) {
+    return KR_V4L2_OPEN_INFO_PRIORITY;
+  }
+  if (!strncmp(string,"kr_v4l2_open_info_mode",len)) {
+    return KR_V4L2_OPEN_INFO_MODE;
+  }
+  return -1;
+}
+
 int kr_v4l2_state_to_index(int val) {
   switch (val) {
     case KR_V4L2_VOID:
@@ -34,7 +63,6 @@ int kr_strto_kr_v4l2_state(char *string) {
   if (!strcmp(string,"kr_v4l2_capture")) {
     return KR_V4L2_CAPTURE;
   }
-
   return -1;
 }
 

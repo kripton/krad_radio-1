@@ -46,4 +46,6 @@ int kr_x11_info_random(struct kr_x11_info *st);
 int kr_x11_path_info_init(struct kr_x11_path_info *st);
 int kr_x11_path_info_valid(struct kr_x11_path_info *st);
 int kr_x11_path_info_random(struct kr_x11_path_info *st);
+kr_x11_info_member kr_x11_info_strto_member(char *string, int len);
+kr_x11_path_info_member kr_x11_path_info_strto_member(char *string, int len);
 #endif

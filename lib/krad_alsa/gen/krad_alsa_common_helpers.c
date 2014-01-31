@@ -1,5 +1,22 @@
 #include "krad_alsa_common_helpers.h"
 
+kr_alsa_info_member kr_alsa_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_alsa_info_card",len)) {
+    return KR_ALSA_INFO_CARD;
+  }
+  if (!strncmp(string,"kr_alsa_info_name",len)) {
+    return KR_ALSA_INFO_NAME;
+  }
+  return -1;
+}
+
+kr_alsa_path_info_member kr_alsa_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_alsa_path_info_card_num",len)) {
+    return KR_ALSA_PATH_INFO_CARD_NUM;
+  }
+  return -1;
+}
+
 int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patch) {
   const ptrdiff_t off[2] = { offsetof(struct kr_alsa_info, card), 
     offsetof(struct kr_alsa_info, name)

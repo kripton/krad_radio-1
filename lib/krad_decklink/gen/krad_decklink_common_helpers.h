@@ -46,4 +46,6 @@ int kr_decklink_info_random(struct kr_decklink_info *st);
 int kr_decklink_path_info_init(struct kr_decklink_path_info *st);
 int kr_decklink_path_info_valid(struct kr_decklink_path_info *st);
 int kr_decklink_path_info_random(struct kr_decklink_path_info *st);
+kr_decklink_info_member kr_decklink_info_strto_member(char *string, int len);
+kr_decklink_path_info_member kr_decklink_path_info_strto_member(char *string, int len);
 #endif

@@ -48,6 +48,8 @@ int kr_v4l2_info_random(struct kr_v4l2_info *st);
 int kr_v4l2_open_info_init(struct kr_v4l2_open_info *st);
 int kr_v4l2_open_info_valid(struct kr_v4l2_open_info *st);
 int kr_v4l2_open_info_random(struct kr_v4l2_open_info *st);
+kr_v4l2_info_member kr_v4l2_info_strto_member(char *string, int len);
+kr_v4l2_open_info_member kr_v4l2_open_info_strto_member(char *string, int len);
 int kr_v4l2_state_to_index(int val);
 int kr_strto_kr_v4l2_state(char *string);
 char *kr_strfr_kr_v4l2_state(int val);

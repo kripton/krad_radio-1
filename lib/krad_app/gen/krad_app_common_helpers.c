@@ -48,7 +48,6 @@ int kr_strto_kr_app_method(char *string) {
   if (!strcmp(string,"kr_delete")) {
     return KR_DELETE;
   }
-
   return -1;
 }
 

@@ -1,5 +1,90 @@
 #include "krad_compositor_common_helpers.h"
 
+kr_sprite_info_member kr_sprite_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_sprite_info_filename",len)) {
+    return KR_SPRITE_INFO_FILENAME;
+  }
+  if (!strncmp(string,"kr_sprite_info_rate",len)) {
+    return KR_SPRITE_INFO_RATE;
+  }
+  if (!strncmp(string,"kr_sprite_info_controls",len)) {
+    return KR_SPRITE_INFO_CONTROLS;
+  }
+  return -1;
+}
+
+kr_text_info_member kr_text_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_text_info_string",len)) {
+    return KR_TEXT_INFO_STRING;
+  }
+  if (!strncmp(string,"kr_text_info_font",len)) {
+    return KR_TEXT_INFO_FONT;
+  }
+  if (!strncmp(string,"kr_text_info_red",len)) {
+    return KR_TEXT_INFO_RED;
+  }
+  if (!strncmp(string,"kr_text_info_green",len)) {
+    return KR_TEXT_INFO_GREEN;
+  }
+  if (!strncmp(string,"kr_text_info_blue",len)) {
+    return KR_TEXT_INFO_BLUE;
+  }
+  if (!strncmp(string,"kr_text_info_controls",len)) {
+    return KR_TEXT_INFO_CONTROLS;
+  }
+  return -1;
+}
+
+kr_vector_info_member kr_vector_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_vector_info_type",len)) {
+    return KR_VECTOR_INFO_TYPE;
+  }
+  if (!strncmp(string,"kr_vector_info_red",len)) {
+    return KR_VECTOR_INFO_RED;
+  }
+  if (!strncmp(string,"kr_vector_info_green",len)) {
+    return KR_VECTOR_INFO_GREEN;
+  }
+  if (!strncmp(string,"kr_vector_info_blue",len)) {
+    return KR_VECTOR_INFO_BLUE;
+  }
+  if (!strncmp(string,"kr_vector_info_controls",len)) {
+    return KR_VECTOR_INFO_CONTROLS;
+  }
+  return -1;
+}
+
+kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_compositor_path_info_type",len)) {
+    return KR_COMPOSITOR_PATH_INFO_TYPE;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_width",len)) {
+    return KR_COMPOSITOR_PATH_INFO_WIDTH;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_height",len)) {
+    return KR_COMPOSITOR_PATH_INFO_HEIGHT;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_crop_x",len)) {
+    return KR_COMPOSITOR_PATH_INFO_CROP_X;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_crop_y",len)) {
+    return KR_COMPOSITOR_PATH_INFO_CROP_Y;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_crop_width",len)) {
+    return KR_COMPOSITOR_PATH_INFO_CROP_WIDTH;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_crop_height",len)) {
+    return KR_COMPOSITOR_PATH_INFO_CROP_HEIGHT;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_view",len)) {
+    return KR_COMPOSITOR_PATH_INFO_VIEW;
+  }
+  if (!strncmp(string,"kr_compositor_path_info_controls",len)) {
+    return KR_COMPOSITOR_PATH_INFO_CONTROLS;
+  }
+  return -1;
+}
+
 int kr_compositor_path_type_to_index(int val) {
   switch (val) {
     case KR_CMP_OUTPUT:
@@ -34,7 +119,6 @@ int kr_strto_kr_compositor_path_type(char *string) {
   if (!strcmp(string,"kr_cmp_bus")) {
     return KR_CMP_BUS;
   }
-
   return -1;
 }
 
@@ -79,7 +163,6 @@ int kr_strto_kr_compositor_subunit_type(char *string) {
   if (!strcmp(string,"kr_vector")) {
     return KR_VECTOR;
   }
-
   return -1;
 }
 
@@ -180,7 +263,6 @@ int kr_strto_kr_vector_type(char *string) {
   if (!strcmp(string,"shadow")) {
     return SHADOW;
   }
-
   return -1;
 }
 
@@ -372,7 +454,6 @@ int kr_strto_kr_compositor_control(char *string) {
   if (!strcmp(string,"kr_view_br_y")) {
     return KR_VIEW_BR_Y;
   }
-
   return -1;
 }
 

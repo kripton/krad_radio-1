@@ -41,4 +41,6 @@ int kr_alsa_info_random(struct kr_alsa_info *st);
 int kr_alsa_path_info_init(struct kr_alsa_path_info *st);
 int kr_alsa_path_info_valid(struct kr_alsa_path_info *st);
 int kr_alsa_path_info_random(struct kr_alsa_path_info *st);
+kr_alsa_info_member kr_alsa_info_strto_member(char *string, int len);
+kr_alsa_path_info_member kr_alsa_path_info_strto_member(char *string, int len);
 #endif

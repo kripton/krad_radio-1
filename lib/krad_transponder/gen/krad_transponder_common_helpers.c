@@ -1,5 +1,32 @@
 #include "krad_transponder_common_helpers.h"
 
+kr_transponder_info_member kr_transponder_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_transponder_info_active_paths",len)) {
+    return KR_TRANSPONDER_INFO_ACTIVE_PATHS;
+  }
+  return -1;
+}
+
+kr_transponder_path_io_info_member kr_transponder_path_io_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_transponder_path_io_info_type",len)) {
+    return KR_TRANSPONDER_PATH_IO_INFO_TYPE;
+  }
+  if (!strncmp(string,"kr_transponder_path_io_info_info",len)) {
+    return KR_TRANSPONDER_PATH_IO_INFO_INFO;
+  }
+  return -1;
+}
+
+kr_transponder_path_info_member kr_transponder_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_transponder_path_info_input",len)) {
+    return KR_TRANSPONDER_PATH_INFO_INPUT;
+  }
+  if (!strncmp(string,"kr_transponder_path_info_output",len)) {
+    return KR_TRANSPONDER_PATH_INFO_OUTPUT;
+  }
+  return -1;
+}
+
 int krad_link_av_mode_t_to_index(int val) {
   switch (val) {
     case AUDIO_ONLY:
@@ -34,7 +61,6 @@ int kr_strto_krad_link_av_mode_t(char *string) {
   if (!strcmp(string,"audio_and_video")) {
     return AUDIO_AND_VIDEO;
   }
-
   return -1;
 }
 
@@ -100,7 +126,6 @@ int kr_strto_kr_txpdr_su_type_t(char *string) {
   if (!strcmp(string,"failure")) {
     return FAILURE;
   }
-
   return -1;
 }
 
@@ -145,7 +170,6 @@ int kr_strto_krad_link_transport_mode_t(char *string) {
   if (!strcmp(string,"fail")) {
     return FAIL;
   }
-
   return -1;
 }
 
@@ -183,7 +207,6 @@ int kr_strto_kr_transponder_path_io_type(char *string) {
   if (!strcmp(string,"kr_xpdr_adapter")) {
     return KR_XPDR_ADAPTER;
   }
-
   return -1;
 }
 

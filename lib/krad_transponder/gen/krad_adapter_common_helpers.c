@@ -1,5 +1,31 @@
 #include "krad_adapter_common_helpers.h"
 
+kr_adapter_info_member kr_adapter_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_adapter_info_api",len)) {
+    return KR_ADAPTER_INFO_API;
+  }
+  if (!strncmp(string,"kr_adapter_info_api_info",len)) {
+    return KR_ADAPTER_INFO_API_INFO;
+  }
+  return -1;
+}
+
+kr_adapter_path_info_member kr_adapter_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_adapter_path_info_name",len)) {
+    return KR_ADAPTER_PATH_INFO_NAME;
+  }
+  if (!strncmp(string,"kr_adapter_path_info_dir",len)) {
+    return KR_ADAPTER_PATH_INFO_DIR;
+  }
+  if (!strncmp(string,"kr_adapter_path_info_api",len)) {
+    return KR_ADAPTER_PATH_INFO_API;
+  }
+  if (!strncmp(string,"kr_adapter_path_info_info",len)) {
+    return KR_ADAPTER_PATH_INFO_INFO;
+  }
+  return -1;
+}
+
 int kr_adapter_path_direction_to_index(int val) {
   switch (val) {
     case KR_ADP_PATH_INPUT:
@@ -27,7 +53,6 @@ int kr_strto_kr_adapter_path_direction(char *string) {
   if (!strcmp(string,"kr_adp_path_output")) {
     return KR_ADP_PATH_OUTPUT;
   }
-
   return -1;
 }
 
@@ -100,7 +125,6 @@ int kr_strto_kr_adapter_api(char *string) {
   if (!strcmp(string,"kr_adp_encoder")) {
     return KR_ADP_ENCODER;
   }
-
   return -1;
 }
 

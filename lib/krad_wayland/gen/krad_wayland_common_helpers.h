@@ -45,4 +45,6 @@ int kr_wayland_info_random(kr_wayland_info *st);
 int kr_wayland_path_info_init(kr_wayland_path_info *st);
 int kr_wayland_path_info_valid(kr_wayland_path_info *st);
 int kr_wayland_path_info_random(kr_wayland_path_info *st);
+kr_wayland_info_member kr_wayland_info_strto_member(char *string, int len);
+kr_wayland_path_info_member kr_wayland_path_info_strto_member(char *string, int len);
 #endif

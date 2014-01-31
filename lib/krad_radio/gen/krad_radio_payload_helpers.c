@@ -41,7 +41,6 @@ int kr_strto_kr_radio_payload_type(char *string) {
   if (!strcmp(string,"pl_kr_compositor_path_info")) {
     return PL_KR_COMPOSITOR_PATH_INFO;
   }
-
   return -1;
 }
 

@@ -50,6 +50,8 @@ int kr_adapter_info_random(struct kr_adapter_info *st);
 int kr_adapter_path_info_init(struct kr_adapter_path_info *st);
 int kr_adapter_path_info_valid(struct kr_adapter_path_info *st);
 int kr_adapter_path_info_random(struct kr_adapter_path_info *st);
+kr_adapter_info_member kr_adapter_info_strto_member(char *string, int len);
+kr_adapter_path_info_member kr_adapter_path_info_strto_member(char *string, int len);
 int kr_adapter_path_direction_to_index(int val);
 int kr_strto_kr_adapter_path_direction(char *string);
 char *kr_strfr_kr_adapter_path_direction(int val);

@@ -1,5 +1,37 @@
 #include "krad_x11_common_helpers.h"
 
+kr_x11_info_member kr_x11_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_x11_info_display",len)) {
+    return KR_X11_INFO_DISPLAY;
+  }
+  return -1;
+}
+
+kr_x11_path_info_member kr_x11_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"kr_x11_path_info_display",len)) {
+    return KR_X11_PATH_INFO_DISPLAY;
+  }
+  if (!strncmp(string,"kr_x11_path_info_width",len)) {
+    return KR_X11_PATH_INFO_WIDTH;
+  }
+  if (!strncmp(string,"kr_x11_path_info_height",len)) {
+    return KR_X11_PATH_INFO_HEIGHT;
+  }
+  if (!strncmp(string,"kr_x11_path_info_num",len)) {
+    return KR_X11_PATH_INFO_NUM;
+  }
+  if (!strncmp(string,"kr_x11_path_info_den",len)) {
+    return KR_X11_PATH_INFO_DEN;
+  }
+  if (!strncmp(string,"kr_x11_path_info_x",len)) {
+    return KR_X11_PATH_INFO_X;
+  }
+  if (!strncmp(string,"kr_x11_path_info_y",len)) {
+    return KR_X11_PATH_INFO_Y;
+  }
+  return -1;
+}
+
 int kr_x11_info_patch_apply(struct kr_x11_info *info, kr_x11_info_patch *patch) {
   const ptrdiff_t off[1] = { offsetof(struct kr_x11_info, display)
   };

@@ -111,7 +111,6 @@ int kr_strto_krad_codec_t(char *string) {
   if (!strcmp(string,"vorbis")) {
     return VORBIS;
   }
-
   return -1;
 }
 
@@ -170,7 +169,6 @@ int kr_strto_krad_container_type_t(char *string) {
   if (!strcmp(string,"kudp")) {
     return KUDP;
   }
-
   return -1;
 }
 

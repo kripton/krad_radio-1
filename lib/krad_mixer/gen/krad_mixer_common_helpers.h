@@ -36,6 +36,7 @@ int kr_mixer_path_info_random(struct kr_mixer_path_info *st);
 int kr_mixer_path_patch_init(struct kr_mixer_path_patch *st);
 int kr_mixer_path_patch_valid(struct kr_mixer_path_patch *st);
 int kr_mixer_path_patch_random(struct kr_mixer_path_patch *st);
+kr_mixer_path_info_member kr_mixer_path_info_strto_member(char *string, int len);
 int kr_mixer_channels_to_index(int val);
 int kr_strto_kr_mixer_channels(char *string);
 char *kr_strfr_kr_mixer_channels(int val);

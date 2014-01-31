@@ -400,11 +400,34 @@ static void codegen_patch_func(struct_data *def,
   fprintf(out,"  return 0;\n}\n\n");
 }
 
+static void codegen_patch_enum_protos(struct_data *defs, int ndefs, 
+  char *prefix, char *suffix, FILE *out) {
+  int i;
+  int n;
+  struct_data *filtered_defs[ndefs];
+
+  for (i = n = 0; i < ndefs; i++) {
+    if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
+      if (defs[i].info.type == ST_STRUCT) {
+         filtered_defs[n] = &defs[i];
+         n++;
+      }
+    }
+  }
+
+  for (i=0;i<n;i++) {
+    fprintf(out,"%s_member %s_strto_member(char *string, int len);\n",
+      filtered_defs[i]->info.name,filtered_defs[i]->info.name);
+  }
+}
+
 static void codegen_enum_protos(struct_data *defs, int ndefs, 
   char *prefix, char *suffix, FILE *out) {
   int i;
   int n;
   struct_data *filtered_defs[ndefs];
+
+  codegen_patch_enum_protos(defs,ndefs,prefix,"_info",out);
 
   for (i = n = 0; i < ndefs; i++) {
     if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
@@ -541,7 +564,8 @@ static void codegen_enum_to_index(struct_data *def, FILE *out) {
   int i;
 
   for (i = 0; i < def->info.member_count; i++) {
-    fprintf(out,"    case %s:\n      return %d;\n",def->info.members[i].name,i);
+    fprintf(out,"    case %s:\n      return %d;\n",
+      def->info.members[i].name,i);
   }
 
   return;
@@ -553,7 +577,8 @@ static void codegen_strfr_enum(struct_data *def, FILE *out) {
   for (i = 0; i < def->info.member_count; i++) {
     char lowercased[strlen(def->info.members[i].name)+1];
     lowercase(def->info.members[i].name,lowercased);
-    fprintf(out,"    case %s:\n      return \"%s\";\n",def->info.members[i].name,lowercased);
+    fprintf(out,"    case %s:\n      return \"%s\";\n",
+      def->info.members[i].name,lowercased);
   }
 
   return;
@@ -565,10 +590,50 @@ static void codegen_strto_enum(struct_data *def, FILE *out) {
   for (i = 0; i < def->info.member_count; i++) {
     char lowercased[strlen(def->info.members[i].name)+1];
     lowercase(def->info.members[i].name,lowercased);
-    fprintf(out,"  if (!strcmp(string,\"%s\")) {\n    return %s;\n  }\n",lowercased,def->info.members[i].name);
+    fprintf(out,"  if (!strcmp(string,\"%s\")) {\n    return %s;\n  }\n",
+      lowercased,def->info.members[i].name);
   }
 
   return;
+}
+
+static void codegen_patch_strto_enum(struct_data *def, FILE *out) {
+  int i;
+  char upp[NAME_MAX_LEN];
+  char str[NAME_MAX_LEN];
+
+  for (i = 0; i < def->info.member_count; i++) {
+    snprintf(str,NAME_MAX_LEN,"%s_%s",
+      def->info.name,def->info.members[i].name);
+    uppercase(str,upp);
+    fprintf(out,"  if (!strncmp(string,\"%s\",len)) {\n    return %s;\n  }\n",
+      str,upp);
+  }
+
+  return;
+}
+
+static void codegen_patch_enum_util_functions(struct_data *defs, int ndefs, 
+  char *prefix, char *suffix, FILE *out) {
+  int i;
+  int n;
+  struct_data *filtered_defs[ndefs];
+
+  for (i = n = 0; i < ndefs; i++) {
+    if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
+      if (defs[i].info.type == ST_STRUCT) {
+         filtered_defs[n] = &defs[i];
+         n++;
+      }
+    }
+  }
+
+  for (i=0;i<n;i++) {
+    fprintf(out,"%s_member %s_strto_member(char *string, int len) {\n",
+      filtered_defs[i]->info.name,filtered_defs[i]->info.name);
+    codegen_patch_strto_enum(filtered_defs[i],out);
+    fprintf(out,"  return -1;\n}\n\n");
+  }
 }
 
 int codegen_enum_util_functions(struct_data *defs, int ndefs, 
@@ -577,6 +642,8 @@ int codegen_enum_util_functions(struct_data *defs, int ndefs,
   int i;
   int n;
   struct_data *filtered_defs[ndefs];
+
+  codegen_patch_enum_util_functions(defs,ndefs,prefix,"_info",out);
 
   for (i = n = 0; i < ndefs; i++) {
     if (is_prefix(defs[i].info.name,prefix) && is_suffix(defs[i].info.name,suffix)) {
@@ -598,7 +665,7 @@ int codegen_enum_util_functions(struct_data *defs, int ndefs,
     
     fprintf(out,"int kr_strto_%s(char *string) {\n",filtered_defs[i]->info.name);
     codegen_strto_enum(filtered_defs[i],out);
-    fprintf(out,"\n  return -1;\n}\n\n");
+    fprintf(out,"  return -1;\n}\n\n");
 
   }
 
