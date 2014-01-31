@@ -14,13 +14,6 @@
 #include "krad_sfx_common.h"
 #include "krad_easing_common.h"
 
-#include "gen/krad_mixer_common_to_json.h"
-#include "gen/krad_mixer_common_from_json.h"
-#include "gen/krad_mixer_common_to_ebml.h"
-#include "gen/krad_mixer_common_from_ebml.h"
-#include "gen/krad_mixer_common_to_text.h"
-#include "gen/krad_mixer_common_helpers.h"
-
 typedef struct kr_mixer_path_info kr_mixer_path_info;
 typedef struct kr_mixer_path_info kr_mixer_source_info;
 typedef struct kr_mixer_path_info kr_mixer_input_info;
@@ -46,6 +39,13 @@ typedef enum {
   KR_MXR_BUS,
   KR_MXR_OUTPUT
 } kr_mixer_path_type;
+
+#include "gen/krad_mixer_common_to_json.h"
+#include "gen/krad_mixer_common_from_json.h"
+#include "gen/krad_mixer_common_to_ebml.h"
+#include "gen/krad_mixer_common_from_ebml.h"
+#include "gen/krad_mixer_common_to_text.h"
+#include "gen/krad_mixer_common_helpers.h"
 
 struct kr_mixer_path_info {
   kr_mixer_path_type type;

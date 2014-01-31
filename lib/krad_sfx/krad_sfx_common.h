@@ -1,18 +1,9 @@
 #ifndef KRAD_SFX_COMMON_H
 #define KRAD_SFX_COMMON_H
 
-#include <string.h>
-
 #define KR_SFX_MAX 6
 #define KR_SFX_MAX_CHANNELS 8
 #define KR_EQ_MAX_BANDS 32
-
-#include "gen/krad_sfx_common_to_json.h"
-#include "gen/krad_sfx_common_from_json.h"
-#include "gen/krad_sfx_common_to_ebml.h"
-#include "gen/krad_sfx_common_from_ebml.h"
-#include "gen/krad_sfx_common_to_text.h"
-#include "gen/krad_sfx_common_helpers.h"
 
 typedef enum {
   KR_SFX_EFFECT_ADD,
@@ -49,6 +40,13 @@ typedef struct kr_lowpass_info kr_lowpass_info;
 typedef struct kr_highpass_info kr_highpass_info;
 typedef struct kr_analog_info kr_analog_info;
 typedef struct kr_volume_info kr_volume_info;
+
+#include "gen/krad_sfx_common_to_json.h"
+#include "gen/krad_sfx_common_from_json.h"
+#include "gen/krad_sfx_common_to_ebml.h"
+#include "gen/krad_sfx_common_from_ebml.h"
+#include "gen/krad_sfx_common_to_text.h"
+#include "gen/krad_sfx_common_helpers.h"
 
 struct kr_eq_band_info {
   float db;

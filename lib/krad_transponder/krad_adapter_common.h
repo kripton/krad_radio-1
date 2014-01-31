@@ -46,6 +46,13 @@ typedef union {
   kr_alsa_path_info alsa;
 } kr_adapter_api_path_info;
 
+#include "gen/krad_adapter_common_to_ebml.h"
+#include "gen/krad_adapter_common_from_ebml.h"
+#include "gen/krad_adapter_common_to_text.h"
+#include "gen/krad_adapter_common_to_json.h"
+#include "gen/krad_adapter_common_from_json.h"
+#include "gen/krad_adapter_common_helpers.h"
+
 struct kr_adapter_info {
   kr_adapter_api api;
   kr_adapter_api_info api_info;
@@ -57,12 +64,5 @@ struct kr_adapter_path_info {
   kr_adapter_api api;
   kr_adapter_api_path_info info;
 };
-
-#include "gen/krad_adapter_common_to_ebml.h"
-#include "gen/krad_adapter_common_from_ebml.h"
-#include "gen/krad_adapter_common_to_text.h"
-#include "gen/krad_adapter_common_to_json.h"
-#include "gen/krad_adapter_common_from_json.h"
-#include "gen/krad_adapter_common_helpers.h"
 
 #endif
