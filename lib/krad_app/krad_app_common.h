@@ -7,13 +7,6 @@
 #define KR_EID_PAYLOAD 0xB9
 #define KR_EID_TERMINATOR 0xE2
 
-#include "gen/krad_app_common_to_ebml.h"
-#include "gen/krad_app_common_from_ebml.h"
-#include "gen/krad_app_common_to_json.h"
-#include "gen/krad_app_common_from_json.h"
-#include "gen/krad_app_common_to_text.h"
-#include "gen/krad_app_common_helpers.h"
-
 /* here is were we link our payload */
 #include "krad_radio_payload.h"
 
@@ -35,5 +28,12 @@ struct kr_crate2 {
   kr_radio_payload_type payload_type;
   kr_radio_payload payload;
 };
+
+#include "gen/krad_app_common_to_ebml.h"
+#include "gen/krad_app_common_from_ebml.h"
+#include "gen/krad_app_common_to_json.h"
+#include "gen/krad_app_common_from_json.h"
+#include "gen/krad_app_common_to_text.h"
+#include "gen/krad_app_common_helpers.h"
 
 #endif

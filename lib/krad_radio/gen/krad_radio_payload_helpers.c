@@ -45,7 +45,7 @@ int kr_strto_kr_radio_payload_type(char *string) {
   return -1;
 }
 
-int kr_nil_init(void *st) {
+int kr_nil_init(struct kr_nil *st) {
   if (st == NULL) {
     return -1;
   }
@@ -54,7 +54,7 @@ int kr_nil_init(void *st) {
   return 0;
 }
 
-int kr_nil_valid(void *st) {
+int kr_nil_valid(struct kr_nil *st) {
   if (st == NULL) {
     return -1;
   }
@@ -63,7 +63,7 @@ int kr_nil_valid(void *st) {
   return 0;
 }
 
-int kr_nil_random(void *st) {
+int kr_nil_random(struct kr_nil *st) {
   if (st == NULL) {
     return -1;
   }
@@ -72,30 +72,27 @@ int kr_nil_random(void *st) {
   return 0;
 }
 
-int kr_radio_payload_init(void *st, int idx) {
-  kr_radio_payload *actual;
-
+int kr_radio_payload_init(kr_radio_payload *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_radio_payload *)st;
-  memset(actual, 0, sizeof(kr_radio_payload));
+  memset(st, 0, sizeof(kr_radio_payload));
   switch (idx) {
     case 0: {
-      kr_nil_init(&actual->nil);
+      kr_nil_init(&st->nil);
       break;
     }
     case 1: {
-      kr_transponder_path_info_init(&actual->transponder_path_info);
+      kr_transponder_path_info_init(&st->transponder_path_info);
       break;
     }
     case 2: {
-      kr_mixer_path_info_init(&actual->mixer_path_info);
+      kr_mixer_path_info_init(&st->mixer_path_info);
       break;
     }
     case 3: {
-      kr_compositor_path_info_init(&actual->compositor_path_info);
+      kr_compositor_path_info_init(&st->compositor_path_info);
       break;
     }
   }
@@ -104,29 +101,26 @@ int kr_radio_payload_init(void *st, int idx) {
   return -1;
 }
 
-int kr_radio_payload_valid(void *st, int idx) {
-  kr_radio_payload *actual;
-
+int kr_radio_payload_valid(kr_radio_payload *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_radio_payload *)st;
   switch (idx) {
     case 0: {
-      kr_nil_valid(&actual->nil);
+      kr_nil_valid(&st->nil);
       break;
     }
     case 1: {
-      kr_transponder_path_info_valid(&actual->transponder_path_info);
+      kr_transponder_path_info_valid(&st->transponder_path_info);
       break;
     }
     case 2: {
-      kr_mixer_path_info_valid(&actual->mixer_path_info);
+      kr_mixer_path_info_valid(&st->mixer_path_info);
       break;
     }
     case 3: {
-      kr_compositor_path_info_valid(&actual->compositor_path_info);
+      kr_compositor_path_info_valid(&st->compositor_path_info);
       break;
     }
   }
@@ -135,30 +129,27 @@ int kr_radio_payload_valid(void *st, int idx) {
   return -1;
 }
 
-int kr_radio_payload_random(void *st, int idx) {
-  kr_radio_payload *actual;
-
+int kr_radio_payload_random(kr_radio_payload *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_radio_payload *)st;
-  memset(actual, 0, sizeof(kr_radio_payload));
+  memset(st, 0, sizeof(kr_radio_payload));
   switch (idx) {
     case 0: {
-      kr_nil_random(&actual->nil);
+      kr_nil_random(&st->nil);
       break;
     }
     case 1: {
-      kr_transponder_path_info_random(&actual->transponder_path_info);
+      kr_transponder_path_info_random(&st->transponder_path_info);
       break;
     }
     case 2: {
-      kr_mixer_path_info_random(&actual->mixer_path_info);
+      kr_mixer_path_info_random(&st->mixer_path_info);
       break;
     }
     case 3: {
-      kr_compositor_path_info_random(&actual->compositor_path_info);
+      kr_compositor_path_info_random(&st->compositor_path_info);
       break;
     }
   }

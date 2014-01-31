@@ -2,11 +2,21 @@
 
 static void codegen_helpers_prototype(struct_data *sdata, char *helper_type, FILE *out) {
   if (sdata->info.type == ST_UNION) {
-    fprintf(out,"int %s_%s(void *st, int idx)",
-      sdata->info.name,helper_type);
+    if (sdata->info.is_typedef) {
+      fprintf(out,"int %s_%s(%s *st, int idx)",
+        sdata->info.name,helper_type,sdata->info.name);
+    } else {
+      fprintf(out,"int %s_%s(union %s *st, int idx)",
+        sdata->info.name,helper_type,sdata->info.name);
+    }
   } else {
-    fprintf(out,"int %s_%s(void *st)",
-      sdata->info.name,helper_type);
+    if (sdata->info.is_typedef) {
+      fprintf(out,"int %s_%s(%s *st)",
+        sdata->info.name,helper_type,sdata->info.name);
+    } else {
+      fprintf(out,"int %s_%s(struct %s *st)",
+        sdata->info.name,helper_type,sdata->info.name);
+    }
   }
 }
 
@@ -27,7 +37,7 @@ static void codegen_helpers_union_content_from_type(struct_data *def,
   for (i = 0; i < def->info.member_count; i++) {
     if (memb_struct_check(&def->info.members[i])) {
       fprintf(out,"    case %d: {\n",i);
-      fprintf(out,"      %s_%s(&actual->%s);\n",
+      fprintf(out,"      %s_%s(&st->%s);\n",
         def->info.members[i].type_info.substruct_info.type_name,
         fun_name,def->info.members[i].name);
       fprintf(out,"      break;\n    }\n");
@@ -49,32 +59,32 @@ static void codegen_helper_init(member_info *memb, int i,
       break;
     }
     case T_INT32: {
-      fprintf(out,"%s  actual->%s%s = %d;\n",
+      fprintf(out,"%s  st->%s%s = %d;\n",
         indent,memb->name,arr,memb->type_info.int32_info.init);
       break;
     }
     case T_INT64: {
-      fprintf(out,"%s  actual->%s%s = %" PRId64 ";\n",
+      fprintf(out,"%s  st->%s%s = %" PRId64 ";\n",
         indent,memb->name,arr,memb->type_info.int64_info.init);
       break;
     }
     case T_UINT32: {
-      fprintf(out,"%s  actual->%s%s = %u;\n",
+      fprintf(out,"%s  st->%s%s = %u;\n",
         indent,memb->name,arr,memb->type_info.uint32_info.init);
       break;
     }
     case T_UINT64: {
-      fprintf(out,"%s  actual->%s%s = %" PRIu64 ";\n",
+      fprintf(out,"%s  st->%s%s = %" PRIu64 ";\n",
         indent,memb->name,arr,memb->type_info.uint64_info.init);
       break;
     }
     case T_FLOAT: {
-      fprintf(out,"%s  actual->%s%s = %0.2f;\n",
+      fprintf(out,"%s  st->%s%s = %0.2f;\n",
         indent,memb->name,arr,memb->type_info.float_info.init);
       break;
     }
     case T_DOUBLE: {
-      fprintf(out,"%s  actual->%s%s = %0.2f;\n",
+      fprintf(out,"%s  st->%s%s = %0.2f;\n",
         indent,memb->name,arr,memb->type_info.double_info.init);
       break;
     }
@@ -91,8 +101,8 @@ static void codegen_helper_random(member_info *memb, int i,
     case T_CHAR: {
       if (memb->arr) {
         fprintf(out,"    scale = (double)%d / RAND_MAX;\n",abs(97-122)); /* downcased ascii letters only */
-        fprintf(out,"    actual->%s[i] = %d + floor(rand() * scale);\n",memb->name,97);
-        fprintf(out,"    if (i == %d) {\n      actual->%s[%d] = '\\0';\n    }\n",
+        fprintf(out,"    st->%s[i] = %d + floor(rand() * scale);\n",memb->name,97);
+        fprintf(out,"    if (i == %d) {\n      st->%s[%d] = '\\0';\n    }\n",
           memb->type_info.char_info.max,memb->name,memb->type_info.char_info.max);
       }
       break;
@@ -100,42 +110,42 @@ static void codegen_helper_random(member_info *memb, int i,
     case T_INT32: {
       fprintf(out,"%s  scale = (double)%d / RAND_MAX;\n",indent,
         abs(memb->type_info.int32_info.min-memb->type_info.int32_info.max));
-      fprintf(out,"%s  actual->%s%s = %d + floor(rand() * scale);\n",
+      fprintf(out,"%s  st->%s%s = %d + floor(rand() * scale);\n",
         indent,memb->name,arr,memb->type_info.int32_info.min);
       break;
     }
     case T_INT64: {
       fprintf(out,"%s  scale = (double)%" PRId64 " / RAND_MAX;\n",indent,
         labs(memb->type_info.int64_info.min-memb->type_info.int64_info.max));
-      fprintf(out,"%s  actual->%s%s = %" PRId64 " + floor(rand() * scale);\n",
+      fprintf(out,"%s  st->%s%s = %" PRId64 " + floor(rand() * scale);\n",
         indent,memb->name,arr,memb->type_info.int64_info.min);
       break;
     }
     case T_UINT32: {
       fprintf(out,"%s  scale = (double)%u / RAND_MAX;\n",indent,
         abs(memb->type_info.uint32_info.min-memb->type_info.uint32_info.max));
-      fprintf(out,"%s  actual->%s%s = %u + floor(rand() * scale);\n",
+      fprintf(out,"%s  st->%s%s = %u + floor(rand() * scale);\n",
         indent,memb->name,arr,memb->type_info.uint32_info.min);
       break;
     }
     case T_UINT64: {
       fprintf(out,"%s  scale = (double)%" PRIu64 " / RAND_MAX;\n",indent,
         labs(memb->type_info.uint64_info.min-memb->type_info.uint64_info.max));
-      fprintf(out,"%s  actual->%s%s = %" PRIu64 " + floor(rand() * scale);\n",
+      fprintf(out,"%s  st->%s%s = %" PRIu64 " + floor(rand() * scale);\n",
         indent,memb->name,arr,memb->type_info.uint64_info.min);
       break;
     }
     case T_FLOAT: {
       fprintf(out,"%s  scale = (double)%0.2f / RAND_MAX;\n",indent,
         fabs(memb->type_info.float_info.min-memb->type_info.float_info.max));
-      fprintf(out,"%s  actual->%s%s = %0.2f + floor(rand() * scale);\n",
+      fprintf(out,"%s  st->%s%s = %0.2f + floor(rand() * scale);\n",
         indent,memb->name,arr,memb->type_info.float_info.min);
       break;
     }
     case T_DOUBLE: {
       fprintf(out,"%s  scale = (double)%0.2f / RAND_MAX;\n",indent,
         fabs(memb->type_info.double_info.min-memb->type_info.double_info.max));
-      fprintf(out,"%s  actual->%s%s = %0.2f + floor(rand() * scale);\n",
+      fprintf(out,"%s  st->%s%s = %0.2f + floor(rand() * scale);\n",
         indent,memb->name,arr,memb->type_info.double_info.min);
       break;
     }
@@ -152,43 +162,43 @@ static void codegen_helper_valid(member_info *memb, int i,
   switch (memb->type) {
     case T_CHAR: {
       if (memb->arr) {
-        fprintf(out,"    if (!actual->%s%s) {\n      break;\n    }\n    if (i == %d && actual->%s%s) {\n      return %d;\n    }\n",
+        fprintf(out,"    if (!st->%s%s) {\n      break;\n    }\n    if (i == %d && st->%s%s) {\n      return %d;\n    }\n",
           memb->name,arr,memb->type_info.char_info.max,memb->name,arr,(i + 2) * -1);
       }
       break;
     }
     case T_INT32: {
-      fprintf(out,"%s  if ( (actual->%s%s < %d) || (actual->%s%s > %d) ) {\n%s    return %d;\n  %s}\n\n",
+      fprintf(out,"%s  if ( (st->%s%s < %d) || (st->%s%s > %d) ) {\n%s    return %d;\n  %s}\n\n",
         indent,memb->name,arr,memb->type_info.int32_info.min,
         memb->name,arr,memb->type_info.int32_info.max,indent,(i + 2) * -1,indent);
       break;
     }
     case T_INT64: {
-      fprintf(out,"%s  if ( (actual->%s%s < %" PRId64 ") || (actual->%s%s > %" PRId64 ") ) {\n%s    return %d;\n  %s}\n\n",
+      fprintf(out,"%s  if ( (st->%s%s < %" PRId64 ") || (st->%s%s > %" PRId64 ") ) {\n%s    return %d;\n  %s}\n\n",
         indent,memb->name,arr,memb->type_info.int64_info.min,
         memb->name,arr,memb->type_info.int64_info.max,indent,(i + 2) * -1,indent);
       break;
     }
     case T_UINT32: {
-      fprintf(out,"%s  if ( (actual->%s%s < %u) || (actual->%s%s > %u) ) {\n%s    return %d;\n  %s}\n\n",
+      fprintf(out,"%s  if ( (st->%s%s < %u) || (st->%s%s > %u) ) {\n%s    return %d;\n  %s}\n\n",
         indent,memb->name,arr,memb->type_info.uint32_info.min,
         memb->name,arr,memb->type_info.uint32_info.max,indent,(i + 2) * -1,indent);
       break;
     }
     case T_UINT64: {
-      fprintf(out,"%s  if ( (actual->%s%s < %" PRIu64 ") || (actual->%s%s > %" PRIu64 ") ) {\n%s    return %d;\n  %s}\n\n",
+      fprintf(out,"%s  if ( (st->%s%s < %" PRIu64 ") || (st->%s%s > %" PRIu64 ") ) {\n%s    return %d;\n  %s}\n\n",
         indent,memb->name,arr,memb->type_info.uint64_info.min,
         memb->name,arr,memb->type_info.uint64_info.max,indent,(i + 2) * -1,indent);
       break;
     }
     case T_FLOAT: {
-     fprintf(out,"%s  if ( (actual->%s%s < %0.2f) || (actual->%s%s > %0.2f) ) {\n%s    return %d;\n  %s}\n\n",
+     fprintf(out,"%s  if ( (st->%s%s < %0.2f) || (st->%s%s > %0.2f) ) {\n%s    return %d;\n  %s}\n\n",
       indent,memb->name,arr,memb->type_info.float_info.min,
       memb->name,arr,memb->type_info.float_info.max,indent,(i + 2) * -1,indent);
      break;
     }
     case T_DOUBLE: {
-     fprintf(out,"%s  if ( (actual->%s%s < %0.2f) || (actual->%s%s > %0.2f) ) {\n%s    return %d;\n  %s}\n\n",
+     fprintf(out,"%s  if ( (st->%s%s < %0.2f) || (st->%s%s > %0.2f) ) {\n%s    return %d;\n  %s}\n\n",
       indent,memb->name,arr,memb->type_info.double_info.min,
       memb->name,arr,memb->type_info.double_info.max,indent,(i + 2) * -1,indent);
      break;
@@ -232,14 +242,6 @@ static void codegen_helper_func(struct_data *def,
     }
   }
 
-  if (!isnull) {
-    if (def->info.is_typedef) {      
-      fprintf(out,"  %s *actual;\n\n",def->info.name);
-    } else {
-      fprintf(out,"  struct %s *actual;\n\n",def->info.name);
-    }
-  }
-
   for (i = 0; i < def->info.member_count; i++) {
     if ((def->info.members[i].arr || def->info.members[i].len_def[0])) {
       if (htype == H_INIT) {
@@ -268,13 +270,11 @@ static void codegen_helper_func(struct_data *def,
 
   if (!isnull) {
     if (def->info.is_typedef) {
-      fprintf(out,"  actual = (%s *)st;\n",def->info.name);
       if (htype != H_VALID)
-        fprintf(out,"  memset(actual, 0, sizeof(%s));\n",def->info.name);
+        fprintf(out,"  memset(st, 0, sizeof(%s));\n",def->info.name);
     } else {
-      fprintf(out,"  actual = (struct %s *)st;\n",def->info.name);
       if (htype != H_VALID)
-        fprintf(out,"  memset(actual, 0, sizeof(struct %s));\n",def->info.name);
+        fprintf(out,"  memset(st, 0, sizeof(struct %s));\n",def->info.name);
     }
   }
 
@@ -301,7 +301,7 @@ static void codegen_helper_func(struct_data *def,
     if (htype == H_VALID) {
       if (memb->type == T_CHAR) {
         if (memb->arr && memb->type_info.char_info.notnull) {
-          fprintf(out,"  if (!actual->%s[0]) {\n    return %d;\n  }\n\n",memb->name,(i + 2) * -1);
+          fprintf(out,"  if (!st->%s[0]) {\n    return %d;\n  }\n\n",memb->name,(i + 2) * -1);
         }
       }
     }
@@ -330,12 +330,12 @@ static void codegen_helper_func(struct_data *def,
     } else {
       if (memb_struct_check(memb) && codegen_is_union(memb->type_info.substruct_info.type_name)) {
         if ((i > 0) && memb_struct_check(&def->info.members[i-1])) {
-          fprintf(out,"%s  %s_%s(&actual->%s%s,%s_to_index(actual->%s));\n",
+          fprintf(out,"%s  %s_%s(&st->%s%s,%s_to_index(st->%s));\n",
             indent,memb->type_info.substruct_info.type_name,type,memb->name,arr,
             def->info.members[i-1].type_info.substruct_info.type_name,def->info.members[i-1].name);
         }
       } else if (!codegen_is_enum(memb->type_info.substruct_info.type_name)) {
-        fprintf(out,"%s  %s_%s(&actual->%s%s);\n",
+        fprintf(out,"%s  %s_%s(&st->%s%s);\n",
           indent,memb->type_info.substruct_info.type_name,type,memb->name,arr);
       }
     }

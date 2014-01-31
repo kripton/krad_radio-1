@@ -101,42 +101,36 @@ int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_pat
   return 0;
 }
 
-int kr_jack_setup_info_init(void *st) {
-  kr_jack_setup_info *actual;
-
+int kr_jack_setup_info_init(kr_jack_setup_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_jack_setup_info *)st;
-  memset(actual, 0, sizeof(kr_jack_setup_info));
+  memset(st, 0, sizeof(kr_jack_setup_info));
 
   return 0;
 }
 
-int kr_jack_setup_info_valid(void *st) {
-  kr_jack_setup_info *actual;
-
+int kr_jack_setup_info_valid(kr_jack_setup_info *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_jack_setup_info *)st;
   for (i = 0; i < 64; i++) {
-    if (!actual->client_name[i]) {
+    if (!st->client_name[i]) {
       break;
     }
-    if (i == 63 && actual->client_name[i]) {
+    if (i == 63 && st->client_name[i]) {
       return -2;
     }
   }
   for (i = 0; i < 64; i++) {
-    if (!actual->server_name[i]) {
+    if (!st->server_name[i]) {
       break;
     }
-    if (i == 63 && actual->server_name[i]) {
+    if (i == 63 && st->server_name[i]) {
       return -3;
     }
   }
@@ -144,9 +138,7 @@ int kr_jack_setup_info_valid(void *st) {
   return 0;
 }
 
-int kr_jack_setup_info_random(void *st) {
-  kr_jack_setup_info *actual;
-
+int kr_jack_setup_info_random(kr_jack_setup_info *st) {
   int i;
 
   struct timeval tv;
@@ -159,62 +151,55 @@ int kr_jack_setup_info_random(void *st) {
     return -1;
   }
 
-  actual = (kr_jack_setup_info *)st;
-  memset(actual, 0, sizeof(kr_jack_setup_info));
+  memset(st, 0, sizeof(kr_jack_setup_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->client_name[i] = 97 + floor(rand() * scale);
+    st->client_name[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->client_name[63] = '\0';
+      st->client_name[63] = '\0';
     }
   }
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->server_name[i] = 97 + floor(rand() * scale);
+    st->server_name[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->server_name[63] = '\0';
+      st->server_name[63] = '\0';
     }
   }
 
   return 0;
 }
 
-int kr_jack_info_init(void *st) {
-  kr_jack_info *actual;
-
+int kr_jack_info_init(kr_jack_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_jack_info *)st;
-  memset(actual, 0, sizeof(kr_jack_info));
+  memset(st, 0, sizeof(kr_jack_info));
 
   return 0;
 }
 
-int kr_jack_info_valid(void *st) {
-  kr_jack_info *actual;
-
+int kr_jack_info_valid(kr_jack_info *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_jack_info *)st;
   for (i = 0; i < 64; i++) {
-    if (!actual->client_name[i]) {
+    if (!st->client_name[i]) {
       break;
     }
-    if (i == 63 && actual->client_name[i]) {
+    if (i == 63 && st->client_name[i]) {
       return -2;
     }
   }
   for (i = 0; i < 64; i++) {
-    if (!actual->server_name[i]) {
+    if (!st->server_name[i]) {
       break;
     }
-    if (i == 63 && actual->server_name[i]) {
+    if (i == 63 && st->server_name[i]) {
       return -3;
     }
   }
@@ -222,9 +207,7 @@ int kr_jack_info_valid(void *st) {
   return 0;
 }
 
-int kr_jack_info_random(void *st) {
-  kr_jack_info *actual;
-
+int kr_jack_info_random(kr_jack_info *st) {
   int i;
 
   struct timeval tv;
@@ -237,54 +220,47 @@ int kr_jack_info_random(void *st) {
     return -1;
   }
 
-  actual = (kr_jack_info *)st;
-  memset(actual, 0, sizeof(kr_jack_info));
+  memset(st, 0, sizeof(kr_jack_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->client_name[i] = 97 + floor(rand() * scale);
+    st->client_name[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->client_name[63] = '\0';
+      st->client_name[63] = '\0';
     }
   }
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->server_name[i] = 97 + floor(rand() * scale);
+    st->server_name[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->server_name[63] = '\0';
+      st->server_name[63] = '\0';
     }
   }
 
   return 0;
 }
 
-int kr_jack_path_info_init(void *st) {
-  kr_jack_path_info *actual;
-
+int kr_jack_path_info_init(kr_jack_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_jack_path_info *)st;
-  memset(actual, 0, sizeof(kr_jack_path_info));
+  memset(st, 0, sizeof(kr_jack_path_info));
 
   return 0;
 }
 
-int kr_jack_path_info_valid(void *st) {
-  kr_jack_path_info *actual;
-
+int kr_jack_path_info_valid(kr_jack_path_info *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_jack_path_info *)st;
   for (i = 0; i < 64; i++) {
-    if (!actual->name[i]) {
+    if (!st->name[i]) {
       break;
     }
-    if (i == 63 && actual->name[i]) {
+    if (i == 63 && st->name[i]) {
       return -2;
     }
   }
@@ -292,9 +268,7 @@ int kr_jack_path_info_valid(void *st) {
   return 0;
 }
 
-int kr_jack_path_info_random(void *st) {
-  kr_jack_path_info *actual;
-
+int kr_jack_path_info_random(kr_jack_path_info *st) {
   int i;
 
   struct timeval tv;
@@ -307,13 +281,12 @@ int kr_jack_path_info_random(void *st) {
     return -1;
   }
 
-  actual = (kr_jack_path_info *)st;
-  memset(actual, 0, sizeof(kr_jack_path_info));
+  memset(st, 0, sizeof(kr_jack_path_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->name[i] = 97 + floor(rand() * scale);
+    st->name[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->name[63] = '\0';
+      st->name[63] = '\0';
     }
   }
 

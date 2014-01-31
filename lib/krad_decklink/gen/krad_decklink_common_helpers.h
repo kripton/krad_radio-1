@@ -40,10 +40,10 @@ typedef struct {
 
 int kr_decklink_info_patch_apply(struct kr_decklink_info *info, kr_decklink_info_patch *patch);
 int kr_decklink_path_info_patch_apply(struct kr_decklink_path_info *info, kr_decklink_path_info_patch *patch);
-int kr_decklink_info_init(void *st);
-int kr_decklink_info_valid(void *st);
-int kr_decklink_info_random(void *st);
-int kr_decklink_path_info_init(void *st);
-int kr_decklink_path_info_valid(void *st);
-int kr_decklink_path_info_random(void *st);
+int kr_decklink_info_init(struct kr_decklink_info *st);
+int kr_decklink_info_valid(struct kr_decklink_info *st);
+int kr_decklink_info_random(struct kr_decklink_info *st);
+int kr_decklink_path_info_init(struct kr_decklink_path_info *st);
+int kr_decklink_path_info_valid(struct kr_decklink_path_info *st);
+int kr_decklink_path_info_random(struct kr_decklink_path_info *st);
 #endif

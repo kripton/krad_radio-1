@@ -39,10 +39,10 @@ typedef struct {
 
 int kr_wayland_info_patch_apply(kr_wayland_info *info, kr_wayland_info_patch *patch);
 int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path_info_patch *patch);
-int kr_wayland_info_init(void *st);
-int kr_wayland_info_valid(void *st);
-int kr_wayland_info_random(void *st);
-int kr_wayland_path_info_init(void *st);
-int kr_wayland_path_info_valid(void *st);
-int kr_wayland_path_info_random(void *st);
+int kr_wayland_info_init(kr_wayland_info *st);
+int kr_wayland_info_valid(kr_wayland_info *st);
+int kr_wayland_info_random(kr_wayland_info *st);
+int kr_wayland_path_info_init(kr_wayland_path_info *st);
+int kr_wayland_path_info_valid(kr_wayland_path_info *st);
+int kr_wayland_path_info_random(kr_wayland_path_info *st);
 #endif

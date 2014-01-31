@@ -24,34 +24,28 @@ int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path
   return 0;
 }
 
-int kr_wayland_info_init(void *st) {
-  kr_wayland_info *actual;
-
+int kr_wayland_info_init(kr_wayland_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_wayland_info *)st;
-  memset(actual, 0, sizeof(kr_wayland_info));
+  memset(st, 0, sizeof(kr_wayland_info));
 
   return 0;
 }
 
-int kr_wayland_info_valid(void *st) {
-  kr_wayland_info *actual;
-
+int kr_wayland_info_valid(kr_wayland_info *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_wayland_info *)st;
   for (i = 0; i < 128; i++) {
-    if (!actual->display_name[i]) {
+    if (!st->display_name[i]) {
       break;
     }
-    if (i == 127 && actual->display_name[i]) {
+    if (i == 127 && st->display_name[i]) {
       return -3;
     }
   }
@@ -59,9 +53,7 @@ int kr_wayland_info_valid(void *st) {
   return 0;
 }
 
-int kr_wayland_info_random(void *st) {
-  kr_wayland_info *actual;
-
+int kr_wayland_info_random(kr_wayland_info *st) {
   int i;
 
   struct timeval tv;
@@ -74,47 +66,40 @@ int kr_wayland_info_random(void *st) {
     return -1;
   }
 
-  actual = (kr_wayland_info *)st;
-  memset(actual, 0, sizeof(kr_wayland_info));
+  memset(st, 0, sizeof(kr_wayland_info));
   for (i = 0; i < 128; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->display_name[i] = 97 + floor(rand() * scale);
+    st->display_name[i] = 97 + floor(rand() * scale);
     if (i == 127) {
-      actual->display_name[127] = '\0';
+      st->display_name[127] = '\0';
     }
   }
 
   return 0;
 }
 
-int kr_wayland_path_info_init(void *st) {
-  kr_wayland_path_info *actual;
-
+int kr_wayland_path_info_init(kr_wayland_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_wayland_path_info *)st;
-  memset(actual, 0, sizeof(kr_wayland_path_info));
+  memset(st, 0, sizeof(kr_wayland_path_info));
 
   return 0;
 }
 
-int kr_wayland_path_info_valid(void *st) {
-  kr_wayland_path_info *actual;
-
+int kr_wayland_path_info_valid(kr_wayland_path_info *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_wayland_path_info *)st;
   for (i = 0; i < 128; i++) {
-    if (!actual->display_name[i]) {
+    if (!st->display_name[i]) {
       break;
     }
-    if (i == 127 && actual->display_name[i]) {
+    if (i == 127 && st->display_name[i]) {
       return -2;
     }
   }
@@ -122,9 +107,7 @@ int kr_wayland_path_info_valid(void *st) {
   return 0;
 }
 
-int kr_wayland_path_info_random(void *st) {
-  kr_wayland_path_info *actual;
-
+int kr_wayland_path_info_random(kr_wayland_path_info *st) {
   int i;
 
   struct timeval tv;
@@ -137,13 +120,12 @@ int kr_wayland_path_info_random(void *st) {
     return -1;
   }
 
-  actual = (kr_wayland_path_info *)st;
-  memset(actual, 0, sizeof(kr_wayland_path_info));
+  memset(st, 0, sizeof(kr_wayland_path_info));
   for (i = 0; i < 128; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->display_name[i] = 97 + floor(rand() * scale);
+    st->display_name[i] = 97 + floor(rand() * scale);
     if (i == 127) {
-      actual->display_name[127] = '\0';
+      st->display_name[127] = '\0';
     }
   }
 

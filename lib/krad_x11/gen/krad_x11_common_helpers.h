@@ -40,10 +40,10 @@ typedef struct {
 
 int kr_x11_info_patch_apply(struct kr_x11_info *info, kr_x11_info_patch *patch);
 int kr_x11_path_info_patch_apply(struct kr_x11_path_info *info, kr_x11_path_info_patch *patch);
-int kr_x11_info_init(void *st);
-int kr_x11_info_valid(void *st);
-int kr_x11_info_random(void *st);
-int kr_x11_path_info_init(void *st);
-int kr_x11_path_info_valid(void *st);
-int kr_x11_path_info_random(void *st);
+int kr_x11_info_init(struct kr_x11_info *st);
+int kr_x11_info_valid(struct kr_x11_info *st);
+int kr_x11_info_random(struct kr_x11_info *st);
+int kr_x11_path_info_init(struct kr_x11_path_info *st);
+int kr_x11_path_info_valid(struct kr_x11_path_info *st);
+int kr_x11_path_info_random(struct kr_x11_path_info *st);
 #endif

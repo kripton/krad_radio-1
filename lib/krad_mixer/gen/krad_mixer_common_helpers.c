@@ -140,87 +140,72 @@ int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_pat
   return 0;
 }
 
-int kr_mixer_path_info_init(void *st) {
-  struct kr_mixer_path_info *actual;
-
+int kr_mixer_path_info_init(struct kr_mixer_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_mixer_path_info *)st;
-  memset(actual, 0, sizeof(struct kr_mixer_path_info));
-  kr_lowpass_info_init(&actual->lowpass);
-  kr_highpass_info_init(&actual->highpass);
-  kr_analog_info_init(&actual->analog);
-  kr_eq_info_init(&actual->eq);
-  kr_volume_info_init(&actual->volume);
+  memset(st, 0, sizeof(struct kr_mixer_path_info));
+  kr_lowpass_info_init(&st->lowpass);
+  kr_highpass_info_init(&st->highpass);
+  kr_analog_info_init(&st->analog);
+  kr_eq_info_init(&st->eq);
+  kr_volume_info_init(&st->volume);
 
   return 0;
 }
 
-int kr_mixer_path_info_valid(void *st) {
-  struct kr_mixer_path_info *actual;
-
+int kr_mixer_path_info_valid(struct kr_mixer_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_mixer_path_info *)st;
-  kr_lowpass_info_valid(&actual->lowpass);
-  kr_highpass_info_valid(&actual->highpass);
-  kr_analog_info_valid(&actual->analog);
-  kr_eq_info_valid(&actual->eq);
-  kr_volume_info_valid(&actual->volume);
+  kr_lowpass_info_valid(&st->lowpass);
+  kr_highpass_info_valid(&st->highpass);
+  kr_analog_info_valid(&st->analog);
+  kr_eq_info_valid(&st->eq);
+  kr_volume_info_valid(&st->volume);
 
   return 0;
 }
 
-int kr_mixer_path_info_random(void *st) {
-  struct kr_mixer_path_info *actual;
-
+int kr_mixer_path_info_random(struct kr_mixer_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_mixer_path_info *)st;
-  memset(actual, 0, sizeof(struct kr_mixer_path_info));
-  kr_lowpass_info_random(&actual->lowpass);
-  kr_highpass_info_random(&actual->highpass);
-  kr_analog_info_random(&actual->analog);
-  kr_eq_info_random(&actual->eq);
-  kr_volume_info_random(&actual->volume);
+  memset(st, 0, sizeof(struct kr_mixer_path_info));
+  kr_lowpass_info_random(&st->lowpass);
+  kr_highpass_info_random(&st->highpass);
+  kr_analog_info_random(&st->analog);
+  kr_eq_info_random(&st->eq);
+  kr_volume_info_random(&st->volume);
 
   return 0;
 }
 
-int kr_mixer_path_patch_init(void *st) {
-  struct kr_mixer_path_patch *actual;
-
+int kr_mixer_path_patch_init(struct kr_mixer_path_patch *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_mixer_path_patch *)st;
-  memset(actual, 0, sizeof(struct kr_mixer_path_patch));
+  memset(st, 0, sizeof(struct kr_mixer_path_patch));
 
   return 0;
 }
 
-int kr_mixer_path_patch_valid(void *st) {
-  struct kr_mixer_path_patch *actual;
-
+int kr_mixer_path_patch_valid(struct kr_mixer_path_patch *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_mixer_path_patch *)st;
   for (i = 0; i < 16; i++) {
-    if (!actual->ctl[i]) {
+    if (!st->ctl[i]) {
       break;
     }
-    if (i == 15 && actual->ctl[i]) {
+    if (i == 15 && st->ctl[i]) {
       return -2;
     }
   }
@@ -228,9 +213,7 @@ int kr_mixer_path_patch_valid(void *st) {
   return 0;
 }
 
-int kr_mixer_path_patch_random(void *st) {
-  struct kr_mixer_path_patch *actual;
-
+int kr_mixer_path_patch_random(struct kr_mixer_path_patch *st) {
   int i;
 
   struct timeval tv;
@@ -243,13 +226,12 @@ int kr_mixer_path_patch_random(void *st) {
     return -1;
   }
 
-  actual = (struct kr_mixer_path_patch *)st;
-  memset(actual, 0, sizeof(struct kr_mixer_path_patch));
+  memset(st, 0, sizeof(struct kr_mixer_path_patch));
   for (i = 0; i < 16; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->ctl[i] = 97 + floor(rand() * scale);
+    st->ctl[i] = 97 + floor(rand() * scale);
     if (i == 15) {
-      actual->ctl[15] = '\0';
+      st->ctl[15] = '\0';
     }
   }
 

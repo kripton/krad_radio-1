@@ -30,12 +30,12 @@ typedef struct {
 } kr_mixer_path_info_patch;
 
 int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_path_info_patch *patch);
-int kr_mixer_path_info_init(void *st);
-int kr_mixer_path_info_valid(void *st);
-int kr_mixer_path_info_random(void *st);
-int kr_mixer_path_patch_init(void *st);
-int kr_mixer_path_patch_valid(void *st);
-int kr_mixer_path_patch_random(void *st);
+int kr_mixer_path_info_init(struct kr_mixer_path_info *st);
+int kr_mixer_path_info_valid(struct kr_mixer_path_info *st);
+int kr_mixer_path_info_random(struct kr_mixer_path_info *st);
+int kr_mixer_path_patch_init(struct kr_mixer_path_patch *st);
+int kr_mixer_path_patch_valid(struct kr_mixer_path_patch *st);
+int kr_mixer_path_patch_random(struct kr_mixer_path_patch *st);
 int kr_mixer_channels_to_index(int val);
 int kr_strto_kr_mixer_channels(char *string);
 char *kr_strfr_kr_mixer_channels(int val);

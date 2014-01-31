@@ -24,34 +24,28 @@ int kr_x11_path_info_patch_apply(struct kr_x11_path_info *info, kr_x11_path_info
   return 0;
 }
 
-int kr_x11_info_init(void *st) {
-  struct kr_x11_info *actual;
-
+int kr_x11_info_init(struct kr_x11_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_x11_info *)st;
-  memset(actual, 0, sizeof(struct kr_x11_info));
+  memset(st, 0, sizeof(struct kr_x11_info));
 
   return 0;
 }
 
-int kr_x11_info_valid(void *st) {
-  struct kr_x11_info *actual;
-
+int kr_x11_info_valid(struct kr_x11_info *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_x11_info *)st;
   for (i = 0; i < 64; i++) {
-    if (!actual->display[i]) {
+    if (!st->display[i]) {
       break;
     }
-    if (i == 63 && actual->display[i]) {
+    if (i == 63 && st->display[i]) {
       return -2;
     }
   }
@@ -59,9 +53,7 @@ int kr_x11_info_valid(void *st) {
   return 0;
 }
 
-int kr_x11_info_random(void *st) {
-  struct kr_x11_info *actual;
-
+int kr_x11_info_random(struct kr_x11_info *st) {
   int i;
 
   struct timeval tv;
@@ -74,47 +66,40 @@ int kr_x11_info_random(void *st) {
     return -1;
   }
 
-  actual = (struct kr_x11_info *)st;
-  memset(actual, 0, sizeof(struct kr_x11_info));
+  memset(st, 0, sizeof(struct kr_x11_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->display[i] = 97 + floor(rand() * scale);
+    st->display[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->display[63] = '\0';
+      st->display[63] = '\0';
     }
   }
 
   return 0;
 }
 
-int kr_x11_path_info_init(void *st) {
-  struct kr_x11_path_info *actual;
-
+int kr_x11_path_info_init(struct kr_x11_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_x11_path_info *)st;
-  memset(actual, 0, sizeof(struct kr_x11_path_info));
+  memset(st, 0, sizeof(struct kr_x11_path_info));
 
   return 0;
 }
 
-int kr_x11_path_info_valid(void *st) {
-  struct kr_x11_path_info *actual;
-
+int kr_x11_path_info_valid(struct kr_x11_path_info *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_x11_path_info *)st;
   for (i = 0; i < 64; i++) {
-    if (!actual->display[i]) {
+    if (!st->display[i]) {
       break;
     }
-    if (i == 63 && actual->display[i]) {
+    if (i == 63 && st->display[i]) {
       return -2;
     }
   }
@@ -122,9 +107,7 @@ int kr_x11_path_info_valid(void *st) {
   return 0;
 }
 
-int kr_x11_path_info_random(void *st) {
-  struct kr_x11_path_info *actual;
-
+int kr_x11_path_info_random(struct kr_x11_path_info *st) {
   int i;
 
   struct timeval tv;
@@ -137,13 +120,12 @@ int kr_x11_path_info_random(void *st) {
     return -1;
   }
 
-  actual = (struct kr_x11_path_info *)st;
-  memset(actual, 0, sizeof(struct kr_x11_path_info));
+  memset(st, 0, sizeof(struct kr_x11_path_info));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->display[i] = 97 + floor(rand() * scale);
+    st->display[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->display[63] = '\0';
+      st->display[63] = '\0';
     }
   }
 

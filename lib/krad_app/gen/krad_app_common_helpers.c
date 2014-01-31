@@ -52,46 +52,38 @@ int kr_strto_kr_app_method(char *string) {
   return -1;
 }
 
-int kr_crate2_init(void *st) {
-  struct kr_crate2 *actual;
-
+int kr_crate2_init(struct kr_crate2 *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_crate2 *)st;
-  memset(actual, 0, sizeof(struct kr_crate2));
-  kr_radio_payload_init(&actual->payload,kr_radio_payload_type_to_index(actual->payload_type));
+  memset(st, 0, sizeof(struct kr_crate2));
+  kr_radio_payload_init(&st->payload,kr_radio_payload_type_to_index(st->payload_type));
 
   return 0;
 }
 
-int kr_crate2_valid(void *st) {
-  struct kr_crate2 *actual;
-
+int kr_crate2_valid(struct kr_crate2 *st) {
   int i;
 
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_crate2 *)st;
   for (i = 0; i < 64; i++) {
-    if (!actual->address[i]) {
+    if (!st->address[i]) {
       break;
     }
-    if (i == 63 && actual->address[i]) {
+    if (i == 63 && st->address[i]) {
       return -2;
     }
   }
-  kr_radio_payload_valid(&actual->payload,kr_radio_payload_type_to_index(actual->payload_type));
+  kr_radio_payload_valid(&st->payload,kr_radio_payload_type_to_index(st->payload_type));
 
   return 0;
 }
 
-int kr_crate2_random(void *st) {
-  struct kr_crate2 *actual;
-
+int kr_crate2_random(struct kr_crate2 *st) {
   int i;
 
   struct timeval tv;
@@ -104,16 +96,15 @@ int kr_crate2_random(void *st) {
     return -1;
   }
 
-  actual = (struct kr_crate2 *)st;
-  memset(actual, 0, sizeof(struct kr_crate2));
+  memset(st, 0, sizeof(struct kr_crate2));
   for (i = 0; i < 64; i++) {
     scale = (double)25 / RAND_MAX;
-    actual->address[i] = 97 + floor(rand() * scale);
+    st->address[i] = 97 + floor(rand() * scale);
     if (i == 63) {
-      actual->address[63] = '\0';
+      st->address[63] = '\0';
     }
   }
-  kr_radio_payload_random(&actual->payload,kr_radio_payload_type_to_index(actual->payload_type));
+  kr_radio_payload_random(&st->payload,kr_radio_payload_type_to_index(st->payload_type));
 
   return 0;
 }

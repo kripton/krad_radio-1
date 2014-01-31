@@ -218,7 +218,7 @@ int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, 
   return 0;
 }
 
-int kr_transponder_info_init(void *st) {
+int kr_transponder_info_init(struct kr_transponder_info *st) {
   if (st == NULL) {
     return -1;
   }
@@ -227,7 +227,7 @@ int kr_transponder_info_init(void *st) {
   return 0;
 }
 
-int kr_transponder_info_valid(void *st) {
+int kr_transponder_info_valid(struct kr_transponder_info *st) {
   if (st == NULL) {
     return -1;
   }
@@ -236,7 +236,7 @@ int kr_transponder_info_valid(void *st) {
   return 0;
 }
 
-int kr_transponder_info_random(void *st) {
+int kr_transponder_info_random(struct kr_transponder_info *st) {
   if (st == NULL) {
     return -1;
   }
@@ -245,26 +245,23 @@ int kr_transponder_info_random(void *st) {
   return 0;
 }
 
-int kr_transponder_path_io_path_info_init(void *st, int idx) {
-  kr_transponder_path_io_path_info *actual;
-
+int kr_transponder_path_io_path_info_init(kr_transponder_path_io_path_info *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_transponder_path_io_path_info *)st;
-  memset(actual, 0, sizeof(kr_transponder_path_io_path_info));
+  memset(st, 0, sizeof(kr_transponder_path_io_path_info));
   switch (idx) {
     case 0: {
-      kr_mixer_path_info_init(&actual->mixer_path_info);
+      kr_mixer_path_info_init(&st->mixer_path_info);
       break;
     }
     case 1: {
-      kr_compositor_path_info_init(&actual->compositor_path_info);
+      kr_compositor_path_info_init(&st->compositor_path_info);
       break;
     }
     case 2: {
-      kr_adapter_path_info_init(&actual->adapter_path_info);
+      kr_adapter_path_info_init(&st->adapter_path_info);
       break;
     }
   }
@@ -273,25 +270,22 @@ int kr_transponder_path_io_path_info_init(void *st, int idx) {
   return -1;
 }
 
-int kr_transponder_path_io_path_info_valid(void *st, int idx) {
-  kr_transponder_path_io_path_info *actual;
-
+int kr_transponder_path_io_path_info_valid(kr_transponder_path_io_path_info *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_transponder_path_io_path_info *)st;
   switch (idx) {
     case 0: {
-      kr_mixer_path_info_valid(&actual->mixer_path_info);
+      kr_mixer_path_info_valid(&st->mixer_path_info);
       break;
     }
     case 1: {
-      kr_compositor_path_info_valid(&actual->compositor_path_info);
+      kr_compositor_path_info_valid(&st->compositor_path_info);
       break;
     }
     case 2: {
-      kr_adapter_path_info_valid(&actual->adapter_path_info);
+      kr_adapter_path_info_valid(&st->adapter_path_info);
       break;
     }
   }
@@ -300,26 +294,23 @@ int kr_transponder_path_io_path_info_valid(void *st, int idx) {
   return -1;
 }
 
-int kr_transponder_path_io_path_info_random(void *st, int idx) {
-  kr_transponder_path_io_path_info *actual;
-
+int kr_transponder_path_io_path_info_random(kr_transponder_path_io_path_info *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (kr_transponder_path_io_path_info *)st;
-  memset(actual, 0, sizeof(kr_transponder_path_io_path_info));
+  memset(st, 0, sizeof(kr_transponder_path_io_path_info));
   switch (idx) {
     case 0: {
-      kr_mixer_path_info_random(&actual->mixer_path_info);
+      kr_mixer_path_info_random(&st->mixer_path_info);
       break;
     }
     case 1: {
-      kr_compositor_path_info_random(&actual->compositor_path_info);
+      kr_compositor_path_info_random(&st->compositor_path_info);
       break;
     }
     case 2: {
-      kr_adapter_path_info_random(&actual->adapter_path_info);
+      kr_adapter_path_info_random(&st->adapter_path_info);
       break;
     }
   }
@@ -328,92 +319,74 @@ int kr_transponder_path_io_path_info_random(void *st, int idx) {
   return -1;
 }
 
-int kr_transponder_path_io_info_init(void *st) {
-  struct kr_transponder_path_io_info *actual;
-
+int kr_transponder_path_io_info_init(struct kr_transponder_path_io_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_io_info *)st;
-  memset(actual, 0, sizeof(struct kr_transponder_path_io_info));
-  kr_transponder_path_io_path_info_init(&actual->info,kr_transponder_path_io_type_to_index(actual->type));
+  memset(st, 0, sizeof(struct kr_transponder_path_io_info));
+  kr_transponder_path_io_path_info_init(&st->info,kr_transponder_path_io_type_to_index(st->type));
 
   return 0;
 }
 
-int kr_transponder_path_io_info_valid(void *st) {
-  struct kr_transponder_path_io_info *actual;
-
+int kr_transponder_path_io_info_valid(struct kr_transponder_path_io_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_io_info *)st;
-  kr_transponder_path_io_path_info_valid(&actual->info,kr_transponder_path_io_type_to_index(actual->type));
+  kr_transponder_path_io_path_info_valid(&st->info,kr_transponder_path_io_type_to_index(st->type));
 
   return 0;
 }
 
-int kr_transponder_path_io_info_random(void *st) {
-  struct kr_transponder_path_io_info *actual;
-
+int kr_transponder_path_io_info_random(struct kr_transponder_path_io_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_io_info *)st;
-  memset(actual, 0, sizeof(struct kr_transponder_path_io_info));
-  kr_transponder_path_io_path_info_random(&actual->info,kr_transponder_path_io_type_to_index(actual->type));
+  memset(st, 0, sizeof(struct kr_transponder_path_io_info));
+  kr_transponder_path_io_path_info_random(&st->info,kr_transponder_path_io_type_to_index(st->type));
 
   return 0;
 }
 
-int kr_transponder_path_info_init(void *st) {
-  struct kr_transponder_path_info *actual;
-
+int kr_transponder_path_info_init(struct kr_transponder_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_info *)st;
-  memset(actual, 0, sizeof(struct kr_transponder_path_info));
-  kr_transponder_path_io_info_init(&actual->input);
-  kr_transponder_path_io_info_init(&actual->output);
+  memset(st, 0, sizeof(struct kr_transponder_path_info));
+  kr_transponder_path_io_info_init(&st->input);
+  kr_transponder_path_io_info_init(&st->output);
 
   return 0;
 }
 
-int kr_transponder_path_info_valid(void *st) {
-  struct kr_transponder_path_info *actual;
-
+int kr_transponder_path_info_valid(struct kr_transponder_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_info *)st;
-  kr_transponder_path_io_info_valid(&actual->input);
-  kr_transponder_path_io_info_valid(&actual->output);
+  kr_transponder_path_io_info_valid(&st->input);
+  kr_transponder_path_io_info_valid(&st->output);
 
   return 0;
 }
 
-int kr_transponder_path_info_random(void *st) {
-  struct kr_transponder_path_info *actual;
-
+int kr_transponder_path_info_random(struct kr_transponder_path_info *st) {
   if (st == NULL) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_info *)st;
-  memset(actual, 0, sizeof(struct kr_transponder_path_info));
-  kr_transponder_path_io_info_random(&actual->input);
-  kr_transponder_path_io_info_random(&actual->output);
+  memset(st, 0, sizeof(struct kr_transponder_path_info));
+  kr_transponder_path_io_info_random(&st->input);
+  kr_transponder_path_io_info_random(&st->output);
 
   return 0;
 }
 
-int kr_transponder_path_patch_init(void *st) {
+int kr_transponder_path_patch_init(struct kr_transponder_path_patch *st) {
   if (st == NULL) {
     return -1;
   }
@@ -422,7 +395,7 @@ int kr_transponder_path_patch_init(void *st) {
   return 0;
 }
 
-int kr_transponder_path_patch_valid(void *st) {
+int kr_transponder_path_patch_valid(struct kr_transponder_path_patch *st) {
   if (st == NULL) {
     return -1;
   }
@@ -431,7 +404,7 @@ int kr_transponder_path_patch_valid(void *st) {
   return 0;
 }
 
-int kr_transponder_path_patch_random(void *st) {
+int kr_transponder_path_patch_random(struct kr_transponder_path_patch *st) {
   if (st == NULL) {
     return -1;
   }
