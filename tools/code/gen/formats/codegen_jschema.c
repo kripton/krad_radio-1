@@ -54,41 +54,42 @@ static void codegen_jschema_memb_limits(member_info *memb, FILE *out) {
   switch (type) {
     case T_CHAR: {
       if (memb->arr) {
-        fprintf(out,"\"maxLength\" : %d, ",memb->arr - 1);
+        fprintf(out,"\"maxLength\" : %d ",memb->arr - 1);
         if (info->char_info.notnull) {
-          fprintf(out,"\"minLength\" : 1, ");
+          fprintf(out,",");
+          fprintf(out,"\"minLength\" : 1 ");
         }
       }
       break;
     }
     case T_INT32: {
       fprintf(out,"\"minimum\" : %d, ",info->int32_info.min);
-      fprintf(out,"\"maximum\" : %d, ",info->int32_info.max);
+      fprintf(out,"\"maximum\" : %d ",info->int32_info.max);
       break;
     }
     case T_INT64: {
       fprintf(out,"\"minimum\" : %" PRId64 ", ",info->int64_info.min);
-      fprintf(out,"\"maximum\" : %" PRId64 ", ",info->int64_info.max);
+      fprintf(out,"\"maximum\" : %" PRId64 " ",info->int64_info.max);
       break;
     }
     case T_UINT32: {
       fprintf(out,"\"minimum\" : %u, ",info->uint32_info.min);
-      fprintf(out,"\"maximum\" : %u, ",info->uint32_info.max);
+      fprintf(out,"\"maximum\" : %u ",info->uint32_info.max);
       break;
     }
     case T_UINT64: {
       fprintf(out,"\"minimum\" : %" PRIu64 ", ",info->uint64_info.min);
-      fprintf(out,"\"maximum\" : %" PRIu64 ", ",info->uint64_info.max);
+      fprintf(out,"\"maximum\" : %" PRIu64 " ",info->uint64_info.max);
       break;
     }
     case T_FLOAT: {
      fprintf(out,"\"minimum\" : %0.2f, ",info->float_info.min);
-     fprintf(out,"\"maximum\" : %0.2f, ",info->float_info.max);
+     fprintf(out,"\"maximum\" : %0.2f ",info->float_info.max);
      break;
    }
    case T_DOUBLE: {
      fprintf(out,"\"minimum\" : %0.2f, ",info->double_info.min);
-     fprintf(out,"\"maximum\" : %0.2f, ",info->double_info.max);
+     fprintf(out,"\"maximum\" : %0.2f ",info->double_info.max);
      break;
    }
    default : break;
@@ -143,11 +144,11 @@ static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE 
     if ( (type = memb_type_to_json_type(actual_members[j])) ) {
 
       fprintf(out,"\"%s\" : {",actual_members[j]->name);
-      fprintf(out,"\"type\" : \"%s\", ",type);
+      fprintf(out,"\"type\" : \"%s\" ",type);
       if (memcmp(&actual_members[j]->type_info,&cmp,sizeof(member_type_info))) {
+        fprintf(out,",");
         codegen_jschema_memb_limits(actual_members[j],out);
       }
-      fprintf(out,"\"required\" : true ");
       fprintf(out,"}");
 
       if (j != (actual_memb_count - 1)) {
@@ -177,6 +178,26 @@ static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE 
     } 
   }
 
+  fprintf(out,",\"required\" : [");
+
+  for (j = actual_memb_count = 0; j < def->info.member_count; j++) {
+    if (memb_type_to_json_type(&def->info.members[j])) {
+      actual_members[actual_memb_count] = &def->info.members[j];
+      actual_memb_count++;
+    }
+  }
+
+  for (j = 0; j < actual_memb_count; j++) {
+    if ( (type = memb_type_to_json_type(actual_members[j])) ) {
+      fprintf(out,"\"%s\"",actual_members[j]->name);
+      if (j != (actual_memb_count - 1)) {
+        fprintf(out,",");
+      }
+    }
+  }
+
+  fprintf(out,"]");
+
   fprintf(out,"}");
 
   return;
@@ -202,7 +223,7 @@ int codegen_jschema(struct_data **defs, int ndefs,
 
   for (i = 0; i < n; i++) {
     fprintf(out,"{");
-    fprintf(out,"\"name\" : \"%s\",",filtered_defs[i]->info.name);
+    fprintf(out,"\"title\" : \"%s\",",filtered_defs[i]->info.name);
     codegen_jschema_internal(filtered_defs[i],defs,out);
     fprintf(out,"}");
     if (i != (n - 1)) {
