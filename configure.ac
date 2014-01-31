@@ -121,6 +121,7 @@ AC_MSG_RESULT([
       Krad Radio Build Configuration
 
         Version: $PACKAGE_VERSION
+             CC: $CC
          CFLAGS: $CFLAGS
 
      Krad Tools: $tools
