@@ -376,6 +376,62 @@ int kr_strto_kr_compositor_control(char *string) {
   return -1;
 }
 
+int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch *patch) {
+  const ptrdiff_t off[3] = { offsetof(struct kr_sprite_info, filename), 
+    offsetof(struct kr_sprite_info, rate), offsetof(struct kr_sprite_info, controls)
+  };
+  const size_t sz[3] = { sizeof(info->filename), 
+    sizeof(info->rate), sizeof(info->controls)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patch) {
+  const ptrdiff_t off[6] = { offsetof(struct kr_text_info, string), 
+    offsetof(struct kr_text_info, font), offsetof(struct kr_text_info, red), 
+    offsetof(struct kr_text_info, green), offsetof(struct kr_text_info, blue), 
+    offsetof(struct kr_text_info, controls)
+  };
+  const size_t sz[6] = { sizeof(info->string), 
+    sizeof(info->font), sizeof(info->red), 
+    sizeof(info->green), sizeof(info->blue), 
+    sizeof(info->controls)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch *patch) {
+  const ptrdiff_t off[5] = { offsetof(struct kr_vector_info, type), 
+    offsetof(struct kr_vector_info, red), offsetof(struct kr_vector_info, green), 
+    offsetof(struct kr_vector_info, blue), offsetof(struct kr_vector_info, controls)
+  };
+  const size_t sz[5] = { sizeof(info->type), 
+    sizeof(info->red), sizeof(info->green), 
+    sizeof(info->blue), sizeof(info->controls)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch) {
+  const ptrdiff_t off[9] = { offsetof(struct kr_compositor_path_info, type), 
+    offsetof(struct kr_compositor_path_info, width), offsetof(struct kr_compositor_path_info, height), 
+    offsetof(struct kr_compositor_path_info, crop_x), offsetof(struct kr_compositor_path_info, crop_y), 
+    offsetof(struct kr_compositor_path_info, crop_width), offsetof(struct kr_compositor_path_info, crop_height), 
+    offsetof(struct kr_compositor_path_info, view), offsetof(struct kr_compositor_path_info, controls)
+  };
+  const size_t sz[9] = { sizeof(info->type), 
+    sizeof(info->width), sizeof(info->height), 
+    sizeof(info->crop_x), sizeof(info->crop_y), 
+    sizeof(info->crop_width), sizeof(info->crop_height), 
+    sizeof(info->view), sizeof(info->controls)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_compositor_controls_init(void *st) {
   if (st == NULL) {
     return -1;

@@ -36,6 +36,8 @@ int codegen_helper_functions(struct_data *defs, int n, char *prefix,
  char *suffix, FILE *out);
 void codegen_helpers_prototypes(struct_data *defs, int n, char *prefix,
  char *suffix, FILE *out);
+void codegen_patch_prototypes(struct_data *defs, int ndefs, char *prefix,
+ char *suffix, FILE *out);
 int codegen_enum_util_functions(struct_data *defs, int n, 
   char *prefix, char *suffix, FILE *out);
 int codegen_sizeof(header_data *hdata, int n, 
@@ -44,3 +46,5 @@ int codegen_jschema(struct_data **defs, int n,
   char *prefix, char *suffix, FILE *out);
 int codegen_enum(header_data *hdefs, int n, char *prefix,
  char *suffix, FILE *out, cgen_target_type type);
+void codegen_patch_struct_and_member_enum(struct_data *defs, int ndefs, char *prefix,
+ char *suffix, FILE *out);

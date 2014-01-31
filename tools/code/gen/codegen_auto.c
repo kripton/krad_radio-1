@@ -131,6 +131,7 @@ void files_gen(header_data *hdata,
   char format2[256];
   char fname[256];
   char *targets[256];
+  char upp[256];
   char *p;
   char *pp;
   char *ppp;
@@ -164,6 +165,15 @@ void files_gen(header_data *hdata,
           exit(1);
         }
 
+        if (hdata[i].targets[l].type == HELPERS) {
+          pp[0] = '\0';
+          ppp = strchr(hdata[i].targets[l].path,'.');
+          ppp[0] = '\0';
+          uppercase(basename(hdata[i].targets[l].path),upp);
+          fprintf(header,"#ifndef %s_GEN_H\n#define %s_GEN_H\n",upp,upp);
+          ppp[0] = '.';
+          pp[0] = '/';
+        }
         fprintf(header,"#include <stdio.h>\n");
         fprintf(header,"#include <stdint.h>\n");
         fprintf(header,"#include \"gen.h\"\n");
@@ -271,6 +281,7 @@ void files_gen(header_data *hdata,
             sprintf(format,"helper");
             sprintf(format2,"helper_proto");
             codegen(hdata[i].defs,hdata[i].def_count,prefix,suffix,"enum_utils",out);
+            codegen_patch_struct_and_member_enum(hdata[i].defs,hdata[i].def_count,prefix,"_info",header);
             break;
             default: break;
           }
@@ -278,6 +289,9 @@ void files_gen(header_data *hdata,
           codegen(hdata[i].defs,hdata[i].def_count,prefix,suffix,format,out);
           codegen(hdata[i].defs,hdata[i].def_count,prefix,suffix,format2,header);
 
+          if (hdata[i].targets[l].type == HELPERS) {
+            fprintf(header,"#endif\n");
+          }
           fclose(out);
           fclose(header);
         }

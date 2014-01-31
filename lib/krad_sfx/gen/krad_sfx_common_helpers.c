@@ -191,6 +191,68 @@ int kr_strto_kr_sfx_effect_control(char *string) {
   return -1;
 }
 
+int kr_eq_band_info_patch_apply(struct kr_eq_band_info *info, kr_eq_band_info_patch *patch) {
+  const ptrdiff_t off[3] = { offsetof(struct kr_eq_band_info, db), 
+    offsetof(struct kr_eq_band_info, bw), offsetof(struct kr_eq_band_info, hz)
+  };
+  const size_t sz[3] = { sizeof(info->db), 
+    sizeof(info->bw), sizeof(info->hz)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_eq_info_patch_apply(struct kr_eq_info *info, kr_eq_info_patch *patch) {
+  const ptrdiff_t off[1] = { offsetof(struct kr_eq_info, band)
+  };
+  const size_t sz[1] = { sizeof(info->band)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_lowpass_info_patch_apply(struct kr_lowpass_info *info, kr_lowpass_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_lowpass_info, bw), 
+    offsetof(struct kr_lowpass_info, hz)
+  };
+  const size_t sz[2] = { sizeof(info->bw), 
+    sizeof(info->hz)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_highpass_info_patch_apply(struct kr_highpass_info *info, kr_highpass_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_highpass_info, bw), 
+    offsetof(struct kr_highpass_info, hz)
+  };
+  const size_t sz[2] = { sizeof(info->bw), 
+    sizeof(info->hz)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_volume_info_patch_apply(struct kr_volume_info *info, kr_volume_info_patch *patch) {
+  const ptrdiff_t off[1] = { offsetof(struct kr_volume_info, level)
+  };
+  const size_t sz[1] = { sizeof(info->level)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_analog_info_patch_apply(struct kr_analog_info *info, kr_analog_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_analog_info, drive), 
+    offsetof(struct kr_analog_info, blend)
+  };
+  const size_t sz[2] = { sizeof(info->drive), 
+    sizeof(info->blend)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_eq_band_info_init(void *st) {
   if (st == NULL) {
     return -1;
