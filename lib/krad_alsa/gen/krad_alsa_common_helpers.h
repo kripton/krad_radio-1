@@ -33,6 +33,8 @@ typedef struct {
   kr_alsa_path_info_patch_value value;
 } kr_alsa_path_info_patch;
 
+int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patch);
+int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_info_patch *patch);
 int kr_alsa_info_init(void *st);
 int kr_alsa_info_valid(void *st);
 int kr_alsa_info_random(void *st);

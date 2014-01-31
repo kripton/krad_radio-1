@@ -29,6 +29,7 @@ typedef struct {
   kr_mixer_path_info_patch_value value;
 } kr_mixer_path_info_patch;
 
+int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_path_info_patch *patch);
 int kr_mixer_path_info_init(void *st);
 int kr_mixer_path_info_valid(void *st);
 int kr_mixer_path_info_random(void *st);

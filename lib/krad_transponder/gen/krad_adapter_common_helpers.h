@@ -36,6 +36,8 @@ typedef struct {
   kr_adapter_path_info_patch_value value;
 } kr_adapter_path_info_patch;
 
+int kr_adapter_info_patch_apply(struct kr_adapter_info *info, kr_adapter_info_patch *patch);
+int kr_adapter_path_info_patch_apply(struct kr_adapter_path_info *info, kr_adapter_path_info_patch *patch);
 int kr_adapter_api_info_init(void *st, int idx);
 int kr_adapter_api_info_valid(void *st, int idx);
 int kr_adapter_api_info_random(void *st, int idx);

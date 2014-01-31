@@ -38,6 +38,8 @@ typedef struct {
   kr_x11_path_info_patch_value value;
 } kr_x11_path_info_patch;
 
+int kr_x11_info_patch_apply(struct kr_x11_info *info, kr_x11_info_patch *patch);
+int kr_x11_path_info_patch_apply(struct kr_x11_path_info *info, kr_x11_path_info_patch *patch);
 int kr_x11_info_init(void *st);
 int kr_x11_info_valid(void *st);
 int kr_x11_info_random(void *st);

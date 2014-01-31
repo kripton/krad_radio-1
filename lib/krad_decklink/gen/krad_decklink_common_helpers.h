@@ -38,6 +38,8 @@ typedef struct {
   kr_decklink_path_info_patch_value value;
 } kr_decklink_path_info_patch;
 
+int kr_decklink_info_patch_apply(struct kr_decklink_info *info, kr_decklink_info_patch *patch);
+int kr_decklink_path_info_patch_apply(struct kr_decklink_path_info *info, kr_decklink_path_info_patch *patch);
 int kr_decklink_info_init(void *st);
 int kr_decklink_info_valid(void *st);
 int kr_decklink_info_random(void *st);

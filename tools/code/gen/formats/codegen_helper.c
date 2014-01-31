@@ -499,8 +499,10 @@ void codegen_patch_prototypes(struct_data *defs, int ndefs, char *prefix,
       n++;
     }
   }
-  codegen_patch_prototype(filtered_defs[i],out);
-  fprintf(out,";\n");
+  for (i = 0; i < n; i++) {
+    codegen_patch_prototype(filtered_defs[i],out);
+    fprintf(out,";\n");
+  }
 }
 
 void codegen_helpers_prototypes(struct_data *defs, int ndefs, char *prefix,
@@ -509,6 +511,8 @@ void codegen_helpers_prototypes(struct_data *defs, int ndefs, char *prefix,
   int i;
   int n;
   struct_data *filtered_defs[ndefs];
+
+  codegen_patch_prototypes(defs,ndefs,prefix,"_info",out);
 
   for (i = n = 0; i < ndefs; i++) {
     if (is_prefix(defs[i].info.name,prefix) 

@@ -57,6 +57,9 @@ typedef struct {
   kr_jack_path_info_patch_value value;
 } kr_jack_path_info_patch;
 
+int kr_jack_setup_info_patch_apply(kr_jack_setup_info *info, kr_jack_setup_info_patch *patch);
+int kr_jack_info_patch_apply(kr_jack_info *info, kr_jack_info_patch *patch);
+int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_patch *patch);
 int kr_jack_setup_info_init(void *st);
 int kr_jack_setup_info_valid(void *st);
 int kr_jack_setup_info_random(void *st);
