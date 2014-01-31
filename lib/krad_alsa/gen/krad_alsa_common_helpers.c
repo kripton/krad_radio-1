@@ -1,5 +1,25 @@
 #include "krad_alsa_common_helpers.h"
 
+int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_alsa_info, card), 
+    offsetof(struct kr_alsa_info, name)
+  };
+  const size_t sz[2] = { sizeof(info->card), 
+    sizeof(info->name)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_info_patch *patch) {
+  const ptrdiff_t off[1] = { offsetof(struct kr_alsa_path_info, card_num)
+  };
+  const size_t sz[1] = { sizeof(info->card_num)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_alsa_info_init(void *st) {
   struct kr_alsa_info *actual;
 

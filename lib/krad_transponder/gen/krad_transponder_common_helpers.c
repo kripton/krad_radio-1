@@ -187,6 +187,37 @@ int kr_strto_kr_transponder_path_io_type(char *string) {
   return -1;
 }
 
+int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transponder_info_patch *patch) {
+  const ptrdiff_t off[1] = { offsetof(struct kr_transponder_info, active_paths)
+  };
+  const size_t sz[1] = { sizeof(info->active_paths)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *info, kr_transponder_path_io_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_transponder_path_io_info, type), 
+    offsetof(struct kr_transponder_path_io_info, info)
+  };
+  const size_t sz[2] = { sizeof(info->type), 
+    sizeof(info->info)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, kr_transponder_path_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_transponder_path_info, input), 
+    offsetof(struct kr_transponder_path_info, output)
+  };
+  const size_t sz[2] = { sizeof(info->input), 
+    sizeof(info->output)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_transponder_info_init(void *st) {
   if (st == NULL) {
     return -1;

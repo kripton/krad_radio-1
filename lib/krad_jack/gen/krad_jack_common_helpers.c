@@ -62,6 +62,45 @@ int kr_strto_kr_jack_state(char *string) {
   return -1;
 }
 
+int kr_jack_setup_info_patch_apply(kr_jack_setup_info *info, kr_jack_setup_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(kr_jack_setup_info, client_name), 
+    offsetof(kr_jack_setup_info, server_name)
+  };
+  const size_t sz[2] = { sizeof(info->client_name), 
+    sizeof(info->server_name)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_jack_info_patch_apply(kr_jack_info *info, kr_jack_info_patch *patch) {
+  const ptrdiff_t off[9] = { offsetof(kr_jack_info, client_name), 
+    offsetof(kr_jack_info, server_name), offsetof(kr_jack_info, state), 
+    offsetof(kr_jack_info, inputs), offsetof(kr_jack_info, outputs), 
+    offsetof(kr_jack_info, sample_rate), offsetof(kr_jack_info, period_size), 
+    offsetof(kr_jack_info, xruns), offsetof(kr_jack_info, frames)
+  };
+  const size_t sz[9] = { sizeof(info->client_name), 
+    sizeof(info->server_name), sizeof(info->state), 
+    sizeof(info->inputs), sizeof(info->outputs), 
+    sizeof(info->sample_rate), sizeof(info->period_size), 
+    sizeof(info->xruns), sizeof(info->frames)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_patch *patch) {
+  const ptrdiff_t off[3] = { offsetof(kr_jack_path_info, name), 
+    offsetof(kr_jack_path_info, channels), offsetof(kr_jack_path_info, direction)
+  };
+  const size_t sz[3] = { sizeof(info->name), 
+    sizeof(info->channels), sizeof(info->direction)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_jack_setup_info_init(void *st) {
   kr_jack_setup_info *actual;
 

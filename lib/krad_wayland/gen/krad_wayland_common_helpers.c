@@ -1,5 +1,29 @@
 #include "krad_wayland_common_helpers.h"
 
+int kr_wayland_info_patch_apply(kr_wayland_info *info, kr_wayland_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(kr_wayland_info, state), 
+    offsetof(kr_wayland_info, display_name)
+  };
+  const size_t sz[2] = { sizeof(info->state), 
+    sizeof(info->display_name)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path_info_patch *patch) {
+  const ptrdiff_t off[5] = { offsetof(kr_wayland_path_info, display_name), 
+    offsetof(kr_wayland_path_info, state), offsetof(kr_wayland_path_info, width), 
+    offsetof(kr_wayland_path_info, height), offsetof(kr_wayland_path_info, fullscreen)
+  };
+  const size_t sz[5] = { sizeof(info->display_name), 
+    sizeof(info->state), sizeof(info->width), 
+    sizeof(info->height), sizeof(info->fullscreen)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_wayland_info_init(void *st) {
   kr_wayland_info *actual;
 

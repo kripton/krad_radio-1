@@ -10,13 +10,22 @@ static void codegen_helpers_prototype(struct_data *sdata, char *helper_type, FIL
   }
 }
 
+static void codegen_patch_prototype(struct_data *sdata, FILE *out) {
+  if (sdata->info.is_typedef) {
+    fprintf(out,"int %s_patch_apply(%s *info, %s_patch *patch)",
+      sdata->info.name,sdata->info.name,sdata->info.name);
+  } else {
+    fprintf(out,"int %s_patch_apply(struct %s *info, %s_patch *patch)",
+      sdata->info.name,sdata->info.name,sdata->info.name);
+  }
+}
+
 static void codegen_helpers_union_content_from_type(struct_data *def, 
   char *fun_name, FILE *out) {
   int i;
 
   for (i = 0; i < def->info.member_count; i++) {
     if (memb_struct_check(&def->info.members[i])) {
-
       fprintf(out,"    case %d: {\n",i);
       fprintf(out,"      %s_%s(&actual->%s);\n",
         def->info.members[i].type_info.substruct_info.type_name,
@@ -346,6 +355,51 @@ static void codegen_helper_func(struct_data *def,
 
 }
 
+static void codegen_patch_func(struct_data *def, 
+  FILE *out) {
+  int i;
+  codegen_patch_prototype(def,out);
+  fprintf(out," {\n");
+  if (def->info.member_count) {
+    fprintf(out,"  const ptrdiff_t off[%d] = { ",
+      def->info.member_count);
+    for (i = 0; i < def->info.member_count; i++) {
+      if (def->info.is_typedef) {
+        fprintf(out,"offsetof(%s, %s)",
+          def->info.name,def->info.members[i].name);
+      } else {
+        fprintf(out,"offsetof(struct %s, %s)",
+          def->info.name,def->info.members[i].name);
+      }
+      if (i != (def->info.member_count - 1)) {
+        fprintf(out,", ");
+        if (!(i%2))
+          fprintf(out,"\n    ");
+      }
+    }
+    fprintf(out,"\n  };\n");
+    fprintf(out,"  const size_t sz[%d] = { ",
+      def->info.member_count);
+    for (i = 0; i < def->info.member_count; i++) {
+      if (def->info.is_typedef) {
+        fprintf(out,"sizeof(info->%s)",
+          def->info.members[i].name);
+      } else {
+        fprintf(out,"sizeof(info->%s)",
+          def->info.members[i].name);
+      }
+      if (i != (def->info.member_count - 1)) {
+        fprintf(out,", ");
+        if (!(i%2))
+          fprintf(out,"\n    ");
+      }
+    }
+    fprintf(out,"  };\n\n");
+  }
+  fprintf(out,"  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);\n");
+  fprintf(out,"  return 0;\n}\n\n");
+}
+
 static void codegen_enum_protos(struct_data *defs, int ndefs, 
   char *prefix, char *suffix, FILE *out) {
   int i;
@@ -368,6 +422,85 @@ static void codegen_enum_protos(struct_data *defs, int ndefs,
   }
 
   return;
+}
+
+static void codegen_patch_struct(struct_data *def, FILE *out) {
+  int i;
+  fprintf(out,"typedef struct {\n  int integer;\n  float real;\n");
+  for (i = 0; i < def->info.member_count; i++) {
+    if (memb_struct_check(&def->info.members[i]) && 
+      is_suffix(def->info.members[i].type_info.substruct_info.type_name,"_info") &&
+      !codegen_is_union(def->info.members[i].type_info.substruct_info.type_name) && 
+      !codegen_is_enum(def->info.members[i].type_info.substruct_info.type_name)) {
+      fprintf(out,"  %s_patch %s_patch;\n",
+        def->info.members[i].type_info.substruct_info.type_name,
+        def->info.members[i].name);
+    }
+  }
+  fprintf(out,"} %s_patch_value;\n\n",def->info.name);
+  fprintf(out,"typedef struct {\n  %s_member member;\n  "
+    "%s_patch_value value;\n} %s_patch;\n\n",def->info.name,
+    def->info.name,def->info.name);
+}
+
+static void codegen_member_enum(struct_data *def, FILE *out) {
+  int i;
+  char struct_name_up[NAME_MAX_LEN];
+  char memb_name_up[NAME_MAX_LEN];
+
+  uppercase(def->info.name,struct_name_up);
+
+  fprintf(out,"typedef enum {\n");
+  for (i = 0; i < def->info.member_count; i++) {
+    uppercase(def->info.members[i].name,memb_name_up);
+    fprintf(out,"  %s_%s",struct_name_up,memb_name_up);
+    if (i != (def->info.member_count - 1)) {
+      fprintf(out,",");
+    }
+    fprintf(out,"\n");
+  }
+  fprintf(out,"} %s_member;\n\n",def->info.name);
+
+}
+
+void codegen_patch_struct_and_member_enum(struct_data *defs, int ndefs, char *prefix,
+ char *suffix, FILE *out) {
+  int i;
+  int n;
+  struct_data *filtered_defs[ndefs];
+
+  for (i = n = 0; i < ndefs; i++) {
+    if (is_prefix(defs[i].info.name,prefix) 
+      && is_suffix(defs[i].info.name,suffix) 
+      && defs[i].info.type == ST_STRUCT) {
+      filtered_defs[n] = &defs[i];
+      n++;
+    }
+  }
+
+  for (i = 0; i < n; i++) {
+    codegen_member_enum(filtered_defs[i],out);
+    codegen_patch_struct(filtered_defs[i],out);
+  }
+
+}
+
+void codegen_patch_prototypes(struct_data *defs, int ndefs, char *prefix,
+ char *suffix, FILE *out) {
+  int i;
+  int n;
+  struct_data *filtered_defs[ndefs];
+
+  for (i = n = 0; i < ndefs; i++) {
+    if (is_prefix(defs[i].info.name,prefix) 
+      && is_suffix(defs[i].info.name,suffix) 
+      && defs[i].info.type == ST_STRUCT) {
+      filtered_defs[n] = &defs[i];
+      n++;
+    }
+  }
+  codegen_patch_prototype(filtered_defs[i],out);
+  fprintf(out,";\n");
 }
 
 void codegen_helpers_prototypes(struct_data *defs, int ndefs, char *prefix,
@@ -468,12 +601,37 @@ int codegen_enum_util_functions(struct_data *defs, int ndefs,
   return 0;
 }
 
+static int codegen_patch_function(struct_data *defs, int ndefs, char *prefix,
+ char *suffix, FILE *out) {
+
+  int i;
+  int n;
+  struct_data *filtered_defs[ndefs];
+
+  for (i = n = 0; i < ndefs; i++) {
+    if (is_prefix(defs[i].info.name,prefix) 
+      && is_suffix(defs[i].info.name,suffix) 
+      && defs[i].info.type == ST_STRUCT) {
+      filtered_defs[n] = &defs[i];
+      n++;
+    }
+  }
+
+  for (i = 0; i < n; i++) {
+    codegen_patch_func(filtered_defs[i],out);
+  }
+
+  return 0;
+}
+
 int codegen_helper_functions(struct_data *defs, int ndefs, char *prefix,
  char *suffix, FILE *out) {
 
   int i;
   int n;
   struct_data *filtered_defs[ndefs];
+
+  codegen_patch_function(defs,ndefs,prefix,"_info",out);
 
   for (i = n = 0; i < ndefs; i++) {
     if (is_prefix(defs[i].info.name,prefix) 

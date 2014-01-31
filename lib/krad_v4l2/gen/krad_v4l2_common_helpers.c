@@ -38,6 +38,30 @@ int kr_strto_kr_v4l2_state(char *string) {
   return -1;
 }
 
+int kr_v4l2_info_patch_apply(struct kr_v4l2_info *info, kr_v4l2_info_patch *patch) {
+  const ptrdiff_t off[4] = { offsetof(struct kr_v4l2_info, dev), 
+    offsetof(struct kr_v4l2_info, priority), offsetof(struct kr_v4l2_info, state), 
+    offsetof(struct kr_v4l2_info, mode)
+  };
+  const size_t sz[4] = { sizeof(info->dev), 
+    sizeof(info->priority), sizeof(info->state), 
+    sizeof(info->mode)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_v4l2_open_info_patch_apply(struct kr_v4l2_open_info *info, kr_v4l2_open_info_patch *patch) {
+  const ptrdiff_t off[3] = { offsetof(struct kr_v4l2_open_info, dev), 
+    offsetof(struct kr_v4l2_open_info, priority), offsetof(struct kr_v4l2_open_info, mode)
+  };
+  const size_t sz[3] = { sizeof(info->dev), 
+    sizeof(info->priority), sizeof(info->mode)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_v4l2_mode_init(void *st) {
   if (st == NULL) {
     return -1;

@@ -104,6 +104,30 @@ int kr_strto_kr_adapter_api(char *string) {
   return -1;
 }
 
+int kr_adapter_info_patch_apply(struct kr_adapter_info *info, kr_adapter_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_adapter_info, api), 
+    offsetof(struct kr_adapter_info, api_info)
+  };
+  const size_t sz[2] = { sizeof(info->api), 
+    sizeof(info->api_info)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_adapter_path_info_patch_apply(struct kr_adapter_path_info *info, kr_adapter_path_info_patch *patch) {
+  const ptrdiff_t off[4] = { offsetof(struct kr_adapter_path_info, name), 
+    offsetof(struct kr_adapter_path_info, dir), offsetof(struct kr_adapter_path_info, api), 
+    offsetof(struct kr_adapter_path_info, info)
+  };
+  const size_t sz[4] = { sizeof(info->name), 
+    sizeof(info->dir), sizeof(info->api), 
+    sizeof(info->info)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_adapter_api_info_init(void *st, int idx) {
   kr_adapter_api_info *actual;
 
@@ -132,6 +156,10 @@ int kr_adapter_api_info_init(void *st, int idx) {
     }
     case 4: {
       kr_x11_info_init(&actual->x11);
+      break;
+    }
+    case 5: {
+      kr_alsa_info_init(&actual->alsa);
       break;
     }
   }
@@ -169,6 +197,10 @@ int kr_adapter_api_info_valid(void *st, int idx) {
       kr_x11_info_valid(&actual->x11);
       break;
     }
+    case 5: {
+      kr_alsa_info_valid(&actual->alsa);
+      break;
+    }
   }
 
 
@@ -203,6 +235,10 @@ int kr_adapter_api_info_random(void *st, int idx) {
     }
     case 4: {
       kr_x11_info_random(&actual->x11);
+      break;
+    }
+    case 5: {
+      kr_alsa_info_random(&actual->alsa);
       break;
     }
   }

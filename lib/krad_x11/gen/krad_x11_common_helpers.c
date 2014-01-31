@@ -1,5 +1,29 @@
 #include "krad_x11_common_helpers.h"
 
+int kr_x11_info_patch_apply(struct kr_x11_info *info, kr_x11_info_patch *patch) {
+  const ptrdiff_t off[1] = { offsetof(struct kr_x11_info, display)
+  };
+  const size_t sz[1] = { sizeof(info->display)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+int kr_x11_path_info_patch_apply(struct kr_x11_path_info *info, kr_x11_path_info_patch *patch) {
+  const ptrdiff_t off[7] = { offsetof(struct kr_x11_path_info, display), 
+    offsetof(struct kr_x11_path_info, width), offsetof(struct kr_x11_path_info, height), 
+    offsetof(struct kr_x11_path_info, num), offsetof(struct kr_x11_path_info, den), 
+    offsetof(struct kr_x11_path_info, x), offsetof(struct kr_x11_path_info, y)
+  };
+  const size_t sz[7] = { sizeof(info->display), 
+    sizeof(info->width), sizeof(info->height), 
+    sizeof(info->num), sizeof(info->den), 
+    sizeof(info->x), sizeof(info->y)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_x11_info_init(void *st) {
   struct kr_x11_info *actual;
 

@@ -125,6 +125,21 @@ int kr_strto_kr_mixer_path_type(char *string) {
   return -1;
 }
 
+int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_path_info_patch *patch) {
+  const ptrdiff_t off[7] = { offsetof(struct kr_mixer_path_info, type), 
+    offsetof(struct kr_mixer_path_info, channels), offsetof(struct kr_mixer_path_info, lowpass), 
+    offsetof(struct kr_mixer_path_info, highpass), offsetof(struct kr_mixer_path_info, analog), 
+    offsetof(struct kr_mixer_path_info, eq), offsetof(struct kr_mixer_path_info, volume)
+  };
+  const size_t sz[7] = { sizeof(info->type), 
+    sizeof(info->channels), sizeof(info->lowpass), 
+    sizeof(info->highpass), sizeof(info->analog), 
+    sizeof(info->eq), sizeof(info->volume)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
 int kr_mixer_path_info_init(void *st) {
   struct kr_mixer_path_info *actual;
 
