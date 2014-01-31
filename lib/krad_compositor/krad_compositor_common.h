@@ -69,7 +69,6 @@ typedef struct kr_vector_info kr_vector_info;
 typedef struct kr_compositor_path_info kr_compositor_path_info;
 typedef struct kr_compositor_controls kr_compositor_controls;
 typedef struct kr_compositor_info kr_compositor_info;
-typedef struct kr_compositor_path_patch kr_compositor_path_patch;
 
 #include "gen/krad_compositor_common_to_json.h"
 #include "gen/krad_compositor_common_from_json.h"
@@ -122,14 +121,6 @@ struct kr_compositor_path_info {
   uint32_t crop_height;
   kr_perspective_view view;
   kr_compositor_controls controls;
-};
-
-struct kr_compositor_path_patch {
-  kr_compositor_control control;
-  int32_t integer;
-  float real;
-  int duration;
-  kr_easing easing;
 };
 
 void kr_aspect_scale(int srcw, int srch, int dstw, int dsth, int *w, int *h);

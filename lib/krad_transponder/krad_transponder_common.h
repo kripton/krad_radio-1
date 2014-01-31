@@ -57,9 +57,6 @@ typedef struct kr_transogg_demuxer_St kr_transogg_demuxer_t;
 
 typedef struct kr_stat_St kr_stat_t;
 
-typedef struct kr_transponder_path_patch kr_transponder_path_patch;
-typedef struct kr_transponder_path_patch kr_xpdr_path_patch;
-
 struct kr_stat_St {
   uint64_t time_last;
   uint64_t time_total;
@@ -325,10 +322,6 @@ struct kr_transponder_path_io_info {
 struct kr_transponder_path_info {
   kr_transponder_path_io_info input;
   kr_transponder_path_io_info output;
-};
-
-struct kr_transponder_path_patch {
-  int coconut;
 };
 
 #include "gen/krad_transponder_common_to_ebml.h"

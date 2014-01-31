@@ -11,4 +11,3 @@ int kr_transponder_info_to_json(char *json, void *st, int32_t max);
 int kr_transponder_path_io_path_info_to_json(char *json, void *st, int32_t max);
 int kr_transponder_path_io_info_to_json(char *json, void *st, int32_t max);
 int kr_transponder_path_info_to_json(char *json, void *st, int32_t max);
-int kr_transponder_path_patch_to_json(char *json, void *st, int32_t max);

@@ -72,22 +72,3 @@ int kr_mixer_path_info_to_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_mixer_path_patch_to_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  struct kr_mixer_path_patch *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (struct kr_mixer_path_patch *)st;
-
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->ctl);
-  res += kr_ebml_pack_float(ebml, 0xe1, actual->val);
-  res += kr_ebml_pack_int32(ebml, 0xe1, actual->ms);
-
-  return res;
-}
-

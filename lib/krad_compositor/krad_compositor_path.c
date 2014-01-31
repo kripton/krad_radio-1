@@ -242,8 +242,11 @@ int kr_compositor_path_info_get(kr_compositor_path *path,
  return 0;
 }
 
-int kr_compositor_path_ctl(kr_compositor_path *p, kr_compositor_path_patch *s) {
-  if ((p == NULL) || (s == NULL)) return -1;
+int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch) {
+  int ret;
+  if ((path == NULL) || (patch == NULL)) return -1;
+  ret = kr_compositor_path_info_patch_apply(&path->info, patch);
+  /*
   switch (s->control) {
     case KR_NO:
       return -1;
@@ -310,7 +313,8 @@ int kr_compositor_path_ctl(kr_compositor_path *p, kr_compositor_path_patch *s) {
     default:
       break;
   }
-  return 0;
+  */
+  return ret;
 }
 
 int kr_compositor_process(kr_compositor_path *path) {

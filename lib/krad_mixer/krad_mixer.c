@@ -40,6 +40,7 @@ struct kr_mixer_path {
   kr_sfx *sfx;
   kr_vertex *vertex;
   kr_edge *edge;
+  kr_mixer_path_info info;
 };
 
 static void limit_samples(float **samples, int nc, int ns);
@@ -346,9 +347,11 @@ static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   return path;
 }
 
-int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch) {
-  if (path == NULL) return -1;
-  return -2;
+int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_info_patch *patch) {
+  int ret;
+  if ((path == NULL) || (patch == NULL)) return -1;
+  ret = kr_mixer_path_info_patch_apply(&path->info, patch);
+  return ret;
 }
 
 int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info) {

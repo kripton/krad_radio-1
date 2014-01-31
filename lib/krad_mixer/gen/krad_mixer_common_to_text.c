@@ -72,22 +72,3 @@ int kr_mixer_path_info_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
-int kr_mixer_path_patch_to_text(char *text, void *st, int32_t max) {
-  int res;
-  struct kr_mixer_path_patch *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_mixer_path_patch *)st;
-
-  res += snprintf(&text[res],max-res,"ctl : %s \n",actual->ctl);
-  res += snprintf(&text[res],max-res,"val : %0.2f \n",actual->val);
-  res += snprintf(&text[res],max-res,"ms : %d \n",actual->ms);
-
-  return res;
-}
-

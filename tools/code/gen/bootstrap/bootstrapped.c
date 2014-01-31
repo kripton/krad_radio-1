@@ -111,8 +111,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_vector_info";
     case CGEN_KR_COMPOSITOR_PATH_INFO:
       return "kr_compositor_path_info";
-    case CGEN_KR_COMPOSITOR_PATH_PATCH:
-      return "kr_compositor_path_patch";
     case CGEN_COMPOSITOR_PATH_STATE:
       return "compositor_path_state";
     case CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG:
@@ -253,8 +251,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_mixer_path_type";
     case CGEN_KR_MIXER_PATH_INFO:
       return "kr_mixer_path_info";
-    case CGEN_KR_MIXER_PATH_PATCH:
-      return "kr_mixer_path_patch";
     case CGEN_KR_MKV_TRACK_ST:
       return "kr_mkv_track_St";
     case CGEN_KR_MKV_ST:
@@ -533,8 +529,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_transponder_path_io_info";
     case CGEN_KR_TRANSPONDER_PATH_INFO:
       return "kr_transponder_path_info";
-    case CGEN_KR_TRANSPONDER_PATH_PATCH:
-      return "kr_transponder_path_patch";
     case CGEN_KRAD_SLICE_TRACK_TYPE_T:
       return "krad_slice_track_type_t";
     case CGEN_KRAD_SUBSLICE_ST:
@@ -804,9 +798,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_compositor_path_info")) {
     return CGEN_KR_COMPOSITOR_PATH_INFO;
   }
-  if (!strcmp(string,"kr_compositor_path_patch")) {
-    return CGEN_KR_COMPOSITOR_PATH_PATCH;
-  }
   if (!strcmp(string,"compositor_path_state")) {
     return CGEN_COMPOSITOR_PATH_STATE;
   }
@@ -1016,9 +1007,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_mixer_path_info")) {
     return CGEN_KR_MIXER_PATH_INFO;
-  }
-  if (!strcmp(string,"kr_mixer_path_patch")) {
-    return CGEN_KR_MIXER_PATH_PATCH;
   }
   if (!strcmp(string,"kr_mkv_track_St")) {
     return CGEN_KR_MKV_TRACK_ST;
@@ -1436,9 +1424,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_transponder_path_info")) {
     return CGEN_KR_TRANSPONDER_PATH_INFO;
-  }
-  if (!strcmp(string,"kr_transponder_path_patch")) {
-    return CGEN_KR_TRANSPONDER_PATH_PATCH;
   }
   if (!strcmp(string,"krad_slice_track_type_t")) {
     return CGEN_KRAD_SLICE_TRACK_TYPE_T;

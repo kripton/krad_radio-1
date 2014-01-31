@@ -281,8 +281,11 @@ static int path_create(kr_xpdr_path *path) {
   return 0;
 }
 
-int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch) {
-  return -1;
+int kr_transponder_path_ctl(kr_xpdr_path *path, kr_transponder_path_info_patch *patch) {
+  int ret;
+  if ((path == NULL) || (patch == NULL)) return -1;
+  ret = kr_transponder_path_info_patch_apply(&path->info, patch);
+  return ret;
 }
 
 int kr_transponder_unlink(kr_xpdr_path *path) {

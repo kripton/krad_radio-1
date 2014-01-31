@@ -47,6 +47,6 @@ int kr_compositor_path_info_get(kr_compositor_path *path,
 int kr_compositor_unlink(kr_compositor_path *path);
 kr_compositor_path *kr_compositor_mkio(kr_compositor *c, kr_compositor_io_path_setup *setup);
 int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user);
-int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_patch *patch);
+int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch);
 
 #endif

@@ -12,14 +12,12 @@
 #define KR_MXR_PERIOD_DEF 1024
 
 #include "krad_sfx_common.h"
-#include "krad_easing_common.h"
 
 typedef struct kr_mixer_path_info kr_mixer_path_info;
 typedef struct kr_mixer_path_info kr_mixer_source_info;
 typedef struct kr_mixer_path_info kr_mixer_input_info;
 typedef struct kr_mixer_path_info kr_mixer_bus_info;
 typedef struct kr_mixer_path_info kr_mixer_output_info;
-typedef struct kr_mixer_path_patch kr_mixer_path_patch;
 
 typedef enum {
   NIL,
@@ -55,12 +53,6 @@ struct kr_mixer_path_info {
   kr_analog_info analog;
   kr_eq_info eq;
   kr_volume_info volume;
-};
-
-struct kr_mixer_path_patch {
-  char ctl[16];
-  float val;
-  int ms;
 };
 
 #endif

@@ -196,29 +196,3 @@ int kr_compositor_path_info_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
-int kr_compositor_path_patch_to_text(char *text, void *st, int32_t max) {
-  uber_St uber;
-  int res;
-  struct kr_compositor_path_patch *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_compositor_path_patch *)st;
-
-  uber.actual = &(actual->control);
-  uber.type = TEXT_KR_COMPOSITOR_CONTROL;
-  res += info_pack_to_text(&text[res],&uber,max-res);
-  res += snprintf(&text[res],max-res,"integer : %d \n",actual->integer);
-  res += snprintf(&text[res],max-res,"real : %0.2f \n",actual->real);
-  res += snprintf(&text[res],max-res,"duration : %d \n",actual->duration);
-  uber.actual = &(actual->easing);
-  uber.type = TEXT_KR_EASING;
-  res += info_pack_to_text(&text[res],&uber,max-res);
-
-  return res;
-}
-

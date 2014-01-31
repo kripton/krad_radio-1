@@ -29,7 +29,7 @@ struct kr_transponder_event {
   void *user;
   void *user_path;
   kr_transponder_event_type type;
-  kr_transponder_path_patch patch;
+  kr_transponder_path_info_patch patch;
   kr_transponder_path_info info;
 };
 
@@ -41,7 +41,7 @@ struct kr_transponder_setup {
   int path_count;
 };
 
-int kr_transponder_path_ctl(kr_xpdr_path *path, kr_xpdr_path_patch *patch);
+int kr_transponder_path_ctl(kr_xpdr_path *path, kr_transponder_path_info_patch *patch);
 int kr_transponder_unlink(kr_xpdr_path *path);
 int kr_transponder_mkpath(kr_xpdr *xpdr, kr_xpdr_path_info *i, void *user);
 int kr_transponder_destroy(kr_transponder *transponder);

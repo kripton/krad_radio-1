@@ -11,4 +11,3 @@ int kr_transponder_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_transponder_path_io_path_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_transponder_path_io_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_transponder_path_info_fr_ebml(kr_ebml *ebml, void *st);
-int kr_transponder_path_patch_fr_ebml(kr_ebml *ebml, void *st);

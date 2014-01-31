@@ -12,4 +12,3 @@ int kr_sprite_info_fr_json(char *json, void *st);
 int kr_text_info_fr_json(char *json, void *st);
 int kr_vector_info_fr_json(char *json, void *st);
 int kr_compositor_path_info_fr_json(char *json, void *st);
-int kr_compositor_path_patch_fr_json(char *json, void *st);

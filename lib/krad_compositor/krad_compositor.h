@@ -52,7 +52,7 @@ struct kr_compositor_event {
   void *user;
   void *user_path;
   kr_compositor_event_type type;
-  kr_compositor_path_patch patch;
+  kr_compositor_path_info_patch patch;
   kr_compositor_path_info info;
 };
 

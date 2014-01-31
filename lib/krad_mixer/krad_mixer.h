@@ -29,7 +29,7 @@ struct kr_mixer_event {
   void *user;
   void *user_path;
   kr_mixer_event_type type;
-  kr_mixer_path_patch patch;
+  kr_mixer_path_info_patch patch;
   kr_mixer_path_info info;
 };
 
@@ -52,7 +52,7 @@ struct kr_mixer_setup {
 };
 
 int kr_mixer_process(kr_mixer_path *path);
-int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_patch *patch);
+int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_info_patch *patch);
 int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info);
 int kr_mixer_unlink(kr_mixer_path *path);
 kr_mixer_path *kr_mixer_mkso(kr_mixer *mixer, kr_mixer_io_path_setup *setup);

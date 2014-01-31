@@ -196,29 +196,3 @@ int kr_compositor_path_info_to_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_compositor_path_patch_to_ebml(kr_ebml *ebml, void *st) {
-  uber_St uber;
-  int res;
-  struct kr_compositor_path_patch *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (struct kr_compositor_path_patch *)st;
-
-  uber.actual = &(actual->control);
-  uber.type = EBML_KR_COMPOSITOR_CONTROL;
-  res += info_pack_to_ebml(&ebml[res],&uber);
-  res += kr_ebml_pack_int32(ebml, 0xe1, actual->integer);
-  res += kr_ebml_pack_float(ebml, 0xe1, actual->real);
-  res += kr_ebml_pack_int32(ebml, 0xe1, actual->duration);
-  uber.actual = &(actual->easing);
-  uber.type = EBML_KR_EASING;
-  res += info_pack_to_ebml(&ebml[res],&uber);
-
-  return res;
-}
-

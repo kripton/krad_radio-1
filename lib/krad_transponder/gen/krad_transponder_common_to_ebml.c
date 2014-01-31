@@ -182,20 +182,3 @@ int kr_transponder_path_info_to_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_transponder_path_patch_to_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  struct kr_transponder_path_patch *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (struct kr_transponder_path_patch *)st;
-
-  res += kr_ebml_pack_int32(ebml, 0xe1, actual->coconut);
-
-  return res;
-}
-

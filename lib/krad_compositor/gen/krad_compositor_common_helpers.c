@@ -736,32 +736,3 @@ int kr_compositor_path_info_random(struct kr_compositor_path_info *st) {
   return 0;
 }
 
-int kr_compositor_path_patch_init(struct kr_compositor_path_patch *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(struct kr_compositor_path_patch));
-
-  return 0;
-}
-
-int kr_compositor_path_patch_valid(struct kr_compositor_path_patch *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-
-  return 0;
-}
-
-int kr_compositor_path_patch_random(struct kr_compositor_path_patch *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(struct kr_compositor_path_patch));
-
-  return 0;
-}
-
