@@ -114,7 +114,7 @@ static void codegen_jschema_enum(struct_data *def, FILE *out) {
   return;
 }
 
-static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE *out) {
+static void codegen_jschema_internal(char *title, struct_data *def, struct_data **defs, FILE *out) {
 
   int j;
   int idx;
@@ -159,7 +159,7 @@ static void codegen_jschema_internal(struct_data *def, struct_data **defs, FILE 
 
       if (defs[idx-1] && (defs[idx-1]->info.type == ST_STRUCT)) {
         fprintf(out,"\"%s\" : {",actual_members[j]->name);
-        codegen_jschema_internal(defs[idx-1],defs,out);
+        codegen_jschema_internal(title,defs[idx-1],defs,out);
         fprintf(out,"}");
 
         if (j != (actual_memb_count - 1)) {
@@ -209,6 +209,8 @@ int codegen_jschema(struct_data **defs, int ndefs,
   int i;
   int n;
   struct_data *filtered_defs[ndefs];
+  char title[NAME_MAX_LEN];
+  char *p;
 
   for (i = n = 0; i < ndefs; i++) {
     if (defs[i] && is_prefix(defs[i]->info.name,prefix) && is_suffix(defs[i]->info.name,suffix) && defs[i]->info.type == ST_STRUCT) {
@@ -217,24 +219,30 @@ int codegen_jschema(struct_data **defs, int ndefs,
     }
   }
 
-  if (n) {
-    fprintf(out,"[\n");
-  }
+  fprintf(out,"schemas:\n");
 
   for (i = 0; i < n; i++) {
-    fprintf(out,"{");
-    fprintf(out,"\"title\" : \"%s\",",filtered_defs[i]->info.name);
-    codegen_jschema_internal(filtered_defs[i],defs,out);
-    fprintf(out,"}");
-    if (i != (n - 1)) {
-      fprintf(out,",");
+    if (is_prefix(filtered_defs[i]->info.name,"kr_")) {
+      snprintf(title,NAME_MAX_LEN,"%s",filtered_defs[i]->info.name+3);
+    } else {
+      snprintf(title,NAME_MAX_LEN,"%s",filtered_defs[i]->info.name);
     }
+    if (is_suffix(title,"_info")) {
+      p = strstr(title,"_info");
+      p[0] = '\0';
+    }
+    if (!i) {
+      fprintf(out,"-");
+      fprintf(out," %s: '",title);
+    } else {
+      fprintf(out,"  %s: '",title);
+    }
+    fprintf(out,"{");
+    fprintf(out,"\"title\" : \"%s\",",title);
+    codegen_jschema_internal(title,filtered_defs[i],defs,out);
+    fprintf(out,"}'");
     fprintf(out,"\n");
   }
 
-  if (n) {
-    fprintf(out,"]\n");
-  }
-  
   return 0;
 }

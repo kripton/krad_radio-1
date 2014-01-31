@@ -2,7 +2,7 @@
 
 void print_usage(char *cmd) {
   printf("  Generates JSchema for the structs gathered.\n");
-  printf("  syntax:\n   %s libpath prefix suffix outfile.json\n",cmd);
+  printf("  syntax:\n   %s libpath prefix suffix outfile.yml\n",cmd);
 }
 
 int main(int argc, char *argv[]) {
