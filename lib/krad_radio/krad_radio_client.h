@@ -228,5 +228,6 @@ int kr_delivery_final (kr_client *client);
 void kr_client_crate_wait(kr_client *client, kr_crate **crate);
 int kr_crate_send(kr_client *client, kr_crate2 *crate);
 int kr_get(kr_client *client, char *address);
+int kr_delete(kr_client *client, char *address);
 int kr_streamer45(kr_client *client);
 #endif

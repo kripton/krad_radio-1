@@ -15,6 +15,15 @@ int kr_cmd_handle(kr_client *client, char *argv[], int argc) {
     kr_delivery_recv(client);
     kr_streamer45(client);
   }
+  if (argc == 2) {
+    if ((strlen(argv[0]) == 2) && (strncmp(argv[0], "rm", 2) == 0)) {
+      ret = kr_delete(client, argv[1]);
+      printf("sending delete %s\n", argv[1]);
+      kr_poll(client, 250);
+      kr_delivery_recv(client);
+      kr_streamer45(client);
+    }
+  }
   return ret;
 }
 
