@@ -15,8 +15,6 @@ typedef enum {
 } kr_mixer_path_info_member;
 
 typedef struct {
-  int integer;
-  float real;
   kr_lowpass_info_patch lowpass_patch;
   kr_highpass_info_patch highpass_patch;
   kr_analog_info_patch analog_patch;
@@ -30,7 +28,7 @@ typedef struct {
 } kr_mixer_path_info_patch;
 
 int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_path_info_patch *patch);
-kr_var *kr_mixer_path_info_address_to_patch(kr_mixer_path_info_patch *patch, kr_address2 *addr);
+kr_var *kr_mixer_path_info_patch_path(kr_mixer_path_info_patch *patch, kr_path *path);
 int kr_mixer_path_info_init(struct kr_mixer_path_info *st);
 int kr_mixer_path_info_valid(struct kr_mixer_path_info *st);
 int kr_mixer_path_info_random(struct kr_mixer_path_info *st);

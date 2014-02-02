@@ -163,25 +163,29 @@ int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_pat
   return 0;
 }
 
-kr_var *kr_mixer_path_info_address_to_patch(kr_mixer_path_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_mixer_path_info_strto_member(addr->path[0]);
+kr_var *kr_mixer_path_info_patch_path(kr_mixer_path_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_mixer_path_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
+  switch(patch->member) {
       case KR_MIXER_PATH_INFO_LOWPASS:
-        return kr_lowpass_info_address_to_patch(&patch->value.lowpass_patch,addr);
+        return kr_lowpass_info_patch_path(&patch->value.lowpass_patch, path);
       case KR_MIXER_PATH_INFO_HIGHPASS:
-        return kr_highpass_info_address_to_patch(&patch->value.highpass_patch,addr);
+        return kr_highpass_info_patch_path(&patch->value.highpass_patch, path);
       case KR_MIXER_PATH_INFO_ANALOG:
-        return kr_analog_info_address_to_patch(&patch->value.analog_patch,addr);
+        return kr_analog_info_patch_path(&patch->value.analog_patch, path);
       case KR_MIXER_PATH_INFO_EQ:
-        return kr_eq_info_address_to_patch(&patch->value.eq_patch,addr);
+        return kr_eq_info_patch_path(&patch->value.eq_patch, path);
       case KR_MIXER_PATH_INFO_VOLUME:
-        return kr_volume_info_address_to_patch(&patch->value.volume_patch,addr);
-      default: break;
-    }
+        return kr_volume_info_patch_path(&patch->value.volume_patch, path);
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }

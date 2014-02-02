@@ -10,8 +10,6 @@ typedef enum {
 } kr_wayland_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_wayland_info_patch_value;
 
 typedef struct {
@@ -28,8 +26,6 @@ typedef enum {
 } kr_wayland_path_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_wayland_path_info_patch_value;
 
 typedef struct {
@@ -38,9 +34,9 @@ typedef struct {
 } kr_wayland_path_info_patch;
 
 int kr_wayland_info_patch_apply(kr_wayland_info *info, kr_wayland_info_patch *patch);
-kr_var *kr_wayland_info_address_to_patch(kr_wayland_info_patch *patch, kr_address2 *addr);
+kr_var *kr_wayland_info_patch_path(kr_wayland_info_patch *patch, kr_path *path);
 int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path_info_patch *patch);
-kr_var *kr_wayland_path_info_address_to_patch(kr_wayland_path_info_patch *patch, kr_address2 *addr);
+kr_var *kr_wayland_path_info_patch_path(kr_wayland_path_info_patch *patch, kr_path *path);
 int kr_wayland_info_init(kr_wayland_info *st);
 int kr_wayland_info_valid(kr_wayland_info *st);
 int kr_wayland_info_random(kr_wayland_info *st);

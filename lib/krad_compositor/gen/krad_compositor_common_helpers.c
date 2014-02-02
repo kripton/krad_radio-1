@@ -468,15 +468,19 @@ int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch
   return 0;
 }
 
-kr_var *kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_sprite_info_strto_member(addr->path[0]);
+kr_var *kr_sprite_info_patch_path(kr_sprite_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_sprite_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
-      default: break;
-    }
+  switch(patch->member) {
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }
@@ -496,15 +500,19 @@ int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patc
   return 0;
 }
 
-kr_var *kr_text_info_address_to_patch(kr_text_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_text_info_strto_member(addr->path[0]);
+kr_var *kr_text_info_patch_path(kr_text_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_text_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
-      default: break;
-    }
+  switch(patch->member) {
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }
@@ -522,15 +530,19 @@ int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch
   return 0;
 }
 
-kr_var *kr_vector_info_address_to_patch(kr_vector_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_vector_info_strto_member(addr->path[0]);
+kr_var *kr_vector_info_patch_path(kr_vector_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_vector_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
-      default: break;
-    }
+  switch(patch->member) {
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }
@@ -552,15 +564,19 @@ int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr
   return 0;
 }
 
-kr_var *kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_compositor_path_info_strto_member(addr->path[0]);
+kr_var *kr_compositor_path_info_patch_path(kr_compositor_path_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_compositor_path_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
-      default: break;
-    }
+  switch(patch->member) {
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }

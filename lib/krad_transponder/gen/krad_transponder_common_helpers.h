@@ -9,8 +9,6 @@ typedef enum {
 } kr_transponder_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_transponder_info_patch_value;
 
 typedef struct {
@@ -24,8 +22,6 @@ typedef enum {
 } kr_transponder_path_io_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_transponder_path_io_info_patch_value;
 
 typedef struct {
@@ -39,8 +35,6 @@ typedef enum {
 } kr_transponder_path_info_member;
 
 typedef struct {
-  int integer;
-  float real;
   kr_transponder_path_io_info_patch input_patch;
   kr_transponder_path_io_info_patch output_patch;
 } kr_transponder_path_info_patch_value;
@@ -51,11 +45,11 @@ typedef struct {
 } kr_transponder_path_info_patch;
 
 int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transponder_info_patch *patch);
-kr_var *kr_transponder_info_address_to_patch(kr_transponder_info_patch *patch, kr_address2 *addr);
+kr_var *kr_transponder_info_patch_path(kr_transponder_info_patch *patch, kr_path *path);
 int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *info, kr_transponder_path_io_info_patch *patch);
-kr_var *kr_transponder_path_io_info_address_to_patch(kr_transponder_path_io_info_patch *patch, kr_address2 *addr);
+kr_var *kr_transponder_path_io_info_patch_path(kr_transponder_path_io_info_patch *patch, kr_path *path);
 int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, kr_transponder_path_info_patch *patch);
-kr_var *kr_transponder_path_info_address_to_patch(kr_transponder_path_info_patch *patch, kr_address2 *addr);
+kr_var *kr_transponder_path_info_patch_path(kr_transponder_path_info_patch *patch, kr_path *path);
 int kr_transponder_info_init(struct kr_transponder_info *st);
 int kr_transponder_info_valid(struct kr_transponder_info *st);
 int kr_transponder_info_random(struct kr_transponder_info *st);

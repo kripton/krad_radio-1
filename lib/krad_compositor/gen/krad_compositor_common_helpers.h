@@ -11,8 +11,6 @@ typedef enum {
 } kr_sprite_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_sprite_info_patch_value;
 
 typedef struct {
@@ -30,8 +28,6 @@ typedef enum {
 } kr_text_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_text_info_patch_value;
 
 typedef struct {
@@ -48,8 +44,6 @@ typedef enum {
 } kr_vector_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_vector_info_patch_value;
 
 typedef struct {
@@ -70,8 +64,6 @@ typedef enum {
 } kr_compositor_path_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_compositor_path_info_patch_value;
 
 typedef struct {
@@ -80,13 +72,13 @@ typedef struct {
 } kr_compositor_path_info_patch;
 
 int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch *patch);
-kr_var *kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, kr_address2 *addr);
+kr_var *kr_sprite_info_patch_path(kr_sprite_info_patch *patch, kr_path *path);
 int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patch);
-kr_var *kr_text_info_address_to_patch(kr_text_info_patch *patch, kr_address2 *addr);
+kr_var *kr_text_info_patch_path(kr_text_info_patch *patch, kr_path *path);
 int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch *patch);
-kr_var *kr_vector_info_address_to_patch(kr_vector_info_patch *patch, kr_address2 *addr);
+kr_var *kr_vector_info_patch_path(kr_vector_info_patch *patch, kr_path *path);
 int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch);
-kr_var *kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, kr_address2 *addr);
+kr_var *kr_compositor_path_info_patch_path(kr_compositor_path_info_patch *patch, kr_path *path);
 int kr_compositor_controls_init(struct kr_compositor_controls *st);
 int kr_compositor_controls_valid(struct kr_compositor_controls *st);
 int kr_compositor_controls_random(struct kr_compositor_controls *st);

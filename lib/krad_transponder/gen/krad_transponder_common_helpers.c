@@ -219,15 +219,19 @@ int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transpo
   return 0;
 }
 
-kr_var *kr_transponder_info_address_to_patch(kr_transponder_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_transponder_info_strto_member(addr->path[0]);
+kr_var *kr_transponder_info_patch_path(kr_transponder_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_transponder_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
-      default: break;
-    }
+  switch(patch->member) {
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }
@@ -243,15 +247,19 @@ int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *
   return 0;
 }
 
-kr_var *kr_transponder_path_io_info_address_to_patch(kr_transponder_path_io_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_transponder_path_io_info_strto_member(addr->path[0]);
+kr_var *kr_transponder_path_io_info_patch_path(kr_transponder_path_io_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_transponder_path_io_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
-      default: break;
-    }
+  switch(patch->member) {
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }
@@ -267,19 +275,23 @@ int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, 
   return 0;
 }
 
-kr_var *kr_transponder_path_info_address_to_patch(kr_transponder_path_info_patch *patch, kr_address2 *addr) {
-   if (patch == NULL) return NULL;
-  if (addr->count < 1) return NULL;
-  if (addr->len[0] < 1) return NULL;
-  patch->member = kr_transponder_path_info_strto_member(addr->path[0]);
+kr_var *kr_transponder_path_info_patch_path(kr_transponder_path_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_transponder_path_info_strto_member(name);
   if (patch->member < 1) return NULL;
-  switch(memb_type) {
+  switch(patch->member) {
       case KR_TRANSPONDER_PATH_INFO_INPUT:
-        return kr_transponder_path_io_info_address_to_patch(&patch->value.input_patch,addr);
+        return kr_transponder_path_io_info_patch_path(&patch->value.input_patch, path);
       case KR_TRANSPONDER_PATH_INFO_OUTPUT:
-        return kr_transponder_path_io_info_address_to_patch(&patch->value.output_patch,addr);
-      default: break;
-    }
+        return kr_transponder_path_io_info_patch_path(&patch->value.output_patch, path);
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
   }
   return patch->value;
 }

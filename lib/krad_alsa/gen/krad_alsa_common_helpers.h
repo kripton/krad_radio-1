@@ -10,8 +10,6 @@ typedef enum {
 } kr_alsa_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_alsa_info_patch_value;
 
 typedef struct {
@@ -24,8 +22,6 @@ typedef enum {
 } kr_alsa_path_info_member;
 
 typedef struct {
-  int integer;
-  float real;
 } kr_alsa_path_info_patch_value;
 
 typedef struct {
@@ -34,9 +30,9 @@ typedef struct {
 } kr_alsa_path_info_patch;
 
 int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patch);
-kr_var *kr_alsa_info_address_to_patch(kr_alsa_info_patch *patch, kr_address2 *addr);
+kr_var *kr_alsa_info_patch_path(kr_alsa_info_patch *patch, kr_path *path);
 int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_info_patch *patch);
-kr_var *kr_alsa_path_info_address_to_patch(kr_alsa_path_info_patch *patch, kr_address2 *addr);
+kr_var *kr_alsa_path_info_patch_path(kr_alsa_path_info_patch *patch, kr_path *path);
 int kr_alsa_info_init(struct kr_alsa_info *st);
 int kr_alsa_info_valid(struct kr_alsa_info *st);
 int kr_alsa_info_random(struct kr_alsa_info *st);
