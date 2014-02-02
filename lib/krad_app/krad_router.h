@@ -14,30 +14,12 @@ typedef struct kr_router_map kr_router_map;
 typedef struct kr_route_setup kr_route_setup;
 typedef struct kr_route kr_route;
 typedef struct kr_name kr_name;
-typedef struct kr_variant kr_variant;
-typedef struct kr_variant kr_var;
 
 typedef int (kr_router_map_create_handler)(void *, void *, void *);
 typedef int (kr_router_map_create2_handler)(void *, void *, void *, void *, void *);
 typedef int (kr_router_map_patch_handler)(void *, void *);
 typedef int (kr_router_map_destroy_handler)(void *);
 typedef int (kr_router_response_handler)(void *, kr_crate2 *crate);
-
-typedef enum {
-  KR_FLOAT = 1,
-  KR_INTEGER,
-} kr_value_type;
-
-typedef union {
-  int integer;
-  float real;
-  char str[8];
-} kr_value;
-
-struct kr_variant {
-  kr_value value;
-  kr_value_type type;
-};
 
 struct kr_router_info {
   uint64_t maps;

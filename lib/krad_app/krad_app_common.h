@@ -7,12 +7,14 @@
 #define KR_EID_PAYLOAD 0xB9
 #define KR_EID_TERMINATOR 0xE2
 
+#include "krad_path.h"
+#include "krad_variant.h"
+
 /* here is were we link our payload */
 #include "krad_radio_payload.h"
 
 typedef struct kr_crate2 kr_crate2;
 
-#include "krad_path.h"
 #include "krad_router.h"
 
 typedef enum {
