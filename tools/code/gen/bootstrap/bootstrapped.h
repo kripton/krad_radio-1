@@ -13,6 +13,9 @@ typedef enum {
   CGEN_KR_APP_SERVER_SETUP,
   CGEN_KR_APP_SERVER_INFO,
   CGEN_KR_APP_SERVER_CLIENT_SETUP,
+  CGEN_KR_VALUE_TYPE,
+  CGEN_KR_VALUE,
+  CGEN_KR_VARIANT,
   CGEN_KR_ROUTER_INFO,
   CGEN_KR_ROUTER_MAP_INFO,
   CGEN_KR_ROUTER_MAP_SETUP,
@@ -302,7 +305,7 @@ typedef enum {
 } cgen_enum;
 
 enum {
-  CODEGEN_ENUM_LAST = 300
+  CODEGEN_ENUM_LAST = 317
 };
 int codegen_is_union(char *type);
 int codegen_is_enum(char *type);
