@@ -2,7 +2,7 @@ include $(top_srcdir)/common.mk
 
 bin_PROGRAMS = kr_cbor_test kr_pool_test kr_v4l2_test kr_alsa_test
 #bin_PROGRAMS += kr_helpers_test kr_ebml_serial_test kr_json_serial_test
-bin_PROGRAMS += kr_graph_test
+bin_PROGRAMS += kr_graph_test kr_path_test
 bin_PROGRAMS += kr_thread_test kr_crypto_test kr_jack_test
 
 if HAVE_WAYLAND
@@ -16,6 +16,11 @@ kr_crypto_test_LDFLAGS = -lssl
 kr_thread_test_SOURCES = kr_thread_test.c
 kr_thread_test_CFLAGS =
 kr_thread_test_LDFLAGS =
+
+kr_path_test_SOURCES = kr_path_test.c
+kr_path_test_SOURCES += ../lib/krad_app/krad_path.c ../lib/krad_mem/krad_mem.c
+kr_path_test_CFLAGS =
+kr_path_test_LDFLAGS =
 
 kr_cbor_test_SOURCES = kr_cbor_test.c
 kr_cbor_test_SOURCES += ../lib/krad_cbor/krad_cbor.c ../lib/krad_mem/krad_mem.c

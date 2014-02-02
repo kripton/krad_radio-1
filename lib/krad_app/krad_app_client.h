@@ -1,6 +1,5 @@
 #include "krad_radio_version.h"
 #include "krad_system.h"
-
 #include "krad_ebml.h"
 #include "krad_io.h"
 #include "krad_app_common.h"

@@ -2,6 +2,7 @@
 #define KRAD_PATH_H
 
 #include <inttypes.h>
+#include <string.h>
 #include <stddef.h>
 
 #define KR_PATH_COMPONENT_MAX 8
@@ -11,7 +12,7 @@ typedef struct kr_path kr_path;
 
 size_t kr_path_sizeof();
 #define kr_path_alloca(path) \
-  path = alloca(kr_path_sizeof()) \
+  path = alloca(kr_path_sizeof()); \
   memset(path, 0, kr_path_sizeof());
 int kr_path_parse(kr_path *path, char *str, int len);
 int kr_path_clear(kr_path *path);
