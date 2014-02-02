@@ -468,7 +468,7 @@ int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch
   return 0;
 }
 
-kr_value *kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -496,7 +496,7 @@ int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patc
   return 0;
 }
 
-kr_value *kr_text_info_address_to_patch(kr_text_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_text_info_address_to_patch(kr_text_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -522,7 +522,7 @@ int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch
   return 0;
 }
 
-kr_value *kr_vector_info_address_to_patch(kr_vector_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_vector_info_address_to_patch(kr_vector_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -552,7 +552,7 @@ int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr
   return 0;
 }
 
-kr_value *kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;

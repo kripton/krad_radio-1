@@ -163,7 +163,7 @@ int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_pat
   return 0;
 }
 
-kr_value *kr_mixer_path_info_address_to_patch(kr_mixer_path_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_mixer_path_info_address_to_patch(kr_mixer_path_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;

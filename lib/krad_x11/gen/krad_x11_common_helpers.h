@@ -39,9 +39,9 @@ typedef struct {
 } kr_x11_path_info_patch;
 
 int kr_x11_info_patch_apply(struct kr_x11_info *info, kr_x11_info_patch *patch);
-kr_value *kr_x11_info_address_to_patch(kr_x11_info_patch *patch, kr_address2 *addr);
+kr_var *kr_x11_info_address_to_patch(kr_x11_info_patch *patch, kr_address2 *addr);
 int kr_x11_path_info_patch_apply(struct kr_x11_path_info *info, kr_x11_path_info_patch *patch);
-kr_value *kr_x11_path_info_address_to_patch(kr_x11_path_info_patch *patch, kr_address2 *addr);
+kr_var *kr_x11_path_info_address_to_patch(kr_x11_path_info_patch *patch, kr_address2 *addr);
 int kr_x11_info_init(struct kr_x11_info *st);
 int kr_x11_info_valid(struct kr_x11_info *st);
 int kr_x11_info_random(struct kr_x11_info *st);

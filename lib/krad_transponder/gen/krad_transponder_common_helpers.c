@@ -219,7 +219,7 @@ int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transpo
   return 0;
 }
 
-kr_value *kr_transponder_info_address_to_patch(kr_transponder_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_transponder_info_address_to_patch(kr_transponder_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -243,7 +243,7 @@ int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *
   return 0;
 }
 
-kr_value *kr_transponder_path_io_info_address_to_patch(kr_transponder_path_io_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_transponder_path_io_info_address_to_patch(kr_transponder_path_io_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -267,7 +267,7 @@ int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, 
   return 0;
 }
 
-kr_value *kr_transponder_path_info_address_to_patch(kr_transponder_path_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_transponder_path_info_address_to_patch(kr_transponder_path_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;

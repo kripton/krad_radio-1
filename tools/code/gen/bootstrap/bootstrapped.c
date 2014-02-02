@@ -31,12 +31,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_app_server_info";
     case CGEN_KR_APP_SERVER_CLIENT_SETUP:
       return "kr_app_server_client_setup";
-    case CGEN_KR_VALUE_TYPE:
-      return "kr_value_type";
-    case CGEN_KR_VALUE:
-      return "kr_value";
-    case CGEN_KR_VARIANT:
-      return "kr_variant";
     case CGEN_KR_ROUTER_INFO:
       return "kr_router_info";
     case CGEN_KR_ROUTER_MAP_INFO:
@@ -47,6 +41,12 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_route_setup";
     case CGEN_KR_ROUTER_SETUP:
       return "kr_router_setup";
+    case CGEN_KR_VALUE_TYPE:
+      return "kr_value_type";
+    case CGEN_KR_VALUE:
+      return "kr_value";
+    case CGEN_KR_VARIANT:
+      return "kr_variant";
     case CGEN_KR_EASER_UPDATE:
       return "kr_easer_update";
     case CGEN_KR_EASER:
@@ -650,15 +650,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_app_server_client_setup")) {
     return CGEN_KR_APP_SERVER_CLIENT_SETUP;
   }
-  if (!strcmp(string,"kr_value_type")) {
-    return CGEN_KR_VALUE_TYPE;
-  }
-  if (!strcmp(string,"kr_value")) {
-    return CGEN_KR_VALUE;
-  }
-  if (!strcmp(string,"kr_variant")) {
-    return CGEN_KR_VARIANT;
-  }
   if (!strcmp(string,"kr_router_info")) {
     return CGEN_KR_ROUTER_INFO;
   }
@@ -673,6 +664,15 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_router_setup")) {
     return CGEN_KR_ROUTER_SETUP;
+  }
+  if (!strcmp(string,"kr_value_type")) {
+    return CGEN_KR_VALUE_TYPE;
+  }
+  if (!strcmp(string,"kr_value")) {
+    return CGEN_KR_VALUE;
+  }
+  if (!strcmp(string,"kr_variant")) {
+    return CGEN_KR_VARIANT;
   }
   if (!strcmp(string,"kr_easer_update")) {
     return CGEN_KR_EASER_UPDATE;

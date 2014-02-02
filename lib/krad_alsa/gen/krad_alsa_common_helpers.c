@@ -28,7 +28,7 @@ int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patc
   return 0;
 }
 
-kr_value *kr_alsa_info_address_to_patch(kr_alsa_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_alsa_info_address_to_patch(kr_alsa_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -50,7 +50,7 @@ int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_i
   return 0;
 }
 
-kr_value *kr_alsa_path_info_address_to_patch(kr_alsa_path_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_alsa_path_info_address_to_patch(kr_alsa_path_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;

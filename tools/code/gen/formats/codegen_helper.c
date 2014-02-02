@@ -31,7 +31,7 @@ static void codegen_patch_prototype(struct_data *sdata, FILE *out) {
 }
 
 static void codegen_address_to_patch_prototype(struct_data *sdata, FILE *out) {
-  fprintf(out,"kr_value *%s_address_to_patch(%s_patch *patch, kr_address2 *addr)",
+  fprintf(out,"kr_var *%s_address_to_patch(%s_patch *patch, kr_address2 *addr)",
     sdata->info.name,sdata->info.name);
 }
 

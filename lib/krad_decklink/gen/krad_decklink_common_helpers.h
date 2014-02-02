@@ -39,9 +39,9 @@ typedef struct {
 } kr_decklink_path_info_patch;
 
 int kr_decklink_info_patch_apply(struct kr_decklink_info *info, kr_decklink_info_patch *patch);
-kr_value *kr_decklink_info_address_to_patch(kr_decklink_info_patch *patch, kr_address2 *addr);
+kr_var *kr_decklink_info_address_to_patch(kr_decklink_info_patch *patch, kr_address2 *addr);
 int kr_decklink_path_info_patch_apply(struct kr_decklink_path_info *info, kr_decklink_path_info_patch *patch);
-kr_value *kr_decklink_path_info_address_to_patch(kr_decklink_path_info_patch *patch, kr_address2 *addr);
+kr_var *kr_decklink_path_info_address_to_patch(kr_decklink_path_info_patch *patch, kr_address2 *addr);
 int kr_decklink_info_init(struct kr_decklink_info *st);
 int kr_decklink_info_valid(struct kr_decklink_info *st);
 int kr_decklink_info_random(struct kr_decklink_info *st);

@@ -256,7 +256,7 @@ int kr_eq_band_info_patch_apply(struct kr_eq_band_info *info, kr_eq_band_info_pa
   return 0;
 }
 
-kr_value *kr_eq_band_info_address_to_patch(kr_eq_band_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_eq_band_info_address_to_patch(kr_eq_band_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -278,7 +278,7 @@ int kr_eq_info_patch_apply(struct kr_eq_info *info, kr_eq_info_patch *patch) {
   return 0;
 }
 
-kr_value *kr_eq_info_address_to_patch(kr_eq_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_eq_info_address_to_patch(kr_eq_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -304,7 +304,7 @@ int kr_lowpass_info_patch_apply(struct kr_lowpass_info *info, kr_lowpass_info_pa
   return 0;
 }
 
-kr_value *kr_lowpass_info_address_to_patch(kr_lowpass_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_lowpass_info_address_to_patch(kr_lowpass_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -328,7 +328,7 @@ int kr_highpass_info_patch_apply(struct kr_highpass_info *info, kr_highpass_info
   return 0;
 }
 
-kr_value *kr_highpass_info_address_to_patch(kr_highpass_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_highpass_info_address_to_patch(kr_highpass_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -350,7 +350,7 @@ int kr_volume_info_patch_apply(struct kr_volume_info *info, kr_volume_info_patch
   return 0;
 }
 
-kr_value *kr_volume_info_address_to_patch(kr_volume_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_volume_info_address_to_patch(kr_volume_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
@@ -374,7 +374,7 @@ int kr_analog_info_patch_apply(struct kr_analog_info *info, kr_analog_info_patch
   return 0;
 }
 
-kr_value *kr_analog_info_address_to_patch(kr_analog_info_patch *patch, kr_address2 *addr) {
+kr_var *kr_analog_info_address_to_patch(kr_analog_info_patch *patch, kr_address2 *addr) {
    if (patch == NULL) return NULL;
   if (addr->count < 1) return NULL;
   if (addr->len[0] < 1) return NULL;
