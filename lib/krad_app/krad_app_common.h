@@ -12,6 +12,7 @@
 
 typedef struct kr_crate2 kr_crate2;
 
+#include "krad_path.h"
 #include "krad_router.h"
 
 typedef enum {

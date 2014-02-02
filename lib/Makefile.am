@@ -131,6 +131,7 @@ krad_mem/krad_pool.c \
 krad_ebml/krad_ebml.c \
 krad_ebml/krad_ebmlx.c \
 krad_system/krad_system.c \
+krad_app/krad_path.c \
 krad_app/krad_router.c \
 krad_app/krad_app_client.c \
 krad_radio/krad_radio_client_ctl.c \
