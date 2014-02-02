@@ -259,7 +259,6 @@ int kr_eq_band_info_patch_apply(struct kr_eq_band_info *info, kr_eq_band_info_pa
 kr_var *kr_eq_band_info_patch_path(kr_eq_band_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -285,7 +284,6 @@ int kr_eq_info_patch_apply(struct kr_eq_info *info, kr_eq_info_patch *patch) {
 kr_var *kr_eq_info_patch_path(kr_eq_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -315,7 +313,6 @@ int kr_lowpass_info_patch_apply(struct kr_lowpass_info *info, kr_lowpass_info_pa
 kr_var *kr_lowpass_info_patch_path(kr_lowpass_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -343,7 +340,6 @@ int kr_highpass_info_patch_apply(struct kr_highpass_info *info, kr_highpass_info
 kr_var *kr_highpass_info_patch_path(kr_highpass_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -369,7 +365,6 @@ int kr_volume_info_patch_apply(struct kr_volume_info *info, kr_volume_info_patch
 kr_var *kr_volume_info_patch_path(kr_volume_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -397,7 +392,6 @@ int kr_analog_info_patch_apply(struct kr_analog_info *info, kr_analog_info_patch
 kr_var *kr_analog_info_patch_path(kr_analog_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);

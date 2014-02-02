@@ -471,7 +471,6 @@ int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch
 kr_var *kr_sprite_info_patch_path(kr_sprite_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -503,7 +502,6 @@ int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patc
 kr_var *kr_text_info_patch_path(kr_text_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -533,7 +531,6 @@ int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch
 kr_var *kr_vector_info_patch_path(kr_vector_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -567,7 +564,6 @@ int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr
 kr_var *kr_compositor_path_info_patch_path(kr_compositor_path_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);

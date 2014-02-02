@@ -44,7 +44,6 @@ int kr_decklink_info_patch_apply(struct kr_decklink_info *info, kr_decklink_info
 kr_var *kr_decklink_info_patch_path(kr_decklink_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -76,7 +75,6 @@ int kr_decklink_path_info_patch_apply(struct kr_decklink_path_info *info, kr_dec
 kr_var *kr_decklink_path_info_patch_path(kr_decklink_path_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);

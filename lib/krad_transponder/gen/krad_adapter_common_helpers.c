@@ -142,7 +142,6 @@ int kr_adapter_info_patch_apply(struct kr_adapter_info *info, kr_adapter_info_pa
 kr_var *kr_adapter_info_patch_path(kr_adapter_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -172,7 +171,6 @@ int kr_adapter_path_info_patch_apply(struct kr_adapter_path_info *info, kr_adapt
 kr_var *kr_adapter_path_info_patch_path(kr_adapter_path_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);

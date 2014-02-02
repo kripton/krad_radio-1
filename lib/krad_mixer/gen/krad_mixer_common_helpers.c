@@ -166,7 +166,6 @@ int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_pat
 kr_var *kr_mixer_path_info_patch_path(kr_mixer_path_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);

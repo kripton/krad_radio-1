@@ -43,7 +43,6 @@ int kr_wayland_info_patch_apply(kr_wayland_info *info, kr_wayland_info_patch *pa
 kr_var *kr_wayland_info_patch_path(kr_wayland_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -73,7 +72,6 @@ int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path
 kr_var *kr_wayland_path_info_patch_path(kr_wayland_path_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);

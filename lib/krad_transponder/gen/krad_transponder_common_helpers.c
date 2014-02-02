@@ -222,7 +222,6 @@ int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transpo
 kr_var *kr_transponder_info_patch_path(kr_transponder_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -250,7 +249,6 @@ int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *
 kr_var *kr_transponder_path_io_info_patch_path(kr_transponder_path_io_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -278,7 +276,6 @@ int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, 
 kr_var *kr_transponder_path_info_patch_path(kr_transponder_path_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);

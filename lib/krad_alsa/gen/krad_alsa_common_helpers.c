@@ -31,7 +31,6 @@ int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patc
 kr_var *kr_alsa_info_patch_path(kr_alsa_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
@@ -57,7 +56,6 @@ int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_i
 kr_var *kr_alsa_path_info_patch_path(kr_alsa_path_info_patch *patch, kr_path *path) {
   char *name;
   int len;
-
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
