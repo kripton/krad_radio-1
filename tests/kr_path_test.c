@@ -66,10 +66,7 @@ static int test_kr_path() {
 }
 
 int main (int argc, char *argv[]) {
-
   int ret;
-
   ret = test_kr_path();
-
   return ret;
 }
