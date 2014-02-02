@@ -468,6 +468,19 @@ int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch
   return 0;
 }
 
+kr_value *kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_sprite_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patch) {
   const ptrdiff_t off[6] = { offsetof(struct kr_text_info, string), 
     offsetof(struct kr_text_info, font), offsetof(struct kr_text_info, red), 
@@ -483,6 +496,19 @@ int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patc
   return 0;
 }
 
+kr_value *kr_text_info_address_to_patch(kr_text_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_text_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch *patch) {
   const ptrdiff_t off[5] = { offsetof(struct kr_vector_info, type), 
     offsetof(struct kr_vector_info, red), offsetof(struct kr_vector_info, green), 
@@ -494,6 +520,19 @@ int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_vector_info_address_to_patch(kr_vector_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_vector_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch) {
@@ -511,6 +550,19 @@ int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_compositor_path_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_compositor_controls_init(struct kr_compositor_controls *st) {

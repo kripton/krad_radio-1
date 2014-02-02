@@ -5,10 +5,10 @@
 #include "gen.h"
 #include "krad_v4l2_common.h"
 typedef enum {
-  KR_V4L2_INFO_DEV,
-  KR_V4L2_INFO_PRIORITY,
-  KR_V4L2_INFO_STATE,
-  KR_V4L2_INFO_MODE
+  KR_V4L2_INFO_DEV = 1,
+  KR_V4L2_INFO_PRIORITY = 2,
+  KR_V4L2_INFO_STATE = 3,
+  KR_V4L2_INFO_MODE = 4
 } kr_v4l2_info_member;
 
 typedef struct {
@@ -22,9 +22,9 @@ typedef struct {
 } kr_v4l2_info_patch;
 
 typedef enum {
-  KR_V4L2_OPEN_INFO_DEV,
-  KR_V4L2_OPEN_INFO_PRIORITY,
-  KR_V4L2_OPEN_INFO_MODE
+  KR_V4L2_OPEN_INFO_DEV = 1,
+  KR_V4L2_OPEN_INFO_PRIORITY = 2,
+  KR_V4L2_OPEN_INFO_MODE = 3
 } kr_v4l2_open_info_member;
 
 typedef struct {
@@ -38,9 +38,9 @@ typedef struct {
 } kr_v4l2_open_info_patch;
 
 int kr_v4l2_info_patch_apply(struct kr_v4l2_info *info, kr_v4l2_info_patch *patch);
-int kr_v4l2_info_address_to_patch(kr_v4l2_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_v4l2_info_address_to_patch(kr_v4l2_info_patch *patch, kr_address2 *addr);
 int kr_v4l2_open_info_patch_apply(struct kr_v4l2_open_info *info, kr_v4l2_open_info_patch *patch);
-int kr_v4l2_open_info_address_to_patch(kr_v4l2_open_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_v4l2_open_info_address_to_patch(kr_v4l2_open_info_patch *patch, kr_address2 *addr);
 int kr_v4l2_mode_init(struct kr_v4l2_mode *st);
 int kr_v4l2_mode_valid(struct kr_v4l2_mode *st);
 int kr_v4l2_mode_random(struct kr_v4l2_mode *st);

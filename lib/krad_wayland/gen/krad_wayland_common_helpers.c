@@ -40,6 +40,19 @@ int kr_wayland_info_patch_apply(kr_wayland_info *info, kr_wayland_info_patch *pa
   return 0;
 }
 
+kr_value *kr_wayland_info_address_to_patch(kr_wayland_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_wayland_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path_info_patch *patch) {
   const ptrdiff_t off[5] = { offsetof(kr_wayland_path_info, display_name), 
     offsetof(kr_wayland_path_info, state), offsetof(kr_wayland_path_info, width), 
@@ -51,6 +64,19 @@ int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_wayland_path_info_address_to_patch(kr_wayland_path_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_wayland_path_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_wayland_info_init(kr_wayland_info *st) {

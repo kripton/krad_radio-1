@@ -139,6 +139,19 @@ int kr_adapter_info_patch_apply(struct kr_adapter_info *info, kr_adapter_info_pa
   return 0;
 }
 
+kr_value *kr_adapter_info_address_to_patch(kr_adapter_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_adapter_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_adapter_path_info_patch_apply(struct kr_adapter_path_info *info, kr_adapter_path_info_patch *patch) {
   const ptrdiff_t off[4] = { offsetof(struct kr_adapter_path_info, name), 
     offsetof(struct kr_adapter_path_info, dir), offsetof(struct kr_adapter_path_info, api), 
@@ -150,6 +163,19 @@ int kr_adapter_path_info_patch_apply(struct kr_adapter_path_info *info, kr_adapt
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_adapter_path_info_address_to_patch(kr_adapter_path_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_adapter_path_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_adapter_api_info_init(kr_adapter_api_info *st, int idx) {

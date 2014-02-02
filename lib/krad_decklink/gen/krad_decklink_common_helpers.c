@@ -41,6 +41,19 @@ int kr_decklink_info_patch_apply(struct kr_decklink_info *info, kr_decklink_info
   return 0;
 }
 
+kr_value *kr_decklink_info_address_to_patch(kr_decklink_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_decklink_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_decklink_path_info_patch_apply(struct kr_decklink_path_info *info, kr_decklink_path_info_patch *patch) {
   const ptrdiff_t off[7] = { offsetof(struct kr_decklink_path_info, device), 
     offsetof(struct kr_decklink_path_info, width), offsetof(struct kr_decklink_path_info, height), 
@@ -54,6 +67,19 @@ int kr_decklink_path_info_patch_apply(struct kr_decklink_path_info *info, kr_dec
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_decklink_path_info_address_to_patch(kr_decklink_path_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_decklink_path_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_decklink_info_init(struct kr_decklink_info *st) {

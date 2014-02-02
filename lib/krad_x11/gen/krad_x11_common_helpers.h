@@ -5,7 +5,7 @@
 #include "gen.h"
 #include "krad_x11_common.h"
 typedef enum {
-  KR_X11_INFO_DISPLAY
+  KR_X11_INFO_DISPLAY = 1
 } kr_x11_info_member;
 
 typedef struct {
@@ -19,13 +19,13 @@ typedef struct {
 } kr_x11_info_patch;
 
 typedef enum {
-  KR_X11_PATH_INFO_DISPLAY,
-  KR_X11_PATH_INFO_WIDTH,
-  KR_X11_PATH_INFO_HEIGHT,
-  KR_X11_PATH_INFO_NUM,
-  KR_X11_PATH_INFO_DEN,
-  KR_X11_PATH_INFO_X,
-  KR_X11_PATH_INFO_Y
+  KR_X11_PATH_INFO_DISPLAY = 1,
+  KR_X11_PATH_INFO_WIDTH = 2,
+  KR_X11_PATH_INFO_HEIGHT = 3,
+  KR_X11_PATH_INFO_NUM = 4,
+  KR_X11_PATH_INFO_DEN = 5,
+  KR_X11_PATH_INFO_X = 6,
+  KR_X11_PATH_INFO_Y = 7
 } kr_x11_path_info_member;
 
 typedef struct {
@@ -39,9 +39,9 @@ typedef struct {
 } kr_x11_path_info_patch;
 
 int kr_x11_info_patch_apply(struct kr_x11_info *info, kr_x11_info_patch *patch);
-int kr_x11_info_address_to_patch(kr_x11_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_x11_info_address_to_patch(kr_x11_info_patch *patch, kr_address2 *addr);
 int kr_x11_path_info_patch_apply(struct kr_x11_path_info *info, kr_x11_path_info_patch *patch);
-int kr_x11_path_info_address_to_patch(kr_x11_path_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_x11_path_info_address_to_patch(kr_x11_path_info_patch *patch, kr_address2 *addr);
 int kr_x11_info_init(struct kr_x11_info *st);
 int kr_x11_info_valid(struct kr_x11_info *st);
 int kr_x11_info_random(struct kr_x11_info *st);

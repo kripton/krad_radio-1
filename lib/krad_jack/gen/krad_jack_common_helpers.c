@@ -125,6 +125,19 @@ int kr_jack_setup_info_patch_apply(kr_jack_setup_info *info, kr_jack_setup_info_
   return 0;
 }
 
+kr_value *kr_jack_setup_info_address_to_patch(kr_jack_setup_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_jack_setup_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_jack_info_patch_apply(kr_jack_info *info, kr_jack_info_patch *patch) {
   const ptrdiff_t off[9] = { offsetof(kr_jack_info, client_name), 
     offsetof(kr_jack_info, server_name), offsetof(kr_jack_info, state), 
@@ -142,6 +155,19 @@ int kr_jack_info_patch_apply(kr_jack_info *info, kr_jack_info_patch *patch) {
   return 0;
 }
 
+kr_value *kr_jack_info_address_to_patch(kr_jack_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_jack_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_patch *patch) {
   const ptrdiff_t off[3] = { offsetof(kr_jack_path_info, name), 
     offsetof(kr_jack_path_info, channels), offsetof(kr_jack_path_info, direction)
@@ -151,6 +177,19 @@ int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_pat
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_jack_path_info_address_to_patch(kr_jack_path_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_jack_path_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_jack_setup_info_init(kr_jack_setup_info *st) {

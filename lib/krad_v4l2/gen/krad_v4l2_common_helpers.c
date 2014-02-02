@@ -79,6 +79,19 @@ int kr_v4l2_info_patch_apply(struct kr_v4l2_info *info, kr_v4l2_info_patch *patc
   return 0;
 }
 
+kr_value *kr_v4l2_info_address_to_patch(kr_v4l2_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_v4l2_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_v4l2_open_info_patch_apply(struct kr_v4l2_open_info *info, kr_v4l2_open_info_patch *patch) {
   const ptrdiff_t off[3] = { offsetof(struct kr_v4l2_open_info, dev), 
     offsetof(struct kr_v4l2_open_info, priority), offsetof(struct kr_v4l2_open_info, mode)
@@ -88,6 +101,19 @@ int kr_v4l2_open_info_patch_apply(struct kr_v4l2_open_info *info, kr_v4l2_open_i
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_v4l2_open_info_address_to_patch(kr_v4l2_open_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_v4l2_open_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_v4l2_mode_init(struct kr_v4l2_mode *st) {

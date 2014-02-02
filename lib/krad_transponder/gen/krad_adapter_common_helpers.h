@@ -5,8 +5,8 @@
 #include "gen.h"
 #include "krad_adapter_common.h"
 typedef enum {
-  KR_ADAPTER_INFO_API,
-  KR_ADAPTER_INFO_API_INFO
+  KR_ADAPTER_INFO_API = 1,
+  KR_ADAPTER_INFO_API_INFO = 2
 } kr_adapter_info_member;
 
 typedef struct {
@@ -20,10 +20,10 @@ typedef struct {
 } kr_adapter_info_patch;
 
 typedef enum {
-  KR_ADAPTER_PATH_INFO_NAME,
-  KR_ADAPTER_PATH_INFO_DIR,
-  KR_ADAPTER_PATH_INFO_API,
-  KR_ADAPTER_PATH_INFO_INFO
+  KR_ADAPTER_PATH_INFO_NAME = 1,
+  KR_ADAPTER_PATH_INFO_DIR = 2,
+  KR_ADAPTER_PATH_INFO_API = 3,
+  KR_ADAPTER_PATH_INFO_INFO = 4
 } kr_adapter_path_info_member;
 
 typedef struct {
@@ -37,9 +37,9 @@ typedef struct {
 } kr_adapter_path_info_patch;
 
 int kr_adapter_info_patch_apply(struct kr_adapter_info *info, kr_adapter_info_patch *patch);
-int kr_adapter_info_address_to_patch(kr_adapter_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_adapter_info_address_to_patch(kr_adapter_info_patch *patch, kr_address2 *addr);
 int kr_adapter_path_info_patch_apply(struct kr_adapter_path_info *info, kr_adapter_path_info_patch *patch);
-int kr_adapter_path_info_address_to_patch(kr_adapter_path_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_adapter_path_info_address_to_patch(kr_adapter_path_info_patch *patch, kr_address2 *addr);
 int kr_adapter_api_info_init(kr_adapter_api_info *st, int idx);
 int kr_adapter_api_info_valid(kr_adapter_api_info *st, int idx);
 int kr_adapter_api_info_random(kr_adapter_api_info *st, int idx);

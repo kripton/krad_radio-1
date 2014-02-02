@@ -5,9 +5,9 @@
 #include "gen.h"
 #include "krad_sfx_common.h"
 typedef enum {
-  KR_EQ_BAND_INFO_DB,
-  KR_EQ_BAND_INFO_BW,
-  KR_EQ_BAND_INFO_HZ
+  KR_EQ_BAND_INFO_DB = 1,
+  KR_EQ_BAND_INFO_BW = 2,
+  KR_EQ_BAND_INFO_HZ = 3
 } kr_eq_band_info_member;
 
 typedef struct {
@@ -21,7 +21,7 @@ typedef struct {
 } kr_eq_band_info_patch;
 
 typedef enum {
-  KR_EQ_INFO_BAND
+  KR_EQ_INFO_BAND = 1
 } kr_eq_info_member;
 
 typedef struct {
@@ -36,8 +36,8 @@ typedef struct {
 } kr_eq_info_patch;
 
 typedef enum {
-  KR_LOWPASS_INFO_BW,
-  KR_LOWPASS_INFO_HZ
+  KR_LOWPASS_INFO_BW = 1,
+  KR_LOWPASS_INFO_HZ = 2
 } kr_lowpass_info_member;
 
 typedef struct {
@@ -51,8 +51,8 @@ typedef struct {
 } kr_lowpass_info_patch;
 
 typedef enum {
-  KR_HIGHPASS_INFO_BW,
-  KR_HIGHPASS_INFO_HZ
+  KR_HIGHPASS_INFO_BW = 1,
+  KR_HIGHPASS_INFO_HZ = 2
 } kr_highpass_info_member;
 
 typedef struct {
@@ -66,7 +66,7 @@ typedef struct {
 } kr_highpass_info_patch;
 
 typedef enum {
-  KR_VOLUME_INFO_LEVEL
+  KR_VOLUME_INFO_LEVEL = 1
 } kr_volume_info_member;
 
 typedef struct {
@@ -80,8 +80,8 @@ typedef struct {
 } kr_volume_info_patch;
 
 typedef enum {
-  KR_ANALOG_INFO_DRIVE,
-  KR_ANALOG_INFO_BLEND
+  KR_ANALOG_INFO_DRIVE = 1,
+  KR_ANALOG_INFO_BLEND = 2
 } kr_analog_info_member;
 
 typedef struct {
@@ -95,17 +95,17 @@ typedef struct {
 } kr_analog_info_patch;
 
 int kr_eq_band_info_patch_apply(struct kr_eq_band_info *info, kr_eq_band_info_patch *patch);
-int kr_eq_band_info_address_to_patch(kr_eq_band_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_eq_band_info_address_to_patch(kr_eq_band_info_patch *patch, kr_address2 *addr);
 int kr_eq_info_patch_apply(struct kr_eq_info *info, kr_eq_info_patch *patch);
-int kr_eq_info_address_to_patch(kr_eq_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_eq_info_address_to_patch(kr_eq_info_patch *patch, kr_address2 *addr);
 int kr_lowpass_info_patch_apply(struct kr_lowpass_info *info, kr_lowpass_info_patch *patch);
-int kr_lowpass_info_address_to_patch(kr_lowpass_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_lowpass_info_address_to_patch(kr_lowpass_info_patch *patch, kr_address2 *addr);
 int kr_highpass_info_patch_apply(struct kr_highpass_info *info, kr_highpass_info_patch *patch);
-int kr_highpass_info_address_to_patch(kr_highpass_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_highpass_info_address_to_patch(kr_highpass_info_patch *patch, kr_address2 *addr);
 int kr_volume_info_patch_apply(struct kr_volume_info *info, kr_volume_info_patch *patch);
-int kr_volume_info_address_to_patch(kr_volume_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_volume_info_address_to_patch(kr_volume_info_patch *patch, kr_address2 *addr);
 int kr_analog_info_patch_apply(struct kr_analog_info *info, kr_analog_info_patch *patch);
-int kr_analog_info_address_to_patch(kr_analog_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_analog_info_address_to_patch(kr_analog_info_patch *patch, kr_address2 *addr);
 int kr_eq_band_info_init(struct kr_eq_band_info *st);
 int kr_eq_band_info_valid(struct kr_eq_band_info *st);
 int kr_eq_band_info_random(struct kr_eq_band_info *st);

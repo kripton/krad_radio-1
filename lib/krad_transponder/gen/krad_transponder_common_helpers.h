@@ -5,7 +5,7 @@
 #include "gen.h"
 #include "krad_transponder_common.h"
 typedef enum {
-  KR_TRANSPONDER_INFO_ACTIVE_PATHS
+  KR_TRANSPONDER_INFO_ACTIVE_PATHS = 1
 } kr_transponder_info_member;
 
 typedef struct {
@@ -19,8 +19,8 @@ typedef struct {
 } kr_transponder_info_patch;
 
 typedef enum {
-  KR_TRANSPONDER_PATH_IO_INFO_TYPE,
-  KR_TRANSPONDER_PATH_IO_INFO_INFO
+  KR_TRANSPONDER_PATH_IO_INFO_TYPE = 1,
+  KR_TRANSPONDER_PATH_IO_INFO_INFO = 2
 } kr_transponder_path_io_info_member;
 
 typedef struct {
@@ -34,8 +34,8 @@ typedef struct {
 } kr_transponder_path_io_info_patch;
 
 typedef enum {
-  KR_TRANSPONDER_PATH_INFO_INPUT,
-  KR_TRANSPONDER_PATH_INFO_OUTPUT
+  KR_TRANSPONDER_PATH_INFO_INPUT = 1,
+  KR_TRANSPONDER_PATH_INFO_OUTPUT = 2
 } kr_transponder_path_info_member;
 
 typedef struct {
@@ -51,11 +51,11 @@ typedef struct {
 } kr_transponder_path_info_patch;
 
 int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transponder_info_patch *patch);
-int kr_transponder_info_address_to_patch(kr_transponder_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_transponder_info_address_to_patch(kr_transponder_info_patch *patch, kr_address2 *addr);
 int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *info, kr_transponder_path_io_info_patch *patch);
-int kr_transponder_path_io_info_address_to_patch(kr_transponder_path_io_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_transponder_path_io_info_address_to_patch(kr_transponder_path_io_info_patch *patch, kr_address2 *addr);
 int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, kr_transponder_path_info_patch *patch);
-int kr_transponder_path_info_address_to_patch(kr_transponder_path_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_transponder_path_info_address_to_patch(kr_transponder_path_info_patch *patch, kr_address2 *addr);
 int kr_transponder_info_init(struct kr_transponder_info *st);
 int kr_transponder_info_valid(struct kr_transponder_info *st);
 int kr_transponder_info_random(struct kr_transponder_info *st);

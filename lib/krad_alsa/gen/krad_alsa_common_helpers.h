@@ -5,8 +5,8 @@
 #include "gen.h"
 #include "krad_alsa_common.h"
 typedef enum {
-  KR_ALSA_INFO_CARD,
-  KR_ALSA_INFO_NAME
+  KR_ALSA_INFO_CARD = 1,
+  KR_ALSA_INFO_NAME = 2
 } kr_alsa_info_member;
 
 typedef struct {
@@ -20,7 +20,7 @@ typedef struct {
 } kr_alsa_info_patch;
 
 typedef enum {
-  KR_ALSA_PATH_INFO_CARD_NUM
+  KR_ALSA_PATH_INFO_CARD_NUM = 1
 } kr_alsa_path_info_member;
 
 typedef struct {
@@ -34,9 +34,9 @@ typedef struct {
 } kr_alsa_path_info_patch;
 
 int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patch);
-int kr_alsa_info_address_to_patch(kr_alsa_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_alsa_info_address_to_patch(kr_alsa_info_patch *patch, kr_address2 *addr);
 int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_info_patch *patch);
-int kr_alsa_path_info_address_to_patch(kr_alsa_path_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_alsa_path_info_address_to_patch(kr_alsa_path_info_patch *patch, kr_address2 *addr);
 int kr_alsa_info_init(struct kr_alsa_info *st);
 int kr_alsa_info_valid(struct kr_alsa_info *st);
 int kr_alsa_info_random(struct kr_alsa_info *st);

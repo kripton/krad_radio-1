@@ -31,7 +31,7 @@ static void codegen_patch_prototype(struct_data *sdata, FILE *out) {
 }
 
 static void codegen_address_to_patch_prototype(struct_data *sdata, FILE *out) {
-  fprintf(out,"int %s_address_to_patch(%s_patch *patch, char **addr, int addr_len)",
+  fprintf(out,"kr_value *%s_address_to_patch(%s_patch *patch, kr_address2 *addr)",
     sdata->info.name,sdata->info.name);
 }
 
@@ -362,6 +362,31 @@ static void codegen_helper_func(struct_data *def,
 
 static void codegen_address_to_patch_func(struct_data *def, 
   FILE *out) {
+  int i;
+  char upp[256];
+
+  codegen_address_to_patch_prototype(def,out);
+  fprintf(out," {\n");
+  fprintf(out,"   if (patch == NULL) return NULL;\n  "
+    "if (addr->count < 1) return NULL;\n  if (addr->len[0] < 1) return NULL;\n");
+  fprintf(out,"  patch->member = %s_strto_member(addr->path[0]);\n  "
+    "if (patch->member < 1) return NULL;\n  switch(memb_type) {\n",def->info.name);
+  
+  for (i = 0; i < def->info.member_count; i++) {
+    if (memb_struct_check(&def->info.members[i]) && 
+      is_suffix(def->info.members[i].type_info.substruct_info.type_name,"_info") &&
+      !codegen_is_union(def->info.members[i].type_info.substruct_info.type_name) && 
+      !codegen_is_enum(def->info.members[i].type_info.substruct_info.type_name)) {
+      snprintf(upp,sizeof(upp),"%s_%s",def->info.name,def->info.members[i].name);
+      uppercase(upp,upp);
+      fprintf(out,"      case %s:\n        return %s_address_to_patch(&patch->value.%s_patch,addr);\n",
+        upp,def->info.members[i].type_info.substruct_info.type_name,
+        def->info.members[i].name);
+    }
+  }
+
+  fprintf(out,"      default: break;\n    }\n  }\n");
+  fprintf(out,"  return patch->value;\n}\n\n");
 
 }
 
@@ -537,7 +562,7 @@ static void codegen_member_enum(struct_data *def, FILE *out) {
   fprintf(out,"typedef enum {\n");
   for (i = 0; i < def->info.member_count; i++) {
     uppercase(def->info.members[i].name,memb_name_up);
-    fprintf(out,"  %s_%s",struct_name_up,memb_name_up);
+    fprintf(out,"  %s_%s = %d",struct_name_up,memb_name_up,i+1);
     if (i != (def->info.member_count - 1)) {
       fprintf(out,",");
     }

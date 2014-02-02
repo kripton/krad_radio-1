@@ -5,13 +5,13 @@
 #include "gen.h"
 #include "krad_mixer_common.h"
 typedef enum {
-  KR_MIXER_PATH_INFO_TYPE,
-  KR_MIXER_PATH_INFO_CHANNELS,
-  KR_MIXER_PATH_INFO_LOWPASS,
-  KR_MIXER_PATH_INFO_HIGHPASS,
-  KR_MIXER_PATH_INFO_ANALOG,
-  KR_MIXER_PATH_INFO_EQ,
-  KR_MIXER_PATH_INFO_VOLUME
+  KR_MIXER_PATH_INFO_TYPE = 1,
+  KR_MIXER_PATH_INFO_CHANNELS = 2,
+  KR_MIXER_PATH_INFO_LOWPASS = 3,
+  KR_MIXER_PATH_INFO_HIGHPASS = 4,
+  KR_MIXER_PATH_INFO_ANALOG = 5,
+  KR_MIXER_PATH_INFO_EQ = 6,
+  KR_MIXER_PATH_INFO_VOLUME = 7
 } kr_mixer_path_info_member;
 
 typedef struct {
@@ -30,7 +30,7 @@ typedef struct {
 } kr_mixer_path_info_patch;
 
 int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_path_info_patch *patch);
-int kr_mixer_path_info_address_to_patch(kr_mixer_path_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_mixer_path_info_address_to_patch(kr_mixer_path_info_patch *patch, kr_address2 *addr);
 int kr_mixer_path_info_init(struct kr_mixer_path_info *st);
 int kr_mixer_path_info_valid(struct kr_mixer_path_info *st);
 int kr_mixer_path_info_random(struct kr_mixer_path_info *st);

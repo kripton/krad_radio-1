@@ -256,6 +256,19 @@ int kr_eq_band_info_patch_apply(struct kr_eq_band_info *info, kr_eq_band_info_pa
   return 0;
 }
 
+kr_value *kr_eq_band_info_address_to_patch(kr_eq_band_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_eq_band_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_eq_info_patch_apply(struct kr_eq_info *info, kr_eq_info_patch *patch) {
   const ptrdiff_t off[1] = { offsetof(struct kr_eq_info, band)
   };
@@ -263,6 +276,21 @@ int kr_eq_info_patch_apply(struct kr_eq_info *info, kr_eq_info_patch *patch) {
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_eq_info_address_to_patch(kr_eq_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_eq_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      case KR_EQ_INFO_BAND:
+        return kr_eq_band_info_address_to_patch(&patch->value.band_patch,addr);
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_lowpass_info_patch_apply(struct kr_lowpass_info *info, kr_lowpass_info_patch *patch) {
@@ -276,6 +304,19 @@ int kr_lowpass_info_patch_apply(struct kr_lowpass_info *info, kr_lowpass_info_pa
   return 0;
 }
 
+kr_value *kr_lowpass_info_address_to_patch(kr_lowpass_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_lowpass_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_highpass_info_patch_apply(struct kr_highpass_info *info, kr_highpass_info_patch *patch) {
   const ptrdiff_t off[2] = { offsetof(struct kr_highpass_info, bw), 
     offsetof(struct kr_highpass_info, hz)
@@ -287,6 +328,19 @@ int kr_highpass_info_patch_apply(struct kr_highpass_info *info, kr_highpass_info
   return 0;
 }
 
+kr_value *kr_highpass_info_address_to_patch(kr_highpass_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_highpass_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_volume_info_patch_apply(struct kr_volume_info *info, kr_volume_info_patch *patch) {
   const ptrdiff_t off[1] = { offsetof(struct kr_volume_info, level)
   };
@@ -294,6 +348,19 @@ int kr_volume_info_patch_apply(struct kr_volume_info *info, kr_volume_info_patch
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_volume_info_address_to_patch(kr_volume_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_volume_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_analog_info_patch_apply(struct kr_analog_info *info, kr_analog_info_patch *patch) {
@@ -305,6 +372,19 @@ int kr_analog_info_patch_apply(struct kr_analog_info *info, kr_analog_info_patch
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
+}
+
+kr_value *kr_analog_info_address_to_patch(kr_analog_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_analog_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      default: break;
+    }
+  }
+  return patch->value;
 }
 
 int kr_eq_band_info_init(struct kr_eq_band_info *st) {

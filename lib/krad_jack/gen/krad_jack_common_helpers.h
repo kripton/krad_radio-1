@@ -5,8 +5,8 @@
 #include "gen.h"
 #include "krad_jack_common.h"
 typedef enum {
-  KR_JACK_SETUP_INFO_CLIENT_NAME,
-  KR_JACK_SETUP_INFO_SERVER_NAME
+  KR_JACK_SETUP_INFO_CLIENT_NAME = 1,
+  KR_JACK_SETUP_INFO_SERVER_NAME = 2
 } kr_jack_setup_info_member;
 
 typedef struct {
@@ -20,15 +20,15 @@ typedef struct {
 } kr_jack_setup_info_patch;
 
 typedef enum {
-  KR_JACK_INFO_CLIENT_NAME,
-  KR_JACK_INFO_SERVER_NAME,
-  KR_JACK_INFO_STATE,
-  KR_JACK_INFO_INPUTS,
-  KR_JACK_INFO_OUTPUTS,
-  KR_JACK_INFO_SAMPLE_RATE,
-  KR_JACK_INFO_PERIOD_SIZE,
-  KR_JACK_INFO_XRUNS,
-  KR_JACK_INFO_FRAMES
+  KR_JACK_INFO_CLIENT_NAME = 1,
+  KR_JACK_INFO_SERVER_NAME = 2,
+  KR_JACK_INFO_STATE = 3,
+  KR_JACK_INFO_INPUTS = 4,
+  KR_JACK_INFO_OUTPUTS = 5,
+  KR_JACK_INFO_SAMPLE_RATE = 6,
+  KR_JACK_INFO_PERIOD_SIZE = 7,
+  KR_JACK_INFO_XRUNS = 8,
+  KR_JACK_INFO_FRAMES = 9
 } kr_jack_info_member;
 
 typedef struct {
@@ -42,9 +42,9 @@ typedef struct {
 } kr_jack_info_patch;
 
 typedef enum {
-  KR_JACK_PATH_INFO_NAME,
-  KR_JACK_PATH_INFO_CHANNELS,
-  KR_JACK_PATH_INFO_DIRECTION
+  KR_JACK_PATH_INFO_NAME = 1,
+  KR_JACK_PATH_INFO_CHANNELS = 2,
+  KR_JACK_PATH_INFO_DIRECTION = 3
 } kr_jack_path_info_member;
 
 typedef struct {
@@ -58,11 +58,11 @@ typedef struct {
 } kr_jack_path_info_patch;
 
 int kr_jack_setup_info_patch_apply(kr_jack_setup_info *info, kr_jack_setup_info_patch *patch);
-int kr_jack_setup_info_address_to_patch(kr_jack_setup_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_jack_setup_info_address_to_patch(kr_jack_setup_info_patch *patch, kr_address2 *addr);
 int kr_jack_info_patch_apply(kr_jack_info *info, kr_jack_info_patch *patch);
-int kr_jack_info_address_to_patch(kr_jack_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_jack_info_address_to_patch(kr_jack_info_patch *patch, kr_address2 *addr);
 int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_patch *patch);
-int kr_jack_path_info_address_to_patch(kr_jack_path_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_jack_path_info_address_to_patch(kr_jack_path_info_patch *patch, kr_address2 *addr);
 int kr_jack_setup_info_init(kr_jack_setup_info *st);
 int kr_jack_setup_info_valid(kr_jack_setup_info *st);
 int kr_jack_setup_info_random(kr_jack_setup_info *st);

@@ -5,9 +5,9 @@
 #include "gen.h"
 #include "krad_compositor_common.h"
 typedef enum {
-  KR_SPRITE_INFO_FILENAME,
-  KR_SPRITE_INFO_RATE,
-  KR_SPRITE_INFO_CONTROLS
+  KR_SPRITE_INFO_FILENAME = 1,
+  KR_SPRITE_INFO_RATE = 2,
+  KR_SPRITE_INFO_CONTROLS = 3
 } kr_sprite_info_member;
 
 typedef struct {
@@ -21,12 +21,12 @@ typedef struct {
 } kr_sprite_info_patch;
 
 typedef enum {
-  KR_TEXT_INFO_STRING,
-  KR_TEXT_INFO_FONT,
-  KR_TEXT_INFO_RED,
-  KR_TEXT_INFO_GREEN,
-  KR_TEXT_INFO_BLUE,
-  KR_TEXT_INFO_CONTROLS
+  KR_TEXT_INFO_STRING = 1,
+  KR_TEXT_INFO_FONT = 2,
+  KR_TEXT_INFO_RED = 3,
+  KR_TEXT_INFO_GREEN = 4,
+  KR_TEXT_INFO_BLUE = 5,
+  KR_TEXT_INFO_CONTROLS = 6
 } kr_text_info_member;
 
 typedef struct {
@@ -40,11 +40,11 @@ typedef struct {
 } kr_text_info_patch;
 
 typedef enum {
-  KR_VECTOR_INFO_TYPE,
-  KR_VECTOR_INFO_RED,
-  KR_VECTOR_INFO_GREEN,
-  KR_VECTOR_INFO_BLUE,
-  KR_VECTOR_INFO_CONTROLS
+  KR_VECTOR_INFO_TYPE = 1,
+  KR_VECTOR_INFO_RED = 2,
+  KR_VECTOR_INFO_GREEN = 3,
+  KR_VECTOR_INFO_BLUE = 4,
+  KR_VECTOR_INFO_CONTROLS = 5
 } kr_vector_info_member;
 
 typedef struct {
@@ -58,15 +58,15 @@ typedef struct {
 } kr_vector_info_patch;
 
 typedef enum {
-  KR_COMPOSITOR_PATH_INFO_TYPE,
-  KR_COMPOSITOR_PATH_INFO_WIDTH,
-  KR_COMPOSITOR_PATH_INFO_HEIGHT,
-  KR_COMPOSITOR_PATH_INFO_CROP_X,
-  KR_COMPOSITOR_PATH_INFO_CROP_Y,
-  KR_COMPOSITOR_PATH_INFO_CROP_WIDTH,
-  KR_COMPOSITOR_PATH_INFO_CROP_HEIGHT,
-  KR_COMPOSITOR_PATH_INFO_VIEW,
-  KR_COMPOSITOR_PATH_INFO_CONTROLS
+  KR_COMPOSITOR_PATH_INFO_TYPE = 1,
+  KR_COMPOSITOR_PATH_INFO_WIDTH = 2,
+  KR_COMPOSITOR_PATH_INFO_HEIGHT = 3,
+  KR_COMPOSITOR_PATH_INFO_CROP_X = 4,
+  KR_COMPOSITOR_PATH_INFO_CROP_Y = 5,
+  KR_COMPOSITOR_PATH_INFO_CROP_WIDTH = 6,
+  KR_COMPOSITOR_PATH_INFO_CROP_HEIGHT = 7,
+  KR_COMPOSITOR_PATH_INFO_VIEW = 8,
+  KR_COMPOSITOR_PATH_INFO_CONTROLS = 9
 } kr_compositor_path_info_member;
 
 typedef struct {
@@ -80,13 +80,13 @@ typedef struct {
 } kr_compositor_path_info_patch;
 
 int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch *patch);
-int kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, kr_address2 *addr);
 int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patch);
-int kr_text_info_address_to_patch(kr_text_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_text_info_address_to_patch(kr_text_info_patch *patch, kr_address2 *addr);
 int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch *patch);
-int kr_vector_info_address_to_patch(kr_vector_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_vector_info_address_to_patch(kr_vector_info_patch *patch, kr_address2 *addr);
 int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch);
-int kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, char **addr, int addr_len);
+kr_value *kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, kr_address2 *addr);
 int kr_compositor_controls_init(struct kr_compositor_controls *st);
 int kr_compositor_controls_valid(struct kr_compositor_controls *st);
 int kr_compositor_controls_random(struct kr_compositor_controls *st);

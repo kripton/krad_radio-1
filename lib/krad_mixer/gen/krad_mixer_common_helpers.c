@@ -163,6 +163,29 @@ int kr_mixer_path_info_patch_apply(struct kr_mixer_path_info *info, kr_mixer_pat
   return 0;
 }
 
+kr_value *kr_mixer_path_info_address_to_patch(kr_mixer_path_info_patch *patch, kr_address2 *addr) {
+   if (patch == NULL) return NULL;
+  if (addr->count < 1) return NULL;
+  if (addr->len[0] < 1) return NULL;
+  patch->member = kr_mixer_path_info_strto_member(addr->path[0]);
+  if (patch->member < 1) return NULL;
+  switch(memb_type) {
+      case KR_MIXER_PATH_INFO_LOWPASS:
+        return kr_lowpass_info_address_to_patch(&patch->value.lowpass_patch,addr);
+      case KR_MIXER_PATH_INFO_HIGHPASS:
+        return kr_highpass_info_address_to_patch(&patch->value.highpass_patch,addr);
+      case KR_MIXER_PATH_INFO_ANALOG:
+        return kr_analog_info_address_to_patch(&patch->value.analog_patch,addr);
+      case KR_MIXER_PATH_INFO_EQ:
+        return kr_eq_info_address_to_patch(&patch->value.eq_patch,addr);
+      case KR_MIXER_PATH_INFO_VOLUME:
+        return kr_volume_info_address_to_patch(&patch->value.volume_patch,addr);
+      default: break;
+    }
+  }
+  return patch->value;
+}
+
 int kr_mixer_path_info_init(struct kr_mixer_path_info *st) {
   if (st == NULL) {
     return -1;
