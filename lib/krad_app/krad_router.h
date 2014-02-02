@@ -14,12 +14,22 @@ typedef struct kr_router_map kr_router_map;
 typedef struct kr_route_setup kr_route_setup;
 typedef struct kr_route kr_route;
 typedef struct kr_name kr_name;
+typedef struct kr_address2 kr_address2;
 
 typedef int (kr_router_map_create_handler)(void *, void *, void *);
 typedef int (kr_router_map_create2_handler)(void *, void *, void *, void *, void *);
 typedef int (kr_router_map_patch_handler)(void *, void *);
 typedef int (kr_router_map_destroy_handler)(void *);
 typedef int (kr_router_response_handler)(void *, kr_crate2 *crate);
+
+#define KR_ADDRESS_PATH_MAX 8
+
+struct kr_address2 {
+  char *path[KR_ADDRESS_PATH_MAX];
+  int len[KR_ADDRESS_PATH_MAX];
+  int count;
+  int current;
+};
 
 struct kr_router_info {
   uint64_t maps;
