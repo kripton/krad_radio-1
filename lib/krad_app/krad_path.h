@@ -5,6 +5,7 @@
 #include <stddef.h>
 
 #define KR_PATH_COMPONENT_MAX 8
+#define KR_PATH_LENGTH_MAX 224
 
 typedef struct kr_path kr_path;
 
