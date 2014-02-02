@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdint.h>
 #include "gen.h"
 #include "krad_easing_common_helpers.h"
 #include "krad_easing_common.h"

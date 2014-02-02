@@ -34,14 +34,15 @@ kr_var *kr_alsa_info_patch_path(kr_alsa_info_patch *patch, kr_path *path) {
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_alsa_info_strto_member(name);
+  patch->member = kr_alsa_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_info_patch *patch) {
@@ -59,14 +60,15 @@ kr_var *kr_alsa_path_info_patch_path(kr_alsa_path_info_patch *patch, kr_path *pa
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_alsa_path_info_strto_member(name);
+  patch->member = kr_alsa_path_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_alsa_info_init(struct kr_alsa_info *st) {

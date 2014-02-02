@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdint.h>
 #include "gen.h"
 #include "krad_radio_payload.h"
 int kr_nil_to_text(char *text, void *st, int32_t max);

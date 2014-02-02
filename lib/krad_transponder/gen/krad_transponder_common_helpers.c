@@ -225,14 +225,15 @@ kr_var *kr_transponder_info_patch_path(kr_transponder_info_patch *patch, kr_path
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_transponder_info_strto_member(name);
+  patch->member = kr_transponder_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *info, kr_transponder_path_io_info_patch *patch) {
@@ -252,14 +253,15 @@ kr_var *kr_transponder_path_io_info_patch_path(kr_transponder_path_io_info_patch
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_transponder_path_io_info_strto_member(name);
+  patch->member = kr_transponder_path_io_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, kr_transponder_path_info_patch *patch) {
@@ -279,18 +281,21 @@ kr_var *kr_transponder_path_info_patch_path(kr_transponder_path_info_patch *patc
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_transponder_path_info_strto_member(name);
+  patch->member = kr_transponder_path_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
-      case KR_TRANSPONDER_PATH_INFO_INPUT:
-        return kr_transponder_path_io_info_patch_path(&patch->value.input_patch, path);
-      case KR_TRANSPONDER_PATH_INFO_OUTPUT:
-        return kr_transponder_path_io_info_patch_path(&patch->value.output_patch, path);
+    case KR_TRANSPONDER_PATH_INFO_INPUT:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_transponder_path_io_info_patch_path(&patch->value.input_patch, path);
+    case KR_TRANSPONDER_PATH_INFO_OUTPUT:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_transponder_path_io_info_patch_path(&patch->value.output_patch, path);
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_transponder_info_init(struct kr_transponder_info *st) {

@@ -1,7 +1,7 @@
 #ifndef KRAD_V4L2_COMMON_HELPERS_GEN_H
 #define KRAD_V4L2_COMMON_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_v4l2_common.h"
 typedef enum {
@@ -12,6 +12,7 @@ typedef enum {
 } kr_v4l2_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_v4l2_info_patch_value;
 
 typedef struct {
@@ -26,6 +27,7 @@ typedef enum {
 } kr_v4l2_open_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_v4l2_open_info_patch_value;
 
 typedef struct {

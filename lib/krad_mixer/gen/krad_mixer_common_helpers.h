@@ -1,7 +1,7 @@
 #ifndef KRAD_MIXER_COMMON_HELPERS_GEN_H
 #define KRAD_MIXER_COMMON_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_mixer_common.h"
 typedef enum {
@@ -15,6 +15,7 @@ typedef enum {
 } kr_mixer_path_info_member;
 
 typedef struct {
+  kr_var var;
   kr_lowpass_info_patch lowpass_patch;
   kr_highpass_info_patch highpass_patch;
   kr_analog_info_patch analog_patch;

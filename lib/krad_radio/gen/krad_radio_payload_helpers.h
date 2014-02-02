@@ -1,7 +1,7 @@
 #ifndef KRAD_RADIO_PAYLOAD_HELPERS_GEN_H
 #define KRAD_RADIO_PAYLOAD_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_radio_payload.h"
 int kr_nil_init(struct kr_nil *st);

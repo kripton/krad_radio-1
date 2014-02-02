@@ -1,7 +1,7 @@
 #ifndef KRAD_X11_COMMON_HELPERS_GEN_H
 #define KRAD_X11_COMMON_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_x11_common.h"
 typedef enum {
@@ -9,6 +9,7 @@ typedef enum {
 } kr_x11_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_x11_info_patch_value;
 
 typedef struct {
@@ -27,6 +28,7 @@ typedef enum {
 } kr_x11_path_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_x11_path_info_patch_value;
 
 typedef struct {

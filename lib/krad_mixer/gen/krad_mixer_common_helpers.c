@@ -169,24 +169,30 @@ kr_var *kr_mixer_path_info_patch_path(kr_mixer_path_info_patch *patch, kr_path *
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_mixer_path_info_strto_member(name);
+  patch->member = kr_mixer_path_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
-      case KR_MIXER_PATH_INFO_LOWPASS:
-        return kr_lowpass_info_patch_path(&patch->value.lowpass_patch, path);
-      case KR_MIXER_PATH_INFO_HIGHPASS:
-        return kr_highpass_info_patch_path(&patch->value.highpass_patch, path);
-      case KR_MIXER_PATH_INFO_ANALOG:
-        return kr_analog_info_patch_path(&patch->value.analog_patch, path);
-      case KR_MIXER_PATH_INFO_EQ:
-        return kr_eq_info_patch_path(&patch->value.eq_patch, path);
-      case KR_MIXER_PATH_INFO_VOLUME:
-        return kr_volume_info_patch_path(&patch->value.volume_patch, path);
+    case KR_MIXER_PATH_INFO_LOWPASS:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_lowpass_info_patch_path(&patch->value.lowpass_patch, path);
+    case KR_MIXER_PATH_INFO_HIGHPASS:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_highpass_info_patch_path(&patch->value.highpass_patch, path);
+    case KR_MIXER_PATH_INFO_ANALOG:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_analog_info_patch_path(&patch->value.analog_patch, path);
+    case KR_MIXER_PATH_INFO_EQ:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_eq_info_patch_path(&patch->value.eq_patch, path);
+    case KR_MIXER_PATH_INFO_VOLUME:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_volume_info_patch_path(&patch->value.volume_patch, path);
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_mixer_path_info_init(struct kr_mixer_path_info *st) {

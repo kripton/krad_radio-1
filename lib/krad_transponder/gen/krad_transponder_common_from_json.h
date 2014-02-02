@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdint.h>
 #include "gen.h"
 #include "jsmn.h"
 #include "krad_transponder_common.h"

@@ -1,7 +1,7 @@
 #ifndef KRAD_SFX_COMMON_HELPERS_GEN_H
 #define KRAD_SFX_COMMON_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_sfx_common.h"
 typedef enum {
@@ -11,6 +11,7 @@ typedef enum {
 } kr_eq_band_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_eq_band_info_patch_value;
 
 typedef struct {
@@ -23,6 +24,7 @@ typedef enum {
 } kr_eq_info_member;
 
 typedef struct {
+  kr_var var;
   kr_eq_band_info_patch band_patch;
 } kr_eq_info_patch_value;
 
@@ -37,6 +39,7 @@ typedef enum {
 } kr_lowpass_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_lowpass_info_patch_value;
 
 typedef struct {
@@ -50,6 +53,7 @@ typedef enum {
 } kr_highpass_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_highpass_info_patch_value;
 
 typedef struct {
@@ -62,6 +66,7 @@ typedef enum {
 } kr_volume_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_volume_info_patch_value;
 
 typedef struct {
@@ -75,6 +80,7 @@ typedef enum {
 } kr_analog_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_analog_info_patch_value;
 
 typedef struct {

@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdint.h>
 #include "gen.h"
 #include "krad_transponder_common.h"
 int krad_link_av_mode_t_to_text(char *text, void *st, int32_t max);

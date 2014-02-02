@@ -262,14 +262,15 @@ kr_var *kr_eq_band_info_patch_path(kr_eq_band_info_patch *patch, kr_path *path) 
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_eq_band_info_strto_member(name);
+  patch->member = kr_eq_band_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_eq_info_patch_apply(struct kr_eq_info *info, kr_eq_info_patch *patch) {
@@ -287,16 +288,18 @@ kr_var *kr_eq_info_patch_path(kr_eq_info_patch *patch, kr_path *path) {
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_eq_info_strto_member(name);
+  patch->member = kr_eq_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
-      case KR_EQ_INFO_BAND:
-        return kr_eq_band_info_patch_path(&patch->value.band_patch, path);
+    case KR_EQ_INFO_BAND:
+       if (kr_path_step(path) != 0) return NULL;
+       return kr_eq_band_info_patch_path(&patch->value.band_patch, path);
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_lowpass_info_patch_apply(struct kr_lowpass_info *info, kr_lowpass_info_patch *patch) {
@@ -316,14 +319,15 @@ kr_var *kr_lowpass_info_patch_path(kr_lowpass_info_patch *patch, kr_path *path) 
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_lowpass_info_strto_member(name);
+  patch->member = kr_lowpass_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_highpass_info_patch_apply(struct kr_highpass_info *info, kr_highpass_info_patch *patch) {
@@ -343,14 +347,15 @@ kr_var *kr_highpass_info_patch_path(kr_highpass_info_patch *patch, kr_path *path
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_highpass_info_strto_member(name);
+  patch->member = kr_highpass_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_volume_info_patch_apply(struct kr_volume_info *info, kr_volume_info_patch *patch) {
@@ -368,14 +373,15 @@ kr_var *kr_volume_info_patch_path(kr_volume_info_patch *patch, kr_path *path) {
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_volume_info_strto_member(name);
+  patch->member = kr_volume_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_analog_info_patch_apply(struct kr_analog_info *info, kr_analog_info_patch *patch) {
@@ -395,14 +401,15 @@ kr_var *kr_analog_info_patch_path(kr_analog_info_patch *patch, kr_path *path) {
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_analog_info_strto_member(name);
+  patch->member = kr_analog_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_eq_band_info_init(struct kr_eq_band_info *st) {

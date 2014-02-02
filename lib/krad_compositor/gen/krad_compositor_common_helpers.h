@@ -1,7 +1,7 @@
 #ifndef KRAD_COMPOSITOR_COMMON_HELPERS_GEN_H
 #define KRAD_COMPOSITOR_COMMON_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_compositor_common.h"
 typedef enum {
@@ -11,6 +11,7 @@ typedef enum {
 } kr_sprite_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_sprite_info_patch_value;
 
 typedef struct {
@@ -28,6 +29,7 @@ typedef enum {
 } kr_text_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_text_info_patch_value;
 
 typedef struct {
@@ -44,6 +46,7 @@ typedef enum {
 } kr_vector_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_vector_info_patch_value;
 
 typedef struct {
@@ -64,6 +67,7 @@ typedef enum {
 } kr_compositor_path_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_compositor_path_info_patch_value;
 
 typedef struct {

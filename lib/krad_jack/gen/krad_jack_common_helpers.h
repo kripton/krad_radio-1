@@ -1,7 +1,7 @@
 #ifndef KRAD_JACK_COMMON_HELPERS_GEN_H
 #define KRAD_JACK_COMMON_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_jack_common.h"
 typedef enum {
@@ -10,6 +10,7 @@ typedef enum {
 } kr_jack_setup_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_jack_setup_info_patch_value;
 
 typedef struct {
@@ -30,6 +31,7 @@ typedef enum {
 } kr_jack_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_jack_info_patch_value;
 
 typedef struct {
@@ -44,6 +46,7 @@ typedef enum {
 } kr_jack_path_info_member;
 
 typedef struct {
+  kr_var var;
 } kr_jack_path_info_patch_value;
 
 typedef struct {

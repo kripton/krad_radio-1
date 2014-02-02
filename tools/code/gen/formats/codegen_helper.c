@@ -369,7 +369,7 @@ static void codegen_patch_path_func(struct_data *def,
   fprintf(out," {\n  char *name;\n  int len;\n");
   fprintf(out,"  if (patch == NULL) return NULL;\n  if (path == NULL) return NULL;\n"
     "  len = kr_path_cur_name(path, &name);\n"
-    "  patch->member = %s_strto_member(name);\n"
+    "  patch->member = %s_strto_member(name, len);\n"
     "  if (patch->member < 1) return NULL;\n  switch(patch->member) {\n",def->info.name);
 
   for (i = 0; i < def->info.member_count; i++) {
@@ -379,14 +379,16 @@ static void codegen_patch_path_func(struct_data *def,
       !codegen_is_enum(def->info.members[i].type_info.substruct_info.type_name)) {
       snprintf(upp,sizeof(upp),"%s_%s",def->info.name,def->info.members[i].name);
       uppercase(upp,upp);
-      fprintf(out,"      case %s:\n        return %s_patch_path(&patch->value.%s_patch, path);\n",
+      fprintf(out,"    case %s:\n       if (kr_path_step(path) != 0) return NULL;"
+        "\n       return %s_patch_path(&patch->value.%s_patch, path);\n",
         upp,def->info.members[i].type_info.substruct_info.type_name,
         def->info.members[i].name);
     }
   }
 
   fprintf(out,"    default:\n      if (kr_path_steps_ahead(path) != 0) return NULL;\n      break;\n  }\n");
-  fprintf(out,"  return patch->value;\n}\n\n");
+  fprintf(out,"  /*patch->value.var.type = NN; not sure about this uhm*/\n");
+  fprintf(out,"  return &patch->value.var;\n}\n\n");
 
 }
 
@@ -484,7 +486,7 @@ static void codegen_enum_protos(struct_data *defs, int ndefs,
 
 static void codegen_patch_struct(struct_data *def, FILE *out) {
   int i;
-  fprintf(out,"typedef struct {\n");
+  fprintf(out,"typedef struct {\n  kr_var var;\n");
   for (i = 0; i < def->info.member_count; i++) {
     if (memb_struct_check(&def->info.members[i]) && 
       is_suffix(def->info.members[i].type_info.substruct_info.type_name,"_info") &&

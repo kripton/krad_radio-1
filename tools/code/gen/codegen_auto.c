@@ -171,11 +171,11 @@ void files_gen(header_data *hdata,
           ppp[0] = '\0';
           uppercase(basename(hdata[i].targets[l].path),upp);
           fprintf(header,"#ifndef %s_GEN_H\n#define %s_GEN_H\n",upp,upp);
+          fprintf(header,"#include \"krad_path.h\"\n");
+          fprintf(header,"#include \"krad_variant.h\"\n");
           ppp[0] = '.';
           pp[0] = '/';
         }
-        fprintf(header,"#include <stdio.h>\n");
-        fprintf(header,"#include <stdint.h>\n");
         fprintf(header,"#include \"gen.h\"\n");
 
         if (hdata[i].targets[l].type == TO_EBML || hdata[i].targets[l].type == FR_EBML) {

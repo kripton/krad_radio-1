@@ -131,14 +131,15 @@ kr_var *kr_jack_setup_info_patch_path(kr_jack_setup_info_patch *patch, kr_path *
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_jack_setup_info_strto_member(name);
+  patch->member = kr_jack_setup_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_jack_info_patch_apply(kr_jack_info *info, kr_jack_info_patch *patch) {
@@ -164,14 +165,15 @@ kr_var *kr_jack_info_patch_path(kr_jack_info_patch *patch, kr_path *path) {
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_jack_info_strto_member(name);
+  patch->member = kr_jack_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_patch *patch) {
@@ -191,14 +193,15 @@ kr_var *kr_jack_path_info_patch_path(kr_jack_path_info_patch *patch, kr_path *pa
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_jack_path_info_strto_member(name);
+  patch->member = kr_jack_path_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
   }
-  return patch->value;
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
 }
 
 int kr_jack_setup_info_init(kr_jack_setup_info *st) {

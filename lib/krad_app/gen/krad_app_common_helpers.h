@@ -1,7 +1,7 @@
 #ifndef KRAD_APP_COMMON_HELPERS_GEN_H
 #define KRAD_APP_COMMON_HELPERS_GEN_H
-#include <stdio.h>
-#include <stdint.h>
+#include "krad_path.h"
+#include "krad_variant.h"
 #include "gen.h"
 #include "krad_app_common.h"
 int kr_crate2_init(struct kr_crate2 *st);
