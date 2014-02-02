@@ -1,5 +1,4 @@
 #include "krad_radio_client.h"
-#include "krad_radio_client_internal.h"
 #include "krad_transponder_common.h"
 
 int kr_xpdr_mkpath(kr_client *client, char *name, kr_transponder_path_info *info) {

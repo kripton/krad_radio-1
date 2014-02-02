@@ -1,17 +1,28 @@
-#include "krad_radio_client_internal.h"
-#include "krad_radio_client.h"
+#include <poll.h>
 
 #include "krad_radio_common.h"
 #include "krad_compositor_common.h"
 #include "krad_transponder_common.h"
 #include "krad_mixer_common.h"
-
+#include "krad_app_client.h"
+#include "krad_radio_client.h"
 #include "krad_compositor_client.h"
 #include "krad_transponder_client.h"
 #include "krad_mixer_client.h"
 
-static void kr_crate_payload_ebml_reset(kr_crate *crate);
-static void kr_crate_destroy(kr_crate **crate);
+struct kr_client {
+  kr_app_client *krad_app_client;
+  char *name;
+  int autosync;
+  int subscriber;
+  int last_delivery_was_final;
+  kr_ebml2_t *ebml2;
+  kr_io2_t *io;
+  kr_ebml2_t *ebml_in;
+  kr_io2_t *io_in;
+};
+
+int kr_send_fd(kr_client *client, int fd);
 
 int kr_client_sync(kr_client *client) {
   int32_t ret;
@@ -225,9 +236,6 @@ int kr_client_destroy(kr_client **client) {
     if (kr_connected(*client)) {
       kr_disconnect(*client);
     }
-    if ((*client)->re_crate != NULL) {
-      kr_crate_destroy(&(*client)->re_crate);
-    }
     if ((*client)->name != NULL) {
       free ((*client)->name);
       (*client)->name = NULL;
@@ -267,14 +275,6 @@ int kr_send_fd(kr_client *client, int fd) {
   return kr_app_client_send_fd(client->krad_app_client, fd);
 }
 
-void kr_crate_free_string(char **string) {
-  free (*string);
-}
-
-char *kr_crate_alloc_string(int length) {
-  return kr_allocz (1, length + 16);
-}
-
 int kr_poll(kr_client *client, uint32_t timeout_ms) {
   int ret;
   struct pollfd pollfds[1];
@@ -294,119 +294,8 @@ int kr_poll(kr_client *client, uint32_t timeout_ms) {
   return ret;
 }
 
-int kr_delivery_final(kr_client *client) {
-  return client->last_delivery_was_final;
-}
-
-void kr_delivery_final_reset(kr_client *client) {
-  client->last_delivery_was_final = 0;
-}
-
-void kr_crate_address(kr_crate *crate, kr_address_t **address) {
-  *address = &crate->address;
-}
-
-static void kr_crate_payload_ebml_reset (kr_crate *crate) {
-  kr_ebml2_set_buffer ( &crate->payload_ebml, crate->buffer, crate->size );
-}
-
-int kr_uncrate_rep(kr_crate *crate) {
-  if (!(crate->notice == KR_GET)) {
-    return 0;
-  }
-  if (crate->size == 0) {
-    return 0;
-  }
-  kr_crate_payload_ebml_reset (crate);
-  switch ( crate->address.path.unit ) {
-    case KR_STATION:
-      //kr_radio_crate_to_rep (crate);
-      return 1;
-    case KR_MIXER:
-      //kr_mixer_crate_to_rep (crate);
-      return 1;
-    case KR_COMPOSITOR:
-      //kr_compositor_crate_to_info(crate);
-      return 1;
-    case KR_TRANSPONDER:
-      break;
-  }
-  return 0;
-}
-
-uint32_t kr_crate_size(kr_crate *crate) {
-  return crate->size;
-}
-
-static void kr_crate_destroy (kr_crate **crate) {
-  if (*crate != NULL) {
-    if ((*crate)->buffer != NULL) {
-      free((*crate)->buffer);
-    }
-    free((*crate));
-    *crate = NULL;
-  }
-}
-
-void kr_crate_reset(kr_crate *crate) {
-  kr_client *client;
-  unsigned char *buffer;
-  client = NULL;
-  buffer = NULL;
-  if (crate != NULL) {
-    client = crate->client;
-    if (crate->buffer != NULL) {
-      buffer = crate->buffer;
-    }
-    memset (crate, 0, sizeof(kr_crate));
-    crate->client = client;
-    if (buffer != NULL) {
-      crate->buffer = buffer;
-    }
-  }
-}
-
-void kr_crate_recycle(kr_crate **crate) {
-  if (*crate != NULL) {
-    if ((*crate)->client->re_crate == NULL) {
-      kr_crate_reset (*crate);
-      (*crate)->client->re_crate = *crate;
-      *crate = NULL;
-    } else {
-      kr_crate_destroy (crate);
-    }
-  }
-}
-
-kr_crate *kr_crate_create(kr_client *client) {
-  kr_crate *crate;
-  crate = kr_allocz (1, sizeof(kr_crate));
-  crate->client = client;
-  return crate;
-}
-
-int kr_have_full_crate(kr_io2_t *in) {
-  kr_ebml2_t ebml;
-  uint32_t element;
-  uint64_t size;
-  int ret;
-  if (!(kr_io2_has_in(in))) {
-    return 0;
-  }
-  kr_ebml2_set_buffer(&ebml, in->rd_buf, in->len);
-  ret = kr_ebml2_unpack_id(&ebml, &element, &size);
-  if (ret < 0) {
-    printf("full_command EBML ID Not found");
-    return 0;
-  }
-  size += ebml.pos;
-  if (in->len < size) {
-    //printf ("full_command Not Enough bytes.. have %zu need %zu\n", in->len, size);
-    return 0;
-  } else {
-    //printf ("Got command have %zu need %zu\n", in->len, size);
-  }
-  return size;
+void kr_delivery_recv(kr_client *client) {
+  kr_io2_read(client->io_in);
 }
 
 int kr_streamer45(kr_client *client) {
@@ -442,152 +331,5 @@ int kr_streamer45(kr_client *client) {
       return 1;
     }
   }
-  return 0;
-}
-
-int kr_delivery_get(kr_client *client, kr_crate **crate) {
-  kr_crate *response;
-  uint32_t ebml_id;
-  uint64_t ebml_data_size;
-  int have_crate;
-  have_crate = 0;
-  ebml_id = 0;
-  ebml_data_size = 0;
-  have_crate = kr_have_full_crate(client->io_in);
-  if (have_crate) {
-    kr_ebml2_set_buffer(client->ebml_in, client->io_in->rd_buf, client->io_in->len);
-    if (client->re_crate != NULL) {
-      response = client->re_crate;
-      client->re_crate = NULL;
-    } else {
-      response = kr_crate_create(client);
-    }
-    *crate = response;
-    response->inside.actual = &response->rep.actual;
-    //FIXME DOUBLE FIXME
-    //krad_read_address_from_ebml(client->ebml_in, &response->address);
-    kr_ebml2_unpack_element_uint32(client->ebml_in, NULL, &response->notice);
-    response->addr = &response->address;
-    if (!client->subscriber) {
-      if (response->notice == KR_EID_TERMINATOR) {
-        client->last_delivery_was_final = 1;
-      } else {
-        client->last_delivery_was_final = 0;
-      }
-    }
-    //kr_address_debug_print (&response->address);
-    //kr_message_notice_debug_print (response->notice);
-    //if (krad_message_notice_has_payload (response->notice)) {
-    //FIXME
-    if (response->notice != KR_EID_TERMINATOR) {
-      kr_ebml2_unpack_id(client->ebml_in, &ebml_id, &ebml_data_size);
-      if (ebml_data_size > 0) {
-        //printf ("KR Client Response payload size: %"PRIu64"\n", ebml_data_size);
-        response->size = ebml_data_size;
-        if (response->buffer == NULL) {
-          response->buffer = kr_alloc(2048);
-        }
-        kr_ebml2_unpack_data(client->ebml_in, response->buffer, ebml_data_size);
-      }
-    }
-
-/*    if (kr_uncrate_int (response, &response->integer)) {
-      response->has_int = 1;
-    }
-    if (kr_uncrate_float (response, &response->real)) {
-      response->has_float = 1;
-    }
-*/
-    kr_io2_pulled(client->io_in, have_crate);
-  }
-  return have_crate;
-}
-
-int kr_crate_has_float(kr_crate *crate) {
-  return crate->has_float;
-}
-
-int kr_crate_has_int(kr_crate *crate) {
-  return crate->has_int;
-}
-
-void kr_client_crate_wait(kr_client *client, kr_crate **crate) {
-  kr_poll(client, 250);
-  kr_delivery_get(client, crate);
-}
-
-void kr_delivery_recv(kr_client *client) {
-  kr_io2_read (client->io_in);
-}
-
-void kr_delivery_accept_and_report(kr_client *client) {
-  kr_crate *crate;
-  char *string;
-  int wait_time_ms;
-  int length;
-  int got_all_delivery;
-  got_all_delivery = 0;
-  string = NULL;
-  crate = NULL;
-  wait_time_ms = 250;
-  for (;;) {
-    kr_delivery_get(client, &crate);
-    if (crate == NULL) {
-      if (kr_poll(client, wait_time_ms)) {
-        kr_delivery_recv(client);
-      } else {
-        break;
-      }
-    } else {
-      //length = kr_uncrate_string(crate, &string);
-      length = 0;
-      if (length > 0) {
-        printf ("%s\n", string);
-        kr_string_recycle (&string);
-      }
-      kr_crate_recycle (&crate);
-      if (kr_delivery_final (client)) {
-        kr_delivery_final_reset (client);
-        got_all_delivery = 1;
-        break;
-      }
-    }
-  }
-  if (got_all_delivery == 0) {
-    printf ("No response after waiting %dms\n", wait_time_ms);
-  }
-}
-
-int kr_delivery_get_until_final(kr_client *client, kr_crate **crate, uint32_t timeout_ms) {
-  kr_crate *lcrate;
-  lcrate = NULL;
-  if (client == NULL) {
-    failfast("kr_delivery_get_until_final called with NULL client pointer");
-  }
-  if (crate == NULL) {
-    failfast("kr_delivery_get_until_final called with NULL crate pointer");
-  }
-  if ((crate != NULL) && (*crate != NULL)) {
-    kr_crate_recycle(crate);
-  }
-  for (;;) {
-    kr_delivery_get(client, &lcrate);
-    if (lcrate == NULL) {
-      if (kr_poll(client, timeout_ms)) {
-        kr_delivery_recv(client);
-      } else {
-        break;
-      }
-    } else {
-      if (kr_delivery_final(client)) {
-        kr_crate_recycle(&lcrate);
-        kr_delivery_final_reset(client);
-        return 0;
-      }
-      *crate = lcrate;
-      return 1;
-    }
-  }
-  printf("No response after waiting %dms\n", timeout_ms);
   return 0;
 }

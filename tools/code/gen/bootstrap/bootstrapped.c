@@ -31,6 +31,12 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_app_server_info";
     case CGEN_KR_APP_SERVER_CLIENT_SETUP:
       return "kr_app_server_client_setup";
+    case CGEN_KR_VALUE_TYPE:
+      return "kr_value_type";
+    case CGEN_KR_VALUE:
+      return "kr_value";
+    case CGEN_KR_VARIANT:
+      return "kr_variant";
     case CGEN_KR_ROUTER_INFO:
       return "kr_router_info";
     case CGEN_KR_ROUTER_MAP_INFO:
@@ -313,40 +319,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_medium_params_t";
     case CGEN_KR_TRACK_INFO_ST:
       return "kr_track_info_St";
-    case CGEN_KR_UNIT_T:
-      return "kr_unit_t";
-    case CGEN_KR_MIXER_SUBUNIT_T:
-      return "kr_mixer_subunit_t";
-    case CGEN_KR_TRANSPONDER_SUBUNIT_TYPE_T:
-      return "kr_transponder_subunit_type_t";
-    case CGEN_KR_STATION_SUBUNIT_T:
-      return "kr_station_subunit_t";
-    case CGEN_KR_UNIT_CONTROL_DATA_T:
-      return "kr_unit_control_data_t";
-    case CGEN_KR_UNIT_CONTROL_VALUE_T:
-      return "kr_unit_control_value_t";
-    case CGEN_KR_TRANSPONDER_CONTROL_T:
-      return "kr_transponder_control_t";
-    case CGEN_KR_SUBUNIT_T:
-      return "kr_subunit_t";
-    case CGEN_KR_UNIT_CONTROL_NAME_T:
-      return "kr_unit_control_name_t";
-    case CGEN_KR_UNIT_PATH_ST:
-      return "kr_unit_path_St";
-    case CGEN_KR_UNIT_ID_T:
-      return "kr_unit_id_t";
-    case CGEN_KR_ADDRESS_ST:
-      return "kr_address_St";
-    case CGEN_KR_UNIT_CONTROL_ST:
-      return "kr_unit_control_St";
-    case CGEN_KR_REP_PTR_T:
-      return "kr_rep_ptr_t";
-    case CGEN_KR_REP_ACTUAL_T:
-      return "kr_rep_actual_t";
-    case CGEN_KR_CRATE:
-      return "kr_crate";
-    case CGEN_KR_CLIENT:
-      return "kr_client";
     case CGEN_KR_NIL:
       return "kr_nil";
     case CGEN_KR_RADIO_PAYLOAD_TYPE:
@@ -677,6 +649,15 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_app_server_client_setup")) {
     return CGEN_KR_APP_SERVER_CLIENT_SETUP;
+  }
+  if (!strcmp(string,"kr_value_type")) {
+    return CGEN_KR_VALUE_TYPE;
+  }
+  if (!strcmp(string,"kr_value")) {
+    return CGEN_KR_VALUE;
+  }
+  if (!strcmp(string,"kr_variant")) {
+    return CGEN_KR_VARIANT;
   }
   if (!strcmp(string,"kr_router_info")) {
     return CGEN_KR_ROUTER_INFO;
@@ -1100,57 +1081,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_track_info_St")) {
     return CGEN_KR_TRACK_INFO_ST;
-  }
-  if (!strcmp(string,"kr_unit_t")) {
-    return CGEN_KR_UNIT_T;
-  }
-  if (!strcmp(string,"kr_mixer_subunit_t")) {
-    return CGEN_KR_MIXER_SUBUNIT_T;
-  }
-  if (!strcmp(string,"kr_transponder_subunit_type_t")) {
-    return CGEN_KR_TRANSPONDER_SUBUNIT_TYPE_T;
-  }
-  if (!strcmp(string,"kr_station_subunit_t")) {
-    return CGEN_KR_STATION_SUBUNIT_T;
-  }
-  if (!strcmp(string,"kr_unit_control_data_t")) {
-    return CGEN_KR_UNIT_CONTROL_DATA_T;
-  }
-  if (!strcmp(string,"kr_unit_control_value_t")) {
-    return CGEN_KR_UNIT_CONTROL_VALUE_T;
-  }
-  if (!strcmp(string,"kr_transponder_control_t")) {
-    return CGEN_KR_TRANSPONDER_CONTROL_T;
-  }
-  if (!strcmp(string,"kr_subunit_t")) {
-    return CGEN_KR_SUBUNIT_T;
-  }
-  if (!strcmp(string,"kr_unit_control_name_t")) {
-    return CGEN_KR_UNIT_CONTROL_NAME_T;
-  }
-  if (!strcmp(string,"kr_unit_path_St")) {
-    return CGEN_KR_UNIT_PATH_ST;
-  }
-  if (!strcmp(string,"kr_unit_id_t")) {
-    return CGEN_KR_UNIT_ID_T;
-  }
-  if (!strcmp(string,"kr_address_St")) {
-    return CGEN_KR_ADDRESS_ST;
-  }
-  if (!strcmp(string,"kr_unit_control_St")) {
-    return CGEN_KR_UNIT_CONTROL_ST;
-  }
-  if (!strcmp(string,"kr_rep_ptr_t")) {
-    return CGEN_KR_REP_PTR_T;
-  }
-  if (!strcmp(string,"kr_rep_actual_t")) {
-    return CGEN_KR_REP_ACTUAL_T;
-  }
-  if (!strcmp(string,"kr_crate")) {
-    return CGEN_KR_CRATE;
-  }
-  if (!strcmp(string,"kr_client")) {
-    return CGEN_KR_CLIENT;
   }
   if (!strcmp(string,"kr_nil")) {
     return CGEN_KR_NIL;
@@ -1582,28 +1512,13 @@ cgen_enum codegen_string_to_enum(char *string) {
 }
 
 int codegen_is_union(char *type) {
+  if (!strcmp(type,"kr_value")) {
+    return 1;
+  }
   if (!strcmp(type,"kr_muxer_transport_params")) {
     return 1;
   }
   if (!strcmp(type,"kr_medium_params_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_unit_control_value_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_subunit_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_unit_control_name_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_unit_id_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_rep_ptr_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_rep_actual_t")) {
     return 1;
   }
   if (!strcmp(type,"kr_radio_payload")) {
@@ -1629,6 +1544,9 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_app_method")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_value_type")) {
     return 1;
   }
   if (!strcmp(type,"kr_easing")) {
@@ -1749,24 +1667,6 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_player_cmd")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_unit_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_mixer_subunit_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_transponder_subunit_type_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_station_subunit_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_unit_control_data_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_transponder_control_t")) {
     return 1;
   }
   if (!strcmp(type,"kr_radio_payload_type")) {

@@ -1,7 +1,9 @@
 #include "krad_radio_client_ctl.h"
 #include "krad_radio_client.h"
-#include "krad_radio_client_internal.h"
 
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <dirent.h>
 #include <ctype.h>
 
 #define LISTMAX 4096

@@ -148,7 +148,6 @@ kradradioincludedir = $(includedir)/krad
 kradradioinclude_HEADERS = krad_radio/kr_client.h \
 krad_app/krad_app_common.h \
 krad_radio/krad_radio_client.h \
-krad_radio/krad_radio_client_internal.h \
 krad_radio/krad_radio_client_ctl.h \
 krad_radio/krad_radio_common.h \
 krad_radio/krad_radio_version.h \
