@@ -68,7 +68,7 @@ typedef enum {
 /* Control Types */
 
 typedef enum {
-  KR_FLOAT,
+  KR_FLOAT_OLD = 1,
   KR_INT32,
   KR_CHAR,
   KR_STRING,
