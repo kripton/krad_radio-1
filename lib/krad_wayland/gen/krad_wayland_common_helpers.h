@@ -38,7 +38,9 @@ typedef struct {
 } kr_wayland_path_info_patch;
 
 int kr_wayland_info_patch_apply(kr_wayland_info *info, kr_wayland_info_patch *patch);
+int kr_wayland_info_address_to_patch(kr_wayland_info_patch *patch, char **addr, int addr_len);
 int kr_wayland_path_info_patch_apply(kr_wayland_path_info *info, kr_wayland_path_info_patch *patch);
+int kr_wayland_path_info_address_to_patch(kr_wayland_path_info_patch *patch, char **addr, int addr_len);
 int kr_wayland_info_init(kr_wayland_info *st);
 int kr_wayland_info_valid(kr_wayland_info *st);
 int kr_wayland_info_random(kr_wayland_info *st);

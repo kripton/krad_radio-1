@@ -80,9 +80,13 @@ typedef struct {
 } kr_compositor_path_info_patch;
 
 int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch *patch);
+int kr_sprite_info_address_to_patch(kr_sprite_info_patch *patch, char **addr, int addr_len);
 int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patch);
+int kr_text_info_address_to_patch(kr_text_info_patch *patch, char **addr, int addr_len);
 int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch *patch);
+int kr_vector_info_address_to_patch(kr_vector_info_patch *patch, char **addr, int addr_len);
 int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch);
+int kr_compositor_path_info_address_to_patch(kr_compositor_path_info_patch *patch, char **addr, int addr_len);
 int kr_compositor_controls_init(struct kr_compositor_controls *st);
 int kr_compositor_controls_valid(struct kr_compositor_controls *st);
 int kr_compositor_controls_random(struct kr_compositor_controls *st);

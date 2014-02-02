@@ -34,7 +34,9 @@ typedef struct {
 } kr_alsa_path_info_patch;
 
 int kr_alsa_info_patch_apply(struct kr_alsa_info *info, kr_alsa_info_patch *patch);
+int kr_alsa_info_address_to_patch(kr_alsa_info_patch *patch, char **addr, int addr_len);
 int kr_alsa_path_info_patch_apply(struct kr_alsa_path_info *info, kr_alsa_path_info_patch *patch);
+int kr_alsa_path_info_address_to_patch(kr_alsa_path_info_patch *patch, char **addr, int addr_len);
 int kr_alsa_info_init(struct kr_alsa_info *st);
 int kr_alsa_info_valid(struct kr_alsa_info *st);
 int kr_alsa_info_random(struct kr_alsa_info *st);

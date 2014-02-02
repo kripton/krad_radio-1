@@ -38,7 +38,9 @@ typedef struct {
 } kr_v4l2_open_info_patch;
 
 int kr_v4l2_info_patch_apply(struct kr_v4l2_info *info, kr_v4l2_info_patch *patch);
+int kr_v4l2_info_address_to_patch(kr_v4l2_info_patch *patch, char **addr, int addr_len);
 int kr_v4l2_open_info_patch_apply(struct kr_v4l2_open_info *info, kr_v4l2_open_info_patch *patch);
+int kr_v4l2_open_info_address_to_patch(kr_v4l2_open_info_patch *patch, char **addr, int addr_len);
 int kr_v4l2_mode_init(struct kr_v4l2_mode *st);
 int kr_v4l2_mode_valid(struct kr_v4l2_mode *st);
 int kr_v4l2_mode_random(struct kr_v4l2_mode *st);

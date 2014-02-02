@@ -1,57 +1,57 @@
 #include "krad_sfx_common_helpers.h"
 
 kr_eq_band_info_member kr_eq_band_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_eq_band_info_db",len)) {
+  if (!strncmp(string,"db",len)) {
     return KR_EQ_BAND_INFO_DB;
   }
-  if (!strncmp(string,"kr_eq_band_info_bw",len)) {
+  if (!strncmp(string,"bw",len)) {
     return KR_EQ_BAND_INFO_BW;
   }
-  if (!strncmp(string,"kr_eq_band_info_hz",len)) {
+  if (!strncmp(string,"hz",len)) {
     return KR_EQ_BAND_INFO_HZ;
   }
   return -1;
 }
 
 kr_eq_info_member kr_eq_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_eq_info_band",len)) {
+  if (!strncmp(string,"band",len)) {
     return KR_EQ_INFO_BAND;
   }
   return -1;
 }
 
 kr_lowpass_info_member kr_lowpass_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_lowpass_info_bw",len)) {
+  if (!strncmp(string,"bw",len)) {
     return KR_LOWPASS_INFO_BW;
   }
-  if (!strncmp(string,"kr_lowpass_info_hz",len)) {
+  if (!strncmp(string,"hz",len)) {
     return KR_LOWPASS_INFO_HZ;
   }
   return -1;
 }
 
 kr_highpass_info_member kr_highpass_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_highpass_info_bw",len)) {
+  if (!strncmp(string,"bw",len)) {
     return KR_HIGHPASS_INFO_BW;
   }
-  if (!strncmp(string,"kr_highpass_info_hz",len)) {
+  if (!strncmp(string,"hz",len)) {
     return KR_HIGHPASS_INFO_HZ;
   }
   return -1;
 }
 
 kr_volume_info_member kr_volume_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_volume_info_level",len)) {
+  if (!strncmp(string,"level",len)) {
     return KR_VOLUME_INFO_LEVEL;
   }
   return -1;
 }
 
 kr_analog_info_member kr_analog_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_analog_info_drive",len)) {
+  if (!strncmp(string,"drive",len)) {
     return KR_ANALOG_INFO_DRIVE;
   }
-  if (!strncmp(string,"kr_analog_info_blend",len)) {
+  if (!strncmp(string,"blend",len)) {
     return KR_ANALOG_INFO_BLEND;
   }
   return -1;

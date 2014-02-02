@@ -1,26 +1,26 @@
 #include "krad_adapter_common_helpers.h"
 
 kr_adapter_info_member kr_adapter_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_adapter_info_api",len)) {
+  if (!strncmp(string,"api",len)) {
     return KR_ADAPTER_INFO_API;
   }
-  if (!strncmp(string,"kr_adapter_info_api_info",len)) {
+  if (!strncmp(string,"api_info",len)) {
     return KR_ADAPTER_INFO_API_INFO;
   }
   return -1;
 }
 
 kr_adapter_path_info_member kr_adapter_path_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_adapter_path_info_name",len)) {
+  if (!strncmp(string,"name",len)) {
     return KR_ADAPTER_PATH_INFO_NAME;
   }
-  if (!strncmp(string,"kr_adapter_path_info_dir",len)) {
+  if (!strncmp(string,"dir",len)) {
     return KR_ADAPTER_PATH_INFO_DIR;
   }
-  if (!strncmp(string,"kr_adapter_path_info_api",len)) {
+  if (!strncmp(string,"api",len)) {
     return KR_ADAPTER_PATH_INFO_API;
   }
-  if (!strncmp(string,"kr_adapter_path_info_info",len)) {
+  if (!strncmp(string,"info",len)) {
     return KR_ADAPTER_PATH_INFO_INFO;
   }
   return -1;

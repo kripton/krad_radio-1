@@ -1,85 +1,85 @@
 #include "krad_compositor_common_helpers.h"
 
 kr_sprite_info_member kr_sprite_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_sprite_info_filename",len)) {
+  if (!strncmp(string,"filename",len)) {
     return KR_SPRITE_INFO_FILENAME;
   }
-  if (!strncmp(string,"kr_sprite_info_rate",len)) {
+  if (!strncmp(string,"rate",len)) {
     return KR_SPRITE_INFO_RATE;
   }
-  if (!strncmp(string,"kr_sprite_info_controls",len)) {
+  if (!strncmp(string,"controls",len)) {
     return KR_SPRITE_INFO_CONTROLS;
   }
   return -1;
 }
 
 kr_text_info_member kr_text_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_text_info_string",len)) {
+  if (!strncmp(string,"string",len)) {
     return KR_TEXT_INFO_STRING;
   }
-  if (!strncmp(string,"kr_text_info_font",len)) {
+  if (!strncmp(string,"font",len)) {
     return KR_TEXT_INFO_FONT;
   }
-  if (!strncmp(string,"kr_text_info_red",len)) {
+  if (!strncmp(string,"red",len)) {
     return KR_TEXT_INFO_RED;
   }
-  if (!strncmp(string,"kr_text_info_green",len)) {
+  if (!strncmp(string,"green",len)) {
     return KR_TEXT_INFO_GREEN;
   }
-  if (!strncmp(string,"kr_text_info_blue",len)) {
+  if (!strncmp(string,"blue",len)) {
     return KR_TEXT_INFO_BLUE;
   }
-  if (!strncmp(string,"kr_text_info_controls",len)) {
+  if (!strncmp(string,"controls",len)) {
     return KR_TEXT_INFO_CONTROLS;
   }
   return -1;
 }
 
 kr_vector_info_member kr_vector_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_vector_info_type",len)) {
+  if (!strncmp(string,"type",len)) {
     return KR_VECTOR_INFO_TYPE;
   }
-  if (!strncmp(string,"kr_vector_info_red",len)) {
+  if (!strncmp(string,"red",len)) {
     return KR_VECTOR_INFO_RED;
   }
-  if (!strncmp(string,"kr_vector_info_green",len)) {
+  if (!strncmp(string,"green",len)) {
     return KR_VECTOR_INFO_GREEN;
   }
-  if (!strncmp(string,"kr_vector_info_blue",len)) {
+  if (!strncmp(string,"blue",len)) {
     return KR_VECTOR_INFO_BLUE;
   }
-  if (!strncmp(string,"kr_vector_info_controls",len)) {
+  if (!strncmp(string,"controls",len)) {
     return KR_VECTOR_INFO_CONTROLS;
   }
   return -1;
 }
 
 kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_compositor_path_info_type",len)) {
+  if (!strncmp(string,"type",len)) {
     return KR_COMPOSITOR_PATH_INFO_TYPE;
   }
-  if (!strncmp(string,"kr_compositor_path_info_width",len)) {
+  if (!strncmp(string,"width",len)) {
     return KR_COMPOSITOR_PATH_INFO_WIDTH;
   }
-  if (!strncmp(string,"kr_compositor_path_info_height",len)) {
+  if (!strncmp(string,"height",len)) {
     return KR_COMPOSITOR_PATH_INFO_HEIGHT;
   }
-  if (!strncmp(string,"kr_compositor_path_info_crop_x",len)) {
+  if (!strncmp(string,"crop_x",len)) {
     return KR_COMPOSITOR_PATH_INFO_CROP_X;
   }
-  if (!strncmp(string,"kr_compositor_path_info_crop_y",len)) {
+  if (!strncmp(string,"crop_y",len)) {
     return KR_COMPOSITOR_PATH_INFO_CROP_Y;
   }
-  if (!strncmp(string,"kr_compositor_path_info_crop_width",len)) {
+  if (!strncmp(string,"crop_width",len)) {
     return KR_COMPOSITOR_PATH_INFO_CROP_WIDTH;
   }
-  if (!strncmp(string,"kr_compositor_path_info_crop_height",len)) {
+  if (!strncmp(string,"crop_height",len)) {
     return KR_COMPOSITOR_PATH_INFO_CROP_HEIGHT;
   }
-  if (!strncmp(string,"kr_compositor_path_info_view",len)) {
+  if (!strncmp(string,"view",len)) {
     return KR_COMPOSITOR_PATH_INFO_VIEW;
   }
-  if (!strncmp(string,"kr_compositor_path_info_controls",len)) {
+  if (!strncmp(string,"controls",len)) {
     return KR_COMPOSITOR_PATH_INFO_CONTROLS;
   }
   return -1;

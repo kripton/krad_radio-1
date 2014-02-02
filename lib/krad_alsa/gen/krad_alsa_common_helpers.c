@@ -1,17 +1,17 @@
 #include "krad_alsa_common_helpers.h"
 
 kr_alsa_info_member kr_alsa_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_alsa_info_card",len)) {
+  if (!strncmp(string,"card",len)) {
     return KR_ALSA_INFO_CARD;
   }
-  if (!strncmp(string,"kr_alsa_info_name",len)) {
+  if (!strncmp(string,"name",len)) {
     return KR_ALSA_INFO_NAME;
   }
   return -1;
 }
 
 kr_alsa_path_info_member kr_alsa_path_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_alsa_path_info_card_num",len)) {
+  if (!strncmp(string,"card_num",len)) {
     return KR_ALSA_PATH_INFO_CARD_NUM;
   }
   return -1;

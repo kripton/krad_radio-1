@@ -1,54 +1,54 @@
 #include "krad_jack_common_helpers.h"
 
 kr_jack_setup_info_member kr_jack_setup_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_jack_setup_info_client_name",len)) {
+  if (!strncmp(string,"client_name",len)) {
     return KR_JACK_SETUP_INFO_CLIENT_NAME;
   }
-  if (!strncmp(string,"kr_jack_setup_info_server_name",len)) {
+  if (!strncmp(string,"server_name",len)) {
     return KR_JACK_SETUP_INFO_SERVER_NAME;
   }
   return -1;
 }
 
 kr_jack_info_member kr_jack_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_jack_info_client_name",len)) {
+  if (!strncmp(string,"client_name",len)) {
     return KR_JACK_INFO_CLIENT_NAME;
   }
-  if (!strncmp(string,"kr_jack_info_server_name",len)) {
+  if (!strncmp(string,"server_name",len)) {
     return KR_JACK_INFO_SERVER_NAME;
   }
-  if (!strncmp(string,"kr_jack_info_state",len)) {
+  if (!strncmp(string,"state",len)) {
     return KR_JACK_INFO_STATE;
   }
-  if (!strncmp(string,"kr_jack_info_inputs",len)) {
+  if (!strncmp(string,"inputs",len)) {
     return KR_JACK_INFO_INPUTS;
   }
-  if (!strncmp(string,"kr_jack_info_outputs",len)) {
+  if (!strncmp(string,"outputs",len)) {
     return KR_JACK_INFO_OUTPUTS;
   }
-  if (!strncmp(string,"kr_jack_info_sample_rate",len)) {
+  if (!strncmp(string,"sample_rate",len)) {
     return KR_JACK_INFO_SAMPLE_RATE;
   }
-  if (!strncmp(string,"kr_jack_info_period_size",len)) {
+  if (!strncmp(string,"period_size",len)) {
     return KR_JACK_INFO_PERIOD_SIZE;
   }
-  if (!strncmp(string,"kr_jack_info_xruns",len)) {
+  if (!strncmp(string,"xruns",len)) {
     return KR_JACK_INFO_XRUNS;
   }
-  if (!strncmp(string,"kr_jack_info_frames",len)) {
+  if (!strncmp(string,"frames",len)) {
     return KR_JACK_INFO_FRAMES;
   }
   return -1;
 }
 
 kr_jack_path_info_member kr_jack_path_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_jack_path_info_name",len)) {
+  if (!strncmp(string,"name",len)) {
     return KR_JACK_PATH_INFO_NAME;
   }
-  if (!strncmp(string,"kr_jack_path_info_channels",len)) {
+  if (!strncmp(string,"channels",len)) {
     return KR_JACK_PATH_INFO_CHANNELS;
   }
-  if (!strncmp(string,"kr_jack_path_info_direction",len)) {
+  if (!strncmp(string,"direction",len)) {
     return KR_JACK_PATH_INFO_DIRECTION;
   }
   return -1;

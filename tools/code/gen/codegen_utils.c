@@ -246,7 +246,7 @@ static void codegen_function(struct_data *def, char *type,
   for (i = 0; i < def->info.member_count; i++) {
     if ((def->info.members[i].type == T_STRUCT) && 
       codegen_is_enum(def->info.members[i].type_info.substruct_info.type_name) ) {
-      if ((gformat == DEJSON)) {
+      if (gformat == DEJSON) {
         res += sprintf(&decl[res],"  int type;\n");
         break;
       }

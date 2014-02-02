@@ -58,8 +58,11 @@ typedef struct {
 } kr_jack_path_info_patch;
 
 int kr_jack_setup_info_patch_apply(kr_jack_setup_info *info, kr_jack_setup_info_patch *patch);
+int kr_jack_setup_info_address_to_patch(kr_jack_setup_info_patch *patch, char **addr, int addr_len);
 int kr_jack_info_patch_apply(kr_jack_info *info, kr_jack_info_patch *patch);
+int kr_jack_info_address_to_patch(kr_jack_info_patch *patch, char **addr, int addr_len);
 int kr_jack_path_info_patch_apply(kr_jack_path_info *info, kr_jack_path_info_patch *patch);
+int kr_jack_path_info_address_to_patch(kr_jack_path_info_patch *patch, char **addr, int addr_len);
 int kr_jack_setup_info_init(kr_jack_setup_info *st);
 int kr_jack_setup_info_valid(kr_jack_setup_info *st);
 int kr_jack_setup_info_random(kr_jack_setup_info *st);

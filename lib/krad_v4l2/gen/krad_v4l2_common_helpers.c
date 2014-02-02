@@ -1,29 +1,29 @@
 #include "krad_v4l2_common_helpers.h"
 
 kr_v4l2_info_member kr_v4l2_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_v4l2_info_dev",len)) {
+  if (!strncmp(string,"dev",len)) {
     return KR_V4L2_INFO_DEV;
   }
-  if (!strncmp(string,"kr_v4l2_info_priority",len)) {
+  if (!strncmp(string,"priority",len)) {
     return KR_V4L2_INFO_PRIORITY;
   }
-  if (!strncmp(string,"kr_v4l2_info_state",len)) {
+  if (!strncmp(string,"state",len)) {
     return KR_V4L2_INFO_STATE;
   }
-  if (!strncmp(string,"kr_v4l2_info_mode",len)) {
+  if (!strncmp(string,"mode",len)) {
     return KR_V4L2_INFO_MODE;
   }
   return -1;
 }
 
 kr_v4l2_open_info_member kr_v4l2_open_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_v4l2_open_info_dev",len)) {
+  if (!strncmp(string,"dev",len)) {
     return KR_V4L2_OPEN_INFO_DEV;
   }
-  if (!strncmp(string,"kr_v4l2_open_info_priority",len)) {
+  if (!strncmp(string,"priority",len)) {
     return KR_V4L2_OPEN_INFO_PRIORITY;
   }
-  if (!strncmp(string,"kr_v4l2_open_info_mode",len)) {
+  if (!strncmp(string,"mode",len)) {
     return KR_V4L2_OPEN_INFO_MODE;
   }
   return -1;

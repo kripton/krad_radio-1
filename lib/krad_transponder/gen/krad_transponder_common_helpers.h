@@ -51,8 +51,11 @@ typedef struct {
 } kr_transponder_path_info_patch;
 
 int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transponder_info_patch *patch);
+int kr_transponder_info_address_to_patch(kr_transponder_info_patch *patch, char **addr, int addr_len);
 int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *info, kr_transponder_path_io_info_patch *patch);
+int kr_transponder_path_io_info_address_to_patch(kr_transponder_path_io_info_patch *patch, char **addr, int addr_len);
 int kr_transponder_path_info_patch_apply(struct kr_transponder_path_info *info, kr_transponder_path_info_patch *patch);
+int kr_transponder_path_info_address_to_patch(kr_transponder_path_info_patch *patch, char **addr, int addr_len);
 int kr_transponder_info_init(struct kr_transponder_info *st);
 int kr_transponder_info_valid(struct kr_transponder_info *st);
 int kr_transponder_info_random(struct kr_transponder_info *st);

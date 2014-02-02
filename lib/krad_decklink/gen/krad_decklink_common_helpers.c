@@ -1,32 +1,32 @@
 #include "krad_decklink_common_helpers.h"
 
 kr_decklink_info_member kr_decklink_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_decklink_info_device",len)) {
+  if (!strncmp(string,"device",len)) {
     return KR_DECKLINK_INFO_DEVICE;
   }
   return -1;
 }
 
 kr_decklink_path_info_member kr_decklink_path_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_decklink_path_info_device",len)) {
+  if (!strncmp(string,"device",len)) {
     return KR_DECKLINK_PATH_INFO_DEVICE;
   }
-  if (!strncmp(string,"kr_decklink_path_info_width",len)) {
+  if (!strncmp(string,"width",len)) {
     return KR_DECKLINK_PATH_INFO_WIDTH;
   }
-  if (!strncmp(string,"kr_decklink_path_info_height",len)) {
+  if (!strncmp(string,"height",len)) {
     return KR_DECKLINK_PATH_INFO_HEIGHT;
   }
-  if (!strncmp(string,"kr_decklink_path_info_num",len)) {
+  if (!strncmp(string,"num",len)) {
     return KR_DECKLINK_PATH_INFO_NUM;
   }
-  if (!strncmp(string,"kr_decklink_path_info_den",len)) {
+  if (!strncmp(string,"den",len)) {
     return KR_DECKLINK_PATH_INFO_DEN;
   }
-  if (!strncmp(string,"kr_decklink_path_info_video_connector",len)) {
+  if (!strncmp(string,"video_connector",len)) {
     return KR_DECKLINK_PATH_INFO_VIDEO_CONNECTOR;
   }
-  if (!strncmp(string,"kr_decklink_path_info_audio_connector",len)) {
+  if (!strncmp(string,"audio_connector",len)) {
     return KR_DECKLINK_PATH_INFO_AUDIO_CONNECTOR;
   }
   return -1;

@@ -1,27 +1,27 @@
 #include "krad_transponder_common_helpers.h"
 
 kr_transponder_info_member kr_transponder_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_transponder_info_active_paths",len)) {
+  if (!strncmp(string,"active_paths",len)) {
     return KR_TRANSPONDER_INFO_ACTIVE_PATHS;
   }
   return -1;
 }
 
 kr_transponder_path_io_info_member kr_transponder_path_io_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_transponder_path_io_info_type",len)) {
+  if (!strncmp(string,"type",len)) {
     return KR_TRANSPONDER_PATH_IO_INFO_TYPE;
   }
-  if (!strncmp(string,"kr_transponder_path_io_info_info",len)) {
+  if (!strncmp(string,"info",len)) {
     return KR_TRANSPONDER_PATH_IO_INFO_INFO;
   }
   return -1;
 }
 
 kr_transponder_path_info_member kr_transponder_path_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"kr_transponder_path_info_input",len)) {
+  if (!strncmp(string,"input",len)) {
     return KR_TRANSPONDER_PATH_INFO_INPUT;
   }
-  if (!strncmp(string,"kr_transponder_path_info_output",len)) {
+  if (!strncmp(string,"output",len)) {
     return KR_TRANSPONDER_PATH_INFO_OUTPUT;
   }
   return -1;

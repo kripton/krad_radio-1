@@ -37,7 +37,9 @@ typedef struct {
 } kr_adapter_path_info_patch;
 
 int kr_adapter_info_patch_apply(struct kr_adapter_info *info, kr_adapter_info_patch *patch);
+int kr_adapter_info_address_to_patch(kr_adapter_info_patch *patch, char **addr, int addr_len);
 int kr_adapter_path_info_patch_apply(struct kr_adapter_path_info *info, kr_adapter_path_info_patch *patch);
+int kr_adapter_path_info_address_to_patch(kr_adapter_path_info_patch *patch, char **addr, int addr_len);
 int kr_adapter_api_info_init(kr_adapter_api_info *st, int idx);
 int kr_adapter_api_info_valid(kr_adapter_api_info *st, int idx);
 int kr_adapter_api_info_random(kr_adapter_api_info *st, int idx);
