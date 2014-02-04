@@ -91,18 +91,18 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_source_info_patch_value";
     case CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH:
       return "kr_compositor_source_info_patch";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER:
-      return "kr_compositor_path_info_member";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE:
-      return "kr_compositor_path_info_patch_value";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH:
-      return "kr_compositor_path_info_patch";
     case CGEN_KR_OVERLAY_INFO_MEMBER:
       return "kr_overlay_info_member";
     case CGEN_KR_OVERLAY_INFO_PATCH_VALUE:
       return "kr_overlay_info_patch_value";
     case CGEN_KR_OVERLAY_INFO_PATCH:
       return "kr_overlay_info_patch";
+    case CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER:
+      return "kr_compositor_path_info_member";
+    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE:
+      return "kr_compositor_path_info_patch_value";
+    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH:
+      return "kr_compositor_path_info_patch";
     case CGEN_KR_SPRITE_INFO_MEMBER:
       return "kr_sprite_info_member";
     case CGEN_KR_SPRITE_INFO_PATCH_VALUE:
@@ -778,15 +778,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_compositor_source_info_patch")) {
     return CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH;
   }
-  if (!strcmp(string,"kr_compositor_path_info_member")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_compositor_path_info_patch_value")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_compositor_path_info_patch")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_overlay_info_member")) {
     return CGEN_KR_OVERLAY_INFO_MEMBER;
   }
@@ -795,6 +786,15 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_overlay_info_patch")) {
     return CGEN_KR_OVERLAY_INFO_PATCH;
+  }
+  if (!strcmp(string,"kr_compositor_path_info_member")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_compositor_path_info_patch_value")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_compositor_path_info_patch")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH;
   }
   if (!strcmp(string,"kr_sprite_info_member")) {
     return CGEN_KR_SPRITE_INFO_MEMBER;
@@ -1668,10 +1668,10 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_compositor_source_info_member")) {
     return 1;
   }
-  if (!strcmp(type,"kr_compositor_path_info_member")) {
+  if (!strcmp(type,"kr_overlay_info_member")) {
     return 1;
   }
-  if (!strcmp(type,"kr_overlay_info_member")) {
+  if (!strcmp(type,"kr_compositor_path_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_sprite_info_member")) {

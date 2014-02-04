@@ -22,12 +22,13 @@ struct kr_compositor_path {
 };
 
 static float kr_round3(float f);
-static void path_create(kr_compositor_path *path,
+static kr_compositor_path *path_create(kr_compositor *comp,
  kr_compositor_io_path_setup *setup);
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
 static void path_output(kr_compositor_path *path, kr_image *image);
 static int path_render(kr_compositor_path *path,
   kr_compositor_input_info *input_info, kr_image *image, cairo_t *cr);
+static int path_info_check(kr_compositor_path_info *info);
 static int path_setup_check(kr_compositor_io_path_setup *setup);
 
 static float kr_round3(float f) {
@@ -36,9 +37,23 @@ static float kr_round3(float f) {
   return f;
 }
 
-static void path_create(kr_compositor_path *path,
+static kr_compositor_path *path_create(kr_compositor *comp,
  kr_compositor_io_path_setup *setup) {
+  int ret;
   kr_compositor_event event;
+  kr_compositor_path *path;
+  if ((path == NULL) || (setup == NULL)) return NULL;
+  ret = path_setup_check(setup);
+  if (ret) {
+    printke("compositor mkpath failed setup check: %d", ret);
+    return NULL;
+  }
+  path = kr_pool_slice(comp->path_pool);
+  if (path == NULL) {
+    printke("compositor mkpath could not slice new path");
+    return NULL;
+  }
+  path->compositor = compositor;
   path->info = setup->info;
   path->frame_user = setup->frame_user;
   path->control_user = setup->control_user;
@@ -57,6 +72,7 @@ static void path_create(kr_compositor_path *path,
     path->vertex = kr_graph_vertex_create(path->comp->graph, setup->info->type, path);
   }*/
   path->compositor->event_cb(&event);
+  return path;
 }
 
 static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
@@ -142,6 +158,19 @@ static int path_render(kr_compositor_path *path,
 //   cairo_paint_with_alpha(cr, kr_round3(path->info.controls.opacity));
 //   cairo_restore(cr);
 //   cairo_surface_destroy(src);
+  return 0;
+}
+
+static int path_info_check(kr_compositor_path_info *info) {
+  if ((info->type != KR_OVERLAY)
+   && (info->type != KR_COMP_INPUT)
+   && (info->type != KR_COMP_BUS)
+   && (info->type != KR_COMP_OUTPUT)) {
+    return -4;
+  }
+
+  /* FIXME check info->info */
+
   return 0;
 }
 
@@ -241,29 +270,41 @@ int kr_compositor_unlink(kr_compositor_path *path) {
 }
 
 int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
-  return -1;
+  kr_compositor_path *path;
+  kr_compositor_io_path_setup setup;
+  kr_compositor_path *path;
+  if ((compositor == NULL) || (info == NULL) || (user == NULL)) return -1;
+  setup.info = info;
+  setup.control_user = user;
+  setup.frame_user = NULL;
+  setup.frame_cb = NULL;
+  path = path_create(compositor, &setup);
+  if (path == NULL) return -2;
+  return 0;
 }
 
 kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
  kr_compositor_io_path_setup *setup) {
-  kr_compositor_path *path;
+  kr_compositor_io_path_setup path_setup;
   if ((compositor == NULL) || (setup == NULL)) return NULL;
-  if (path_setup_check(setup)) {
-    printke("compositor mkpath failed setup check");
-    return NULL;
-  }
-  path = kr_pool_slice(compositor->path_pool);
-  if (path == NULL) {
-    printke("compositor mkpath could not slice new path");
-    return NULL;
-  }
-  path->compositor = compositor;
-  path_create(path, setup);
-  return path;
+  path_setup.info = &setup->info;
+  setup.control_user = setup->control_user;
+  setup.frame_user = setup->frame_user;
+  setup.frame_cb = setup->frame_cb;
+  return path_create(compositor, &path_setup);
 }
 
 int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from,
   kr_compositor_input_info *info, void *user) {
+  kr_compositor_io_path_setup setup;
+  kr_compositor_path *path;
+  if ((compositor == NULL) || (info == NULL) || (user == NULL)) return -1;
+  setup.info = info;
+  setup.control_user = user;
+  setup.frame_user = NULL;
+  setup.frame_cb = NULL;
+  path = path_create(compositor, &setup);
+  if (path == NULL) return -2;
   return 0;
 }
 

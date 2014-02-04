@@ -74,7 +74,7 @@ kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string
 
 int kr_compositor_path_type_to_index(int val) {
   switch (val) {
-    case KR_COMP_SOURCE:
+    case KR_OVERLAY:
       return 0;
     case KR_COMP_INPUT:
       return 1;
@@ -82,31 +82,27 @@ int kr_compositor_path_type_to_index(int val) {
       return 2;
     case KR_COMP_OUTPUT:
       return 3;
-    case KR_OVERLAY:
-      return 4;
   }
   return -1;
 }
 
 char *kr_strfr_kr_compositor_path_type(int val) {
   switch (val) {
-    case KR_COMP_SOURCE:
-      return "kr_comp_source";
+    case KR_OVERLAY:
+      return "kr_overlay";
     case KR_COMP_INPUT:
       return "kr_comp_input";
     case KR_COMP_BUS:
       return "kr_comp_bus";
     case KR_COMP_OUTPUT:
       return "kr_comp_output";
-    case KR_OVERLAY:
-      return "kr_overlay";
   }
   return NULL;
 }
 
 int kr_strto_kr_compositor_path_type(char *string) {
-  if (!strcmp(string,"kr_comp_source")) {
-    return KR_COMP_SOURCE;
+  if (!strcmp(string,"kr_overlay")) {
+    return KR_OVERLAY;
   }
   if (!strcmp(string,"kr_comp_input")) {
     return KR_COMP_INPUT;
@@ -116,9 +112,6 @@ int kr_strto_kr_compositor_path_type(char *string) {
   }
   if (!strcmp(string,"kr_comp_output")) {
     return KR_COMP_OUTPUT;
-  }
-  if (!strcmp(string,"kr_overlay")) {
-    return KR_OVERLAY;
   }
   return -1;
 }

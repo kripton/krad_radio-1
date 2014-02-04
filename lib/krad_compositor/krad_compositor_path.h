@@ -7,6 +7,8 @@
 
 typedef struct kr_compositor_path kr_compositor_path;
 
+#include "krad_compositor_so_path.h"
+
 int kr_compositor_process(kr_compositor_path *path);
 int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch);
 int kr_compositor_unlink(kr_compositor_path *path);
