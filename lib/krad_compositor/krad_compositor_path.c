@@ -21,15 +21,26 @@ struct kr_compositor_path {
   kr_edge *edge;
 };
 
+struct kr_compositor_path_setup {
+  kr_compositor_path_info *info;
+  void *control_user;
+  void *frane_user;
+  kr_compositor_path_frame_cb *frame_cb;
+  /*kr_compositor_path *from;
+  kr_compositor_path *to;
+  */
+};
+
+
 static float kr_round3(float f);
 static kr_compositor_path *path_create(kr_compositor *comp,
- kr_compositor_io_path_setup *setup);
+ kr_compositor_path_setup *setup);
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
 static void path_output(kr_compositor_path *path, kr_image *image);
 static int path_render(kr_compositor_path *path,
   kr_compositor_input_info *input_info, kr_image *image, cairo_t *cr);
 static int path_info_check(kr_compositor_path_info *info);
-static int path_setup_check(kr_compositor_io_path_setup *setup);
+static int path_setup_check(kr_compositor_path_setup *setup);
 
 static float kr_round3(float f) {
   f = rintf(f * 1000.0);
@@ -38,7 +49,7 @@ static float kr_round3(float f) {
 }
 
 static kr_compositor_path *path_create(kr_compositor *comp,
- kr_compositor_io_path_setup *setup) {
+ kr_compositor_path_setup *setup) {
   int ret;
   kr_compositor_event event;
   kr_compositor_path *path;
@@ -93,71 +104,6 @@ static void path_output(kr_compositor_path *path, kr_image *image) {
 
 static int path_render(kr_compositor_path *path,
   kr_compositor_input_info *input_info, kr_image *dst, cairo_t *cr) {
-
-//   int ret;
-//   kr_image image;
-//   kr_compositor_path_frame_cb_arg cb_arg;
-//   cairo_surface_t *src;
-//   static uint8_t scratch[1920*1080*4]; /*FIXME*/
-
-//   cb_arg.user = path->frame_user;
-//   path_tick(path);
-//   /*if (path->info.controls.opacity == 0.0f) return 0; Hrmzor */
-//   path->frame_cb(&cb_arg);
-//   /* After the frame_cb if the parameters (crop, size)
-//    *  have not changed we should see if the image has also not changed
-//    *  in which case we can use a cached version -- this function can be
-//    *   used perhaps beforehand so output can wait on new input
-//    */
-//   if ((path->info.controls.x == 0)
-//    && (path->info.controls.y == 0)
-//    && (path->info.controls.w == 0)
-//    && (path->info.controls.h == 0)
-//    && (path->info.controls.opacity == 1.0f)
-//    && (path->info.controls.rotation == 0.0f)) {
-//   /*image = subimage(dst, params);*/
-//     image = *dst;
-//     ret = kr_image_convert(&path->converter, &image, &cb_arg.image);
-//     if (ret != 0) {
-//       printke("kr_image convert returned %d :/", ret);
-//       return -1;
-//     }
-//     return 0;
-//   }
-// /*image = subimage(path_scratch_image, params);*/
-//   image = *dst;
-//   image.px = scratch;
-//   image.ppx[0] = image.px;
-//   if (path->info.controls.w != 0) {
-//     image.w = path->info.controls.w;
-//   }
-//   if (path->info.controls.h != 0) {
-//     image.h = path->info.controls.h;
-//   }
-//   path->converter.crop.x = path->info.crop_x;
-//   path->converter.crop.y = path->info.crop_y;
-//   path->converter.crop.w = path->info.crop_width;
-//   path->converter.crop.h = path->info.crop_height;
-//   ret = kr_image_convert(&path->converter, &image, &cb_arg.image);
-//   if (ret != 0) {
-//     printke("kr_image convert returned %d :/", ret);
-//     return -1;
-//   }
-//   cairo_save(cr);
-//   src = cairo_image_surface_create_for_data(image.px, CAIRO_FORMAT_ARGB32,
-//    image.w, image.h, image.pps[0]);
-//   if (path->info.controls.rotation != 0.0f) {
-//     cairo_translate (cr, path->info.controls.x, path->info.controls.y);
-//     cairo_translate(cr, (int)(image.w) / 2.0, (int)(image.h) / 2.0);
-//     cairo_rotate(cr, kr_round3(path->info.controls.rotation * (M_PI/180.0)));
-//     cairo_translate(cr, - (int)(image.w) / 2.0, - (int)(image.h) / 2.0);
-//     cairo_translate (cr, -path->info.controls.x, -path->info.controls.y);
-//   }
-//   cairo_set_source_surface(cr, src, path->info.controls.x, path->info.controls.y);
-//   cairo_rectangle(cr, path->info.controls.x, path->info.controls.y, image.w, image.h);
-//   cairo_paint_with_alpha(cr, kr_round3(path->info.controls.opacity));
-//   cairo_restore(cr);
-//   cairo_surface_destroy(src);
   return 0;
 }
 
@@ -174,7 +120,7 @@ static int path_info_check(kr_compositor_path_info *info) {
   return 0;
 }
 
-static int path_setup_check(kr_compositor_io_path_setup *setup) {
+static int path_setup_check(kr_compositor_path_setup *setup) {
   kr_compositor_path_info *info;
   info = &setup->info;
   if ((setup->frame_user == NULL) || (setup->frame_cb == NULL)) {
@@ -271,7 +217,7 @@ int kr_compositor_unlink(kr_compositor_path *path) {
 
 int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
   kr_compositor_path *path;
-  kr_compositor_io_path_setup setup;
+  kr_compositor_path_setup setup;
   kr_compositor_path *path;
   if ((compositor == NULL) || (info == NULL) || (user == NULL)) return -1;
   setup.info = info;
@@ -284,8 +230,7 @@ int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user
 }
 
 kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
- kr_compositor_io_path_setup *setup) {
-  kr_compositor_io_path_setup path_setup;
+ kr_compositor_io_path_setup *setup) {  kr_compositor_path_setup path_setup;
   if ((compositor == NULL) || (setup == NULL)) return NULL;
   path_setup.info = &setup->info;
   setup.control_user = setup->control_user;
@@ -296,7 +241,7 @@ kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
 
 int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from,
   kr_compositor_input_info *info, void *user) {
-  kr_compositor_io_path_setup setup;
+  kr_compositor_path_setup setup;
   kr_compositor_path *path;
   if ((compositor == NULL) || (info == NULL) || (user == NULL)) return -1;
   setup.info = info;
