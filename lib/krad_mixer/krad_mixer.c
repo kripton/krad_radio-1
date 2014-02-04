@@ -424,7 +424,7 @@ int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
   return 0;
 }
 
-int kr_mixer_splice(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user) {
+int kr_mixer_mkinput(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user) {
   kr_mixer_path *path;
   kr_mixer_path_setup setup;
   if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;

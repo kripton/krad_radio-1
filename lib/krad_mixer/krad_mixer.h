@@ -57,7 +57,7 @@ int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info);
 int kr_mixer_unlink(kr_mixer_path *path);
 kr_mixer_path *kr_mixer_mkso(kr_mixer *mixer, kr_mixer_io_path_setup *setup);
 int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user);
-int kr_mixer_splice(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user);
+int kr_mixer_mkinput(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user);
 int kr_mixer_destroy(kr_mixer *mixer);
 kr_mixer *kr_mixer_create(kr_mixer_setup *setup);
 

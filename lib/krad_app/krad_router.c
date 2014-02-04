@@ -32,7 +32,7 @@ struct kr_router_map {
   char prefix[32];
   void *ptr; /* for create */
   kr_router_map_create_handler *create;
-  kr_router_map_create2_handler *create2;
+  kr_router_map_connect_handler *connect;
   kr_router_map_patch_handler *patch;
   kr_router_map_destroy_handler *destroy;
 };
@@ -340,8 +340,8 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         snprintf(temp, sizeof(temp), "%s/%s", sliced.slice[1], sliced.slice[2]);
         name = create_name(router, temp);
         if (!name) return -6;
-        //printk("I will call %p with %p - %p - %p - %p!", map->create2, map->ptr, route->ptr, route2->ptr, name);
-        ret = map->create2(map->ptr, (void *)&crate->payload, route->ptr, route2->ptr, name);
+        //printk("I will call %p with %p - %p - %p - %p!", map->connect, map->ptr, route->ptr, route2->ptr, name);
+        ret = map->connect(map->ptr, (void *)&crate->payload, route->ptr, route2->ptr, name);
         return ret;
       }
       printke("hrm wtf!");
@@ -369,7 +369,7 @@ kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setu
   strncpy(map->prefix, setup->prefix, sizeof(map->prefix));
   map->ptr = setup->ptr;
   map->create = setup->create;
-  map->create2 = setup->create2;
+  map->connect = setup->connect;
   map->patch = setup->patch;
   map->destroy = setup->destroy;
   printk("Router: Added map for: %s", map->prefix);
