@@ -1,6 +1,7 @@
 #include "krad_transponder.h"
 #include "krad_pool.h"
 #include "krad_av.h"
+#include "krad_compositor_so_path.h"
 
 #define ADP_TEMP_MAX 128
 

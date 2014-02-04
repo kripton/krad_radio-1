@@ -143,8 +143,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_sprite_info";
     case CGEN_KR_TEXT_INFO:
       return "kr_text_info";
-    case CGEN_COMPOSITOR_PATH_STATE:
-      return "compositor_path_state";
     case CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG:
       return "kr_compositor_path_frame_cb_arg";
     case CGEN_KR_COMPOSITOR_IO_PATH_SETUP:
@@ -847,9 +845,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_text_info")) {
     return CGEN_KR_TEXT_INFO;
-  }
-  if (!strcmp(string,"compositor_path_state")) {
-    return CGEN_COMPOSITOR_PATH_STATE;
   }
   if (!strcmp(string,"kr_compositor_path_frame_cb_arg")) {
     return CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG;
@@ -1664,9 +1659,6 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_compositor_overlay_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"compositor_path_state")) {
     return 1;
   }
   if (!strcmp(type,"kr_vector_type")) {

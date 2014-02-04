@@ -69,7 +69,6 @@ typedef enum {
   CGEN_KR_COMPOSITOR_PATH_INFO,
   CGEN_KR_SPRITE_INFO,
   CGEN_KR_TEXT_INFO,
-  CGEN_COMPOSITOR_PATH_STATE,
   CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG,
   CGEN_KR_COMPOSITOR_IO_PATH_SETUP,
   CGEN_KR_CROP,
@@ -317,7 +316,7 @@ typedef enum {
 } cgen_enum;
 
 enum {
-  CODEGEN_ENUM_LAST = 315
+  CODEGEN_ENUM_LAST = 314
 };
 int codegen_is_union(char *type);
 int codegen_is_enum(char *type);

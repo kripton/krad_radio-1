@@ -1,3 +1,14 @@
+#include <cairo.h>
+
+#include "krad_compositor_so_path.h"
+
+typedef enum {
+  PATH_UNUSED,
+  PATH_READY,
+  PATH_ACTIVE,
+  PATH_DESTROYING
+} compositor_path_state;
+
 struct kr_compositor_path {
   kr_compositor_path_info info;
   void *frame_user;
@@ -224,7 +235,7 @@ kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
   return path;
 }
 
-int kr_compositor_input(kr_compositor_path *output, kr_compositor_path *from, 
+int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from, 
   kr_compositor_input_info *info, void *user) {
   return 0;
 }
