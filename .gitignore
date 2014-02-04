@@ -132,3 +132,4 @@ tools/code/gen/bootstrap/codegen_bootstrap
 tests/cert/server.key
 tests/cert/server.crt
 tests/kr_path_test
+tests/kr_json_patch_test
