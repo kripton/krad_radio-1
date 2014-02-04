@@ -52,22 +52,22 @@ kr_compositor_source_info_member kr_compositor_source_info_strto_member(char *st
   return -1;
 }
 
-kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"type",len)) {
-    return KR_COMPOSITOR_PATH_INFO_TYPE;
-  }
-  if (!strncmp(string,"info",len)) {
-    return KR_COMPOSITOR_PATH_INFO_INFO;
-  }
-  return -1;
-}
-
 kr_overlay_info_member kr_overlay_info_strto_member(char *string, int len) {
   if (!strncmp(string,"type",len)) {
     return KR_OVERLAY_INFO_TYPE;
   }
   if (!strncmp(string,"info",len)) {
     return KR_OVERLAY_INFO_INFO;
+  }
+  return -1;
+}
+
+kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"type",len)) {
+    return KR_COMPOSITOR_PATH_INFO_TYPE;
+  }
+  if (!strncmp(string,"info",len)) {
+    return KR_COMPOSITOR_PATH_INFO_INFO;
   }
   return -1;
 }
@@ -82,6 +82,8 @@ int kr_compositor_path_type_to_index(int val) {
       return 2;
     case KR_COMP_OUTPUT:
       return 3;
+    case KR_OVERLAY:
+      return 4;
   }
   return -1;
 }
@@ -96,6 +98,8 @@ char *kr_strfr_kr_compositor_path_type(int val) {
       return "kr_comp_bus";
     case KR_COMP_OUTPUT:
       return "kr_comp_output";
+    case KR_OVERLAY:
+      return "kr_overlay";
   }
   return NULL;
 }
@@ -113,12 +117,15 @@ int kr_strto_kr_compositor_path_type(char *string) {
   if (!strcmp(string,"kr_comp_output")) {
     return KR_COMP_OUTPUT;
   }
+  if (!strcmp(string,"kr_overlay")) {
+    return KR_OVERLAY;
+  }
   return -1;
 }
 
 int kr_compositor_overlay_type_to_index(int val) {
   switch (val) {
-    case KR_COMP_OVERLAY:
+    case KR_COMP_PATH:
       return 0;
     case KR_SPRITE:
       return 1;
@@ -132,8 +139,8 @@ int kr_compositor_overlay_type_to_index(int val) {
 
 char *kr_strfr_kr_compositor_overlay_type(int val) {
   switch (val) {
-    case KR_COMP_OVERLAY:
-      return "kr_comp_overlay";
+    case KR_COMP_PATH:
+      return "kr_comp_path";
     case KR_SPRITE:
       return "kr_sprite";
     case KR_TEXT:
@@ -145,8 +152,8 @@ char *kr_strfr_kr_compositor_overlay_type(int val) {
 }
 
 int kr_strto_kr_compositor_overlay_type(char *string) {
-  if (!strcmp(string,"kr_comp_overlay")) {
-    return KR_COMP_OVERLAY;
+  if (!strcmp(string,"kr_comp_path")) {
+    return KR_COMP_PATH;
   }
   if (!strcmp(string,"kr_sprite")) {
     return KR_SPRITE;
@@ -274,34 +281,6 @@ kr_var *kr_compositor_source_info_patch_path(kr_compositor_source_info_patch *pa
   return &patch->value.var;
 }
 
-int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch) {
-  const ptrdiff_t off[2] = { offsetof(struct kr_compositor_path_info, type), 
-    offsetof(struct kr_compositor_path_info, info)
-  };
-  const size_t sz[2] = { sizeof(info->type), 
-    sizeof(info->info)  };
-
-  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
-  return 0;
-}
-
-kr_var *kr_compositor_path_info_patch_path(kr_compositor_path_info_patch *patch, kr_path *path) {
-  char *name;
-  int len;
-  if (patch == NULL) return NULL;
-  if (path == NULL) return NULL;
-  len = kr_path_cur_name(path, &name);
-  patch->member = kr_compositor_path_info_strto_member(name, len);
-  if (patch->member < 1) return NULL;
-  switch(patch->member) {
-    default:
-      if (kr_path_steps_ahead(path) != 0) return NULL;
-      break;
-  }
-  /*patch->value.var.type = NN; not sure about this uhm*/
-  return &patch->value.var;
-}
-
 int kr_overlay_info_patch_apply(struct kr_overlay_info *info, kr_overlay_info_patch *patch) {
   const ptrdiff_t off[2] = { offsetof(struct kr_overlay_info, type), 
     offsetof(struct kr_overlay_info, info)
@@ -320,6 +299,34 @@ kr_var *kr_overlay_info_patch_path(kr_overlay_info_patch *patch, kr_path *path) 
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
   patch->member = kr_overlay_info_strto_member(name, len);
+  if (patch->member < 1) return NULL;
+  switch(patch->member) {
+    default:
+      if (kr_path_steps_ahead(path) != 0) return NULL;
+      break;
+  }
+  /*patch->value.var.type = NN; not sure about this uhm*/
+  return &patch->value.var;
+}
+
+int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_compositor_path_info, type), 
+    offsetof(struct kr_compositor_path_info, info)
+  };
+  const size_t sz[2] = { sizeof(info->type), 
+    sizeof(info->info)  };
+
+  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
+  return 0;
+}
+
+kr_var *kr_compositor_path_info_patch_path(kr_compositor_path_info_patch *patch, kr_path *path) {
+  char *name;
+  int len;
+  if (patch == NULL) return NULL;
+  if (path == NULL) return NULL;
+  len = kr_path_cur_name(path, &name);
+  patch->member = kr_compositor_path_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
     default:
@@ -482,6 +489,112 @@ int kr_compositor_source_info_random(struct kr_compositor_source_info *st) {
   return 0;
 }
 
+int kr_overlay_type_info_init(kr_overlay_type_info *st, int idx) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  memset(st, 0, sizeof(kr_overlay_type_info));
+  switch (idx) {
+    case 0: {
+      kr_text_info_init(&st->text);
+      break;
+    }
+    case 1: {
+      kr_vector_info_init(&st->vector);
+      break;
+    }
+    case 2: {
+      kr_sprite_info_init(&st->sprite);
+      break;
+    }
+  }
+
+
+  return -1;
+}
+
+int kr_overlay_type_info_valid(kr_overlay_type_info *st, int idx) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  switch (idx) {
+    case 0: {
+      kr_text_info_valid(&st->text);
+      break;
+    }
+    case 1: {
+      kr_vector_info_valid(&st->vector);
+      break;
+    }
+    case 2: {
+      kr_sprite_info_valid(&st->sprite);
+      break;
+    }
+  }
+
+
+  return -1;
+}
+
+int kr_overlay_type_info_random(kr_overlay_type_info *st, int idx) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  memset(st, 0, sizeof(kr_overlay_type_info));
+  switch (idx) {
+    case 0: {
+      kr_text_info_random(&st->text);
+      break;
+    }
+    case 1: {
+      kr_vector_info_random(&st->vector);
+      break;
+    }
+    case 2: {
+      kr_sprite_info_random(&st->sprite);
+      break;
+    }
+  }
+
+
+  return -1;
+}
+
+int kr_overlay_info_init(struct kr_overlay_info *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  memset(st, 0, sizeof(struct kr_overlay_info));
+  kr_overlay_type_info_init(&st->info,kr_compositor_overlay_type_to_index(st->type));
+
+  return 0;
+}
+
+int kr_overlay_info_valid(struct kr_overlay_info *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  kr_overlay_type_info_valid(&st->info,kr_compositor_overlay_type_to_index(st->type));
+
+  return 0;
+}
+
+int kr_overlay_info_random(struct kr_overlay_info *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  memset(st, 0, sizeof(struct kr_overlay_info));
+  kr_overlay_type_info_random(&st->info,kr_compositor_overlay_type_to_index(st->type));
+
+  return 0;
+}
+
 int kr_compositor_path_type_info_init(kr_compositor_path_type_info *st, int idx) {
   if (st == NULL) {
     return -1;
@@ -596,112 +709,6 @@ int kr_compositor_path_info_random(struct kr_compositor_path_info *st) {
 
   memset(st, 0, sizeof(struct kr_compositor_path_info));
   kr_compositor_path_type_info_random(&st->info,kr_compositor_path_type_to_index(st->type));
-
-  return 0;
-}
-
-int kr_overlay_type_info_init(kr_overlay_type_info *st, int idx) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(kr_overlay_type_info));
-  switch (idx) {
-    case 0: {
-      kr_text_info_init(&st->text);
-      break;
-    }
-    case 1: {
-      kr_vector_info_init(&st->vector);
-      break;
-    }
-    case 2: {
-      kr_sprite_info_init(&st->sprite);
-      break;
-    }
-  }
-
-
-  return -1;
-}
-
-int kr_overlay_type_info_valid(kr_overlay_type_info *st, int idx) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  switch (idx) {
-    case 0: {
-      kr_text_info_valid(&st->text);
-      break;
-    }
-    case 1: {
-      kr_vector_info_valid(&st->vector);
-      break;
-    }
-    case 2: {
-      kr_sprite_info_valid(&st->sprite);
-      break;
-    }
-  }
-
-
-  return -1;
-}
-
-int kr_overlay_type_info_random(kr_overlay_type_info *st, int idx) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(kr_overlay_type_info));
-  switch (idx) {
-    case 0: {
-      kr_text_info_random(&st->text);
-      break;
-    }
-    case 1: {
-      kr_vector_info_random(&st->vector);
-      break;
-    }
-    case 2: {
-      kr_sprite_info_random(&st->sprite);
-      break;
-    }
-  }
-
-
-  return -1;
-}
-
-int kr_overlay_info_init(struct kr_overlay_info *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(struct kr_overlay_info));
-  kr_overlay_type_info_init(&st->info,kr_compositor_overlay_type_to_index(st->type));
-
-  return 0;
-}
-
-int kr_overlay_info_valid(struct kr_overlay_info *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  kr_overlay_type_info_valid(&st->info,kr_compositor_overlay_type_to_index(st->type));
-
-  return 0;
-}
-
-int kr_overlay_info_random(struct kr_overlay_info *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(struct kr_overlay_info));
-  kr_overlay_type_info_random(&st->info,kr_compositor_overlay_type_to_index(st->type));
 
   return 0;
 }

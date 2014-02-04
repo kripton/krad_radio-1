@@ -141,14 +141,14 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_input_info";
     case CGEN_KR_COMPOSITOR_SOURCE_INFO:
       return "kr_compositor_source_info";
-    case CGEN_KR_COMPOSITOR_PATH_TYPE_INFO:
-      return "kr_compositor_path_type_info";
-    case CGEN_KR_COMPOSITOR_PATH_INFO:
-      return "kr_compositor_path_info";
     case CGEN_KR_OVERLAY_TYPE_INFO:
       return "kr_overlay_type_info";
     case CGEN_KR_OVERLAY_INFO:
       return "kr_overlay_info";
+    case CGEN_KR_COMPOSITOR_PATH_TYPE_INFO:
+      return "kr_compositor_path_type_info";
+    case CGEN_KR_COMPOSITOR_PATH_INFO:
+      return "kr_compositor_path_info";
     case CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG:
       return "kr_compositor_path_frame_cb_arg";
     case CGEN_KR_COMPOSITOR_IO_PATH_SETUP:
@@ -853,17 +853,17 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_compositor_source_info")) {
     return CGEN_KR_COMPOSITOR_SOURCE_INFO;
   }
-  if (!strcmp(string,"kr_compositor_path_type_info")) {
-    return CGEN_KR_COMPOSITOR_PATH_TYPE_INFO;
-  }
-  if (!strcmp(string,"kr_compositor_path_info")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO;
-  }
   if (!strcmp(string,"kr_overlay_type_info")) {
     return CGEN_KR_OVERLAY_TYPE_INFO;
   }
   if (!strcmp(string,"kr_overlay_info")) {
     return CGEN_KR_OVERLAY_INFO;
+  }
+  if (!strcmp(string,"kr_compositor_path_type_info")) {
+    return CGEN_KR_COMPOSITOR_PATH_TYPE_INFO;
+  }
+  if (!strcmp(string,"kr_compositor_path_info")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO;
   }
   if (!strcmp(string,"kr_compositor_path_frame_cb_arg")) {
     return CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG;
@@ -1610,10 +1610,10 @@ int codegen_is_union(char *type) {
   if (!strcmp(type,"kr_value")) {
     return 1;
   }
-  if (!strcmp(type,"kr_compositor_path_type_info")) {
+  if (!strcmp(type,"kr_overlay_type_info")) {
     return 1;
   }
-  if (!strcmp(type,"kr_overlay_type_info")) {
+  if (!strcmp(type,"kr_compositor_path_type_info")) {
     return 1;
   }
   if (!strcmp(type,"kr_muxer_transport_params")) {

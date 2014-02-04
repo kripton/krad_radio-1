@@ -129,6 +129,80 @@ int kr_compositor_source_info_to_text(char *text, void *st, int32_t max) {
   return res;
 }
 
+int kr_overlay_type_info_to_text(char *text, void *st, int32_t max) {
+  uber_St uber;
+  int res;
+  uber_St *uber_actual;
+
+  kr_overlay_type_info *actual;
+
+  res = 0;
+
+  if ((text == NULL) || (st == NULL) || (max < 1)) {
+    return -1;
+  }
+
+  uber_actual = (uber_St *)st;
+
+  if (uber_actual->actual == NULL) {
+    return -1;
+  }
+
+  actual = (kr_overlay_type_info *)uber_actual->actual;
+
+  switch (uber_actual->type) {
+    case 0: {
+      uber.actual = &(actual->text);
+      uber.type = TEXT_KR_TEXT_INFO;
+      res += info_pack_to_text(&text[res],&uber,max-res);
+      break;
+    }
+    case 1: {
+      uber.actual = &(actual->vector);
+      uber.type = TEXT_KR_VECTOR_INFO;
+      res += info_pack_to_text(&text[res],&uber,max-res);
+      break;
+    }
+    case 2: {
+      uber.actual = &(actual->sprite);
+      uber.type = TEXT_KR_SPRITE_INFO;
+      res += info_pack_to_text(&text[res],&uber,max-res);
+      break;
+    }
+  }
+
+
+  return res;
+}
+
+int kr_overlay_info_to_text(char *text, void *st, int32_t max) {
+  uber_St uber;
+  uber_St uber_sub;
+  int index;
+  int res;
+  struct kr_overlay_info *actual;
+
+  res = 0;
+
+  if ((text == NULL) || (st == NULL) || (max < 1)) {
+    return -1;
+  }
+
+  actual = (struct kr_overlay_info *)st;
+
+  uber.actual = &(actual->type);
+  uber.type = TEXT_KR_COMPOSITOR_OVERLAY_TYPE;
+  res += info_pack_to_text(&text[res],&uber,max-res);
+  index = kr_compositor_overlay_type_to_index(actual->type);
+  uber_sub.type = index;
+  uber_sub.actual = &(actual->info);
+  uber.actual = &(uber_sub);
+  uber.type = TEXT_KR_OVERLAY_TYPE_INFO;
+  res += info_pack_to_text(&text[res],&uber,max-res);
+
+  return res;
+}
+
 int kr_compositor_path_type_info_to_text(char *text, void *st, int32_t max) {
   uber_St uber;
   int res;
@@ -204,80 +278,6 @@ int kr_compositor_path_info_to_text(char *text, void *st, int32_t max) {
   uber_sub.actual = &(actual->info);
   uber.actual = &(uber_sub);
   uber.type = TEXT_KR_COMPOSITOR_PATH_TYPE_INFO;
-  res += info_pack_to_text(&text[res],&uber,max-res);
-
-  return res;
-}
-
-int kr_overlay_type_info_to_text(char *text, void *st, int32_t max) {
-  uber_St uber;
-  int res;
-  uber_St *uber_actual;
-
-  kr_overlay_type_info *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  uber_actual = (uber_St *)st;
-
-  if (uber_actual->actual == NULL) {
-    return -1;
-  }
-
-  actual = (kr_overlay_type_info *)uber_actual->actual;
-
-  switch (uber_actual->type) {
-    case 0: {
-      uber.actual = &(actual->text);
-      uber.type = TEXT_KR_TEXT_INFO;
-      res += info_pack_to_text(&text[res],&uber,max-res);
-      break;
-    }
-    case 1: {
-      uber.actual = &(actual->vector);
-      uber.type = TEXT_KR_VECTOR_INFO;
-      res += info_pack_to_text(&text[res],&uber,max-res);
-      break;
-    }
-    case 2: {
-      uber.actual = &(actual->sprite);
-      uber.type = TEXT_KR_SPRITE_INFO;
-      res += info_pack_to_text(&text[res],&uber,max-res);
-      break;
-    }
-  }
-
-
-  return res;
-}
-
-int kr_overlay_info_to_text(char *text, void *st, int32_t max) {
-  uber_St uber;
-  uber_St uber_sub;
-  int index;
-  int res;
-  struct kr_overlay_info *actual;
-
-  res = 0;
-
-  if ((text == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_overlay_info *)st;
-
-  uber.actual = &(actual->type);
-  uber.type = TEXT_KR_COMPOSITOR_OVERLAY_TYPE;
-  res += info_pack_to_text(&text[res],&uber,max-res);
-  index = kr_compositor_overlay_type_to_index(actual->type);
-  uber_sub.type = index;
-  uber_sub.actual = &(actual->info);
-  uber.actual = &(uber_sub);
-  uber.type = TEXT_KR_OVERLAY_TYPE_INFO;
   res += info_pack_to_text(&text[res],&uber,max-res);
 
   return res;

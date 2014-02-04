@@ -422,6 +422,173 @@ int kr_compositor_source_info_fr_json(char *json, void *st) {
   return res;
 }
 
+int kr_overlay_type_info_fr_json(char *json, void *st) {
+  uber_St uber;
+  int res;
+  jsmn_parser parser;
+  jsmntok_t tokens[512];
+  jsmnerr_t err;
+  int ntokens;
+  int k;
+  uber_St *uber_actual;
+
+  kr_overlay_type_info *actual;
+
+  res = 0;
+
+  if ((json == NULL) || (st == NULL)) {
+    return -1;
+  }
+
+  uber_actual = (uber_St *)st;
+
+  if (uber_actual->actual == NULL) {
+    return -1;
+  }
+
+  actual = (kr_overlay_type_info *)uber_actual->actual;
+
+  jsmn_init(&parser);
+  err = jsmn_parse(&parser,json,tokens,512);
+  ntokens = parser.toknext;
+
+  k = 0;
+
+  if (err != JSMN_SUCCESS || ntokens < 3) {
+    return -1;
+  }
+
+  if (tokens[k].type != JSMN_OBJECT) {
+    return -1;
+  }
+
+    switch (uber_actual->type) {
+    case 0: {
+      uber.actual = &(actual->text);
+      uber.type = DEJSON_KR_TEXT_INFO;
+      json[tokens[k].end] = '\0';
+      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+      if (res < 0) {
+        return -1;
+      }
+      break;
+    }
+    case 1: {
+      uber.actual = &(actual->vector);
+      uber.type = DEJSON_KR_VECTOR_INFO;
+      json[tokens[k].end] = '\0';
+      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+      if (res < 0) {
+        return -2;
+      }
+      break;
+    }
+    case 2: {
+      uber.actual = &(actual->sprite);
+      uber.type = DEJSON_KR_SPRITE_INFO;
+      json[tokens[k].end] = '\0';
+      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+      if (res < 0) {
+        return -3;
+      }
+      break;
+    }
+  }
+
+
+  return res;
+}
+
+int kr_overlay_info_fr_json(char *json, void *st) {
+  uber_St uber;
+  int type;
+  uber_St uber_sub;
+  int index;
+  int res;
+  jsmn_parser parser;
+  jsmntok_t tokens[512];
+  jsmnerr_t err;
+  int ntokens;
+  int k;
+  struct kr_overlay_info *actual;
+
+  res = 0;
+
+  if ((json == NULL) || (st == NULL)) {
+    return -1;
+  }
+
+  actual = (struct kr_overlay_info *)st;
+
+  jsmn_init(&parser);
+  err = jsmn_parse(&parser,json,tokens,512);
+  ntokens = parser.toknext;
+
+  k = 0;
+
+  if (err != JSMN_SUCCESS || ntokens < 3) {
+    return -1;
+  }
+
+  if (tokens[k].type != JSMN_OBJECT) {
+    return -1;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"type",4)) {
+    return -1;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  type = kr_strto_kr_compositor_overlay_type(&json[tokens[k].start]);
+  if (type < 0) {
+    return -1;
+  }
+  actual->type = type;
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -2;
+  }
+
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"info",4)) {
+    return -2;
+  }
+
+  k++;
+  if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
+    return -2;
+  }
+
+  index = kr_compositor_overlay_type_to_index(actual->type);
+  uber_sub.type = index;
+  uber_sub.actual = &(actual->info);
+  uber.actual = &(uber_sub);
+  uber.type = DEJSON_KR_OVERLAY_TYPE_INFO;
+  json[tokens[k].end] = '\0';
+  res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+  if (res < 0) {
+    return -2;
+  }
+
+  k += res;
+
+  res = k;
+
+  return res;
+}
+
 int kr_compositor_path_type_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -586,173 +753,6 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   uber_sub.actual = &(actual->info);
   uber.actual = &(uber_sub);
   uber.type = DEJSON_KR_COMPOSITOR_PATH_TYPE_INFO;
-  json[tokens[k].end] = '\0';
-  res += info_unpack_fr_json(&json[tokens[k].start],&uber);
-  if (res < 0) {
-    return -2;
-  }
-
-  k += res;
-
-  res = k;
-
-  return res;
-}
-
-int kr_overlay_type_info_fr_json(char *json, void *st) {
-  uber_St uber;
-  int res;
-  jsmn_parser parser;
-  jsmntok_t tokens[512];
-  jsmnerr_t err;
-  int ntokens;
-  int k;
-  uber_St *uber_actual;
-
-  kr_overlay_type_info *actual;
-
-  res = 0;
-
-  if ((json == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  uber_actual = (uber_St *)st;
-
-  if (uber_actual->actual == NULL) {
-    return -1;
-  }
-
-  actual = (kr_overlay_type_info *)uber_actual->actual;
-
-  jsmn_init(&parser);
-  err = jsmn_parse(&parser,json,tokens,512);
-  ntokens = parser.toknext;
-
-  k = 0;
-
-  if (err != JSMN_SUCCESS || ntokens < 3) {
-    return -1;
-  }
-
-  if (tokens[k].type != JSMN_OBJECT) {
-    return -1;
-  }
-
-    switch (uber_actual->type) {
-    case 0: {
-      uber.actual = &(actual->text);
-      uber.type = DEJSON_KR_TEXT_INFO;
-      json[tokens[k].end] = '\0';
-      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
-      if (res < 0) {
-        return -1;
-      }
-      break;
-    }
-    case 1: {
-      uber.actual = &(actual->vector);
-      uber.type = DEJSON_KR_VECTOR_INFO;
-      json[tokens[k].end] = '\0';
-      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
-      if (res < 0) {
-        return -2;
-      }
-      break;
-    }
-    case 2: {
-      uber.actual = &(actual->sprite);
-      uber.type = DEJSON_KR_SPRITE_INFO;
-      json[tokens[k].end] = '\0';
-      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
-      if (res < 0) {
-        return -3;
-      }
-      break;
-    }
-  }
-
-
-  return res;
-}
-
-int kr_overlay_info_fr_json(char *json, void *st) {
-  uber_St uber;
-  int type;
-  uber_St uber_sub;
-  int index;
-  int res;
-  jsmn_parser parser;
-  jsmntok_t tokens[512];
-  jsmnerr_t err;
-  int ntokens;
-  int k;
-  struct kr_overlay_info *actual;
-
-  res = 0;
-
-  if ((json == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (struct kr_overlay_info *)st;
-
-  jsmn_init(&parser);
-  err = jsmn_parse(&parser,json,tokens,512);
-  ntokens = parser.toknext;
-
-  k = 0;
-
-  if (err != JSMN_SUCCESS || ntokens < 3) {
-    return -1;
-  }
-
-  if (tokens[k].type != JSMN_OBJECT) {
-    return -1;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -1;
-  }
-  json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"type",4)) {
-    return -1;
-  }
-
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -1;
-  }
-  json[tokens[k].end] = '\0';
-  type = kr_strto_kr_compositor_overlay_type(&json[tokens[k].start]);
-  if (type < 0) {
-    return -1;
-  }
-  actual->type = type;
-  k++;
-
-  if (ntokens > k && tokens[k].type != JSMN_STRING) {
-    return -2;
-  }
-
-  json[tokens[k].end] = '\0';
-  if (strncmp(&json[tokens[k].start],"info",4)) {
-    return -2;
-  }
-
-  k++;
-  if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
-    return -2;
-  }
-
-  index = kr_compositor_overlay_type_to_index(actual->type);
-  uber_sub.type = index;
-  uber_sub.actual = &(actual->info);
-  uber.actual = &(uber_sub);
-  uber.type = DEJSON_KR_OVERLAY_TYPE_INFO;
   json[tokens[k].end] = '\0';
   res += info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {
