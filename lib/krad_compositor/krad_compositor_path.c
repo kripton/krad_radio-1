@@ -26,7 +26,7 @@ static void path_create(kr_compositor_path *path,
  kr_compositor_io_path_setup *setup);
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
 static void path_output(kr_compositor_path *path, kr_image *image);
-static int path_render(kr_compositor_path *path, 
+static int path_render(kr_compositor_path *path,
   kr_compositor_input_info *input_info, kr_image *image, cairo_t *cr);
 static int path_setup_check(kr_compositor_io_path_setup *setup);
 
@@ -49,8 +49,8 @@ static void path_create(kr_compositor_path *path,
   event.path = path;
   event.type = KR_COMP_CREATE;
   event.info = path->info;
-  /*  
-  Dunno about this 
+  /*
+  Dunno about this
   if (path->type == KR_COMP_INPUT) {
     kr_graph_edge_create(path->comp->graph, setup->to->vertex, setup->from->vertex, path);
   } else {
@@ -75,7 +75,7 @@ static void path_output(kr_compositor_path *path, kr_image *image) {
   memcpy(cb_arg.image.px, image->px, image->w * image->h * 4);
 }
 
-static int path_render(kr_compositor_path *path, 
+static int path_render(kr_compositor_path *path,
   kr_compositor_input_info *input_info, kr_image *dst, cairo_t *cr) {
 
 //   int ret;
@@ -262,7 +262,7 @@ kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
   return path;
 }
 
-int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from, 
+int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from,
   kr_compositor_input_info *info, void *user) {
   return 0;
 }
