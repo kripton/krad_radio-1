@@ -21,10 +21,14 @@ struct kr_compositor_path {
   kr_edge *edge;
 };
 
+static float kr_round3(float f);
+static void path_create(kr_compositor_path *path,
+ kr_compositor_io_path_setup *setup);
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
+static void path_output(kr_compositor_path *path, kr_image *image);
 static int path_render(kr_compositor_path *path, 
   kr_compositor_input_info *input_info, kr_image *image, cairo_t *cr);
-static void path_tick(kr_compositor_path *path);
+static int path_setup_check(kr_compositor_io_path_setup *setup);
 
 static float kr_round3(float f) {
   f = rintf(f * 1000.0);
@@ -32,22 +36,46 @@ static float kr_round3(float f) {
   return f;
 }
 
-size_t kr_compositor_path_size() {
-  return sizeof(kr_compositor_path);
+static void path_create(kr_compositor_path *path,
+ kr_compositor_io_path_setup *setup) {
+  kr_compositor_event event;
+  path->info = setup->info;
+  path->frame_user = setup->frame_user;
+  path->control_user = setup->control_user;
+  path->frame_cb = setup->frame_cb;
+  kr_image_convert_init(&path->converter);
+  event.user = path->compositor->user;
+  event.user_path = path->control_user;
+  event.path = path;
+  event.type = KR_COMP_CREATE;
+  event.info = path->info;
+  /*  
+  Dunno about this 
+  if (path->type == KR_COMP_INPUT) {
+    kr_graph_edge_create(path->comp->graph, setup->to->vertex, setup->from->vertex, path);
+  } else {
+    path->vertex = kr_graph_vertex_create(path->comp->graph, setup->info->type, path);
+  }*/
+  path->compositor->event_cb(&event);
 }
 
-kr_compositor_path_type path_type_get(kr_compositor_path *path) {
-  return path->info.type;
+static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
+  if (path->perspective != NULL) {
+    kr_perspective_destroy(&path->perspective);
+  }
+  kr_image_convert_clear(&path->converter);
+  kr_graph_vertex_destroy(path->compositor->graph, path->vertex);
+  kr_pool_recycle(path->compositor->path_pool, path);
 }
 
-void path_output(kr_compositor_path *path, kr_image *image) {
+static void path_output(kr_compositor_path *path, kr_image *image) {
   kr_compositor_path_frame_cb_arg cb_arg;
   cb_arg.user = path->frame_user;
   path->frame_cb(&cb_arg);
   memcpy(cb_arg.image.px, image->px, image->w * image->h * 4);
 }
 
-int path_render(kr_compositor_path *path, 
+static int path_render(kr_compositor_path *path, 
   kr_compositor_input_info *input_info, kr_image *dst, cairo_t *cr) {
 
 //   int ret;
@@ -117,7 +145,7 @@ int path_render(kr_compositor_path *path,
   return 0;
 }
 
-int path_setup_check(kr_compositor_io_path_setup *setup) {
+static int path_setup_check(kr_compositor_io_path_setup *setup) {
   kr_compositor_path_info *info;
   info = &setup->info;
   if ((setup->frame_user == NULL) || (setup->frame_cb == NULL)) {
@@ -134,29 +162,6 @@ int path_setup_check(kr_compositor_io_path_setup *setup) {
   }
   /* FIXME check more things out */
   return 0;
-}
-
-static void path_create(kr_compositor_path *path,
- kr_compositor_io_path_setup *setup) {
-  kr_compositor_event event;
-  path->info = setup->info;
-  path->frame_user = setup->frame_user;
-  path->control_user = setup->control_user;
-  path->frame_cb = setup->frame_cb;
-  kr_image_convert_init(&path->converter);
-  event.user = path->compositor->user;
-  event.user_path = path->control_user;
-  event.path = path;
-  event.type = KR_COMP_CREATE;
-  event.info = path->info;
-  /*  
-  Dunno about this 
-  if (path->type == KR_COMP_INPUT) {
-    kr_graph_edge_create(path->comp->graph, setup->to->vertex, setup->from->vertex, path);
-  } else {
-    path->vertex = kr_graph_vertex_create(path->comp->graph, setup->info->type, path);
-  }*/
-  path->compositor->event_cb(&event);
 }
 
 int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
@@ -186,15 +191,6 @@ int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from,
   return 0;
 }
 
-static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
-  if (path->perspective != NULL) {
-    kr_perspective_destroy(&path->perspective);
-  }
-  kr_image_convert_clear(&path->converter);
-  kr_graph_vertex_destroy(path->compositor->graph, path->vertex);
-  kr_pool_recycle(path->compositor->path_pool, path);
-}
-
 int kr_compositor_unlink(kr_compositor_path *path) {
   if (path == NULL) return -1;
   /*FIXME*/
@@ -202,11 +198,10 @@ int kr_compositor_unlink(kr_compositor_path *path) {
   return 0;
 }
 
-int kr_compositor_path_info_get(kr_compositor_path *path,
- kr_compositor_path_info *info) {
- if ((path == NULL) || (info == NULL)) return -1;
- *info = path->info;
- return 0;
+int kr_compositor_process(kr_compositor_path *path) {
+  if (path == NULL) return -1;
+
+  return 0;
 }
 
 int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch) {
@@ -272,8 +267,13 @@ int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_pat
   return ret;
 }
 
-int kr_compositor_process(kr_compositor_path *path) {
-  if (path == NULL) return -1;
+int kr_compositor_path_info_get(kr_compositor_path *path,
+ kr_compositor_path_info *info) {
+ if ((path == NULL) || (info == NULL)) return -1;
+ *info = path->info;
+ return 0;
+}
 
-  return 0;
+size_t kr_compositor_path_size() {
+  return sizeof(kr_compositor_path);
 }
