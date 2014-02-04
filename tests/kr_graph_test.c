@@ -20,9 +20,9 @@ void print_usage(const char *cmd) {
 
 char *kr_graph_vertex_type_to_str(kr_vertex_type type) {
   switch (type) {
-    case KR_INPUT: return "INPUT";
-    case KR_BUS: return "BUS";
-    case KR_OUTPUT: return "OUTPUT";
+    case KR_VERTEX_SOURCE: return "SOURCE";
+    case KR_VERTEX_BUS: return "BUS";
+    case KR_VERTEX_OUTPUT: return "OUTPUT";
     default: break;
   }
   return NULL;
