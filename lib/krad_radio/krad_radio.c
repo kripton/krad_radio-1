@@ -75,7 +75,7 @@ static void compositor_event(kr_compositor_event *event) {
   kr_route_setup route_setup;
   radio = (kr_radio *)event->user;
   switch (event->type) {
-    case KR_COMP_CREATE:
+    case KR_COM_CREATE:
       printk("Radio: Compositor path create event");
       route_setup.ptr = radio->compositor;
       route_setup.name = event->user_path;
@@ -83,11 +83,11 @@ static void compositor_event(kr_compositor_event *event) {
       route_setup.payload.compositor_path_info = event->info;
       kr_app_server_route_create(radio->app, &route_setup);
       break;
-    case KR_COMP_PATCH:
+    case KR_COM_PATCH:
       printk("Radio: Compositor path patch event");
       /* update the info struct in the route */
       break;
-    case KR_COMP_DESTROY:
+    case KR_COM_DESTROY:
       printk("Radio: Compositor path delete event");
       /* remove the route */
       break;

@@ -31,12 +31,11 @@ int kr_text_init(kr_text *text, char *str, char *font, FT_Library *ftlib) {
   strncpy(text->info.string, str, (sizeof(text->info.string) - 1));
   text->info.string[(sizeof(text->info.string) - 1)] = '\0';
   kr_text_set_font(text, font);
-  text->info.input_info.opacity = 1.0f;
   text->info.red = 1.0f;
   text->info.green = 1.0f;
   text->info.blue = 1.0f;
-  text->info.input_info.pos.h = 128;
-  text->info.input_info.pos.y = text->info.input_info.pos.h + 12;
+  //text->info.input_info.pos.h = 128;
+  //text->info.input_info.pos.y = text->info.input_info.pos.h + 12;
   return 0;
 }
 
@@ -91,6 +90,7 @@ void kr_text_prerender(kr_text *krad_text, cairo_t *cr) {
                             CAIRO_FONT_SLANT_NORMAL,
                             CAIRO_FONT_WEIGHT_NORMAL);
   }
+/*
   cairo_set_font_size(cr, krad_text->info.input_info.pos.h);
   cairo_set_source_rgba (cr,
                          krad_text->info.red,
@@ -109,6 +109,7 @@ void kr_text_prerender(kr_text *krad_text, cairo_t *cr) {
                      krad_text->info.input_info.pos.h / 2);
   }
   krad_text->prerendered = 1;
+  */
 }
 
 void kr_text_render(kr_text *text, cairo_t *cr) {
@@ -118,11 +119,13 @@ void kr_text_render(kr_text *text, cairo_t *cr) {
   cairo_restore(cr);
   text->prerendered = 0;
   kr_compositor_input_info *input_info;
+  /*
   input_info = &text->info.input_info;
   printk("rendered %s %s %f %f %f %f %f %d %d %d %d", text->info.string,
    text->info.font, text->info.red, text->info.green, text->info.blue,
    input_info->opacity, input_info->rotation, input_info->pos.x, input_info->pos.y,
    input_info->pos.w, input_info->pos.h);
+  */
 }
 
 int kr_text_info_get(kr_text *text, kr_text_info *info) {

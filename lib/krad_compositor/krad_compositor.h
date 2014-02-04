@@ -20,9 +20,9 @@ struct kr_compositor_setup {
 };
 
 typedef enum {
-  KR_COMP_CREATE = 1,
-  KR_COMP_PATCH,
-  KR_COMP_DESTROY
+  KR_COM_CREATE = 1,
+  KR_COM_PATCH,
+  KR_COM_DESTROY
 } kr_compositor_event_type;
 
 struct kr_compositor_event {

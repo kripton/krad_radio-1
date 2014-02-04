@@ -9,6 +9,8 @@ struct kr_sprite {
   cairo_surface_t **sprite_frames;
   int multisurface;
   cairo_pattern_t *sprite_pattern;
+  int w;
+  int h;
   int sheet_width;
   int sheet_height;
 };
@@ -291,15 +293,10 @@ size_t kr_sprite_size() {
 }
 
 int kr_sprite_open(kr_sprite *sprite, char *filename) {
-
   int64_t size;
-  kr_compositor_input_info *input_info;
-
   if ((sprite == NULL) || (filename == NULL)) {
     return -1;
   }
-
-  input_info = &sprite->info.input_info;
   if (sprite->sprite != NULL) {
     kr_sprite_clear(sprite);
   }
@@ -397,25 +394,22 @@ int kr_sprite_open(kr_sprite *sprite, char *filename) {
   sprite->sheet_height = cairo_image_surface_get_height(sprite->sprite);
   if ((sprite->frames > 1) && (sprite->multisurface == 0)) {
     if (sprite->frames >= 10) {
-      input_info->pos.w = sprite->sheet_width / 10;
-      input_info->pos.h = sprite->sheet_height / ((sprite->frames / 10) + MIN (1, (sprite->frames % 10)));
+      sprite->w = sprite->sheet_width / 10;
+      sprite->h = sprite->sheet_height / ((sprite->frames / 10) + MIN (1, (sprite->frames % 10)));
     } else {
-      input_info->pos.w = sprite->sheet_width / sprite->frames;
-      input_info->pos.h = sprite->sheet_height;
+      sprite->w = sprite->sheet_width / sprite->frames;
+      sprite->h = sprite->sheet_height;
     }
   } else {
-    input_info->pos.w = sprite->sheet_width;
-    input_info->pos.h = sprite->sheet_height;
+    sprite->w = sprite->sheet_width;
+    sprite->h = sprite->sheet_height;
   }
   sprite->sprite_pattern = cairo_pattern_create_for_surface(sprite->sprite);
   cairo_pattern_set_extend(sprite->sprite_pattern, CAIRO_EXTEND_REPEAT);
   strcpy(sprite->info.filename, filename);
   printk("Loaded Sprite: %s Sheet Width: %d Frames: %d Width: %d Height: %d",
-   sprite->info.filename, sprite->sheet_width, sprite->frames, input_info->pos.w,
-   input_info->pos.h);
-  input_info->opacity = 1.0f;
-
-  //kr_easer_set(&sprite->easers.rotation, 560.0f, 800, EASEINOUTSINE, NULL);
+   sprite->info.filename, sprite->sheet_width, sprite->frames, sprite->w,
+   sprite->h);
   return 0;
 }
 
@@ -487,10 +481,7 @@ static void sprite_tick(kr_sprite *sprite) {
 }
 
 void kr_sprite_render(kr_sprite *sprite, cairo_t *cr) {
-
-  kr_compositor_input_info *input_info;
-
-  input_info = &sprite->info.input_info;
+/*
   cairo_save(cr);
   if (input_info->rotation != 0.0f) {
     cairo_translate(cr, input_info->pos.x, input_info->pos.y);
@@ -508,7 +499,9 @@ void kr_sprite_render(kr_sprite *sprite, cairo_t *cr) {
   }
   cairo_rectangle(cr, input_info->pos.x, input_info->pos.y, input_info->pos.w, input_info->pos.h);
   cairo_clip(cr);
+  */
   /*cairo_pattern_set_filter (cairo_get_source (cr), CAIRO_FILTER_FAST);*/
+  /*
   if (input_info->opacity == 1.0f) {
     cairo_paint(cr);
   } else {
@@ -516,6 +509,7 @@ void kr_sprite_render(kr_sprite *sprite, cairo_t *cr) {
   }
   cairo_restore(cr);
   sprite_tick(sprite);
+  */
 }
 
 int kr_sprite_info_get(kr_sprite *sprite, kr_sprite_info *info) {

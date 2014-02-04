@@ -1,5 +1,4 @@
 #include <cairo.h>
-
 #include "krad_compositor_so_path.h"
 
 typedef enum {
@@ -24,17 +23,17 @@ struct kr_compositor_path {
   } g;
 };
 
-struct kr_compositor_path_setup {
+typedef struct {
   kr_compositor_path_info *info;
   void *control_user;
-  void *frane_user;
+  void *frame_user;
   kr_compositor_path_frame_cb *frame_cb;
   kr_compositor_path *from;
   kr_compositor_path *to;
-};
+} kr_compositor_path_setup;
 
 static float kr_round3(float f);
-static kr_graph_type path_vertex_type(kr_compositor_path_type type);
+static kr_vertex_type path_vertex_type(kr_compositor_path_type type);
 static kr_compositor_path *path_create(kr_compositor *comp,
  kr_compositor_path_setup *setup);
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
@@ -83,9 +82,19 @@ static kr_compositor_path *path_create(kr_compositor *comp,
     printke("compositor mkpath could not slice new path");
     return NULL;
   }
-  path->type = setup->info->type;
-  path->compositor = compositor;
-  path->info = setup->info;
+  path->g.ptr = NULL;
+  if (setup->info->type == KR_COM_INPUT) {
+    path->g.edge = kr_graph_edge_create(comp->graph, setup->to->g.vertex, setup->from->g.vertex, path);
+  } else {
+    vertex_type = path_vertex_type(setup->info->type);
+    path->g.vertex = kr_graph_vertex_create(comp->graph, vertex_type, path);
+  }
+  if (path->g.ptr == NULL) {
+    kr_pool_recycle(comp->path_pool, path);
+    return NULL;
+  }
+  path->compositor = comp;
+  path->info = *setup->info;
   path->frame_user = setup->frame_user;
   path->control_user = setup->control_user;
   path->frame_cb = setup->frame_cb;
@@ -93,19 +102,8 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   event.user = path->compositor->user;
   event.user_path = path->control_user;
   event.path = path;
-  event.type = KR_COMP_CREATE;
+  event.type = KR_COM_CREATE;
   event.info = path->info;
-  path->g.p = NULL;
-  if (path->type == KR_COM_INPUT) {
-    path->g.edge = kr_graph_edge_create(comp->graph, setup->to->g.vertex, setup->from->g.vertex, path);
-  } else {
-    vertex_type = path_vertex_type(setup->info->type);
-    path->g.vertex = kr_graph_vertex_create(comp->graph, vertex_type, path);
-  }
-  if (path->g.p == NULL) {
-    kr_slice_recycle(comp->path_pool, path);
-    return NULL;
-  }
   path->compositor->event_cb(&event);
   return path;
 }
@@ -115,7 +113,7 @@ static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
     kr_perspective_destroy(&path->perspective);
   }
   kr_image_convert_clear(&path->converter);
-  if (path->type == KR_COM_INPUT) {
+  if (path->info.type == KR_COM_INPUT) {
     kr_graph_edge_destroy(path->compositor->graph, path->g.edge);
   } else {
     kr_graph_vertex_destroy(path->compositor->graph, path->g.vertex);
@@ -136,10 +134,10 @@ static int path_render(kr_compositor_path *path,
 }
 
 static int path_info_check(kr_compositor_path_info *info) {
-  if ((info->type != KR_OVERLAY)
-   && (info->type != KR_COMP_INPUT)
-   && (info->type != KR_COMP_BUS)
-   && (info->type != KR_COMP_OUTPUT)) {
+  if ((info->type != KR_COM_OVERLAY)
+   && (info->type != KR_COM_INPUT)
+   && (info->type != KR_COM_BUS)
+   && (info->type != KR_COM_OUTPUT)) {
     return -4;
   }
 
@@ -150,7 +148,7 @@ static int path_info_check(kr_compositor_path_info *info) {
 
 static int path_setup_check(kr_compositor_path_setup *setup) {
   kr_compositor_path_info *info;
-  info = &setup->info;
+  info = setup->info;
   if ((setup->frame_user == NULL) || (setup->frame_cb == NULL)) {
     /* FIXME HRMMM */
   }
@@ -160,7 +158,7 @@ static int path_setup_check(kr_compositor_path_setup *setup) {
 /*  if ((info->width == 0) || (info->height == 0)) {
     return -1;
   }*/
-  if ((info->type != KR_COMP_INPUT) && (info->type != KR_COMP_OUTPUT)) {
+  if ((info->type != KR_COM_INPUT) && (info->type != KR_COM_OUTPUT)) {
     return -2;
   }
   /* FIXME check more things out */
@@ -246,39 +244,40 @@ int kr_compositor_unlink(kr_compositor_path *path) {
 int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
   kr_compositor_path *path;
   kr_compositor_path_setup setup;
-  kr_compositor_path *path;
-  if ((compositor == NULL) || (info == NULL) || (user == NULL)) return -1;
-  setup.info = info;
+  if ((c == NULL) || (i == NULL) || (user == NULL)) return -1;
+  setup.info = i;
   setup.control_user = user;
   setup.frame_user = NULL;
   setup.frame_cb = NULL;
-  path = path_create(compositor, &setup);
+  path = path_create(c, &setup);
   if (path == NULL) return -2;
   return 0;
 }
 
-kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
- kr_compositor_io_path_setup *setup) {  kr_compositor_path_setup path_setup;
-  if ((compositor == NULL) || (setup == NULL)) return NULL;
-  path_setup.info = &setup->info;
-  setup.control_user = setup->control_user;
-  setup.frame_user = setup->frame_user;
-  setup.frame_cb = setup->frame_cb;
-  return path_create(compositor, &path_setup);
+kr_compositor_path *kr_compositor_mkso(kr_compositor *com,
+ kr_compositor_io_path_setup *io_setup) {
+  kr_compositor_path_setup setup;
+  if ((com == NULL) || (io_setup == NULL)) return NULL;
+  setup.info = &io_setup->info;
+  setup.control_user = io_setup->control_user;
+  setup.frame_user = io_setup->frame_user;
+  setup.frame_cb = io_setup->frame_cb;
+  return path_create(com, &setup);
 }
 
-int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from,
+int kr_compositor_mkinput(kr_compositor_path *to, kr_compositor_path *fr,
   kr_compositor_input_info *info, void *user) {
   kr_compositor_path_setup setup;
   kr_compositor_path *path;
-  if ((compositor == NULL) || (info == NULL) || (user == NULL)) return -1;
+  if ((fr == NULL) || (to == NULL) || (info == NULL) || (user == NULL)) return -1;
+  if (fr->compositor != to->compositor) return -2;
   setup.info = info;
   setup.control_user = user;
   setup.frame_user = NULL;
   setup.frame_cb = NULL;
-  setup.from = from;
+  setup.from = fr;
   setup.to = to;
-  path = path_create(compositor, &setup);
+  path = path_create(to->compositor, &setup);
   if (path == NULL) return -2;
   return 0;
 }

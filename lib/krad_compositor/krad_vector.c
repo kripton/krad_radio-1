@@ -51,10 +51,7 @@ void kr_vector_clear(kr_vector *vector) {
 int kr_vector_init(kr_vector *vector, char *type) {
   if ((vector == NULL) || (type == NULL)) return -1;
   memset(vector, 0, sizeof(kr_vector));
-  vector->info.input_info.opacity = 1.0f;
   vector->type = kr_strto_kr_vector_type(type);
-  vector->info.input_info.pos.w = 96;
-  vector->info.input_info.pos.h = 96;
   switch (vector->type) {
     case METER:
     case HEX:
@@ -83,7 +80,7 @@ int kr_vector_info_get(kr_vector *vector, kr_vector_info *info) {
 }
 
 void kr_vector_render(kr_vector *krad_vector, cairo_t *cr) {
-
+/*
   cairo_save(cr);
 
   if (krad_vector->type != VIPER) {
@@ -196,6 +193,7 @@ void kr_vector_render(kr_vector *krad_vector, cairo_t *cr) {
   }
 
   cairo_restore(cr);
+  */
 }
 
 static void render_meter(cairo_t *cr, int x, int y, int size, float pos, float opacity) {
