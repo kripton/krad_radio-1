@@ -22,7 +22,8 @@ typedef int (kr_router_map_destroy_handler)(void *);
 typedef int (kr_router_response_handler)(void *, kr_crate2 *crate);
 
 struct kr_router_info {
-  uint64_t maps;
+  char raml[8192];
+  int raml_len;
 };
 
 struct kr_router_map_info {
@@ -49,6 +50,7 @@ struct kr_route_setup {
 struct kr_router_setup {
   int routes_max;
   int maps_max;
+  char name[64];
   void *user;
   kr_router_response_handler *response;
 };

@@ -790,6 +790,7 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
     kr_app_server_destroy(server);
     return NULL;
   }
+  snprintf(router_setup.name, sizeof(router_setup.name), "%s", setup->appname);
   router_setup.routes_max = 64;
   router_setup.maps_max = 64;
   router_setup.user = server;

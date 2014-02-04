@@ -6,6 +6,7 @@ struct kr_router {
   kr_pool *maps;
   kr_pool *routes;
   kr_pool *names;
+  char name[64];
 };
 
 typedef struct {
@@ -37,13 +38,35 @@ struct kr_router_map {
 };
 
 int kr_router_info_get(kr_router *router, kr_router_info *info) {
+  int i;
+  int p;
+  int m;
+  kr_router_map *map;
   if ((router == NULL) || (info == NULL)) return -1;
-  info->maps = 666;
+  i = 0;
+  p = 0;
+  m = sizeof(info->raml);
+  p += snprintf(info->raml + p, m - p, "#%%RAML 0.8\n\n"
+   "title: %s api\n", router->name);
+  while ((map = kr_pool_iterate_active(router->maps, &i))) {
+    p += snprintf(info->raml + p, m - p, "%s:\n", map->prefix);
+    if (1) p += snprintf(info->raml + p, m - p, "  get:\n");
+    if (map->create) p += snprintf(info->raml + p, m - p, "  put:\n");
+    if (map->patch) p += snprintf(info->raml + p, m - p, "  patch:\n");
+    if (map->destroy) p += snprintf(info->raml + p, m - p, "  delete:\n");
+  }
   return 0;
+}
+
+static void router_debug(kr_router *router) {
+  kr_router_info info;
+  kr_router_info_get(router, &info);
+  printk("\n%s\n", info.raml);
 }
 
 int kr_router_destroy(kr_router *router) {
   if (router == NULL) return -1;
+  router_debug(router);
   kr_pool_destroy(router->maps);
   kr_pool_destroy(router->routes);
   kr_pool_destroy(router->names);
@@ -55,6 +78,7 @@ kr_router *kr_router_create(kr_router_setup *setup) {
   kr_router *router;
   kr_pool_setup pool_setup;
   router = kr_allocz(1, sizeof(kr_router));
+  memcpy(router->name, setup->name, sizeof(router->name));
   router->user = setup->user;
   router->response = setup->response;
   pool_setup.size = sizeof(kr_route);
