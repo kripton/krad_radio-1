@@ -33,7 +33,6 @@ struct kr_compositor_path_setup {
   kr_compositor_path *to;
 };
 
-
 static float kr_round3(float f);
 static kr_graph_type path_vertex_type(kr_compositor_path_type type);
 static kr_compositor_path *path_create(kr_compositor *comp,
@@ -54,13 +53,13 @@ static float kr_round3(float f) {
 static kr_vertex_type path_vertex_type(kr_compositor_path_type type) {
   switch (type) {
     case KR_COM_SOURCE:
+      return KR_VERTEX_SOURCE;
     case KR_COM_OVERLAY:
-    case KR_COM_INPUT:
-      return KR_GRAPH_SOURCE;
+      return KR_VERTEX_SOURCE;
     case KR_COM_BUS:
-      return KR_GRAPH_BUS;
+      return KR_VERTEX_BUS;
     case KR_COM_OUTPUT:
-      return KR_GRAPH_OUTPUT;
+      return KR_VERTEX_OUTPUT;
     default:
       break;
   }
@@ -70,6 +69,7 @@ static kr_vertex_type path_vertex_type(kr_compositor_path_type type) {
 static kr_compositor_path *path_create(kr_compositor *comp,
  kr_compositor_path_setup *setup) {
   int ret;
+  kr_vertex_type vertex_type;
   kr_compositor_event event;
   kr_compositor_path *path;
   if ((path == NULL) || (setup == NULL)) return NULL;
@@ -97,9 +97,10 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   event.info = path->info;
   path->g.p = NULL;
   if (path->type == KR_COM_INPUT) {
-    path->g.edge = kr_graph_edge_create(comp->graph, setup->to->vertex, setup->from->vertex, path);
+    path->g.edge = kr_graph_edge_create(comp->graph, setup->to->g.vertex, setup->from->g.vertex, path);
   } else {
-    path->g.vertex = kr_graph_vertex_create(comp->graph, setup->info->type, path);
+    vertex_type = path_vertex_type(setup->info->type);
+    path->g.vertex = kr_graph_vertex_create(comp->graph, vertex_type, path);
   }
   if (path->g.p == NULL) {
     kr_slice_recycle(comp->path_pool, path);

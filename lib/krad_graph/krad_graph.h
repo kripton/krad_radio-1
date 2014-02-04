@@ -16,9 +16,9 @@ typedef enum {
 } kr_edge_dir;
 
 typedef enum {
-  KR_GRAPH_SOURCE = 1,
-  KR_GRAPH_BUS,
-  KR_GRAPH_OUTPUT
+  KR_VERTEX_SOURCE = 1,
+  KR_VERTEX_BUS,
+  KR_VERTEX_OUTPUT
 } kr_vertex_type;
 
 typedef struct {

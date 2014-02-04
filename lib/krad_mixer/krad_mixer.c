@@ -46,6 +46,7 @@ struct kr_mixer_path {
   kr_mixer_path_info info;
 };
 
+static kr_graph_type path_vertex_type(kr_mixer_path_type type);
 static void limit_samples(float **samples, int nc, int ns);
 static void clear_samples(float **dst, int nc, int ns);
 static void copy_samples(float **dst, float **src, int nc, int ns);
@@ -60,6 +61,20 @@ static kr_vertex_type path_vertex_type(kr_mixer_path_type type);
 static int kr_mixer_process_path(kr_mixer_path *path);
 static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup);
 static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup);
+
+static kr_vertex_type path_vertex_type(kr_mixer_path_type type) {
+  switch (type) {
+    case KR_MXR_SOURCE:
+      return KR_VERTEX_SOURCE;
+    case KR_MXR_BUS:
+      return KR_VERTEX_BUS;
+    case KR_MXR_OUTPUT:
+      return KR_VERTEX_OUTPUT;
+    default:
+      break;
+  }
+  return -1;
+}
 
 static void limit_samples(float **samples, int nc, int ns) {
   int c;
@@ -345,6 +360,7 @@ static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
 static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   int ret;
   kr_mixer_path *path;
+  kr_vertex_type vertex_type;
   if ((mixer == NULL) || (setup == NULL)) return NULL;
   ret = path_setup_check(setup);
   if (ret) {
@@ -361,7 +377,8 @@ static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   if (setup->info->type == KR_MXR_INPUT) {
     path->g.edge = kr_graph_edge_create(mixer->graph, setup->to->g.vertex, setup->from->g.vertex, path);
   } else {
-    path->g.vertex = kr_graph_vertex_create(mixer->graph, setup->info->type, path);
+    vertex_type = path_vertex_type(setup->info->type);
+    path->g.vertex = kr_graph_vertex_create(mixer->graph, vertex_type, path);
   }
   if (path->g.p == NULL) {
     kr_slice_recycle(mixer->path_pool, path);
