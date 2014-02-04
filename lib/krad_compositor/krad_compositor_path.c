@@ -164,40 +164,6 @@ static int path_setup_check(kr_compositor_io_path_setup *setup) {
   return 0;
 }
 
-int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
-  return -1;
-}
-
-kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
- kr_compositor_io_path_setup *setup) {
-  kr_compositor_path *path;
-  if ((compositor == NULL) || (setup == NULL)) return NULL;
-  if (path_setup_check(setup)) {
-    printke("compositor mkpath failed setup check");
-    return NULL;
-  }
-  path = kr_pool_slice(compositor->path_pool);
-  if (path == NULL) {
-    printke("compositor mkpath could not slice new path");
-    return NULL;
-  }
-  path->compositor = compositor;
-  path_create(path, setup);
-  return path;
-}
-
-int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from, 
-  kr_compositor_input_info *info, void *user) {
-  return 0;
-}
-
-int kr_compositor_unlink(kr_compositor_path *path) {
-  if (path == NULL) return -1;
-  /*FIXME*/
-  /* do destroy event callback */
-  return 0;
-}
-
 int kr_compositor_process(kr_compositor_path *path) {
   if (path == NULL) return -1;
 
@@ -265,6 +231,40 @@ int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_pat
       break;
   }*/
   return ret;
+}
+
+int kr_compositor_unlink(kr_compositor_path *path) {
+  if (path == NULL) return -1;
+  /*FIXME*/
+  /* do destroy event callback */
+  return 0;
+}
+
+int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
+  return -1;
+}
+
+kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
+ kr_compositor_io_path_setup *setup) {
+  kr_compositor_path *path;
+  if ((compositor == NULL) || (setup == NULL)) return NULL;
+  if (path_setup_check(setup)) {
+    printke("compositor mkpath failed setup check");
+    return NULL;
+  }
+  path = kr_pool_slice(compositor->path_pool);
+  if (path == NULL) {
+    printke("compositor mkpath could not slice new path");
+    return NULL;
+  }
+  path->compositor = compositor;
+  path_create(path, setup);
+  return path;
+}
+
+int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from, 
+  kr_compositor_input_info *info, void *user) {
+  return 0;
 }
 
 int kr_compositor_path_info_get(kr_compositor_path *path,
