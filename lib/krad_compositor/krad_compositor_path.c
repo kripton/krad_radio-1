@@ -17,8 +17,11 @@ struct kr_compositor_path {
   kr_compositor *compositor;
   kr_convert converter;
   kr_perspective *perspective;
-  kr_vertex *vertex;
-  kr_edge *edge;
+  union {
+    kr_vertex *vertex;
+    kr_edge *edge;
+    void *ptr;
+  } g;
 };
 
 struct kr_compositor_path_setup {
@@ -32,6 +35,7 @@ struct kr_compositor_path_setup {
 
 
 static float kr_round3(float f);
+static kr_graph_type path_vertex_type(kr_compositor_path_type type);
 static kr_compositor_path *path_create(kr_compositor *comp,
  kr_compositor_path_setup *setup);
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
@@ -45,6 +49,22 @@ static float kr_round3(float f) {
   f = rintf(f * 1000.0);
   f = f / 1000.0;
   return f;
+}
+
+static kr_vertex_type path_vertex_type(kr_compositor_path_type type) {
+  switch (type) {
+    case KR_COM_SOURCE:
+    case KR_COM_OVERLAY:
+    case KR_COM_INPUT:
+      return KR_GRAPH_SOURCE;
+    case KR_COM_BUS:
+      return KR_GRAPH_BUS;
+    case KR_COM_OUTPUT:
+      return KR_GRAPH_OUTPUT;
+    default:
+      break;
+  }
+  return -1;
 }
 
 static kr_compositor_path *path_create(kr_compositor *comp,
@@ -63,6 +83,7 @@ static kr_compositor_path *path_create(kr_compositor *comp,
     printke("compositor mkpath could not slice new path");
     return NULL;
   }
+  path->type = setup->info->type;
   path->compositor = compositor;
   path->info = setup->info;
   path->frame_user = setup->frame_user;
@@ -74,13 +95,14 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   event.path = path;
   event.type = KR_COMP_CREATE;
   event.info = path->info;
+  path->g.p = NULL;
   if (path->type == KR_COM_INPUT) {
-    kr_graph_edge_create(path->compositor->graph, setup->to->vertex, setup->from->vertex, path);
+    path->g.edge = kr_graph_edge_create(comp->graph, setup->to->vertex, setup->from->vertex, path);
   } else {
-    path->vertex = kr_graph_vertex_create(path->compositor->graph, setup->info->type, path);
+    path->g.vertex = kr_graph_vertex_create(comp->graph, setup->info->type, path);
   }
-  if (path->vertex == NULL) {
-    kr_pool_recycle(path->compositor->path_pool, path);
+  if (path->g.p == NULL) {
+    kr_slice_recycle(comp->path_pool, path);
     return NULL;
   }
   path->compositor->event_cb(&event);
@@ -92,7 +114,11 @@ static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
     kr_perspective_destroy(&path->perspective);
   }
   kr_image_convert_clear(&path->converter);
-  kr_graph_vertex_destroy(path->compositor->graph, path->vertex);
+  if (path->type == KR_COM_INPUT) {
+    kr_graph_edge_destroy(path->compositor->graph, path->g.edge);
+  } else {
+    kr_graph_vertex_destroy(path->compositor->graph, path->g.vertex);
+  }
   kr_pool_recycle(path->compositor->path_pool, path);
 }
 

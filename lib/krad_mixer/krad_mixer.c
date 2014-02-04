@@ -38,8 +38,11 @@ struct kr_mixer_path {
   void *control_user;
   kr_mixer *mixer;
   kr_sfx *sfx;
-  kr_vertex *vertex;
-  kr_edge *edge;
+  union {
+    kr_vertex *vertex;
+    kr_edge *edge;
+    void *ptr;
+  } g;
   kr_mixer_path_info info;
 };
 
@@ -53,6 +56,8 @@ static void path_release(kr_mixer_path *path);
 static int path_info_check(kr_mixer_path_info *info);
 static int path_setup_check(kr_mixer_path_setup *setup);
 static void path_sfx_create(kr_mixer_path *path);
+static kr_vertex_type path_vertex_type(kr_mixer_path_type type);
+static int kr_mixer_process_path(kr_mixer_path *path);
 static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup);
 static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup);
 
@@ -129,6 +134,21 @@ static void update_state(kr_mixer *mixer) {
   }
 }
 
+static kr_vertex_type path_vertex_type(kr_mixer_path_type type) {
+  switch (type) {
+    case KR_MXR_SOURCE:
+    case KR_MXR_INPUT:
+      return KR_GRAPH_SOURCE;
+    case KR_MXR_BUS:
+      return KR_GRAPH_BUS;
+    case KR_MXR_OUTPUT:
+      return KR_GRAPH_OUTPUT;
+    default:
+      break;
+  }
+  return -1;
+}
+
 static int kr_mixer_process_path(kr_mixer_path *path) {
   int i;
   int e;
@@ -142,7 +162,7 @@ static int kr_mixer_process_path(kr_mixer_path *path) {
   if (path->type == KR_MXR_SOURCE) {
     transport(path);
     kr_sfx_process(path->sfx, path->samples, path->samples, path->nframes);
-    e = kr_graph_in_out_edges(mixer->graph, path->vertex, -45, user, 16);
+    e = kr_graph_in_out_edges(mixer->graph, path->g.vertex, -45, user, 16);
     for (i = 0; i < e; i++) {
       streamer45 = (kr_mixer_path *)user[i];
       copy_samples(streamer45->samples, path->samples, path->channels, path->nframes);
@@ -161,7 +181,7 @@ static int kr_mixer_process_path(kr_mixer_path *path) {
   */
   if (path->type == KR_MXR_BUS) {
     //clear_samples(path->samples, path->channels, path->nframes);
-    e = kr_graph_in_out_edges(mixer->graph, path->vertex, -45, user, 16);
+    e = kr_graph_in_out_edges(mixer->graph, path->g.vertex, -45, user, 16);
     for (i = 0; i < e; i++) {
       streamer45 = (kr_mixer_path *)user[i];
       path->nframes = streamer45->nframes;
@@ -176,7 +196,7 @@ static int kr_mixer_process_path(kr_mixer_path *path) {
   }
   if (path->type == KR_MXR_OUTPUT) {
     //clear_samples(path->samples, path->channels, path->nframes);
-    e = kr_graph_in_out_edges(mixer->graph, path->vertex, -45, user, 16);
+    e = kr_graph_in_out_edges(mixer->graph, path->g.vertex, -45, user, 16);
     for (i = 0; i < e; i++) {
       streamer45 = (kr_mixer_path *)user[i];
       path->nframes = streamer45->nframes;
@@ -239,10 +259,9 @@ static void path_release(kr_mixer_path *path) {
   }
   path->state = KR_MXP_NIL;
   if (path->type == KR_MXR_INPUT) {
-    kr_graph_edge_destroy(path->mixer->graph, path->edge);
+    kr_graph_edge_destroy(path->mixer->graph, path->g.edge);
   } else {
-    kr_graph_vertex_destroy(path->mixer->graph, path->vertex);
-    path->vertex = NULL;
+    kr_graph_vertex_destroy(path->mixer->graph, path->g.vertex);
   }
   kr_pool_recycle(path->mixer->path_pool, path);
 }
@@ -320,11 +339,6 @@ static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.path = path;
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
-  if (path->type == KR_MXR_INPUT) {
-    kr_graph_edge_create(path->mixer->graph, setup->to->vertex, setup->from->vertex, path);
-  } else {
-    path->vertex = kr_graph_vertex_create(path->mixer->graph, setup->info->type, path);
-  }
   path->mixer->event_cb(&event);
 }
 
@@ -343,6 +357,16 @@ static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {
     return NULL;
   }
   path->mixer = mixer;
+  path->g.p = NULL;
+  if (setup->info->type == KR_MXR_INPUT) {
+    path->g.edge = kr_graph_edge_create(mixer->graph, setup->to->g.vertex, setup->from->g.vertex, path);
+  } else {
+    path->g.vertex = kr_graph_vertex_create(mixer->graph, setup->info->type, path);
+  }
+  if (path->g.p == NULL) {
+    kr_slice_recycle(mixer->path_pool, path);
+    return NULL;
+  }
   path_setup(path, setup);
   return path;
 }
