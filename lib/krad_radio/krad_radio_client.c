@@ -50,15 +50,15 @@ int kr_client_want_out (kr_client *client) {
   return kr_io2_want_out(client->io);
 }
 
-int kr_crate_send(kr_client *client, kr_crate2 *crate) {
+int kr_crate_send(kr_client *client, kr_crate *crate) {
   if (client == NULL) return -1;
   if (crate == NULL) return -2;
-  //if (kr_crate2_valid(info) < 0) {
+  //if (kr_crate_valid(info) < 0) {
   // return -1;
   //}
   uint8_t *ebml_crate;
   kr_ebml2_start_element(client->ebml2, KR_EID_CRATE, &ebml_crate);
-  kr_crate2_to_ebml(client->ebml2, crate);
+  kr_crate_to_ebml(client->ebml2, crate);
   kr_ebml2_finish_element(client->ebml2, ebml_crate);
   kr_client_push(client);
   return 0;
@@ -66,10 +66,10 @@ int kr_crate_send(kr_client *client, kr_crate2 *crate) {
 
 int kr_get(kr_client *client, char *address) {
   int ret;
-  kr_crate2 crate;
+  kr_crate crate;
   if (client == NULL) return -1;
   if (address == NULL) return -2;
-  memset(&crate, 0, sizeof(kr_crate2));
+  memset(&crate, 0, sizeof(kr_crate));
   crate.method = KR_GET;
   strncpy(crate.address, address, sizeof(crate.address));
   /* need a no payload type or something */
@@ -79,10 +79,10 @@ int kr_get(kr_client *client, char *address) {
 
 int kr_delete(kr_client *client, char *address) {
   int ret;
-  kr_crate2 crate;
+  kr_crate crate;
   if (client == NULL) return -1;
   if (address == NULL) return -2;
-  memset(&crate, 0, sizeof(kr_crate2));
+  memset(&crate, 0, sizeof(kr_crate));
   crate.method = KR_DELETE;
   strncpy(crate.address, address, sizeof(crate.address));
   /* need a no payload type or something */
@@ -300,14 +300,14 @@ void kr_delivery_recv(kr_client *client) {
 
 int kr_streamer45(kr_client *client) {
   kr_ebml2_t ebml;
-  kr_crate2 crate;
+  kr_crate crate;
   uint32_t element;
   uint64_t size;
   int ret;
   if (!(kr_io2_has_in(client->io_in))) {
     return 0;
   }
-  memset(&crate, 0, sizeof(kr_crate2));
+  memset(&crate, 0, sizeof(kr_crate));
   kr_ebml2_set_buffer(&ebml, client->io_in->rd_buf, client->io_in->len);
   ret = kr_ebml2_unpack_id(&ebml, &element, &size);
   if (ret < 0) {
@@ -320,10 +320,10 @@ int kr_streamer45(kr_client *client) {
     return 0;
   }
   if (element == KR_EID_CRATE) {
-    ret = kr_crate2_fr_ebml(&ebml, &crate);
+    ret = kr_crate_fr_ebml(&ebml, &crate);
     if (ret == 0) {
       char string[8192];
-      ret = kr_crate2_to_text(string, &crate, sizeof(string));
+      ret = kr_crate_to_text(string, &crate, sizeof(string));
       if (ret > 0) {
         printk("Got a %"PRIu64" Byte Crate: \n%s\n", size, string);
       }

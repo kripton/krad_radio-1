@@ -1,8 +1,8 @@
 #include "gen.h"
 int info_unpack_fr_json(char *json, uber_St *uber) {
   const info_unpack_fr_json_func fr_json_functions[63] = {kr_alsa_info_fr_json,
-  kr_alsa_path_info_fr_json,kr_app_method_fr_json,
-  kr_crate2_fr_json,kr_easing_fr_json,
+  kr_alsa_path_info_fr_json,kr_method_fr_json,
+  kr_crate_fr_json,kr_easing_fr_json,
   kr_compositor_path_type_fr_json,kr_compositor_subunit_type_fr_json,
   kr_vector_type_fr_json,kr_compositor_control_fr_json,
   kr_compositor_controls_fr_json,kr_sprite_info_fr_json,
@@ -15,8 +15,8 @@ int info_unpack_fr_json(char *json, uber_St *uber) {
   kr_jack_setup_info_fr_json,kr_jack_info_fr_json,
   kr_jack_path_info_fr_json,kr_mixer_channels_fr_json,
   kr_mixer_path_type_fr_json,kr_mixer_path_info_fr_json,
-  kr_nil_fr_json,kr_radio_payload_type_fr_json,
-  kr_radio_payload_fr_json,kr_sfx_control_fr_json,
+  kr_nil_fr_json,kr_payload_type_fr_json,
+  kr_payload_fr_json,kr_sfx_control_fr_json,
   kr_sfx_effect_type_fr_json,kr_sfx_effect_control_fr_json,
   kr_eq_band_info_fr_json,kr_eq_info_fr_json,
   kr_lowpass_info_fr_json,kr_highpass_info_fr_json,

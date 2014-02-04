@@ -53,7 +53,6 @@ static void mixer_event(kr_mixer_event *event) {
       route_setup.ptr = radio->mixer;
       route_setup.name = event->user_path;
       route_setup.ctx = event->path;
-      route_setup.payload_type = PL_KR_MIXER_PATH_INFO;
       route_setup.payload.mixer_path_info = event->info;
       kr_app_server_route_create(radio->app, &route_setup);
       break;
@@ -81,7 +80,6 @@ static void compositor_event(kr_compositor_event *event) {
       route_setup.ptr = radio->compositor;
       route_setup.name = event->user_path;
       route_setup.ctx = event->path;
-      route_setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
       route_setup.payload.compositor_path_info = event->info;
       kr_app_server_route_create(radio->app, &route_setup);
       break;
@@ -108,6 +106,7 @@ static int setup_maps(kr_radio *radio) {
   kr_router_map_setup setup;
   setup.prefix = "/mixer";
   setup.ptr = radio->mixer;
+  setup.payload_type = PL_KR_MIXER_PATH_INFO;
   setup.create = (kr_router_map_create_handler *)kr_mixer_mkbus;
   setup.connect = (kr_router_map_connect_handler *)kr_mixer_mkinput;
   setup.patch = (kr_router_map_patch_handler *)kr_mixer_path_ctl;
@@ -119,6 +118,7 @@ static int setup_maps(kr_radio *radio) {
   }
   setup.prefix = "/compositor";
   setup.ptr = radio->compositor;
+  setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
   setup.create = (kr_router_map_create_handler *)kr_compositor_mkbus;
   setup.connect = NULL;
   setup.patch = (kr_router_map_patch_handler *)kr_compositor_path_ctl;

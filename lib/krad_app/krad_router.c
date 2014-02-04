@@ -24,13 +24,13 @@ struct kr_route {
   void *ptr;
   kr_router_map *map;
   char name[48];
-  kr_radio_payload_type payload_type;
-  kr_radio_payload payload;
+  kr_payload payload;
 };
 
 struct kr_router_map {
   char prefix[32];
   void *ptr; /* for create */
+  kr_payload_type payload_type;
   kr_router_map_create_handler *create;
   kr_router_map_connect_handler *connect;
   kr_router_map_patch_handler *patch;
@@ -231,7 +231,7 @@ kr_route *kr_route_create(kr_router *router, kr_route_setup *setup) {
   route->ptr = setup->ctx; /* tricky ! */
   strncpy(route->name, setup->name->name, sizeof(route->name));
   setup->name->use++;
-  route->payload_type = setup->payload_type;
+  //route->payload_type = setup->payload_type;
   route->payload = setup->payload;
   printk("Created route: %s/%s", map->prefix, route->name);
   return route;
@@ -246,11 +246,11 @@ static int destroy_route(kr_router *router, kr_route *route) {
 }
 */
 
-int kr_router_handle(kr_router *router, kr_crate2 *crate) {
+int kr_router_handle(kr_router *router, kr_crate *crate) {
   int i;
   int len;
   int ret;
-  kr_crate2 outcrate;
+  kr_crate outcrate;
   address_sliced sliced;
   kr_router_map *map;
   kr_route *route;
@@ -294,7 +294,7 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         if (route == NULL) return 0;
         outcrate.method = crate->method;
         strcpy(outcrate.address, crate->address);
-        outcrate.payload_type = route->payload_type;
+        outcrate.payload_type = map->payload_type;
         outcrate.payload = route->payload;
         router->response(router->user, &outcrate);
         return 0;
@@ -307,7 +307,7 @@ int kr_router_handle(kr_router *router, kr_crate2 *crate) {
         if (route == NULL) return 0;
         outcrate.method = crate->method;
         strcpy(outcrate.address, crate->address);
-        outcrate.payload_type = route->payload_type;
+        outcrate.payload_type = map->payload_type;
         outcrate.payload = route->payload;
         router->response(router->user, &outcrate);
         return 0;
@@ -381,6 +381,7 @@ kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setu
   map->connect = setup->connect;
   map->patch = setup->patch;
   map->destroy = setup->destroy;
+  map->payload_type = setup->payload_type;
   printk("Router: Added map for: %s", map->prefix);
   return map;
 }

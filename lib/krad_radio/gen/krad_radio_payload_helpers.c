@@ -1,6 +1,6 @@
 #include "krad_radio_payload_helpers.h"
 
-int kr_radio_payload_type_to_index(int val) {
+int kr_payload_type_to_index(int val) {
   switch (val) {
     case PL_KR_NIL:
       return 0;
@@ -14,7 +14,7 @@ int kr_radio_payload_type_to_index(int val) {
   return -1;
 }
 
-char *kr_strfr_kr_radio_payload_type(int val) {
+char *kr_strfr_kr_payload_type(int val) {
   switch (val) {
     case PL_KR_NIL:
       return "pl_kr_nil";
@@ -28,7 +28,7 @@ char *kr_strfr_kr_radio_payload_type(int val) {
   return NULL;
 }
 
-int kr_strto_kr_radio_payload_type(char *string) {
+int kr_strto_kr_payload_type(char *string) {
   if (!strcmp(string,"pl_kr_nil")) {
     return PL_KR_NIL;
   }
@@ -71,12 +71,12 @@ int kr_nil_random(struct kr_nil *st) {
   return 0;
 }
 
-int kr_radio_payload_init(kr_radio_payload *st, int idx) {
+int kr_payload_init(kr_payload *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  memset(st, 0, sizeof(kr_radio_payload));
+  memset(st, 0, sizeof(kr_payload));
   switch (idx) {
     case 0: {
       kr_nil_init(&st->nil);
@@ -100,7 +100,7 @@ int kr_radio_payload_init(kr_radio_payload *st, int idx) {
   return -1;
 }
 
-int kr_radio_payload_valid(kr_radio_payload *st, int idx) {
+int kr_payload_valid(kr_payload *st, int idx) {
   if (st == NULL) {
     return -1;
   }
@@ -128,12 +128,12 @@ int kr_radio_payload_valid(kr_radio_payload *st, int idx) {
   return -1;
 }
 
-int kr_radio_payload_random(kr_radio_payload *st, int idx) {
+int kr_payload_random(kr_payload *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  memset(st, 0, sizeof(kr_radio_payload));
+  memset(st, 0, sizeof(kr_payload));
   switch (idx) {
     case 0: {
       kr_nil_random(&st->nil);

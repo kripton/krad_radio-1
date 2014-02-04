@@ -21,16 +21,16 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_alsa_path_info";
     case CGEN_KRAD_ALSA_SEQ_ST:
       return "krad_alsa_seq_St";
-    case CGEN_KR_APP_METHOD:
-      return "kr_app_method";
-    case CGEN_KR_CRATE2:
-      return "kr_crate2";
     case CGEN_KR_APP_SERVER_SETUP:
       return "kr_app_server_setup";
     case CGEN_KR_APP_SERVER_INFO:
       return "kr_app_server_info";
     case CGEN_KR_APP_SERVER_CLIENT_SETUP:
       return "kr_app_server_client_setup";
+    case CGEN_KR_METHOD:
+      return "kr_method";
+    case CGEN_KR_CRATE:
+      return "kr_crate";
     case CGEN_KR_ROUTER_INFO:
       return "kr_router_info";
     case CGEN_KR_ROUTER_MAP_INFO:
@@ -321,10 +321,10 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_track_info_St";
     case CGEN_KR_NIL:
       return "kr_nil";
-    case CGEN_KR_RADIO_PAYLOAD_TYPE:
-      return "kr_radio_payload_type";
-    case CGEN_KR_RADIO_PAYLOAD:
-      return "kr_radio_payload";
+    case CGEN_KR_PAYLOAD_TYPE:
+      return "kr_payload_type";
+    case CGEN_KR_PAYLOAD:
+      return "kr_payload";
     case CGEN_KRAD_RC_TYPE_T:
       return "krad_rc_type_t";
     case CGEN_KRAD_RC_ST:
@@ -635,12 +635,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_alsa_seq_St")) {
     return CGEN_KRAD_ALSA_SEQ_ST;
   }
-  if (!strcmp(string,"kr_app_method")) {
-    return CGEN_KR_APP_METHOD;
-  }
-  if (!strcmp(string,"kr_crate2")) {
-    return CGEN_KR_CRATE2;
-  }
   if (!strcmp(string,"kr_app_server_setup")) {
     return CGEN_KR_APP_SERVER_SETUP;
   }
@@ -649,6 +643,12 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_app_server_client_setup")) {
     return CGEN_KR_APP_SERVER_CLIENT_SETUP;
+  }
+  if (!strcmp(string,"kr_method")) {
+    return CGEN_KR_METHOD;
+  }
+  if (!strcmp(string,"kr_crate")) {
+    return CGEN_KR_CRATE;
   }
   if (!strcmp(string,"kr_router_info")) {
     return CGEN_KR_ROUTER_INFO;
@@ -1085,11 +1085,11 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_nil")) {
     return CGEN_KR_NIL;
   }
-  if (!strcmp(string,"kr_radio_payload_type")) {
-    return CGEN_KR_RADIO_PAYLOAD_TYPE;
+  if (!strcmp(string,"kr_payload_type")) {
+    return CGEN_KR_PAYLOAD_TYPE;
   }
-  if (!strcmp(string,"kr_radio_payload")) {
-    return CGEN_KR_RADIO_PAYLOAD;
+  if (!strcmp(string,"kr_payload")) {
+    return CGEN_KR_PAYLOAD;
   }
   if (!strcmp(string,"krad_rc_type_t")) {
     return CGEN_KRAD_RC_TYPE_T;
@@ -1521,7 +1521,7 @@ int codegen_is_union(char *type) {
   if (!strcmp(type,"kr_medium_params_t")) {
     return 1;
   }
-  if (!strcmp(type,"kr_radio_payload")) {
+  if (!strcmp(type,"kr_payload")) {
     return 1;
   }
   if (!strcmp(type,"kr_adapter_api_info")) {
@@ -1543,7 +1543,7 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_alsa_path_info_member")) {
     return 1;
   }
-  if (!strcmp(type,"kr_app_method")) {
+  if (!strcmp(type,"kr_method")) {
     return 1;
   }
   if (!strcmp(type,"kr_value_type")) {
@@ -1669,7 +1669,7 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_player_cmd")) {
     return 1;
   }
-  if (!strcmp(type,"kr_radio_payload_type")) {
+  if (!strcmp(type,"kr_payload_type")) {
     return 1;
   }
   if (!strcmp(type,"krad_rc_type_t")) {

@@ -9,34 +9,7 @@
 
 #include "krad_path.h"
 #include "krad_variant.h"
-
-/* here is were we link our payload */
-#include "krad_radio_payload.h"
-
-typedef struct kr_crate2 kr_crate2;
-
+#include "krad_crate.h"
 #include "krad_router.h"
-
-typedef enum {
-  KR_GET = 1,
-  KR_PUT,
-  KR_POST,
-  KR_PATCH,
-  KR_DELETE
-} kr_app_method;
-
-struct kr_crate2 {
-  char address[64];
-  kr_app_method method;
-  kr_radio_payload_type payload_type;
-  kr_radio_payload payload;
-};
-
-#include "gen/krad_app_common_to_ebml.h"
-#include "gen/krad_app_common_from_ebml.h"
-#include "gen/krad_app_common_to_json.h"
-#include "gen/krad_app_common_from_json.h"
-#include "gen/krad_app_common_to_text.h"
-#include "gen/krad_app_common_helpers.h"
 
 #endif

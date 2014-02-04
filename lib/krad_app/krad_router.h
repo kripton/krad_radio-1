@@ -19,7 +19,7 @@ typedef int (kr_router_map_create_handler)(void *, void *, void *);
 typedef int (kr_router_map_connect_handler)(void *, void *, void *, void *, void *);
 typedef int (kr_router_map_patch_handler)(void *, void *);
 typedef int (kr_router_map_destroy_handler)(void *);
-typedef int (kr_router_response_handler)(void *, kr_crate2 *crate);
+typedef int (kr_router_response_handler)(void *, kr_crate *crate);
 
 struct kr_router_info {
   char raml[8192];
@@ -33,6 +33,7 @@ struct kr_router_map_info {
 struct kr_router_map_setup {
   const char *prefix;
   void *ptr; /* for create */
+  kr_payload_type payload_type;
   kr_router_map_create_handler *create;
   kr_router_map_connect_handler *connect;
   kr_router_map_patch_handler *patch;
@@ -43,8 +44,7 @@ struct kr_route_setup {
   kr_name *name;
   void *ptr; /* for map */
   void *ctx;
-  kr_radio_payload_type payload_type;
-  kr_radio_payload payload;
+  kr_payload payload;
 };
 
 struct kr_router_setup {
@@ -56,7 +56,7 @@ struct kr_router_setup {
 };
 
 kr_route *kr_route_create(kr_router *router, kr_route_setup *setup);
-int kr_router_handle(kr_router *router, kr_crate2 *crate);
+int kr_router_handle(kr_router *router, kr_crate *crate);
 int kr_router_map_destroy(kr_router *router, kr_router_map *map);
 kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setup);
 int kr_router_info_get(kr_router *router, kr_router_info *info);

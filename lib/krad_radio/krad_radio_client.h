@@ -28,7 +28,7 @@ int kr_client_want_out (kr_client *client);
 void kr_subscribe (kr_client *client, uint32_t broadcast_id);
 void kr_subscribe_all (kr_client *client);
 int kr_poll (kr_client *client, uint32_t timeout_ms);
-int kr_crate_send(kr_client *client, kr_crate2 *crate);
+int kr_crate_send(kr_client *client, kr_crate *crate);
 int kr_get(kr_client *client, char *address);
 int kr_delete(kr_client *client, char *address);
 int kr_streamer45(kr_client *client);

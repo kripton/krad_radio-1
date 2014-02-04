@@ -75,10 +75,10 @@ struct kr_app_server_client {
 
 static int validate_local_client_header(uint8_t *header, size_t sz);
 static int validate_local_client(kr_app_server_client *client);
-static int pack_crate_remote(uint8_t *buffer, kr_crate2 *crate, size_t max);
-static int pack_crate_local(uint8_t *buffer, kr_crate2 *crate, size_t max);
-static int unpack_crate_remote(kr_crate2 *crate, kr_app_server_client *client);
-static int unpack_crate_local(kr_crate2 *crate, kr_io2_t *in);
+static int pack_crate_remote(uint8_t *buffer, kr_crate *crate, size_t max);
+static int pack_crate_local(uint8_t *buffer, kr_crate *crate, size_t max);
+static int unpack_crate_remote(kr_crate *crate, kr_app_server_client *client);
+static int unpack_crate_local(kr_crate *crate, kr_io2_t *in);
 static int handle_client(kr_app_server *server, kr_app_server_client *client);
 static void disconnect_client(kr_app_server *server, kr_app_server_client *client);
 static kr_app_server_client *accept_client(kr_app_server *server);
@@ -134,23 +134,23 @@ static int validate_local_client(kr_app_server_client *client) {
   return -1;
 }
 
-static int pack_crate_remote(uint8_t *buffer, kr_crate2 *crate, size_t max) {
+static int pack_crate_remote(uint8_t *buffer, kr_crate *crate, size_t max) {
   int res;
-  res = kr_crate2_to_json((char *)buffer, crate, max);
+  res = kr_crate_to_json((char *)buffer, crate, max);
   return res;
 }
 
-static int pack_crate_local(uint8_t *buffer, kr_crate2 *crate, size_t max) {
+static int pack_crate_local(uint8_t *buffer, kr_crate *crate, size_t max) {
   kr_ebml2_t ebml;
   uint8_t *ebml_crate;
   kr_ebml2_set_buffer(&ebml, buffer, max);
   kr_ebml2_start_element(&ebml, KR_EID_CRATE, &ebml_crate);
-  kr_crate2_to_ebml(&ebml, crate);
+  kr_crate_to_ebml(&ebml, crate);
   kr_ebml2_finish_element(&ebml, ebml_crate);
   return ebml.pos;
 }
 
-static int unpack_crate_remote(kr_crate2 *crate, kr_app_server_client *client) {
+static int unpack_crate_remote(kr_crate *crate, kr_app_server_client *client) {
   int ret;
   char json[8192];
   if (!(kr_io2_has_in(client->in))) {
@@ -159,7 +159,7 @@ static int unpack_crate_remote(kr_crate2 *crate, kr_app_server_client *client) {
   ret = client->input_cb(&client->state_tracker, json, sizeof(json), client->in->rd_buf, client->in->len);
   if (ret < 1) return 0;
   kr_io2_pulled(client->in, ret);
-  ret = kr_crate2_fr_json(json, crate);
+  ret = kr_crate_fr_json(json, crate);
   if (ret > 0) {
     return 1;
   } else {
@@ -168,7 +168,7 @@ static int unpack_crate_remote(kr_crate2 *crate, kr_app_server_client *client) {
   return 0;
 }
 
-static int unpack_crate_local(kr_crate2 *crate, kr_io2_t *in) {
+static int unpack_crate_local(kr_crate *crate, kr_io2_t *in) {
   kr_ebml2_t ebml;
   uint32_t element;
   uint64_t size;
@@ -188,7 +188,7 @@ static int unpack_crate_local(kr_crate2 *crate, kr_io2_t *in) {
     return 0;
   }
   if (element == KR_EID_CRATE) {
-    ret = kr_crate2_fr_ebml(&ebml, crate);
+    ret = kr_crate_fr_ebml(&ebml, crate);
     if (ret == 0) {
       kr_io2_pulled(in, ebml.pos);
       return 1;
@@ -198,7 +198,7 @@ static int unpack_crate_local(kr_crate2 *crate, kr_io2_t *in) {
 }
 
 static int handle_client(kr_app_server *server, kr_app_server_client *client) {
-  kr_crate2 crate;
+  kr_crate crate;
   switch (client->type) {
     case KR_APP_CLIENT_REMOTE:
       while (unpack_crate_remote(&crate, client)) {
@@ -593,7 +593,7 @@ int kr_app_server_client_create(kr_app_server *server,
   return 0;
 }
 
-int kr_app_server_crate_reply(kr_app_server *server, kr_crate2 *crate) {
+int kr_app_server_crate_reply(kr_app_server *server, kr_crate *crate) {
   int ret;
   printk("crate response");
   kr_app_server_client *client;

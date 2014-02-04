@@ -191,7 +191,7 @@ int test_x11_get(kr_client *client) {
 
 int make_masterbus(kr_client *client) {
   int ret;
-  kr_crate2 crate;
+  kr_crate crate;
   memset(&crate, 0, sizeof(crate));
   kr_mixer_path_info *masterbus;
   strcpy(crate.address, "/mixer/Master");
@@ -206,7 +206,7 @@ int make_masterbus(kr_client *client) {
 
 int make_musicbus(kr_client *client) {
   int ret;
-  kr_crate2 crate;
+  kr_crate crate;
   memset(&crate, 0, sizeof(crate));
   kr_mixer_path_info *bus;
   strcpy(crate.address, "/mixer/Music");
@@ -221,7 +221,7 @@ int make_musicbus(kr_client *client) {
 
 int make_musicmaster(kr_client *client) {
   int ret;
-  kr_crate2 crate;
+  kr_crate crate;
   memset(&crate, 0, sizeof(crate));
   kr_mixer_path_info *in;
   strcpy(crate.address, "/mixer/Master/Music");
@@ -236,7 +236,7 @@ int make_musicmaster(kr_client *client) {
 
 int make_jackinout(kr_client *client) {
   int ret;
-  kr_crate2 crate;
+  kr_crate crate;
   memset(&crate, 0, sizeof(crate));
   kr_mixer_path_info *in;
   strcpy(crate.address, "/mixer/Main/Music1");

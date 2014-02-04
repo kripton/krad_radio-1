@@ -19,10 +19,10 @@ int kr_nil_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
-int kr_radio_payload_type_to_json(char *json, void *st, int32_t max) {
+int kr_payload_type_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
-  kr_radio_payload_type *actual;
+  kr_payload_type *actual;
 
   res = 0;
 
@@ -30,20 +30,20 @@ int kr_radio_payload_type_to_json(char *json, void *st, int32_t max) {
     return -1;
   }
 
-  actual = (kr_radio_payload_type *)st;
+  actual = (kr_payload_type *)st;
 
-  type = kr_strfr_kr_radio_payload_type(*actual);
+  type = kr_strfr_kr_payload_type(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
 
-int kr_radio_payload_to_json(char *json, void *st, int32_t max) {
+int kr_payload_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
 
-  kr_radio_payload *actual;
+  kr_payload *actual;
 
   res = 0;
 
@@ -57,7 +57,7 @@ int kr_radio_payload_to_json(char *json, void *st, int32_t max) {
     return -1;
   }
 
-  actual = (kr_radio_payload *)uber_actual->actual;
+  actual = (kr_payload *)uber_actual->actual;
 
   switch (uber_actual->type) {
     case 0: {

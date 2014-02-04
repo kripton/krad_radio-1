@@ -3,7 +3,7 @@
 
 int kr_xpdr_mkpath(kr_client *client, char *name, kr_transponder_path_info *info) {
   int ret;
-  kr_crate2 crate;
+  kr_crate crate;
   if (client == NULL) return -1;
   if (name == NULL) return -2;
   if (info == NULL) return -3;

@@ -166,11 +166,11 @@ ssize_t rest_pack(void *ctx, void *out, size_t max, void *in, size_t len) {
 }
 
 ssize_t rest_unpack(void *ctx, void *out, size_t max, void *in, size_t len) {
-  kr_crate2 crate;
+  kr_crate crate;
   memset(&crate, 0, sizeof(crate));
   strcpy(crate.address, in + 4);
   crate.method = KR_GET;
-  kr_crate2_to_json(out, &crate, max);
+  kr_crate_to_json(out, &crate, max);
   return len;
 }
 

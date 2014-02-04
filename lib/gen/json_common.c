@@ -1,8 +1,8 @@
 #include "gen.h"
 int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
   const info_pack_to_json_func to_json_functions[63] = {kr_alsa_info_to_json,
-  kr_alsa_path_info_to_json,kr_app_method_to_json,
-  kr_crate2_to_json,kr_easing_to_json,
+  kr_alsa_path_info_to_json,kr_method_to_json,
+  kr_crate_to_json,kr_easing_to_json,
   kr_compositor_path_type_to_json,kr_compositor_subunit_type_to_json,
   kr_vector_type_to_json,kr_compositor_control_to_json,
   kr_compositor_controls_to_json,kr_sprite_info_to_json,
@@ -15,8 +15,8 @@ int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
   kr_jack_setup_info_to_json,kr_jack_info_to_json,
   kr_jack_path_info_to_json,kr_mixer_channels_to_json,
   kr_mixer_path_type_to_json,kr_mixer_path_info_to_json,
-  kr_nil_to_json,kr_radio_payload_type_to_json,
-  kr_radio_payload_to_json,kr_sfx_control_to_json,
+  kr_nil_to_json,kr_payload_type_to_json,
+  kr_payload_to_json,kr_sfx_control_to_json,
   kr_sfx_effect_type_to_json,kr_sfx_effect_control_to_json,
   kr_eq_band_info_to_json,kr_eq_info_to_json,
   kr_lowpass_info_to_json,kr_highpass_info_to_json,

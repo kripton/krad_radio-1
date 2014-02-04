@@ -1,6 +1,6 @@
-#include "krad_app_common_from_json.h"
+#include "krad_crate_from_json.h"
 
-int kr_app_method_fr_json(char *json, void *st) {
+int kr_method_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -33,7 +33,7 @@ int kr_app_method_fr_json(char *json, void *st) {
   return res;
 }
 
-int kr_crate2_fr_json(char *json, void *st) {
+int kr_crate_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
   uber_St uber_sub;
@@ -44,7 +44,7 @@ int kr_crate2_fr_json(char *json, void *st) {
   jsmnerr_t err;
   int ntokens;
   int k;
-  struct kr_crate2 *actual;
+  struct kr_crate *actual;
 
   res = 0;
 
@@ -52,7 +52,7 @@ int kr_crate2_fr_json(char *json, void *st) {
     return -1;
   }
 
-  actual = (struct kr_crate2 *)st;
+  actual = (struct kr_crate *)st;
 
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
@@ -102,7 +102,7 @@ int kr_crate2_fr_json(char *json, void *st) {
     return -2;
   }
   json[tokens[k].end] = '\0';
-  type = kr_strto_kr_app_method(&json[tokens[k].start]);
+  type = kr_strto_kr_method(&json[tokens[k].start]);
   if (type < 0) {
     return -2;
   }
@@ -123,7 +123,7 @@ int kr_crate2_fr_json(char *json, void *st) {
     return -3;
   }
   json[tokens[k].end] = '\0';
-  type = kr_strto_kr_radio_payload_type(&json[tokens[k].start]);
+  type = kr_strto_kr_payload_type(&json[tokens[k].start]);
   if (type < 0) {
     return -3;
   }
@@ -144,11 +144,11 @@ int kr_crate2_fr_json(char *json, void *st) {
     return -4;
   }
 
-  index = kr_radio_payload_type_to_index(actual->payload_type);
+  index = kr_payload_type_to_index(actual->payload_type);
   uber_sub.type = index;
   uber_sub.actual = &(actual->payload);
   uber.actual = &(uber_sub);
-  uber.type = DEJSON_KR_RADIO_PAYLOAD;
+  uber.type = DEJSON_KR_PAYLOAD;
   json[tokens[k].end] = '\0';
   res += info_unpack_fr_json(&json[tokens[k].start],&uber);
   if (res < 0) {

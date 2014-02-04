@@ -56,7 +56,7 @@ int kr_nil_fr_json(char *json, void *st) {
   return res;
 }
 
-int kr_radio_payload_type_fr_json(char *json, void *st) {
+int kr_payload_type_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -89,7 +89,7 @@ int kr_radio_payload_type_fr_json(char *json, void *st) {
   return res;
 }
 
-int kr_radio_payload_fr_json(char *json, void *st) {
+int kr_payload_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
   jsmn_parser parser;
@@ -99,7 +99,7 @@ int kr_radio_payload_fr_json(char *json, void *st) {
   int k;
   uber_St *uber_actual;
 
-  kr_radio_payload *actual;
+  kr_payload *actual;
 
   res = 0;
 
@@ -113,7 +113,7 @@ int kr_radio_payload_fr_json(char *json, void *st) {
     return -1;
   }
 
-  actual = (kr_radio_payload *)uber_actual->actual;
+  actual = (kr_payload *)uber_actual->actual;
 
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
