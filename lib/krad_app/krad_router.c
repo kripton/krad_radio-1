@@ -51,9 +51,18 @@ int kr_router_info_get(kr_router *router, kr_router_info *info) {
   while ((map = kr_pool_iterate_active(router->maps, &i))) {
     p += snprintf(info->raml + p, m - p, "%s:\n", map->prefix);
     if (1) p += snprintf(info->raml + p, m - p, "  get:\n");
-    if (map->create) p += snprintf(info->raml + p, m - p, "  put:\n");
-    if (map->patch) p += snprintf(info->raml + p, m - p, "  patch:\n");
-    if (map->destroy) p += snprintf(info->raml + p, m - p, "  delete:\n");
+    if (1) p += snprintf(info->raml + p, m - p, "  /{name}:\n");
+    if (1) p += snprintf(info->raml + p, m - p, "    get:\n");
+    if (map->create) p += snprintf(info->raml + p, m - p, "    put:\n");
+    if (map->patch) p += snprintf(info->raml + p, m - p, "    patch:\n");
+    if (map->destroy) p += snprintf(info->raml + p, m - p, "    delete:\n");
+    if (map->connect) {
+      if (1) p += snprintf(info->raml + p, m - p, "  /{name}/{name2}:\n");
+      if (1) p += snprintf(info->raml + p, m - p, "    get:\n");
+      if (map->create) p += snprintf(info->raml + p, m - p, "    put:\n");
+      if (map->patch) p += snprintf(info->raml + p, m - p, "    patch:\n");
+      if (map->destroy) p += snprintf(info->raml + p, m - p, "    delete:\n");
+    }
   }
   return 0;
 }

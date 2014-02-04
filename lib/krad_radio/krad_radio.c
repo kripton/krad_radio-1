@@ -120,6 +120,7 @@ static int setup_maps(kr_radio *radio) {
   setup.prefix = "/compositor";
   setup.ptr = radio->compositor;
   setup.create = (kr_router_map_create_handler *)kr_compositor_mkbus;
+  setup.connect = NULL;
   setup.patch = (kr_router_map_patch_handler *)kr_compositor_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
@@ -130,6 +131,7 @@ static int setup_maps(kr_radio *radio) {
   setup.prefix = "/transponder";
   setup.ptr = radio->transponder;
   setup.create = (kr_router_map_create_handler *)kr_transponder_mkpath;
+  setup.connect = NULL;
   setup.patch = (kr_router_map_patch_handler *)kr_transponder_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_transponder_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
