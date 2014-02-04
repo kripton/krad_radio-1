@@ -26,9 +26,8 @@ struct kr_compositor_path_setup {
   void *control_user;
   void *frane_user;
   kr_compositor_path_frame_cb *frame_cb;
-  /*kr_compositor_path *from;
+  kr_compositor_path *from;
   kr_compositor_path *to;
-  */
 };
 
 
@@ -75,13 +74,15 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   event.path = path;
   event.type = KR_COMP_CREATE;
   event.info = path->info;
-  /*
-  Dunno about this
-  if (path->type == KR_COMP_INPUT) {
-    kr_graph_edge_create(path->comp->graph, setup->to->vertex, setup->from->vertex, path);
+  if (path->type == KR_COM_INPUT) {
+    kr_graph_edge_create(path->compositor->graph, setup->to->vertex, setup->from->vertex, path);
   } else {
-    path->vertex = kr_graph_vertex_create(path->comp->graph, setup->info->type, path);
-  }*/
+    path->vertex = kr_graph_vertex_create(path->compositor->graph, setup->info->type, path);
+  }
+  if (path->vertex == NULL) {
+    kr_pool_recycle(path->compositor->path_pool, path);
+    return NULL;
+  }
   path->compositor->event_cb(&event);
   return path;
 }
@@ -248,6 +249,8 @@ int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from,
   setup.control_user = user;
   setup.frame_user = NULL;
   setup.frame_cb = NULL;
+  setup.from = from;
+  setup.to = to;
   path = path_create(compositor, &setup);
   if (path == NULL) return -2;
   return 0;

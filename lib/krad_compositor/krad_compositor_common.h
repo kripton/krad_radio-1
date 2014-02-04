@@ -8,15 +8,15 @@
 #include "krad_perspective_common.h"
 
 typedef enum {
-  KR_OVERLAY = 1,
-  KR_COMP_INPUT,
-  KR_COMP_BUS,
-  KR_COMP_OUTPUT
+  KR_COM_SOURCE = 1,
+  KR_COM_OVERLAY,
+  KR_COM_INPUT,
+  KR_COM_BUS,
+  KR_COM_OUTPUT
 } kr_compositor_path_type;
 
 typedef enum {
-  KR_COMP_PATH = 1,
-  KR_SPRITE,
+  KR_SPRITE = 1,
   KR_TEXT,
   KR_VECTOR
 } kr_compositor_overlay_type;

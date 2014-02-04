@@ -74,66 +74,69 @@ kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string
 
 int kr_compositor_path_type_to_index(int val) {
   switch (val) {
-    case KR_OVERLAY:
+    case KR_COM_SOURCE:
       return 0;
-    case KR_COMP_INPUT:
+    case KR_COM_OVERLAY:
       return 1;
-    case KR_COMP_BUS:
+    case KR_COM_INPUT:
       return 2;
-    case KR_COMP_OUTPUT:
+    case KR_COM_BUS:
       return 3;
+    case KR_COM_OUTPUT:
+      return 4;
   }
   return -1;
 }
 
 char *kr_strfr_kr_compositor_path_type(int val) {
   switch (val) {
-    case KR_OVERLAY:
-      return "kr_overlay";
-    case KR_COMP_INPUT:
-      return "kr_comp_input";
-    case KR_COMP_BUS:
-      return "kr_comp_bus";
-    case KR_COMP_OUTPUT:
-      return "kr_comp_output";
+    case KR_COM_SOURCE:
+      return "kr_com_source";
+    case KR_COM_OVERLAY:
+      return "kr_com_overlay";
+    case KR_COM_INPUT:
+      return "kr_com_input";
+    case KR_COM_BUS:
+      return "kr_com_bus";
+    case KR_COM_OUTPUT:
+      return "kr_com_output";
   }
   return NULL;
 }
 
 int kr_strto_kr_compositor_path_type(char *string) {
-  if (!strcmp(string,"kr_overlay")) {
-    return KR_OVERLAY;
+  if (!strcmp(string,"kr_com_source")) {
+    return KR_COM_SOURCE;
   }
-  if (!strcmp(string,"kr_comp_input")) {
-    return KR_COMP_INPUT;
+  if (!strcmp(string,"kr_com_overlay")) {
+    return KR_COM_OVERLAY;
   }
-  if (!strcmp(string,"kr_comp_bus")) {
-    return KR_COMP_BUS;
+  if (!strcmp(string,"kr_com_input")) {
+    return KR_COM_INPUT;
   }
-  if (!strcmp(string,"kr_comp_output")) {
-    return KR_COMP_OUTPUT;
+  if (!strcmp(string,"kr_com_bus")) {
+    return KR_COM_BUS;
+  }
+  if (!strcmp(string,"kr_com_output")) {
+    return KR_COM_OUTPUT;
   }
   return -1;
 }
 
 int kr_compositor_overlay_type_to_index(int val) {
   switch (val) {
-    case KR_COMP_PATH:
-      return 0;
     case KR_SPRITE:
-      return 1;
+      return 0;
     case KR_TEXT:
-      return 2;
+      return 1;
     case KR_VECTOR:
-      return 3;
+      return 2;
   }
   return -1;
 }
 
 char *kr_strfr_kr_compositor_overlay_type(int val) {
   switch (val) {
-    case KR_COMP_PATH:
-      return "kr_comp_path";
     case KR_SPRITE:
       return "kr_sprite";
     case KR_TEXT:
@@ -145,9 +148,6 @@ char *kr_strfr_kr_compositor_overlay_type(int val) {
 }
 
 int kr_strto_kr_compositor_overlay_type(char *string) {
-  if (!strcmp(string,"kr_comp_path")) {
-    return KR_COMP_PATH;
-  }
   if (!strcmp(string,"kr_sprite")) {
     return KR_SPRITE;
   }

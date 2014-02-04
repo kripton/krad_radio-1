@@ -6,7 +6,6 @@
 #include "krad_perspective.h"
 
 typedef struct kr_compositor_path kr_compositor_path;
-typedef struct kr_compositor_path_setup kr_compositor_path_setup;
 
 int kr_compositor_process(kr_compositor_path *path);
 int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch);
