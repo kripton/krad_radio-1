@@ -8,11 +8,10 @@
 #include "krad_perspective.h"
 
 typedef enum {
-  KR_COMP_SOURCE = 1,
+  KR_OVERLAY = 1,
   KR_COMP_INPUT,
   KR_COMP_BUS,
   KR_COMP_OUTPUT,
-  KR_OVERLAY
 } kr_compositor_path_type;
 
 typedef enum {
