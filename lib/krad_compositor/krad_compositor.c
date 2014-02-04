@@ -22,7 +22,7 @@ static void overlays_free(kr_compositor *compositor);
 static void overlays_create(kr_compositor *compositor);
 
 static void overlays_free(kr_compositor *com) {
-/*  int i;
+  int i;
   i = 0;
   void *overlay;
   while ((overlay = kr_pool_iterate_active(com->sprite_pool, &i))) {
@@ -30,7 +30,7 @@ static void overlays_free(kr_compositor *com) {
     kr_pool_recycle(com->sprite_pool, overlay);
   }
   while ((overlay = kr_pool_iterate_active(com->text_pool, &i))) {
-    kr_text_clear(com->text_pool, overlay);
+    kr_text_clear(overlay);
     kr_pool_recycle(com->text_pool, overlay);
   }
   while ((overlay = kr_pool_iterate_active(com->vector_pool, &i))) {
@@ -39,7 +39,7 @@ static void overlays_free(kr_compositor *com) {
   kr_pool_destroy(com->sprite_pool);
   kr_pool_destroy(com->vector_pool);
   kr_pool_destroy(com->text_pool);
-  FT_Done_FreeType(com->ftlib);*/
+  FT_Done_FreeType(com->ftlib);
 }
 
 static void overlays_create(kr_compositor *compositor) {
