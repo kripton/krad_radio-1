@@ -5,7 +5,7 @@
 #define KR_COMPOSITOR_HEIGHT 4320
 
 #include "krad_system.h"
-#include "krad_perspective.h"
+#include "krad_perspective_common.h" 
 
 typedef enum {
   KR_OVERLAY = 1,
