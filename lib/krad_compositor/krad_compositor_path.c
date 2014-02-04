@@ -39,51 +39,6 @@ kr_compositor_path_type path_type_get(kr_compositor_path *path) {
   return path->info.type;
 }
 
-/*void controls_tick(kr_compositor_controls *c, path_control_easers *e) {
-  if (kr_easer_active(&e->x)) {
-    c->x = kr_easer_process(&e->x, c->x, NULL);
-  }
-  if (kr_easer_active(&e->y)) {
-    c->y = kr_easer_process(&e->y, c->y, NULL);
-  }
-  //if (kr_easer_active(&e->z)) {
-  //  c->z = kr_easer_process(&e->z, c->z, NULL);
-  //}
-  if (kr_easer_active(&e->w)) {
-    c->w = kr_easer_process(&e->w, c->w, NULL);
-  }
-  if (kr_easer_active(&e->h)) {
-    c->h = kr_easer_process(&e->h, c->h, NULL);
-  }
-  if (kr_easer_active(&e->opacity)) {
-    c->opacity = kr_easer_process(&e->opacity, c->opacity, NULL);
-  }
-  if (kr_easer_active(&e->rotation)) {
-    c->rotation = kr_easer_process(&e->rotation, c->rotation, NULL);
-  }
-}*/
-
-static void path_tick(kr_compositor_path *path) {
-  /*controls_tick(&path->info.controls, &path->easers);
-  if (kr_easer_active(&path->crop_x_easer)) {
-    path->info.crop_x = kr_easer_process(&path->crop_x_easer,
-     path->info.crop_x, NULL);
-  }
-  if (kr_easer_active(&path->crop_y_easer)) {
-    path->info.crop_y = kr_easer_process(&path->crop_y_easer,
-     path->info.crop_y, NULL);
-  }
-  if (kr_easer_active(&path->crop_width_easer)) {
-    path->info.crop_width = kr_easer_process(&path->crop_width_easer,
-     path->info.crop_width, NULL);
-  }
-  if (kr_easer_active(&path->crop_height_easer)) {
-    path->info.crop_height = kr_easer_process(&path->crop_height_easer,
-     path->info.crop_height, NULL);
-  }
-  */
-}
-
 void path_output(kr_compositor_path *path, kr_image *image) {
   kr_compositor_path_frame_cb_arg cb_arg;
   cb_arg.user = path->frame_user;
@@ -183,10 +138,6 @@ static void path_create(kr_compositor_path *path,
  kr_compositor_io_path_setup *setup) {
   kr_compositor_event event;
   path->info = setup->info;
-  /* FIXME a silly default? 
-  path->info.controls.opacity = 0.0f;*/
-  /*kr_easer_set(&path->easers.opacity, 1.0f, 60, EASEINOUTSINE, NULL);*/
-  /* End silly thing */
   path->frame_user = setup->frame_user;
   path->control_user = setup->control_user;
   path->frame_cb = setup->frame_cb;
@@ -218,13 +169,6 @@ kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
     printke("compositor mkpath failed setup check");
     return NULL;
   }
-  /*
-  path = kr_mixer_find(mixer, setup->info.name);
-  if (path != NULL) {
-    printke("mixer mkpath path with that name already exists");
-    return NULL;
-  }
-  */
   path = kr_pool_slice(compositor->path_pool);
   if (path == NULL) {
     printke("compositor mkpath could not slice new path");
@@ -267,45 +211,34 @@ int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_pat
   int ret;
   if ((path == NULL) || (patch == NULL)) return -1;
   ret = kr_compositor_path_info_patch_apply(&path->info, patch);
-  /*
-  switch (s->control) {
+/*  switch (s->control) {
     case KR_NO:
       return -1;
     case KR_X:
-      kr_easer_set(&p->easers.x, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_Y:
-      kr_easer_set(&p->easers.y, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_Z:
      break;
     case KR_WIDTH:
-      kr_easer_set(&p->easers.w, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_HEIGHT:
-      kr_easer_set(&p->easers.h, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_ROTATION:
-      kr_easer_set(&p->easers.rotation, s->real, s->duration, s->easing, NULL);
       break;
     case KR_OPACITY:
-      kr_easer_set(&p->easers.opacity, s->real, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_RED:
     case KR_GREEN:
     case KR_BLUE:
     case KR_ALPHA:
     case KR_CROP_X:
-      kr_easer_set(&p->crop_x_easer, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_CROP_Y:
-      kr_easer_set(&p->crop_y_easer, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_CROP_W:
-      kr_easer_set(&p->crop_width_easer, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_CROP_H:
-      kr_easer_set(&p->crop_height_easer, s->integer, s->duration, EASEINOUTSINE, NULL);
       break;
     case KR_VIEW_TL_X:
       p->info.view.top_left.x = s->real;
@@ -333,8 +266,7 @@ int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_pat
       break;
     default:
       break;
-  }
-  */
+  }*/
   return ret;
 }
 
