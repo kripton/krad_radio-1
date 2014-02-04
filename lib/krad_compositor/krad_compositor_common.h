@@ -15,7 +15,7 @@ typedef enum {
 } kr_compositor_path_type;
 
 typedef enum {
-  KR_COMP_PATH = 1,
+  KR_COMP_OVERLAY = 1,
   KR_SPRITE,
   KR_TEXT,
   KR_VECTOR
@@ -29,6 +29,7 @@ typedef struct kr_compositor_input_info kr_compositor_input_info;
 typedef struct kr_compositor_bus_info kr_compositor_bus_info;
 typedef struct kr_compositor_output_info kr_compositor_output_info;
 typedef struct kr_compositor_path_info kr_compositor_path_info;
+typedef struct kr_compositor_overlay_info kr_compositor_overlay_info;
 
 struct kr_rect {
   int16_t x;
@@ -73,19 +74,19 @@ struct kr_compositor_path_info {
   kr_compositor_path_type_info info;
 };
 
-struct kr_sprite_info {
-  char filename[256];
-  int32_t rate;
-  kr_compositor_input_info input_info;
-};
+#include "krad_text_common.h"
+#include "krad_vector_common.h"
+#include "krad_sprite_common.h"
 
-struct kr_text_info {
-  char string[512];
-  char font[256];
-  float red;
-  float green;
-  float blue;
-  kr_compositor_input_info input_info;
+typedef union {
+  kr_text_info text;
+  kr_vector_info vector;
+  kr_sprite_info sprite;
+} kr_overlay_type_info;
+
+struct kr_overlay_info {
+  kr_compositor_overlay_type type;
+  kr_overlay_type_info info;
 };
 
 void kr_aspect_scale(int srcw, int srch, int dstw, int dsth, int *w, int *h);
@@ -96,7 +97,5 @@ void kr_aspect_scale(int srcw, int srch, int dstw, int dsth, int *w, int *h);
 #include "gen/krad_compositor_common_from_ebml.h"
 #include "gen/krad_compositor_common_to_text.h"
 #include "gen/krad_compositor_common_helpers.h"
-
-#include "krad_vector_common.h"
 
 #endif

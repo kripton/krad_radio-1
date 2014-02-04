@@ -13,9 +13,6 @@ kr_vector_info_member kr_vector_info_strto_member(char *string, int len) {
   if (!strncmp(string,"blue",len)) {
     return KR_VECTOR_INFO_BLUE;
   }
-  if (!strncmp(string,"input_info",len)) {
-    return KR_VECTOR_INFO_INPUT_INFO;
-  }
   return -1;
 }
 
@@ -120,13 +117,13 @@ int kr_strto_kr_vector_type(char *string) {
 }
 
 int kr_vector_info_patch_apply(struct kr_vector_info *info, kr_vector_info_patch *patch) {
-  const ptrdiff_t off[5] = { offsetof(struct kr_vector_info, type), 
+  const ptrdiff_t off[4] = { offsetof(struct kr_vector_info, type), 
     offsetof(struct kr_vector_info, red), offsetof(struct kr_vector_info, green), 
-    offsetof(struct kr_vector_info, blue), offsetof(struct kr_vector_info, input_info)
+    offsetof(struct kr_vector_info, blue)
   };
-  const size_t sz[5] = { sizeof(info->type), 
+  const size_t sz[4] = { sizeof(info->type), 
     sizeof(info->red), sizeof(info->green), 
-    sizeof(info->blue), sizeof(info->input_info)  };
+    sizeof(info->blue)  };
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
@@ -141,9 +138,6 @@ kr_var *kr_vector_info_patch_path(kr_vector_info_patch *patch, kr_path *path) {
   patch->member = kr_vector_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
-    case KR_VECTOR_INFO_INPUT_INFO:
-       if (kr_path_step(path) != 0) return NULL;
-       return kr_compositor_input_info_patch_path(&patch->value.input_info_patch, path);
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
@@ -158,7 +152,6 @@ int kr_vector_info_init(struct kr_vector_info *st) {
   }
 
   memset(st, 0, sizeof(struct kr_vector_info));
-  kr_compositor_input_info_init(&st->input_info);
 
   return 0;
 }
@@ -168,7 +161,6 @@ int kr_vector_info_valid(struct kr_vector_info *st) {
     return -1;
   }
 
-  kr_compositor_input_info_valid(&st->input_info);
 
   return 0;
 }
@@ -179,7 +171,6 @@ int kr_vector_info_random(struct kr_vector_info *st) {
   }
 
   memset(st, 0, sizeof(struct kr_vector_info));
-  kr_compositor_input_info_random(&st->input_info);
 
   return 0;
 }

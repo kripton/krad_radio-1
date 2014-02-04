@@ -22,7 +22,8 @@ struct kr_compositor_path {
 };
 
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
-static int path_render(kr_compositor_path *path, kr_image *image, cairo_t *cr);
+static int path_render(kr_compositor_path *path, 
+  kr_compositor_input_info *input_info, kr_image *image, cairo_t *cr);
 static void path_tick(kr_compositor_path *path);
 
 static float kr_round3(float f) {
@@ -46,7 +47,8 @@ void path_output(kr_compositor_path *path, kr_image *image) {
   memcpy(cb_arg.image.px, image->px, image->w * image->h * 4);
 }
 
-int path_render(kr_compositor_path *path, kr_image *dst, cairo_t *cr) {
+int path_render(kr_compositor_path *path, 
+  kr_compositor_input_info *input_info, kr_image *dst, cairo_t *cr) {
 
 //   int ret;
 //   kr_image image;

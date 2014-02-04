@@ -1,3 +1,7 @@
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "krad_perspective.h"
 
 typedef struct kr_coord kr_coord;

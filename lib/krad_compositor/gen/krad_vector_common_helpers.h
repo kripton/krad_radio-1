@@ -8,13 +8,11 @@ typedef enum {
   KR_VECTOR_INFO_TYPE = 1,
   KR_VECTOR_INFO_RED = 2,
   KR_VECTOR_INFO_GREEN = 3,
-  KR_VECTOR_INFO_BLUE = 4,
-  KR_VECTOR_INFO_INPUT_INFO = 5
+  KR_VECTOR_INFO_BLUE = 4
 } kr_vector_info_member;
 
 typedef struct {
   kr_var var;
-  kr_compositor_input_info_patch input_info_patch;
 } kr_vector_info_patch_value;
 
 typedef struct {

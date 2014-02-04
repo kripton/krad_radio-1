@@ -1,38 +1,14 @@
 #ifndef KRAD_PERSPECTIVE_H
 #define KRAD_PERSPECTIVE_H
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include <inttypes.h>
-
 #include "krad_timer.h"
 #include "krad_av.h"
 
 typedef struct kr_perspective kr_perspective;
-typedef struct kr_perspective_view kr_perspective_view;
 typedef struct kr_perspective_priv kr_perspective_priv;
-typedef struct kr_pos kr_pos;
 
-struct kr_pos {
-  uint32_t x;
-  uint32_t y;
-};
-
-struct kr_perspective_view {
-  kr_pos top_left;
-  kr_pos top_right;
-  kr_pos bottom_left;
-  kr_pos bottom_right;
-};
-
-#include "gen/krad_perspective_to_json.h"
-#include "gen/krad_perspective_from_json.h"
-#include "gen/krad_perspective_to_ebml.h"
-#include "gen/krad_perspective_from_ebml.h"
-#include "gen/krad_perspective_to_text.h"
-#include "gen/krad_perspective_helpers.h"
+#include "krad_perspective_common.h"
 
 struct kr_perspective {
   kr_perspective_priv *priv;

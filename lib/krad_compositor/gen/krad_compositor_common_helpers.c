@@ -62,37 +62,12 @@ kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string
   return -1;
 }
 
-kr_sprite_info_member kr_sprite_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"filename",len)) {
-    return KR_SPRITE_INFO_FILENAME;
+kr_overlay_info_member kr_overlay_info_strto_member(char *string, int len) {
+  if (!strncmp(string,"type",len)) {
+    return KR_OVERLAY_INFO_TYPE;
   }
-  if (!strncmp(string,"rate",len)) {
-    return KR_SPRITE_INFO_RATE;
-  }
-  if (!strncmp(string,"input_info",len)) {
-    return KR_SPRITE_INFO_INPUT_INFO;
-  }
-  return -1;
-}
-
-kr_text_info_member kr_text_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"string",len)) {
-    return KR_TEXT_INFO_STRING;
-  }
-  if (!strncmp(string,"font",len)) {
-    return KR_TEXT_INFO_FONT;
-  }
-  if (!strncmp(string,"red",len)) {
-    return KR_TEXT_INFO_RED;
-  }
-  if (!strncmp(string,"green",len)) {
-    return KR_TEXT_INFO_GREEN;
-  }
-  if (!strncmp(string,"blue",len)) {
-    return KR_TEXT_INFO_BLUE;
-  }
-  if (!strncmp(string,"input_info",len)) {
-    return KR_TEXT_INFO_INPUT_INFO;
+  if (!strncmp(string,"info",len)) {
+    return KR_OVERLAY_INFO_INFO;
   }
   return -1;
 }
@@ -143,7 +118,7 @@ int kr_strto_kr_compositor_path_type(char *string) {
 
 int kr_compositor_overlay_type_to_index(int val) {
   switch (val) {
-    case KR_COMP_PATH:
+    case KR_COMP_OVERLAY:
       return 0;
     case KR_SPRITE:
       return 1;
@@ -157,8 +132,8 @@ int kr_compositor_overlay_type_to_index(int val) {
 
 char *kr_strfr_kr_compositor_overlay_type(int val) {
   switch (val) {
-    case KR_COMP_PATH:
-      return "kr_comp_path";
+    case KR_COMP_OVERLAY:
+      return "kr_comp_overlay";
     case KR_SPRITE:
       return "kr_sprite";
     case KR_TEXT:
@@ -170,8 +145,8 @@ char *kr_strfr_kr_compositor_overlay_type(int val) {
 }
 
 int kr_strto_kr_compositor_overlay_type(char *string) {
-  if (!strcmp(string,"kr_comp_path")) {
-    return KR_COMP_PATH;
+  if (!strcmp(string,"kr_comp_overlay")) {
+    return KR_COMP_OVERLAY;
   }
   if (!strcmp(string,"kr_sprite")) {
     return KR_SPRITE;
@@ -327,64 +302,26 @@ kr_var *kr_compositor_path_info_patch_path(kr_compositor_path_info_patch *patch,
   return &patch->value.var;
 }
 
-int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch *patch) {
-  const ptrdiff_t off[3] = { offsetof(struct kr_sprite_info, filename), 
-    offsetof(struct kr_sprite_info, rate), offsetof(struct kr_sprite_info, input_info)
+int kr_overlay_info_patch_apply(struct kr_overlay_info *info, kr_overlay_info_patch *patch) {
+  const ptrdiff_t off[2] = { offsetof(struct kr_overlay_info, type), 
+    offsetof(struct kr_overlay_info, info)
   };
-  const size_t sz[3] = { sizeof(info->filename), 
-    sizeof(info->rate), sizeof(info->input_info)  };
+  const size_t sz[2] = { sizeof(info->type), 
+    sizeof(info->info)  };
 
   memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
   return 0;
 }
 
-kr_var *kr_sprite_info_patch_path(kr_sprite_info_patch *patch, kr_path *path) {
+kr_var *kr_overlay_info_patch_path(kr_overlay_info_patch *patch, kr_path *path) {
   char *name;
   int len;
   if (patch == NULL) return NULL;
   if (path == NULL) return NULL;
   len = kr_path_cur_name(path, &name);
-  patch->member = kr_sprite_info_strto_member(name, len);
+  patch->member = kr_overlay_info_strto_member(name, len);
   if (patch->member < 1) return NULL;
   switch(patch->member) {
-    case KR_SPRITE_INFO_INPUT_INFO:
-       if (kr_path_step(path) != 0) return NULL;
-       return kr_compositor_input_info_patch_path(&patch->value.input_info_patch, path);
-    default:
-      if (kr_path_steps_ahead(path) != 0) return NULL;
-      break;
-  }
-  /*patch->value.var.type = NN; not sure about this uhm*/
-  return &patch->value.var;
-}
-
-int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patch) {
-  const ptrdiff_t off[6] = { offsetof(struct kr_text_info, string), 
-    offsetof(struct kr_text_info, font), offsetof(struct kr_text_info, red), 
-    offsetof(struct kr_text_info, green), offsetof(struct kr_text_info, blue), 
-    offsetof(struct kr_text_info, input_info)
-  };
-  const size_t sz[6] = { sizeof(info->string), 
-    sizeof(info->font), sizeof(info->red), 
-    sizeof(info->green), sizeof(info->blue), 
-    sizeof(info->input_info)  };
-
-  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
-  return 0;
-}
-
-kr_var *kr_text_info_patch_path(kr_text_info_patch *patch, kr_path *path) {
-  char *name;
-  int len;
-  if (patch == NULL) return NULL;
-  if (path == NULL) return NULL;
-  len = kr_path_cur_name(path, &name);
-  patch->member = kr_text_info_strto_member(name, len);
-  if (patch->member < 1) return NULL;
-  switch(patch->member) {
-    case KR_TEXT_INFO_INPUT_INFO:
-       if (kr_path_step(path) != 0) return NULL;
-       return kr_compositor_input_info_patch_path(&patch->value.input_info_patch, path);
     default:
       if (kr_path_steps_ahead(path) != 0) return NULL;
       break;
@@ -663,131 +600,108 @@ int kr_compositor_path_info_random(struct kr_compositor_path_info *st) {
   return 0;
 }
 
-int kr_sprite_info_init(struct kr_sprite_info *st) {
+int kr_overlay_type_info_init(kr_overlay_type_info *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_sprite_info));
-  kr_compositor_input_info_init(&st->input_info);
-
-  return 0;
-}
-
-int kr_sprite_info_valid(struct kr_sprite_info *st) {
-  int i;
-
-  if (st == NULL) {
-    return -1;
-  }
-
-  for (i = 0; i < 256; i++) {
-    if (!st->filename[i]) {
+  memset(st, 0, sizeof(kr_overlay_type_info));
+  switch (idx) {
+    case 0: {
+      kr_text_info_init(&st->text);
       break;
     }
-    if (i == 255 && st->filename[i]) {
-      return -2;
-    }
-  }
-  kr_compositor_input_info_valid(&st->input_info);
-
-  return 0;
-}
-
-int kr_sprite_info_random(struct kr_sprite_info *st) {
-  int i;
-
-  struct timeval tv;
-  double scale;
-
-  gettimeofday(&tv, NULL);
-  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
-
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(struct kr_sprite_info));
-  for (i = 0; i < 256; i++) {
-    scale = (double)25 / RAND_MAX;
-    st->filename[i] = 97 + floor(rand() * scale);
-    if (i == 255) {
-      st->filename[255] = '\0';
-    }
-  }
-  kr_compositor_input_info_random(&st->input_info);
-
-  return 0;
-}
-
-int kr_text_info_init(struct kr_text_info *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-  memset(st, 0, sizeof(struct kr_text_info));
-  kr_compositor_input_info_init(&st->input_info);
-
-  return 0;
-}
-
-int kr_text_info_valid(struct kr_text_info *st) {
-  int i;
-
-  if (st == NULL) {
-    return -1;
-  }
-
-  for (i = 0; i < 512; i++) {
-    if (!st->string[i]) {
+    case 1: {
+      kr_vector_info_init(&st->vector);
       break;
     }
-    if (i == 511 && st->string[i]) {
-      return -2;
-    }
-  }
-  for (i = 0; i < 256; i++) {
-    if (!st->font[i]) {
+    case 2: {
+      kr_sprite_info_init(&st->sprite);
       break;
     }
-    if (i == 255 && st->font[i]) {
-      return -3;
-    }
   }
-  kr_compositor_input_info_valid(&st->input_info);
 
-  return 0;
+
+  return -1;
 }
 
-int kr_text_info_random(struct kr_text_info *st) {
-  int i;
-
-  struct timeval tv;
-  double scale;
-
-  gettimeofday(&tv, NULL);
-  srand(tv.tv_sec + tv.tv_usec * 1000000ul);
-
+int kr_overlay_type_info_valid(kr_overlay_type_info *st, int idx) {
   if (st == NULL) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_text_info));
-  for (i = 0; i < 512; i++) {
-    scale = (double)25 / RAND_MAX;
-    st->string[i] = 97 + floor(rand() * scale);
-    if (i == 511) {
-      st->string[511] = '\0';
+  switch (idx) {
+    case 0: {
+      kr_text_info_valid(&st->text);
+      break;
+    }
+    case 1: {
+      kr_vector_info_valid(&st->vector);
+      break;
+    }
+    case 2: {
+      kr_sprite_info_valid(&st->sprite);
+      break;
     }
   }
-  for (i = 0; i < 256; i++) {
-    scale = (double)25 / RAND_MAX;
-    st->font[i] = 97 + floor(rand() * scale);
-    if (i == 255) {
-      st->font[255] = '\0';
+
+
+  return -1;
+}
+
+int kr_overlay_type_info_random(kr_overlay_type_info *st, int idx) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  memset(st, 0, sizeof(kr_overlay_type_info));
+  switch (idx) {
+    case 0: {
+      kr_text_info_random(&st->text);
+      break;
+    }
+    case 1: {
+      kr_vector_info_random(&st->vector);
+      break;
+    }
+    case 2: {
+      kr_sprite_info_random(&st->sprite);
+      break;
     }
   }
-  kr_compositor_input_info_random(&st->input_info);
+
+
+  return -1;
+}
+
+int kr_overlay_info_init(struct kr_overlay_info *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  memset(st, 0, sizeof(struct kr_overlay_info));
+  kr_overlay_type_info_init(&st->info,kr_compositor_overlay_type_to_index(st->type));
+
+  return 0;
+}
+
+int kr_overlay_info_valid(struct kr_overlay_info *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  kr_overlay_type_info_valid(&st->info,kr_compositor_overlay_type_to_index(st->type));
+
+  return 0;
+}
+
+int kr_overlay_info_random(struct kr_overlay_info *st) {
+  if (st == NULL) {
+    return -1;
+  }
+
+  memset(st, 0, sizeof(struct kr_overlay_info));
+  kr_overlay_type_info_random(&st->info,kr_compositor_overlay_type_to_index(st->type));
 
   return 0;
 }

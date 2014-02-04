@@ -79,39 +79,18 @@ typedef struct {
 } kr_compositor_path_info_patch;
 
 typedef enum {
-  KR_SPRITE_INFO_FILENAME = 1,
-  KR_SPRITE_INFO_RATE = 2,
-  KR_SPRITE_INFO_INPUT_INFO = 3
-} kr_sprite_info_member;
+  KR_OVERLAY_INFO_TYPE = 1,
+  KR_OVERLAY_INFO_INFO = 2
+} kr_overlay_info_member;
 
 typedef struct {
   kr_var var;
-  kr_compositor_input_info_patch input_info_patch;
-} kr_sprite_info_patch_value;
+} kr_overlay_info_patch_value;
 
 typedef struct {
-  kr_sprite_info_member member;
-  kr_sprite_info_patch_value value;
-} kr_sprite_info_patch;
-
-typedef enum {
-  KR_TEXT_INFO_STRING = 1,
-  KR_TEXT_INFO_FONT = 2,
-  KR_TEXT_INFO_RED = 3,
-  KR_TEXT_INFO_GREEN = 4,
-  KR_TEXT_INFO_BLUE = 5,
-  KR_TEXT_INFO_INPUT_INFO = 6
-} kr_text_info_member;
-
-typedef struct {
-  kr_var var;
-  kr_compositor_input_info_patch input_info_patch;
-} kr_text_info_patch_value;
-
-typedef struct {
-  kr_text_info_member member;
-  kr_text_info_patch_value value;
-} kr_text_info_patch;
+  kr_overlay_info_member member;
+  kr_overlay_info_patch_value value;
+} kr_overlay_info_patch;
 
 int kr_compositor_output_info_patch_apply(struct kr_compositor_output_info *info, kr_compositor_output_info_patch *patch);
 kr_var *kr_compositor_output_info_patch_path(kr_compositor_output_info_patch *patch, kr_path *path);
@@ -123,10 +102,8 @@ int kr_compositor_source_info_patch_apply(struct kr_compositor_source_info *info
 kr_var *kr_compositor_source_info_patch_path(kr_compositor_source_info_patch *patch, kr_path *path);
 int kr_compositor_path_info_patch_apply(struct kr_compositor_path_info *info, kr_compositor_path_info_patch *patch);
 kr_var *kr_compositor_path_info_patch_path(kr_compositor_path_info_patch *patch, kr_path *path);
-int kr_sprite_info_patch_apply(struct kr_sprite_info *info, kr_sprite_info_patch *patch);
-kr_var *kr_sprite_info_patch_path(kr_sprite_info_patch *patch, kr_path *path);
-int kr_text_info_patch_apply(struct kr_text_info *info, kr_text_info_patch *patch);
-kr_var *kr_text_info_patch_path(kr_text_info_patch *patch, kr_path *path);
+int kr_overlay_info_patch_apply(struct kr_overlay_info *info, kr_overlay_info_patch *patch);
+kr_var *kr_overlay_info_patch_path(kr_overlay_info_patch *patch, kr_path *path);
 int kr_rect_init(struct kr_rect *st);
 int kr_rect_valid(struct kr_rect *st);
 int kr_rect_random(struct kr_rect *st);
@@ -148,19 +125,18 @@ int kr_compositor_path_type_info_random(kr_compositor_path_type_info *st, int id
 int kr_compositor_path_info_init(struct kr_compositor_path_info *st);
 int kr_compositor_path_info_valid(struct kr_compositor_path_info *st);
 int kr_compositor_path_info_random(struct kr_compositor_path_info *st);
-int kr_sprite_info_init(struct kr_sprite_info *st);
-int kr_sprite_info_valid(struct kr_sprite_info *st);
-int kr_sprite_info_random(struct kr_sprite_info *st);
-int kr_text_info_init(struct kr_text_info *st);
-int kr_text_info_valid(struct kr_text_info *st);
-int kr_text_info_random(struct kr_text_info *st);
+int kr_overlay_type_info_init(kr_overlay_type_info *st, int idx);
+int kr_overlay_type_info_valid(kr_overlay_type_info *st, int idx);
+int kr_overlay_type_info_random(kr_overlay_type_info *st, int idx);
+int kr_overlay_info_init(struct kr_overlay_info *st);
+int kr_overlay_info_valid(struct kr_overlay_info *st);
+int kr_overlay_info_random(struct kr_overlay_info *st);
 kr_compositor_output_info_member kr_compositor_output_info_strto_member(char *string, int len);
 kr_compositor_bus_info_member kr_compositor_bus_info_strto_member(char *string, int len);
 kr_compositor_input_info_member kr_compositor_input_info_strto_member(char *string, int len);
 kr_compositor_source_info_member kr_compositor_source_info_strto_member(char *string, int len);
 kr_compositor_path_info_member kr_compositor_path_info_strto_member(char *string, int len);
-kr_sprite_info_member kr_sprite_info_strto_member(char *string, int len);
-kr_text_info_member kr_text_info_strto_member(char *string, int len);
+kr_overlay_info_member kr_overlay_info_strto_member(char *string, int len);
 int kr_compositor_path_type_to_index(int val);
 int kr_strto_kr_compositor_path_type(char *string);
 char *kr_strfr_kr_compositor_path_type(int val);

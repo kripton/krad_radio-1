@@ -10,5 +10,5 @@ int kr_compositor_input_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_compositor_source_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_compositor_path_type_info_fr_ebml(kr_ebml *ebml, void *st);
 int kr_compositor_path_info_fr_ebml(kr_ebml *ebml, void *st);
-int kr_sprite_info_fr_ebml(kr_ebml *ebml, void *st);
-int kr_text_info_fr_ebml(kr_ebml *ebml, void *st);
+int kr_overlay_type_info_fr_ebml(kr_ebml *ebml, void *st);
+int kr_overlay_info_fr_ebml(kr_ebml *ebml, void *st);

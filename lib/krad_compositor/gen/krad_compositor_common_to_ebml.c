@@ -209,10 +209,12 @@ int kr_compositor_path_info_to_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_sprite_info_to_ebml(kr_ebml *ebml, void *st) {
+int kr_overlay_type_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
-  struct kr_sprite_info *actual;
+  uber_St *uber_actual;
+
+  kr_overlay_type_info *actual;
 
   res = 0;
 
@@ -220,21 +222,45 @@ int kr_sprite_info_to_ebml(kr_ebml *ebml, void *st) {
     return -1;
   }
 
-  actual = (struct kr_sprite_info *)st;
+  uber_actual = (uber_St *)st;
 
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->filename);
-  res += kr_ebml_pack_int32(ebml, 0xe1, actual->rate);
-  uber.actual = &(actual->input_info);
-  uber.type = EBML_KR_COMPOSITOR_INPUT_INFO;
-  res += info_pack_to_ebml(&ebml[res],&uber);
+  if (uber_actual->actual == NULL) {
+    return -1;
+  }
+
+  actual = (kr_overlay_type_info *)uber_actual->actual;
+
+  switch (uber_actual->type) {
+    case 0: {
+      uber.actual = &(actual->text);
+      uber.type = EBML_KR_TEXT_INFO;
+      res += info_pack_to_ebml(&ebml[res],&uber);
+      break;
+    }
+    case 1: {
+      uber.actual = &(actual->vector);
+      uber.type = EBML_KR_VECTOR_INFO;
+      res += info_pack_to_ebml(&ebml[res],&uber);
+      break;
+    }
+    case 2: {
+      uber.actual = &(actual->sprite);
+      uber.type = EBML_KR_SPRITE_INFO;
+      res += info_pack_to_ebml(&ebml[res],&uber);
+      break;
+    }
+  }
+
 
   return res;
 }
 
-int kr_text_info_to_ebml(kr_ebml *ebml, void *st) {
+int kr_overlay_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
+  uber_St uber_sub;
+  int index;
   int res;
-  struct kr_text_info *actual;
+  struct kr_overlay_info *actual;
 
   res = 0;
 
@@ -242,15 +268,16 @@ int kr_text_info_to_ebml(kr_ebml *ebml, void *st) {
     return -1;
   }
 
-  actual = (struct kr_text_info *)st;
+  actual = (struct kr_overlay_info *)st;
 
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->string);
-  res += kr_ebml_pack_string(ebml, 0xe1, actual->font);
-  res += kr_ebml_pack_float(ebml, 0xe1, actual->red);
-  res += kr_ebml_pack_float(ebml, 0xe1, actual->green);
-  res += kr_ebml_pack_float(ebml, 0xe1, actual->blue);
-  uber.actual = &(actual->input_info);
-  uber.type = EBML_KR_COMPOSITOR_INPUT_INFO;
+  uber.actual = &(actual->type);
+  uber.type = EBML_KR_COMPOSITOR_OVERLAY_TYPE;
+  res += info_pack_to_ebml(&ebml[res],&uber);
+  index = kr_compositor_overlay_type_to_index(actual->type);
+  uber_sub.type = index;
+  uber_sub.actual = &(actual->info);
+  uber.actual = &(uber_sub);
+  uber.type = EBML_KR_OVERLAY_TYPE_INFO;
   res += info_pack_to_ebml(&ebml[res],&uber);
 
   return res;

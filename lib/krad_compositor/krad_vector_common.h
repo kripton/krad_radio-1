@@ -25,9 +25,13 @@ struct kr_vector_info {
   float red;
   float green;
   float blue;
-  kr_compositor_input_info input_info;
 };
 
+#include "gen/krad_vector_common_to_json.h"
+#include "gen/krad_vector_common_from_json.h"
+#include "gen/krad_vector_common_to_ebml.h"
+#include "gen/krad_vector_common_from_ebml.h"
+#include "gen/krad_vector_common_to_text.h"
 #include "gen/krad_vector_common_helpers.h"
 
 #endif

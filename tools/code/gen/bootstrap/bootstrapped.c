@@ -97,6 +97,12 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_path_info_patch_value";
     case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH:
       return "kr_compositor_path_info_patch";
+    case CGEN_KR_OVERLAY_INFO_MEMBER:
+      return "kr_overlay_info_member";
+    case CGEN_KR_OVERLAY_INFO_PATCH_VALUE:
+      return "kr_overlay_info_patch_value";
+    case CGEN_KR_OVERLAY_INFO_PATCH:
+      return "kr_overlay_info_patch";
     case CGEN_KR_SPRITE_INFO_MEMBER:
       return "kr_sprite_info_member";
     case CGEN_KR_SPRITE_INFO_PATCH_VALUE:
@@ -139,10 +145,10 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_path_type_info";
     case CGEN_KR_COMPOSITOR_PATH_INFO:
       return "kr_compositor_path_info";
-    case CGEN_KR_SPRITE_INFO:
-      return "kr_sprite_info";
-    case CGEN_KR_TEXT_INFO:
-      return "kr_text_info";
+    case CGEN_KR_OVERLAY_TYPE_INFO:
+      return "kr_overlay_type_info";
+    case CGEN_KR_OVERLAY_INFO:
+      return "kr_overlay_info";
     case CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG:
       return "kr_compositor_path_frame_cb_arg";
     case CGEN_KR_COMPOSITOR_IO_PATH_SETUP:
@@ -151,12 +157,16 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_crop";
     case CGEN_KR_CONVERT:
       return "kr_convert";
+    case CGEN_KR_PERSPECTIVE:
+      return "kr_perspective";
     case CGEN_KR_POS:
       return "kr_pos";
     case CGEN_KR_PERSPECTIVE_VIEW:
       return "kr_perspective_view";
-    case CGEN_KR_PERSPECTIVE:
-      return "kr_perspective";
+    case CGEN_KR_SPRITE_INFO:
+      return "kr_sprite_info";
+    case CGEN_KR_TEXT_INFO:
+      return "kr_text_info";
     case CGEN_KR_VECTOR_TYPE:
       return "kr_vector_type";
     case CGEN_KR_VECTOR_INFO:
@@ -777,6 +787,15 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_compositor_path_info_patch")) {
     return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH;
   }
+  if (!strcmp(string,"kr_overlay_info_member")) {
+    return CGEN_KR_OVERLAY_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_overlay_info_patch_value")) {
+    return CGEN_KR_OVERLAY_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_overlay_info_patch")) {
+    return CGEN_KR_OVERLAY_INFO_PATCH;
+  }
   if (!strcmp(string,"kr_sprite_info_member")) {
     return CGEN_KR_SPRITE_INFO_MEMBER;
   }
@@ -840,11 +859,11 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_compositor_path_info")) {
     return CGEN_KR_COMPOSITOR_PATH_INFO;
   }
-  if (!strcmp(string,"kr_sprite_info")) {
-    return CGEN_KR_SPRITE_INFO;
+  if (!strcmp(string,"kr_overlay_type_info")) {
+    return CGEN_KR_OVERLAY_TYPE_INFO;
   }
-  if (!strcmp(string,"kr_text_info")) {
-    return CGEN_KR_TEXT_INFO;
+  if (!strcmp(string,"kr_overlay_info")) {
+    return CGEN_KR_OVERLAY_INFO;
   }
   if (!strcmp(string,"kr_compositor_path_frame_cb_arg")) {
     return CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG;
@@ -858,14 +877,20 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_convert")) {
     return CGEN_KR_CONVERT;
   }
+  if (!strcmp(string,"kr_perspective")) {
+    return CGEN_KR_PERSPECTIVE;
+  }
   if (!strcmp(string,"kr_pos")) {
     return CGEN_KR_POS;
   }
   if (!strcmp(string,"kr_perspective_view")) {
     return CGEN_KR_PERSPECTIVE_VIEW;
   }
-  if (!strcmp(string,"kr_perspective")) {
-    return CGEN_KR_PERSPECTIVE;
+  if (!strcmp(string,"kr_sprite_info")) {
+    return CGEN_KR_SPRITE_INFO;
+  }
+  if (!strcmp(string,"kr_text_info")) {
+    return CGEN_KR_TEXT_INFO;
   }
   if (!strcmp(string,"kr_vector_type")) {
     return CGEN_KR_VECTOR_TYPE;
@@ -1588,6 +1613,9 @@ int codegen_is_union(char *type) {
   if (!strcmp(type,"kr_compositor_path_type_info")) {
     return 1;
   }
+  if (!strcmp(type,"kr_overlay_type_info")) {
+    return 1;
+  }
   if (!strcmp(type,"kr_muxer_transport_params")) {
     return 1;
   }
@@ -1641,6 +1669,9 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_compositor_path_info_member")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_overlay_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_sprite_info_member")) {
