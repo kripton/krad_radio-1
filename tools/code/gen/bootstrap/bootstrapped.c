@@ -67,6 +67,36 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_medium_St";
     case CGEN_KR_ENCODER_MACHINE_SECTOR_ST:
       return "kr_encoder_machine_sector_St";
+    case CGEN_KR_COMPOSITOR_OUTPUT_INFO_MEMBER:
+      return "kr_compositor_output_info_member";
+    case CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH_VALUE:
+      return "kr_compositor_output_info_patch_value";
+    case CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH:
+      return "kr_compositor_output_info_patch";
+    case CGEN_KR_COMPOSITOR_BUS_INFO_MEMBER:
+      return "kr_compositor_bus_info_member";
+    case CGEN_KR_COMPOSITOR_BUS_INFO_PATCH_VALUE:
+      return "kr_compositor_bus_info_patch_value";
+    case CGEN_KR_COMPOSITOR_BUS_INFO_PATCH:
+      return "kr_compositor_bus_info_patch";
+    case CGEN_KR_COMPOSITOR_INPUT_INFO_MEMBER:
+      return "kr_compositor_input_info_member";
+    case CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH_VALUE:
+      return "kr_compositor_input_info_patch_value";
+    case CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH:
+      return "kr_compositor_input_info_patch";
+    case CGEN_KR_COMPOSITOR_SOURCE_INFO_MEMBER:
+      return "kr_compositor_source_info_member";
+    case CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH_VALUE:
+      return "kr_compositor_source_info_patch_value";
+    case CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH:
+      return "kr_compositor_source_info_patch";
+    case CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER:
+      return "kr_compositor_path_info_member";
+    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE:
+      return "kr_compositor_path_info_patch_value";
+    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH:
+      return "kr_compositor_path_info_patch";
     case CGEN_KR_SPRITE_INFO_MEMBER:
       return "kr_sprite_info_member";
     case CGEN_KR_SPRITE_INFO_PATCH_VALUE:
@@ -85,14 +115,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_vector_info_patch_value";
     case CGEN_KR_VECTOR_INFO_PATCH:
       return "kr_vector_info_patch";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER:
-      return "kr_compositor_path_info_member";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE:
-      return "kr_compositor_path_info_patch_value";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH:
-      return "kr_compositor_path_info_patch";
-    case CGEN_KR_COMPOSITOR_CONTROL_EASERS:
-      return "kr_compositor_control_easers";
     case CGEN_KR_COMPOSITOR_SETUP:
       return "kr_compositor_setup";
     case CGEN_KR_COMPOSITOR_EVENT_TYPE:
@@ -101,22 +123,26 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_event";
     case CGEN_KR_COMPOSITOR_PATH_TYPE:
       return "kr_compositor_path_type";
-    case CGEN_KR_COMPOSITOR_SUBUNIT_TYPE:
-      return "kr_compositor_subunit_type";
-    case CGEN_KR_VECTOR_TYPE:
-      return "kr_vector_type";
-    case CGEN_KR_COMPOSITOR_CONTROL:
-      return "kr_compositor_control";
-    case CGEN_KR_COMPOSITOR_CONTROLS:
-      return "kr_compositor_controls";
+    case CGEN_KR_COMPOSITOR_OVERLAY_TYPE:
+      return "kr_compositor_overlay_type";
+    case CGEN_KR_RECT:
+      return "kr_rect";
+    case CGEN_KR_COMPOSITOR_OUTPUT_INFO:
+      return "kr_compositor_output_info";
+    case CGEN_KR_COMPOSITOR_BUS_INFO:
+      return "kr_compositor_bus_info";
+    case CGEN_KR_COMPOSITOR_INPUT_INFO:
+      return "kr_compositor_input_info";
+    case CGEN_KR_COMPOSITOR_SOURCE_INFO:
+      return "kr_compositor_source_info";
+    case CGEN_KR_COMPOSITOR_PATH_TYPE_INFO:
+      return "kr_compositor_path_type_info";
+    case CGEN_KR_COMPOSITOR_PATH_INFO:
+      return "kr_compositor_path_info";
     case CGEN_KR_SPRITE_INFO:
       return "kr_sprite_info";
     case CGEN_KR_TEXT_INFO:
       return "kr_text_info";
-    case CGEN_KR_VECTOR_INFO:
-      return "kr_vector_info";
-    case CGEN_KR_COMPOSITOR_PATH_INFO:
-      return "kr_compositor_path_info";
     case CGEN_COMPOSITOR_PATH_STATE:
       return "compositor_path_state";
     case CGEN_KR_COMPOSITOR_PATH_FRAME_CB_ARG:
@@ -133,6 +159,10 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_perspective_view";
     case CGEN_KR_PERSPECTIVE:
       return "kr_perspective";
+    case CGEN_KR_VECTOR_TYPE:
+      return "kr_vector_type";
+    case CGEN_KR_VECTOR_INFO:
+      return "kr_vector_info";
     case CGEN_KRAD_CODEC_T:
       return "krad_codec_t";
     case CGEN_KRAD_CONTAINER_TYPE_T:
@@ -704,6 +734,51 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_encoder_machine_sector_St")) {
     return CGEN_KR_ENCODER_MACHINE_SECTOR_ST;
   }
+  if (!strcmp(string,"kr_compositor_output_info_member")) {
+    return CGEN_KR_COMPOSITOR_OUTPUT_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_compositor_output_info_patch_value")) {
+    return CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_compositor_output_info_patch")) {
+    return CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH;
+  }
+  if (!strcmp(string,"kr_compositor_bus_info_member")) {
+    return CGEN_KR_COMPOSITOR_BUS_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_compositor_bus_info_patch_value")) {
+    return CGEN_KR_COMPOSITOR_BUS_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_compositor_bus_info_patch")) {
+    return CGEN_KR_COMPOSITOR_BUS_INFO_PATCH;
+  }
+  if (!strcmp(string,"kr_compositor_input_info_member")) {
+    return CGEN_KR_COMPOSITOR_INPUT_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_compositor_input_info_patch_value")) {
+    return CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_compositor_input_info_patch")) {
+    return CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH;
+  }
+  if (!strcmp(string,"kr_compositor_source_info_member")) {
+    return CGEN_KR_COMPOSITOR_SOURCE_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_compositor_source_info_patch_value")) {
+    return CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_compositor_source_info_patch")) {
+    return CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH;
+  }
+  if (!strcmp(string,"kr_compositor_path_info_member")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_compositor_path_info_patch_value")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_compositor_path_info_patch")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH;
+  }
   if (!strcmp(string,"kr_sprite_info_member")) {
     return CGEN_KR_SPRITE_INFO_MEMBER;
   }
@@ -731,18 +806,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_vector_info_patch")) {
     return CGEN_KR_VECTOR_INFO_PATCH;
   }
-  if (!strcmp(string,"kr_compositor_path_info_member")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_compositor_path_info_patch_value")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_compositor_path_info_patch")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_compositor_control_easers")) {
-    return CGEN_KR_COMPOSITOR_CONTROL_EASERS;
-  }
   if (!strcmp(string,"kr_compositor_setup")) {
     return CGEN_KR_COMPOSITOR_SETUP;
   }
@@ -755,29 +818,35 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_compositor_path_type")) {
     return CGEN_KR_COMPOSITOR_PATH_TYPE;
   }
-  if (!strcmp(string,"kr_compositor_subunit_type")) {
-    return CGEN_KR_COMPOSITOR_SUBUNIT_TYPE;
+  if (!strcmp(string,"kr_compositor_overlay_type")) {
+    return CGEN_KR_COMPOSITOR_OVERLAY_TYPE;
   }
-  if (!strcmp(string,"kr_vector_type")) {
-    return CGEN_KR_VECTOR_TYPE;
+  if (!strcmp(string,"kr_rect")) {
+    return CGEN_KR_RECT;
   }
-  if (!strcmp(string,"kr_compositor_control")) {
-    return CGEN_KR_COMPOSITOR_CONTROL;
+  if (!strcmp(string,"kr_compositor_output_info")) {
+    return CGEN_KR_COMPOSITOR_OUTPUT_INFO;
   }
-  if (!strcmp(string,"kr_compositor_controls")) {
-    return CGEN_KR_COMPOSITOR_CONTROLS;
+  if (!strcmp(string,"kr_compositor_bus_info")) {
+    return CGEN_KR_COMPOSITOR_BUS_INFO;
+  }
+  if (!strcmp(string,"kr_compositor_input_info")) {
+    return CGEN_KR_COMPOSITOR_INPUT_INFO;
+  }
+  if (!strcmp(string,"kr_compositor_source_info")) {
+    return CGEN_KR_COMPOSITOR_SOURCE_INFO;
+  }
+  if (!strcmp(string,"kr_compositor_path_type_info")) {
+    return CGEN_KR_COMPOSITOR_PATH_TYPE_INFO;
+  }
+  if (!strcmp(string,"kr_compositor_path_info")) {
+    return CGEN_KR_COMPOSITOR_PATH_INFO;
   }
   if (!strcmp(string,"kr_sprite_info")) {
     return CGEN_KR_SPRITE_INFO;
   }
   if (!strcmp(string,"kr_text_info")) {
     return CGEN_KR_TEXT_INFO;
-  }
-  if (!strcmp(string,"kr_vector_info")) {
-    return CGEN_KR_VECTOR_INFO;
-  }
-  if (!strcmp(string,"kr_compositor_path_info")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO;
   }
   if (!strcmp(string,"compositor_path_state")) {
     return CGEN_COMPOSITOR_PATH_STATE;
@@ -802,6 +871,12 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_perspective")) {
     return CGEN_KR_PERSPECTIVE;
+  }
+  if (!strcmp(string,"kr_vector_type")) {
+    return CGEN_KR_VECTOR_TYPE;
+  }
+  if (!strcmp(string,"kr_vector_info")) {
+    return CGEN_KR_VECTOR_INFO;
   }
   if (!strcmp(string,"krad_codec_t")) {
     return CGEN_KRAD_CODEC_T;
@@ -1515,6 +1590,9 @@ int codegen_is_union(char *type) {
   if (!strcmp(type,"kr_value")) {
     return 1;
   }
+  if (!strcmp(type,"kr_compositor_path_type_info")) {
+    return 1;
+  }
   if (!strcmp(type,"kr_muxer_transport_params")) {
     return 1;
   }
@@ -1555,6 +1633,21 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_mtype_t")) {
     return 1;
   }
+  if (!strcmp(type,"kr_compositor_output_info_member")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_compositor_bus_info_member")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_compositor_input_info_member")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_compositor_source_info_member")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_compositor_path_info_member")) {
+    return 1;
+  }
   if (!strcmp(type,"kr_sprite_info_member")) {
     return 1;
   }
@@ -1564,25 +1657,19 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_vector_info_member")) {
     return 1;
   }
-  if (!strcmp(type,"kr_compositor_path_info_member")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_compositor_event_type")) {
     return 1;
   }
   if (!strcmp(type,"kr_compositor_path_type")) {
     return 1;
   }
-  if (!strcmp(type,"kr_compositor_subunit_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_vector_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_compositor_control")) {
+  if (!strcmp(type,"kr_compositor_overlay_type")) {
     return 1;
   }
   if (!strcmp(type,"compositor_path_state")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_vector_type")) {
     return 1;
   }
   if (!strcmp(type,"krad_codec_t")) {

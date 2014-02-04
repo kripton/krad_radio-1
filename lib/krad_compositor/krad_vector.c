@@ -24,7 +24,6 @@
 
 struct kr_vector {
   kr_vector_info info;
-  kr_compositor_control_easers easers;
   kr_vector_type type;
 };
 
@@ -52,10 +51,10 @@ void kr_vector_clear(kr_vector *vector) {
 int kr_vector_init(kr_vector *vector, char *type) {
   if ((vector == NULL) || (type == NULL)) return -1;
   memset(vector, 0, sizeof(kr_vector));
-  vector->info.controls.opacity = 1.0f;
+  vector->info.input_info.opacity = 1.0f;
   vector->type = kr_strto_kr_vector_type(type);
-  vector->info.controls.w = 96;
-  vector->info.controls.h = 96;
+  vector->info.input_info.pos.w = 96;
+  vector->info.input_info.pos.h = 96;
   switch (vector->type) {
     case METER:
     case HEX:
@@ -88,109 +87,109 @@ void kr_vector_render(kr_vector *krad_vector, cairo_t *cr) {
   cairo_save(cr);
 
   if (krad_vector->type != VIPER) {
-    if (krad_vector->info.controls.rotation != 0.0f) {
-      cairo_translate(cr, krad_vector->info.controls.x, krad_vector->info.controls.y);
-      cairo_translate(cr, krad_vector->info.controls.w / 2, krad_vector->info.controls.h / 2);
-      cairo_rotate(cr, krad_vector->info.controls.rotation * (M_PI/180.0));
-      cairo_translate(cr, krad_vector->info.controls.w / -2, krad_vector->info.controls.h / -2);
-      cairo_translate(cr, krad_vector->info.controls.x * -1, krad_vector->info.controls.y * -1);
+    if (krad_vector->info.input_info.rotation != 0.0f) {
+      cairo_translate(cr, krad_vector->info.input_info.pos.x, krad_vector->info.input_info.pos.y);
+      cairo_translate(cr, krad_vector->info.input_info.pos.w / 2, krad_vector->info.input_info.pos.h / 2);
+      cairo_rotate(cr, krad_vector->info.input_info.rotation * (M_PI/180.0));
+      cairo_translate(cr, krad_vector->info.input_info.pos.w / -2, krad_vector->info.input_info.pos.h / -2);
+      cairo_translate(cr, krad_vector->info.input_info.pos.x * -1, krad_vector->info.input_info.pos.y * -1);
     }
   }
 
   switch (krad_vector->type) {
 
     case METER:
-      render_meter(cr, krad_vector->info.controls.x, krad_vector->info.controls.y,
-                                krad_vector->info.controls.w,
-                                krad_vector->info.controls.rotation, krad_vector->info.controls.opacity);
+      render_meter(cr, krad_vector->info.input_info.pos.x, krad_vector->info.input_info.pos.y,
+                                krad_vector->info.input_info.pos.w,
+                                krad_vector->info.input_info.rotation, krad_vector->info.input_info.opacity);
       break;
 
     case HEX:
 
-      render_hex(cr, krad_vector->info.controls.x,
-                              krad_vector->info.controls.y,
-                              krad_vector->info.controls.w,
+      render_hex(cr, krad_vector->info.input_info.pos.x,
+                              krad_vector->info.input_info.pos.y,
+                              krad_vector->info.input_info.pos.w,
                               krad_vector->info.red,
                               krad_vector->info.green,
                               krad_vector->info.blue,
-                              krad_vector->info.controls.opacity);
+                              krad_vector->info.input_info.opacity);
       break;
     case CURVE:
-      render_curve(cr, krad_vector->info.controls.x,
-                                krad_vector->info.controls.y);
+      render_curve(cr, krad_vector->info.input_info.pos.x,
+                                krad_vector->info.input_info.pos.y);
       break;
     case CIRCLE:
-      render_circle(cr, krad_vector->info.controls.x,
-                                 krad_vector->info.controls.y,
-                                 krad_vector->info.controls.w,
+      render_circle(cr, krad_vector->info.input_info.pos.x,
+                                 krad_vector->info.input_info.pos.y,
+                                 krad_vector->info.input_info.pos.w,
                                  krad_vector->info.red,
                                  krad_vector->info.green,
                                  krad_vector->info.blue,
-                                 krad_vector->info.controls.opacity);
+                                 krad_vector->info.input_info.opacity);
        break;
     case RECT:
-      render_rectangle(cr, krad_vector->info.controls.x,
-                                    krad_vector->info.controls.y,
-                                    krad_vector->info.controls.w,
-                                    krad_vector->info.controls.h,
+      render_rectangle(cr, krad_vector->info.input_info.pos.x,
+                                    krad_vector->info.input_info.pos.y,
+                                    krad_vector->info.input_info.pos.w,
+                                    krad_vector->info.input_info.pos.h,
                                     krad_vector->info.red,
                                     krad_vector->info.green,
                                     krad_vector->info.blue,
-                                    krad_vector->info.controls.opacity);
+                                    krad_vector->info.input_info.opacity);
       break;
     case TRIANGLE:
-      render_triangle(cr, krad_vector->info.controls.x,
-                                   krad_vector->info.controls.y,
-                                   krad_vector->info.controls.w,
-                                   krad_vector->info.controls.h,
+      render_triangle(cr, krad_vector->info.input_info.pos.x,
+                                   krad_vector->info.input_info.pos.y,
+                                   krad_vector->info.input_info.pos.w,
+                                   krad_vector->info.input_info.pos.h,
                                    krad_vector->info.red,
                                    krad_vector->info.green,
                                    krad_vector->info.blue,
-                                   krad_vector->info.controls.opacity);
+                                   krad_vector->info.input_info.opacity);
       break;
     case ARROW:
-      render_arrow(cr, krad_vector->info.controls.x,
-                                   krad_vector->info.controls.y,
-                                   krad_vector->info.controls.w,
-                                   krad_vector->info.controls.h,
+      render_arrow(cr, krad_vector->info.input_info.pos.x,
+                                   krad_vector->info.input_info.pos.y,
+                                   krad_vector->info.input_info.pos.w,
+                                   krad_vector->info.input_info.pos.h,
                                    krad_vector->info.red,
                                    krad_vector->info.green,
                                    krad_vector->info.blue,
-                                   krad_vector->info.controls.opacity);
+                                   krad_vector->info.input_info.opacity);
       break;
     case GRID:
-      render_grid(cr, krad_vector->info.controls.x,
-                               krad_vector->info.controls.y,
-                               krad_vector->info.controls.w,
-                               krad_vector->info.controls.h,
+      render_grid(cr, krad_vector->info.input_info.pos.x,
+                               krad_vector->info.input_info.pos.y,
+                               krad_vector->info.input_info.pos.w,
+                               krad_vector->info.input_info.pos.h,
                                6,
                                krad_vector->info.red,
                                krad_vector->info.green,
                                krad_vector->info.blue,
-                               krad_vector->info.controls.opacity);
+                               krad_vector->info.input_info.opacity);
       break;
     case VIPER:
-      render_viper(cr, krad_vector->info.controls.x,
-                                krad_vector->info.controls.y,
-                                krad_vector->info.controls.w,
-                                krad_vector->info.controls.rotation);
+      render_viper(cr, krad_vector->info.input_info.pos.x,
+                                krad_vector->info.input_info.pos.y,
+                                krad_vector->info.input_info.pos.w,
+                                krad_vector->info.input_info.rotation);
       break;
     case CLOCK:
-      render_clock(cr, krad_vector->info.controls.x,
-                                krad_vector->info.controls.y,
-                                (int) krad_vector->info.controls.w,
-                                (int) krad_vector->info.controls.h,
-                                 krad_vector->info.controls.opacity);
+      render_clock(cr, krad_vector->info.input_info.pos.x,
+                                krad_vector->info.input_info.pos.y,
+                                (int) krad_vector->info.input_info.pos.w,
+                                (int) krad_vector->info.input_info.pos.h,
+                                 krad_vector->info.input_info.opacity);
       break;
     case SHADOW:
-      render_shadow(cr, krad_vector->info.controls.x,
-                                            krad_vector->info.controls.y,
-                                            krad_vector->info.controls.w,
-                                            krad_vector->info.controls.h,
+      render_shadow(cr, krad_vector->info.input_info.pos.x,
+                                            krad_vector->info.input_info.pos.y,
+                                            krad_vector->info.input_info.pos.w,
+                                            krad_vector->info.input_info.pos.h,
                                             krad_vector->info.red,
                                             krad_vector->info.green,
                                             krad_vector->info.blue,
-                                            krad_vector->info.controls.opacity);
+                                            krad_vector->info.input_info.opacity);
       break;
     default:
       break;

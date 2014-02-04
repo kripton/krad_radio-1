@@ -7,7 +7,6 @@ struct kr_text {
   cairo_scaled_font_t* scaled_font;
   FT_Face ft_face;
   FT_Library *ft_library;
-  kr_compositor_control_easers easers;
 };
 
 static void kr_text_set_font(kr_text *text, char *font);
@@ -32,12 +31,12 @@ int kr_text_init(kr_text *text, char *str, char *font, FT_Library *ftlib) {
   strncpy(text->info.string, str, (sizeof(text->info.string) - 1));
   text->info.string[(sizeof(text->info.string) - 1)] = '\0';
   kr_text_set_font(text, font);
-  text->info.controls.opacity = 1.0f;
+  text->info.input_info.opacity = 1.0f;
   text->info.red = 1.0f;
   text->info.green = 1.0f;
   text->info.blue = 1.0f;
-  text->info.controls.h = 128;
-  text->info.controls.y = text->info.controls.h + 12;
+  text->info.input_info.pos.h = 128;
+  text->info.input_info.pos.y = text->info.input_info.pos.h + 12;
   return 0;
 }
 
@@ -92,22 +91,22 @@ void kr_text_prerender(kr_text *krad_text, cairo_t *cr) {
                             CAIRO_FONT_SLANT_NORMAL,
                             CAIRO_FONT_WEIGHT_NORMAL);
   }
-  cairo_set_font_size(cr, krad_text->info.controls.h);
+  cairo_set_font_size(cr, krad_text->info.input_info.pos.h);
   cairo_set_source_rgba (cr,
                          krad_text->info.red,
                          krad_text->info.green,
                          krad_text->info.blue,
-                         krad_text->info.controls.opacity);
+                         krad_text->info.input_info.opacity);
   cairo_text_extents (cr, krad_text->info.string, &extents);
-  krad_text->info.controls.w = extents.width;
-//  krad_text->info.controls.h = extents.height;
-  cairo_translate (cr, krad_text->info.controls.x, krad_text->info.controls.y);
-  if (krad_text->info.controls.rotation != 0.0f) {
-    cairo_translate (cr, krad_text->info.controls.w / 2,
-                     krad_text->info.controls.h / -2);
-    cairo_rotate (cr, krad_text->info.controls.rotation * (M_PI/180.0));
-    cairo_translate (cr, krad_text->info.controls.w / -2,
-                     krad_text->info.controls.h / 2);
+  krad_text->info.input_info.pos.w = extents.width;
+//  krad_text->info.input_info.pos.h = extents.height;
+  cairo_translate (cr, krad_text->info.input_info.pos.x, krad_text->info.input_info.pos.y);
+  if (krad_text->info.input_info.rotation != 0.0f) {
+    cairo_translate (cr, krad_text->info.input_info.pos.w / 2,
+                     krad_text->info.input_info.pos.h / -2);
+    cairo_rotate (cr, krad_text->info.input_info.rotation * (M_PI/180.0));
+    cairo_translate (cr, krad_text->info.input_info.pos.w / -2,
+                     krad_text->info.input_info.pos.h / 2);
   }
   krad_text->prerendered = 1;
 }
@@ -118,12 +117,12 @@ void kr_text_render(kr_text *text, cairo_t *cr) {
   cairo_stroke(cr);
   cairo_restore(cr);
   text->prerendered = 0;
-  kr_compositor_controls *controls;
-  controls = &text->info.controls;
+  kr_compositor_input_info *input_info;
+  input_info = &text->info.input_info;
   printk("rendered %s %s %f %f %f %f %f %d %d %d %d", text->info.string,
    text->info.font, text->info.red, text->info.green, text->info.blue,
-   controls->opacity, controls->rotation, controls->x, controls->y,
-   controls->w, controls->h);
+   input_info->opacity, input_info->rotation, input_info->pos.x, input_info->pos.y,
+   input_info->pos.w, input_info->pos.h);
 }
 
 int kr_text_info_get(kr_text *text, kr_text_info *info) {

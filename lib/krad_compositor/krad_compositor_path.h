@@ -2,11 +2,11 @@
 #define KRAD_COMPOSITOR_PATH_H
 
 #include <cairo.h>
-
 #include "krad_av.h"
 #include "krad_convert.h"
 #include "krad_perspective.h"
 #include "krad_ring.h"
+#include "krad_easing.h"
 
 typedef enum {
   KR_CMP_NIL,
@@ -32,21 +32,16 @@ struct kr_compositor_io_path_setup {
   kr_compositor_path_frame_cb *frame_cb;
 };
 
-/* internalish */
 size_t kr_compositor_path_size();
-void cmper_path_release(kr_compositor *compositor, kr_compositor_path *path);
-int path_render(kr_compositor_path *path, kr_image *image, cairo_t *cr);
-/* end internalish */
-
-
 int kr_compositor_process(kr_compositor_path *path);
-
 int kr_compositor_path_info_get(kr_compositor_path *path,
  kr_compositor_path_info *info);
-
 int kr_compositor_unlink(kr_compositor_path *path);
-kr_compositor_path *kr_compositor_mkio(kr_compositor *c, kr_compositor_io_path_setup *setup);
+kr_compositor_path *kr_compositor_mkso(kr_compositor *compositor,
+ kr_compositor_io_path_setup *setup);
 int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user);
+int kr_compositor_input(kr_compositor_path *output, 
+  kr_compositor_path *from, kr_compositor_input_info *info, void *user); 
 int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch);
 
 #endif

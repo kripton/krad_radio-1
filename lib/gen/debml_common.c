@@ -1,14 +1,15 @@
 #include "gen.h"
 #include "krad_ebmlx.h"
 int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber) {
-  const info_unpack_fr_ebml_func fr_ebml_functions[63] = {kr_alsa_info_fr_ebml,
+  const info_unpack_fr_ebml_func fr_ebml_functions[65] = {kr_alsa_info_fr_ebml,
   kr_alsa_path_info_fr_ebml,kr_method_fr_ebml,
   kr_crate_fr_ebml,kr_easing_fr_ebml,
-  kr_compositor_path_type_fr_ebml,kr_compositor_subunit_type_fr_ebml,
-  kr_vector_type_fr_ebml,kr_compositor_control_fr_ebml,
-  kr_compositor_controls_fr_ebml,kr_sprite_info_fr_ebml,
-  kr_text_info_fr_ebml,kr_vector_info_fr_ebml,
-  kr_compositor_path_info_fr_ebml,kr_pos_fr_ebml,
+  kr_compositor_path_type_fr_ebml,kr_compositor_overlay_type_fr_ebml,
+  kr_rect_fr_ebml,kr_compositor_output_info_fr_ebml,
+  kr_compositor_bus_info_fr_ebml,kr_compositor_input_info_fr_ebml,
+  kr_compositor_source_info_fr_ebml,kr_compositor_path_type_info_fr_ebml,
+  kr_compositor_path_info_fr_ebml,kr_sprite_info_fr_ebml,
+  kr_text_info_fr_ebml,kr_pos_fr_ebml,
   kr_perspective_view_fr_ebml,kr_perspective_fr_ebml,
   krad_codec_t_fr_ebml,krad_container_type_t_fr_ebml,
   kr_decklink_info_fr_ebml,kr_decklink_path_info_fr_ebml,

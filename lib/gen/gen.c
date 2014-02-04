@@ -28,6 +28,7 @@
 #include "../krad_compositor/gen/krad_perspective_from_ebml.c"
 #include "../krad_compositor/gen/krad_perspective_to_text.c"
 #include "../krad_compositor/gen/krad_perspective_helpers.c"
+#include "../krad_compositor/gen/krad_vector_common_helpers.c"
 #include "../krad_container/gen/krad_codec_header_to_ebml.c"
 #include "../krad_container/gen/krad_codec_header_from_ebml.c"
 #include "../krad_container/gen/krad_codec_header_to_text.c"

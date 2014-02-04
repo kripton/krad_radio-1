@@ -2,7 +2,6 @@
 
 struct kr_sprite {
   kr_sprite_info info;
-  kr_compositor_control_easers easers;
   int frames;
   int tick;
   int frame;
@@ -294,13 +293,13 @@ size_t kr_sprite_size() {
 int kr_sprite_open(kr_sprite *sprite, char *filename) {
 
   int64_t size;
-  kr_compositor_controls *ctrl;
+  kr_compositor_input_info *input_info;
 
   if ((sprite == NULL) || (filename == NULL)) {
     return -1;
   }
 
-  ctrl = &sprite->info.controls;
+  input_info = &sprite->info.input_info;
   if (sprite->sprite != NULL) {
     kr_sprite_clear(sprite);
   }
@@ -398,25 +397,25 @@ int kr_sprite_open(kr_sprite *sprite, char *filename) {
   sprite->sheet_height = cairo_image_surface_get_height(sprite->sprite);
   if ((sprite->frames > 1) && (sprite->multisurface == 0)) {
     if (sprite->frames >= 10) {
-      ctrl->w = sprite->sheet_width / 10;
-      ctrl->h = sprite->sheet_height / ((sprite->frames / 10) + MIN (1, (sprite->frames % 10)));
+      input_info->pos.w = sprite->sheet_width / 10;
+      input_info->pos.h = sprite->sheet_height / ((sprite->frames / 10) + MIN (1, (sprite->frames % 10)));
     } else {
-      ctrl->w = sprite->sheet_width / sprite->frames;
-      ctrl->h = sprite->sheet_height;
+      input_info->pos.w = sprite->sheet_width / sprite->frames;
+      input_info->pos.h = sprite->sheet_height;
     }
   } else {
-    ctrl->w = sprite->sheet_width;
-    ctrl->h = sprite->sheet_height;
+    input_info->pos.w = sprite->sheet_width;
+    input_info->pos.h = sprite->sheet_height;
   }
   sprite->sprite_pattern = cairo_pattern_create_for_surface(sprite->sprite);
   cairo_pattern_set_extend(sprite->sprite_pattern, CAIRO_EXTEND_REPEAT);
   strcpy(sprite->info.filename, filename);
   printk("Loaded Sprite: %s Sheet Width: %d Frames: %d Width: %d Height: %d",
-   sprite->info.filename, sprite->sheet_width, sprite->frames, ctrl->w,
-   ctrl->h);
-  ctrl->opacity = 1.0f;
+   sprite->info.filename, sprite->sheet_width, sprite->frames, input_info->pos.w,
+   input_info->pos.h);
+  input_info->opacity = 1.0f;
 
-kr_easer_set(&sprite->easers.rotation, 560.0f, 800, EASEINOUTSINE, NULL);
+  //kr_easer_set(&sprite->easers.rotation, 560.0f, 800, EASEINOUTSINE, NULL);
   return 0;
 }
 
@@ -448,16 +447,16 @@ int kr_sprite_rate_set(kr_sprite *sprite, int rate) {
   return 0;
 }
 
-void sprite_controls_tick(kr_compositor_controls *c, kr_compositor_control_easers *e) {
+/*void sprite_controls_tick(kr_compositor_controls *c, kr_compositor_control_easers *e) {
   if (kr_easer_active(&e->x)) {
     c->x = kr_easer_process(&e->x, c->x, NULL);
   }
   if (kr_easer_active(&e->y)) {
     c->y = kr_easer_process(&e->y, c->y, NULL);
   }
-/*  if (kr_easer_active(&e->z)) {
-    c->z = kr_easer_process(&e->z, c->z, NULL);
-  }*/
+ // if (kr_easer_active(&e->z)) {
+ //   c->z = kr_easer_process(&e->z, c->z, NULL);
+ // }
   if (kr_easer_active(&e->w)) {
     c->w = kr_easer_process(&e->w, c->w, NULL);
   }
@@ -470,7 +469,7 @@ void sprite_controls_tick(kr_compositor_controls *c, kr_compositor_control_easer
   if (kr_easer_active(&e->rotation)) {
     c->rotation = kr_easer_process(&e->rotation, c->rotation, NULL);
   }
-}
+}*/
 
 static void sprite_tick(kr_sprite *sprite) {
   sprite->tick++;
@@ -484,36 +483,36 @@ static void sprite_tick(kr_sprite *sprite) {
       sprite->sprite = sprite->sprite_frames[sprite->frame];
     }
   }
-  sprite_controls_tick(&sprite->info.controls, &sprite->easers);
+  //sprite_controls_tick(&sprite->info.controls, &sprite->easers);
 }
 
 void kr_sprite_render(kr_sprite *sprite, cairo_t *cr) {
 
-  kr_compositor_controls *ctrl;
+  kr_compositor_input_info *input_info;
 
-  ctrl = &sprite->info.controls;
+  input_info = &sprite->info.input_info;
   cairo_save(cr);
-  if (ctrl->rotation != 0.0f) {
-    cairo_translate(cr, ctrl->x, ctrl->y);
-    cairo_translate(cr, ctrl->w / 2, ctrl->h / 2);
-    cairo_rotate(cr, ctrl->rotation * (M_PI/180.0));
-    cairo_translate(cr, ctrl->w / -2, ctrl->h / -2);
-    cairo_translate(cr, ctrl->x * -1, ctrl->y * -1);
+  if (input_info->rotation != 0.0f) {
+    cairo_translate(cr, input_info->pos.x, input_info->pos.y);
+    cairo_translate(cr, input_info->pos.w / 2, input_info->pos.h / 2);
+    cairo_rotate(cr, input_info->rotation * (M_PI/180.0));
+    cairo_translate(cr, input_info->pos.w / -2, input_info->pos.h / -2);
+    cairo_translate(cr, input_info->pos.x * -1, input_info->pos.y * -1);
   }
   if (sprite->multisurface == 0) {
     cairo_set_source_surface(cr, sprite->sprite,
-     ctrl->x - (ctrl->w * (sprite->frame % 10)),
-     ctrl->y - (ctrl->h * (sprite->frame / 10)));
+     input_info->pos.x - (input_info->pos.w * (sprite->frame % 10)),
+     input_info->pos.y - (input_info->pos.h * (sprite->frame / 10)));
   } else {
-    cairo_set_source_surface(cr, sprite->sprite, ctrl->x, ctrl->y);
+    cairo_set_source_surface(cr, sprite->sprite, input_info->pos.x, input_info->pos.y);
   }
-  cairo_rectangle(cr, ctrl->x, ctrl->y, ctrl->w, ctrl->h);
+  cairo_rectangle(cr, input_info->pos.x, input_info->pos.y, input_info->pos.w, input_info->pos.h);
   cairo_clip(cr);
   /*cairo_pattern_set_filter (cairo_get_source (cr), CAIRO_FILTER_FAST);*/
-  if (ctrl->opacity == 1.0f) {
+  if (input_info->opacity == 1.0f) {
     cairo_paint(cr);
   } else {
-    cairo_paint_with_alpha(cr, ctrl->opacity);
+    cairo_paint_with_alpha(cr, input_info->opacity);
   }
   cairo_restore(cr);
   sprite_tick(sprite);

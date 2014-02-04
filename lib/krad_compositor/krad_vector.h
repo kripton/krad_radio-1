@@ -20,6 +20,7 @@
 typedef struct kr_vector kr_vector;
 
 #include "krad_compositor_common.h"
+#include "krad_vector_common.h"
 #include "krad_compositor.h"
 
 size_t kr_vector_size();

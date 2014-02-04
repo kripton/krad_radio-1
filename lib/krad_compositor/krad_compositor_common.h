@@ -1,96 +1,82 @@
 #ifndef KRAD_COMPOSITOR_COMMON_H
 #define KRAD_COMPOSITOR_COMMON_H
 
-#define KRAD_COMPOSITOR_SUBUNIT_DEFAULT_TICKRATE 4
+#define KR_COMPOSITOR_WIDTH 7680
+#define KR_COMPOSITOR_HEIGHT 4320
 
 #include "krad_system.h"
 #include "krad_perspective.h"
-#include "krad_easing_common.h"
 
 typedef enum {
-  KR_CMP_OUTPUT = 666,
-  KR_CMP_INPUT,
-  KR_CMP_BUS
+  KR_COMP_SOURCE = 1,
+  KR_COMP_INPUT,
+  KR_COMP_BUS,
+  KR_COMP_OUTPUT
 } kr_compositor_path_type;
 
 typedef enum {
-  KR_VIDEOPORT = 31,
+  KR_COMP_PATH = 1,
   KR_SPRITE,
   KR_TEXT,
   KR_VECTOR
-} kr_compositor_subunit_type;
+} kr_compositor_overlay_type;
 
-typedef enum {
-  NOTHING,
-  HEX,
-  CIRCLE,
-  RECT,
-  TRIANGLE,
-  VIPER,
-  METER,
-  GRID,
-  CURVE,
-  ARROW,
-  CLOCK,
-  SHADOW
-} kr_vector_type;
-
-typedef enum {
-  KR_NO,
-  KR_X,
-  KR_Y,
-  KR_Z,
-  KR_WIDTH,
-  KR_HEIGHT,
-  KR_ROTATION,
-  KR_OPACITY,
-  KR_RED,
-  KR_GREEN,
-  KR_BLUE,
-  KR_ALPHA,
-  KR_TICKRATE,
-  KR_CROP_X,
-  KR_CROP_Y,
-  KR_CROP_W,
-  KR_CROP_H,
-  KR_VIEW_TL_X,
-  KR_VIEW_TL_Y,
-  KR_VIEW_TR_X,
-  KR_VIEW_TR_Y,
-  KR_VIEW_BL_X,
-  KR_VIEW_BL_Y,
-  KR_VIEW_BR_X,
-  KR_VIEW_BR_Y
-} kr_compositor_control;
-
+typedef struct kr_rect kr_rect;
 typedef struct kr_text_info kr_text_info;
 typedef struct kr_sprite_info kr_sprite_info;
-typedef struct kr_vector_info kr_vector_info;
+typedef struct kr_compositor_source_info kr_compositor_source_info;
+typedef struct kr_compositor_input_info kr_compositor_input_info;
+typedef struct kr_compositor_bus_info kr_compositor_bus_info;
+typedef struct kr_compositor_output_info kr_compositor_output_info;
 typedef struct kr_compositor_path_info kr_compositor_path_info;
-typedef struct kr_compositor_controls kr_compositor_controls;
-typedef struct kr_compositor_info kr_compositor_info;
 
-#include "gen/krad_compositor_common_to_json.h"
-#include "gen/krad_compositor_common_from_json.h"
-#include "gen/krad_compositor_common_to_ebml.h"
-#include "gen/krad_compositor_common_from_ebml.h"
-#include "gen/krad_compositor_common_to_text.h"
-#include "gen/krad_compositor_common_helpers.h"
+struct kr_rect {
+  int16_t x;
+  int16_t y;
+  int16_t w;
+  int16_t h;
+};
 
-struct kr_compositor_controls {
-  int32_t x;
-  int32_t y;
+struct kr_compositor_output_info {
+  int16_t w;
+  int16_t h;
+  float opacity;
+};
+
+struct kr_compositor_bus_info {
+  float opacity;
+};
+
+struct kr_compositor_input_info {
+  kr_rect crop;
+  kr_rect pos;
+  kr_perspective_view view;
   uint32_t z;
-  uint32_t w;
-  uint32_t h;
   float rotation;
   float opacity;
+};
+
+struct kr_compositor_source_info {
+  int16_t w;
+  int16_t h;
+};
+
+typedef union {
+  kr_compositor_output_info output_info;
+  kr_compositor_bus_info bus_info;
+  kr_compositor_input_info input_info;
+  kr_compositor_source_info source_info;
+} kr_compositor_path_type_info;
+
+struct kr_compositor_path_info {
+  kr_compositor_path_type type;
+  kr_compositor_path_type_info info;
 };
 
 struct kr_sprite_info {
   char filename[256];
   int32_t rate;
-  kr_compositor_controls controls;
+  kr_compositor_input_info input_info;
 };
 
 struct kr_text_info {
@@ -99,30 +85,18 @@ struct kr_text_info {
   float red;
   float green;
   float blue;
-  kr_compositor_controls controls;
-};
-
-struct kr_vector_info {
-  kr_vector_type type;
-  float red;
-  float green;
-  float blue;
-  kr_compositor_controls controls;
-};
-
-struct kr_compositor_path_info {
-  kr_compositor_path_type type;
-  /* Source / Dest res */
-  uint32_t width;
-  uint32_t height;
-  uint32_t crop_x;
-  uint32_t crop_y;
-  uint32_t crop_width;
-  uint32_t crop_height;
-  kr_perspective_view view;
-  kr_compositor_controls controls;
+  kr_compositor_input_info input_info;
 };
 
 void kr_aspect_scale(int srcw, int srch, int dstw, int dsth, int *w, int *h);
+
+#include "gen/krad_compositor_common_to_json.h"
+#include "gen/krad_compositor_common_from_json.h"
+#include "gen/krad_compositor_common_to_ebml.h"
+#include "gen/krad_compositor_common_from_ebml.h"
+#include "gen/krad_compositor_common_to_text.h"
+#include "gen/krad_compositor_common_helpers.h"
+
+#include "krad_vector_common.h"
 
 #endif
