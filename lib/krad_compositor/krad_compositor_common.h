@@ -11,7 +11,7 @@ typedef enum {
   KR_OVERLAY = 1,
   KR_COMP_INPUT,
   KR_COMP_BUS,
-  KR_COMP_OUTPUT,
+  KR_COMP_OUTPUT
 } kr_compositor_path_type;
 
 typedef enum {
