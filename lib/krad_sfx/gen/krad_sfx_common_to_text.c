@@ -12,7 +12,7 @@ int kr_sfx_control_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_sfx_control *)st;
 
-  res += snprintf(&text[res],max-res,"kr_sfx_control : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_sfx_control: %s \n",kr_strfr_kr_sfx_control(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_sfx_effect_type_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_sfx_effect_type *)st;
 
-  res += snprintf(&text[res],max-res,"kr_sfx_effect_type : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_sfx_effect_type: %s \n",kr_strfr_kr_sfx_effect_type(*actual));
 
   return res;
 }
@@ -46,7 +46,7 @@ int kr_sfx_effect_control_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_sfx_effect_control *)st;
 
-  res += snprintf(&text[res],max-res,"kr_sfx_effect_control : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_sfx_effect_control: %s \n",kr_strfr_kr_sfx_effect_control(*actual));
 
   return res;
 }
@@ -63,9 +63,9 @@ int kr_eq_band_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_eq_band_info *)st;
 
-  res += snprintf(&text[res],max-res,"db : %0.2f \n",actual->db);
-  res += snprintf(&text[res],max-res,"bw : %0.2f \n",actual->bw);
-  res += snprintf(&text[res],max-res,"hz : %0.2f \n",actual->hz);
+  res += snprintf(&text[res],max-res,"db: %0.2f \n",actual->db);
+  res += snprintf(&text[res],max-res,"bw: %0.2f \n",actual->bw);
+  res += snprintf(&text[res],max-res,"hz: %0.2f \n",actual->hz);
 
   return res;
 }
@@ -105,8 +105,8 @@ int kr_lowpass_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_lowpass_info *)st;
 
-  res += snprintf(&text[res],max-res,"bw : %0.2f \n",actual->bw);
-  res += snprintf(&text[res],max-res,"hz : %0.2f \n",actual->hz);
+  res += snprintf(&text[res],max-res,"bw: %0.2f \n",actual->bw);
+  res += snprintf(&text[res],max-res,"hz: %0.2f \n",actual->hz);
 
   return res;
 }
@@ -123,8 +123,8 @@ int kr_highpass_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_highpass_info *)st;
 
-  res += snprintf(&text[res],max-res,"bw : %0.2f \n",actual->bw);
-  res += snprintf(&text[res],max-res,"hz : %0.2f \n",actual->hz);
+  res += snprintf(&text[res],max-res,"bw: %0.2f \n",actual->bw);
+  res += snprintf(&text[res],max-res,"hz: %0.2f \n",actual->hz);
 
   return res;
 }
@@ -141,7 +141,7 @@ int kr_volume_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_volume_info *)st;
 
-  res += snprintf(&text[res],max-res,"level : %0.2f \n",actual->level);
+  res += snprintf(&text[res],max-res,"level: %0.2f \n",actual->level);
 
   return res;
 }
@@ -158,8 +158,8 @@ int kr_analog_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_analog_info *)st;
 
-  res += snprintf(&text[res],max-res,"drive : %0.2f \n",actual->drive);
-  res += snprintf(&text[res],max-res,"blend : %0.2f \n",actual->blend);
+  res += snprintf(&text[res],max-res,"drive: %0.2f \n",actual->drive);
+  res += snprintf(&text[res],max-res,"blend: %0.2f \n",actual->blend);
 
   return res;
 }

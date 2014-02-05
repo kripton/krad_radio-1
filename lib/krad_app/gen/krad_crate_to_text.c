@@ -12,7 +12,7 @@ int kr_method_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_method *)st;
 
-  res += snprintf(&text[res],max-res,"kr_method : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_method: %s \n",kr_strfr_kr_method(*actual));
 
   return res;
 }
@@ -32,7 +32,7 @@ int kr_crate_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_crate *)st;
 
-  res += snprintf(&text[res],max-res,"address : %s \n",actual->address);
+  res += snprintf(&text[res],max-res,"address: %s \n",actual->address);
   uber.actual = &(actual->method);
   uber.type = TEXT_KR_METHOD;
   res += info_pack_to_text(&text[res],&uber,max-res);

@@ -12,7 +12,7 @@ int kr_adapter_path_direction_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_adapter_path_direction *)st;
 
-  res += snprintf(&text[res],max-res,"kr_adapter_path_direction : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_adapter_path_direction: %s \n",kr_strfr_kr_adapter_path_direction(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_adapter_api_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_adapter_api *)st;
 
-  res += snprintf(&text[res],max-res,"kr_adapter_api : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_adapter_api: %s \n",kr_strfr_kr_adapter_api(*actual));
 
   return res;
 }
@@ -205,7 +205,7 @@ int kr_adapter_path_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_adapter_path_info *)st;
 
-  res += snprintf(&text[res],max-res,"name : %s \n",actual->name);
+  res += snprintf(&text[res],max-res,"name: %s \n",actual->name);
   uber.actual = &(actual->dir);
   uber.type = TEXT_KR_ADAPTER_PATH_DIRECTION;
   res += info_pack_to_text(&text[res],&uber,max-res);

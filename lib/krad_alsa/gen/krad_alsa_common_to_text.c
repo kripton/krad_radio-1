@@ -12,8 +12,8 @@ int kr_alsa_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_alsa_info *)st;
 
-  res += snprintf(&text[res],max-res,"card : %d \n",actual->card);
-  res += snprintf(&text[res],max-res,"name : %s \n",actual->name);
+  res += snprintf(&text[res],max-res,"card: %d \n",actual->card);
+  res += snprintf(&text[res],max-res,"name: %s \n",actual->name);
 
   return res;
 }
@@ -30,7 +30,7 @@ int kr_alsa_path_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_alsa_path_info *)st;
 
-  res += snprintf(&text[res],max-res,"card_num : %d \n",actual->card_num);
+  res += snprintf(&text[res],max-res,"card_num: %d \n",actual->card_num);
 
   return res;
 }

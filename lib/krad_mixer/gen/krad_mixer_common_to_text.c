@@ -12,7 +12,7 @@ int kr_mixer_channels_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_mixer_channels *)st;
 
-  res += snprintf(&text[res],max-res,"kr_mixer_channels : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_mixer_channels: %s \n",kr_strfr_kr_mixer_channels(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_mixer_path_type_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_mixer_path_type *)st;
 
-  res += snprintf(&text[res],max-res,"kr_mixer_path_type : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_mixer_path_type: %s \n",kr_strfr_kr_mixer_path_type(*actual));
 
   return res;
 }

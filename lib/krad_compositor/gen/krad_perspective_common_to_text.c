@@ -12,8 +12,8 @@ int kr_pos_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_pos *)st;
 
-  res += snprintf(&text[res],max-res,"x : %u \n",actual->x);
-  res += snprintf(&text[res],max-res,"y : %u \n",actual->y);
+  res += snprintf(&text[res],max-res,"x: %u \n",actual->x);
+  res += snprintf(&text[res],max-res,"y: %u \n",actual->y);
 
   return res;
 }

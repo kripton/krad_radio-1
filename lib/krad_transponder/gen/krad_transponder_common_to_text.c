@@ -12,7 +12,7 @@ int krad_link_av_mode_t_to_text(char *text, void *st, int32_t max) {
 
   actual = (krad_link_av_mode_t *)st;
 
-  res += snprintf(&text[res],max-res,"krad_link_av_mode_t : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"krad_link_av_mode_t: %s \n",kr_strfr_krad_link_av_mode_t(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_txpdr_su_type_t_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_txpdr_su_type_t *)st;
 
-  res += snprintf(&text[res],max-res,"kr_txpdr_su_type_t : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_txpdr_su_type_t: %s \n",kr_strfr_kr_txpdr_su_type_t(*actual));
 
   return res;
 }
@@ -46,7 +46,7 @@ int krad_link_transport_mode_t_to_text(char *text, void *st, int32_t max) {
 
   actual = (krad_link_transport_mode_t *)st;
 
-  res += snprintf(&text[res],max-res,"krad_link_transport_mode_t : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"krad_link_transport_mode_t: %s \n",kr_strfr_krad_link_transport_mode_t(*actual));
 
   return res;
 }
@@ -63,7 +63,7 @@ int kr_transponder_path_io_type_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_transponder_path_io_type *)st;
 
-  res += snprintf(&text[res],max-res,"kr_transponder_path_io_type : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_transponder_path_io_type: %s \n",kr_strfr_kr_transponder_path_io_type(*actual));
 
   return res;
 }

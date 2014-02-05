@@ -16,7 +16,7 @@ static void codegen_text_union_content_from_type(struct_data *def, FILE *out) {
     }
     /* TODO: handle unions of primitives (ints,floats,strings...) */
   }
-        
+
   return;
 }
 
@@ -25,7 +25,8 @@ void codegen_text(struct_data *def, char *type, FILE *out) {
   char format[16];
 
   if (def->info.type == ST_ENUM) {
-    fprintf(out,"  res += snprintf(&%s[res],max-res,\"%s : %%u \\n\",*actual);\n",type,def->info.name);
+    fprintf(out,"  res += snprintf(&%s[res],max-res,\"%s: %%s \\n\",kr_strfr_%s(*actual));\n",
+      type,def->info.name,def->info.name);
     return;
   }
 
@@ -40,7 +41,7 @@ void codegen_text(struct_data *def, char *type, FILE *out) {
     if (memb_to_print_format(&def->info.members[i],format)) {
 
       if ((!def->info.members[i].arr && !def->info.members[i].len_def[0]) || def->info.members[i].type == T_CHAR) {
-        fprintf(out,"  res += snprintf(&%s[res],max-res,\"%s : %s \\n\",actual->%s);\n",
+        fprintf(out,"  res += snprintf(&%s[res],max-res,\"%s: %s \\n\",actual->%s);\n",
           type,def->info.members[i].name,format,def->info.members[i].name);
       } else {
         if (def->info.members[i].arr) {
@@ -50,13 +51,13 @@ void codegen_text(struct_data *def, char *type, FILE *out) {
           fprintf(out,"  for (i = 0; i < %s; i++) {\n",def->info.members[i].len_def);
         }
 
-        fprintf(out,"    res += snprintf(&%s[res],max-res,\"%s[%%d] : %s \\n\",i,actual->%s[i]);\n",
+        fprintf(out,"    res += snprintf(&%s[res],max-res,\"%s[%%d]: %s \\n\",i,actual->%s[i]);\n",
           type,def->info.members[i].name,format,def->info.members[i].name);
 
         fprintf(out,"  }\n");
       }
 
-    } else if ( (def->info.members[i-1].type == T_STRUCT && 
+    } else if ( (def->info.members[i-1].type == T_STRUCT &&
       codegen_is_enum(def->info.members[i-1].type_info.substruct_info.type_name))
        && memb_struct_check(&def->info.members[i]) &&
       codegen_is_union(def->info.members[i].type_info.substruct_info.type_name) && (i > 0)) {
@@ -67,7 +68,7 @@ void codegen_text(struct_data *def, char *type, FILE *out) {
       fprintf(out,"  index = %s_to_index(actual->%s);\n",
           def->info.members[i-1].type_info.substruct_info.type_name,
           def->info.members[i-1].name);
- 
+
       fprintf(out,"  uber_sub.type = index;\n");
       fprintf(out,"  uber_sub.actual = &(actual->%s);\n",def->info.members[i].name);
 
@@ -101,7 +102,7 @@ void codegen_text(struct_data *def, char *type, FILE *out) {
         fprintf(out,"  }\n");
       }
 
-    } 
+    }
   }
 
   return;

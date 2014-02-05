@@ -12,7 +12,7 @@ int kr_nil_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_nil *)st;
 
-  res += snprintf(&text[res],max-res,"n : %d \n",actual->n);
+  res += snprintf(&text[res],max-res,"n: %d \n",actual->n);
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_payload_type_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_payload_type *)st;
 
-  res += snprintf(&text[res],max-res,"kr_payload_type : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_payload_type: %s \n",kr_strfr_kr_payload_type(*actual));
 
   return res;
 }

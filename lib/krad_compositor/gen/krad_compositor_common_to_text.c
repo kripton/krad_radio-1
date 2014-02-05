@@ -12,7 +12,7 @@ int kr_compositor_path_type_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_compositor_path_type *)st;
 
-  res += snprintf(&text[res],max-res,"kr_compositor_path_type : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_compositor_path_type: %s \n",kr_strfr_kr_compositor_path_type(*actual));
 
   return res;
 }
@@ -29,7 +29,7 @@ int kr_compositor_overlay_type_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_compositor_overlay_type *)st;
 
-  res += snprintf(&text[res],max-res,"kr_compositor_overlay_type : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_compositor_overlay_type: %s \n",kr_strfr_kr_compositor_overlay_type(*actual));
 
   return res;
 }
@@ -62,7 +62,7 @@ int kr_compositor_output_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_compositor_output_info *)st;
 
-  res += snprintf(&text[res],max-res,"opacity : %0.2f \n",actual->opacity);
+  res += snprintf(&text[res],max-res,"opacity: %0.2f \n",actual->opacity);
 
   return res;
 }
@@ -79,7 +79,7 @@ int kr_compositor_bus_info_to_text(char *text, void *st, int32_t max) {
 
   actual = (struct kr_compositor_bus_info *)st;
 
-  res += snprintf(&text[res],max-res,"opacity : %0.2f \n",actual->opacity);
+  res += snprintf(&text[res],max-res,"opacity: %0.2f \n",actual->opacity);
 
   return res;
 }
@@ -106,9 +106,9 @@ int kr_compositor_input_info_to_text(char *text, void *st, int32_t max) {
   uber.actual = &(actual->view);
   uber.type = TEXT_KR_PERSPECTIVE_VIEW;
   res += info_pack_to_text(&text[res],&uber,max-res);
-  res += snprintf(&text[res],max-res,"z : %u \n",actual->z);
-  res += snprintf(&text[res],max-res,"rotation : %0.2f \n",actual->rotation);
-  res += snprintf(&text[res],max-res,"opacity : %0.2f \n",actual->opacity);
+  res += snprintf(&text[res],max-res,"z: %u \n",actual->z);
+  res += snprintf(&text[res],max-res,"rotation: %0.2f \n",actual->rotation);
+  res += snprintf(&text[res],max-res,"opacity: %0.2f \n",actual->opacity);
 
   return res;
 }

@@ -12,7 +12,7 @@ int kr_easing_to_text(char *text, void *st, int32_t max) {
 
   actual = (kr_easing *)st;
 
-  res += snprintf(&text[res],max-res,"kr_easing : %u \n",*actual);
+  res += snprintf(&text[res],max-res,"kr_easing: %s \n",kr_strfr_kr_easing(*actual));
 
   return res;
 }
