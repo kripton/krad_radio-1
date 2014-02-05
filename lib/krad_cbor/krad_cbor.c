@@ -1,4 +1,5 @@
 #include "krad_cbor.h"
+#include "krad_mem.h"
 
 #define KR_CBOR_UINT 0x00
 #define KR_CBOR_NINT 0x01

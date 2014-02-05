@@ -1,4 +1,6 @@
 #include "krad_cbor.h"
+#include "krad_system.h"
+#include "krad_mem.h"
 
 void cbor_buffer_print(kr_cbor *cbor) {
 
