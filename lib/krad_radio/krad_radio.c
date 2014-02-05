@@ -153,6 +153,7 @@ static int setup_maps(kr_radio *radio) {
   }
   setup.prefix = "/transponder";
   setup.ptr = radio->transponder;
+  setup.payload_type = PL_KR_TRANSPONDER_PATH_INFO;
   setup.create = (kr_router_map_create_handler *)kr_transponder_mkpath;
   setup.connect = NULL;
   setup.patch = (kr_router_map_patch_handler *)kr_transponder_path_ctl;
