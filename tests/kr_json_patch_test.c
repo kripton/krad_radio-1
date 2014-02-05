@@ -244,6 +244,7 @@ int handle_json_patch_obj(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr) 
   char *value;
   int vstart;
   int vlimit;
+  int vret;
   //int vlen;
   kr_jtok *tok;
   if (tokr == NULL) return -1;
@@ -251,6 +252,7 @@ int handle_json_patch_obj(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr) 
   or = 0;
   vstart = 0;
   vlimit = 0;
+  vret = 0;
   //vlen = 0;
   patch_path = NULL;
   value = NULL;
@@ -262,9 +264,11 @@ int handle_json_patch_obj(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr) 
   for (;;) {
     if ((or == 1) && (patch_path != NULL) && (value != NULL)) {
       printf("winner!\n");
+      vret = tokr->cur;
       kr_jtokr_tseek(tokr, vstart);
       ret = handle_json_partial(patchset, path, tokr, vlimit);
       printf("handle json partial ret %d\n", ret);
+      kr_jtokr_tseek(tokr, vret);
       return 0;
     }
     if (oseek != 0) {
@@ -339,7 +343,8 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
       break;
     case JSMN_ARRAY:
       printf("Parsing as JSON PATCH Array\n");
-      while ((ret = handle_json_patch_obj(patchset, path, &tokr) == 0)) {
+      while (ret == 0) {
+        ret = handle_json_patch_obj(patchset, path, &tokr);
         printf("handle json patch obj ret %d\n", ret);
       }
       break;
