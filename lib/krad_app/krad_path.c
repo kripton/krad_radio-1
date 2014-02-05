@@ -83,6 +83,11 @@ int kr_path_steps_ahead(kr_path *path) {
   return (path->count - 1) - path->cur;
 }
 
+int kr_path_steps_free(kr_path *path) {
+  if (path == NULL) return -1;
+  return KR_PATH_COMPONENT_MAX - path->count;
+}
+
 int kr_path_cur_name(kr_path *path, char **name) {
   if (path == NULL) return -1;
   if (name == NULL) return -1;

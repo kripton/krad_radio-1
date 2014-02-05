@@ -21,6 +21,7 @@ int kr_path_steps(kr_path *path);
 int kr_path_rewind(kr_path *path);
 int kr_path_last(kr_path *path, char **name);
 int kr_path_steps_ahead(kr_path *path);
+int kr_path_steps_free(kr_path *path);
 int kr_path_cur_name(kr_path *path, char **name);
 int kr_path_push(kr_path *path, char *str, int len);
 int kr_path_clear_last(kr_path *path);
