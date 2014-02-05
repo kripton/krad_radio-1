@@ -340,6 +340,7 @@ static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   event.type = KR_MIXER_CREATE;
   kr_mixer_path_info_get(path, &event.info);
   path->mixer->event_cb(&event);
+  path->control_user = event.user_path;
 }
 
 static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {

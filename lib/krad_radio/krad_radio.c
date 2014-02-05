@@ -54,7 +54,7 @@ static void mixer_event(kr_mixer_event *event) {
       route_setup.name = event->user_path;
       route_setup.ctx = event->path;
       route_setup.payload.mixer_path_info = event->info;
-      kr_app_server_route_create(radio->app, &route_setup);
+      event->user_path = kr_app_server_route_create(radio->app, &route_setup);
       break;
     case KR_MIXER_PATCH:
       printk("Radio: Mixer path patch event");
@@ -62,7 +62,7 @@ static void mixer_event(kr_mixer_event *event) {
       break;
     case KR_MIXER_DESTROY:
       printk("Radio: Mixer path delete event");
-      /* remove the route */
+      kr_app_server_route_destroy(radio->app, event->user_path);
       break;
     default:
       printke("Radio: Bad event from mixer");
@@ -81,7 +81,7 @@ static void compositor_event(kr_compositor_event *event) {
       route_setup.name = event->user_path;
       route_setup.ctx = event->path;
       route_setup.payload.compositor_path_info = event->info;
-      kr_app_server_route_create(radio->app, &route_setup);
+      event->user_path = kr_app_server_route_create(radio->app, &route_setup);
       break;
     case KR_COM_PATCH:
       printk("Radio: Compositor path patch event");
@@ -89,7 +89,7 @@ static void compositor_event(kr_compositor_event *event) {
       break;
     case KR_COM_DESTROY:
       printk("Radio: Compositor path delete event");
-      /* remove the route */
+      kr_app_server_route_destroy(radio->app, event->user_path);
       break;
     default:
       printke("Radio: Bad event from compositor");

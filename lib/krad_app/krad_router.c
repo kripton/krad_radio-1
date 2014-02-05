@@ -24,6 +24,7 @@ struct kr_route {
   void *ptr;
   kr_router_map *map;
   char name[48];
+  kr_name *namespace;
   kr_payload payload;
 };
 
@@ -180,14 +181,14 @@ static kr_name *create_name(kr_router *router, char *name) {
   return space;
 }
 
-/*
-static int destroy_name(kr_router *router, kr_name *name) {
+static int destroy_name(kr_router *router, kr_name *namespace) {
   int ret;
-  if ((router == NULL) || (name == NULL)) return -1;
-  ret = kr_pool_recycle(router->names, name);
+  if ((router == NULL) || (namespace == NULL)) return -1;
+  printk("Destroyed name: %s", namespace->name);
+  ret = kr_pool_recycle(router->names, namespace);
   return ret;
 }
-*/
+
 
 static kr_route *find_route(kr_router *router, kr_router_map *map, char *name) {
   int i;
@@ -230,21 +231,26 @@ kr_route *kr_route_create(kr_router *router, kr_route_setup *setup) {
   route->map = map;
   route->ptr = setup->ctx; /* tricky ! */
   strncpy(route->name, setup->name->name, sizeof(route->name));
-  setup->name->use++;
-  //route->payload_type = setup->payload_type;
+  route->namespace = setup->name;
+  route->namespace->use++;
   route->payload = setup->payload;
   printk("Created route: %s/%s", map->prefix, route->name);
   return route;
 }
 
-/*
-static int destroy_route(kr_router *router, kr_route *route) {
+int kr_route_destroy(kr_router *router, kr_route *route) {
   int ret;
+  kr_name *name;
   if ((router == NULL) || (route == NULL)) return -1;
+  printk("Destroyed route: %s/%s", route->map->prefix, route->name);
+  name = route->namespace;
   ret = kr_pool_recycle(router->routes, route);
+  name->use--;
+  if (name->use == 0) {
+    destroy_name(router, name);
+  }
   return ret;
 }
-*/
 
 int kr_router_handle(kr_router *router, kr_crate *crate) {
   int i;

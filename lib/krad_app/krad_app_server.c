@@ -631,6 +631,11 @@ kr_router_map *kr_app_server_map_create(kr_app_server *server, kr_router_map_set
   return kr_router_map_create(server->router, setup);
 }
 
+int kr_app_server_route_destroy(kr_app_server *server, kr_route *route) {
+  if (server == NULL) return -1;
+  return kr_route_destroy(server->router, route);
+}
+
 kr_route *kr_app_server_route_create(kr_app_server *server, kr_route_setup *setup) {
   if (server == NULL) return NULL;
   return kr_route_create(server->router, setup);

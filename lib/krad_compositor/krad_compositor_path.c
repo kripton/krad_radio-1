@@ -105,6 +105,7 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   event.type = KR_COM_CREATE;
   event.info = path->info;
   path->compositor->event_cb(&event);
+  path->control_user = event.user_path;
   return path;
 }
 

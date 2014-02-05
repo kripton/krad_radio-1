@@ -58,6 +58,7 @@ int kr_app_server_client_create(kr_app_server *server,
 int kr_app_server_crate_reply(kr_app_server *server, kr_crate *crate);
 int kr_app_server_map_destroy(kr_app_server *server, kr_router_map *map);
 kr_router_map *kr_app_server_map_create(kr_app_server *server, kr_router_map_setup *setup);
+int kr_app_server_route_destroy(kr_app_server *server, kr_route *route);
 kr_route *kr_app_server_route_create(kr_app_server *server, kr_route_setup *setup);
 int kr_app_server_info_get(kr_app_server *server, kr_app_server_info *info);
 int kr_app_server_disable(kr_app_server *server);

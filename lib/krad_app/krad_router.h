@@ -55,6 +55,7 @@ struct kr_router_setup {
   kr_router_response_handler *response;
 };
 
+int kr_route_destroy(kr_router *router, kr_route *route);
 kr_route *kr_route_create(kr_router *router, kr_route_setup *setup);
 int kr_router_handle(kr_router *router, kr_crate *crate);
 int kr_router_map_destroy(kr_router *router, kr_router_map *map);
