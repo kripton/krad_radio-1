@@ -288,11 +288,8 @@ struct krad_transponder_subunit_rep_St {
   kr_transponder_subunit_actual_t actual;
 }; /* do not generate */
 
-typedef struct kr_transponder_info kr_xpdr_info;
 typedef struct kr_transponder_path_info kr_xpdr_path_info;
 typedef struct kr_transponder_path_io_info kr_xpdr_path_io_info;
-
-typedef struct kr_transponder_info kr_transponder_info;
 typedef struct kr_transponder_path_info kr_transponder_path_info;
 typedef struct kr_transponder_path_io_info kr_transponder_path_io_info;
 
@@ -303,10 +300,6 @@ typedef enum {
 } kr_transponder_path_io_type;
 
 typedef kr_transponder_path_io_type kr_xpdr_path_io_type;
-
-struct kr_transponder_info {
-  uint32_t active_paths;
-};
 
 typedef union {
   kr_mixer_path_info mixer_path_info;

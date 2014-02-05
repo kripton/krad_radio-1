@@ -1,6 +1,6 @@
 #include "gen.h"
 int info_pack_to_text(char *text, uber_St *uber, int32_t max) {
-  const info_pack_to_text_func to_text_functions[68] = {kr_alsa_info_to_text,
+  const info_pack_to_text_func to_text_functions[67] = {kr_alsa_info_to_text,
   kr_alsa_path_info_to_text,kr_method_to_text,
   kr_crate_to_text,kr_easing_to_text,
   kr_compositor_path_type_to_text,kr_compositor_overlay_type_to_text,
@@ -28,13 +28,13 @@ int info_pack_to_text(char *text, uber_St *uber, int32_t max) {
   kr_adapter_api_path_info_to_text,kr_adapter_info_to_text,
   kr_adapter_path_info_to_text,krad_link_av_mode_t_to_text,
   kr_txpdr_su_type_t_to_text,krad_link_transport_mode_t_to_text,
-  kr_transponder_path_io_type_to_text,kr_transponder_info_to_text,
-  kr_transponder_path_io_path_info_to_text,kr_transponder_path_io_info_to_text,
-  kr_transponder_path_info_to_text,kr_v4l2_state_to_text,
-  kr_v4l2_mode_to_text,kr_v4l2_info_to_text,
-  kr_v4l2_open_info_to_text,kr_wayland_info_to_text,
-  kr_wayland_path_info_to_text,kr_x11_info_to_text,
-  kr_x11_path_info_to_text};
+  kr_transponder_path_io_type_to_text,kr_transponder_path_io_path_info_to_text,
+  kr_transponder_path_io_info_to_text,kr_transponder_path_info_to_text,
+  kr_v4l2_state_to_text,kr_v4l2_mode_to_text,
+  kr_v4l2_info_to_text,kr_v4l2_open_info_to_text,
+  kr_wayland_info_to_text,kr_wayland_path_info_to_text,
+  kr_x11_info_to_text,kr_x11_path_info_to_text
+  };
   return to_text_functions[uber->type-1](text , uber->actual, max);
 }
 

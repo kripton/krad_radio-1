@@ -76,25 +76,6 @@ int kr_transponder_path_io_type_to_json(char *json, void *st, int32_t max) {
   return res;
 }
 
-int kr_transponder_info_to_json(char *json, void *st, int32_t max) {
-  int res;
-  struct kr_transponder_info *actual;
-
-  res = 0;
-
-  if ((json == NULL) || (st == NULL) || (max < 1)) {
-    return -1;
-  }
-
-  actual = (struct kr_transponder_info *)st;
-
-  res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"active_paths\" : %u",actual->active_paths);
-  res += snprintf(&json[res],max-res,"}");
-
-  return res;
-}
-
 int kr_transponder_path_io_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;

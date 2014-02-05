@@ -1,7 +1,7 @@
 #include "gen.h"
 #include "krad_ebmlx.h"
 int info_pack_to_ebml(kr_ebml *ebml, uber_St *uber) {
-  const info_pack_to_ebml_func to_ebml_functions[70] = {kr_alsa_info_to_ebml,
+  const info_pack_to_ebml_func to_ebml_functions[69] = {kr_alsa_info_to_ebml,
   kr_alsa_path_info_to_ebml,kr_method_to_ebml,
   kr_crate_to_ebml,kr_easing_to_ebml,
   kr_compositor_path_type_to_ebml,kr_compositor_overlay_type_to_ebml,
@@ -30,13 +30,13 @@ int info_pack_to_ebml(kr_ebml *ebml, uber_St *uber) {
   kr_adapter_api_path_info_to_ebml,kr_adapter_info_to_ebml,
   kr_adapter_path_info_to_ebml,krad_link_av_mode_t_to_ebml,
   kr_txpdr_su_type_t_to_ebml,krad_link_transport_mode_t_to_ebml,
-  kr_transponder_path_io_type_to_ebml,kr_transponder_info_to_ebml,
-  kr_transponder_path_io_path_info_to_ebml,kr_transponder_path_io_info_to_ebml,
-  kr_transponder_path_info_to_ebml,kr_v4l2_state_to_ebml,
-  kr_v4l2_mode_to_ebml,kr_v4l2_info_to_ebml,
-  kr_v4l2_open_info_to_ebml,kr_wayland_info_to_ebml,
-  kr_wayland_path_info_to_ebml,kr_x11_info_to_ebml,
-  kr_x11_path_info_to_ebml};
+  kr_transponder_path_io_type_to_ebml,kr_transponder_path_io_path_info_to_ebml,
+  kr_transponder_path_io_info_to_ebml,kr_transponder_path_info_to_ebml,
+  kr_v4l2_state_to_ebml,kr_v4l2_mode_to_ebml,
+  kr_v4l2_info_to_ebml,kr_v4l2_open_info_to_ebml,
+  kr_wayland_info_to_ebml,kr_wayland_path_info_to_ebml,
+  kr_x11_info_to_ebml,kr_x11_path_info_to_ebml
+  };
   return to_ebml_functions[uber->type-1](ebml , uber->actual);
 }
 

@@ -1,12 +1,5 @@
 #include "krad_transponder_common_helpers.h"
 
-kr_transponder_info_member kr_transponder_info_strto_member(char *string, int len) {
-  if (!strncmp(string,"active_paths",len)) {
-    return KR_TRANSPONDER_INFO_ACTIVE_PATHS;
-  }
-  return -1;
-}
-
 kr_transponder_path_io_info_member kr_transponder_path_io_info_strto_member(char *string, int len) {
   if (!strncmp(string,"type",len)) {
     return KR_TRANSPONDER_PATH_IO_INFO_TYPE;
@@ -210,32 +203,6 @@ int kr_strto_kr_transponder_path_io_type(char *string) {
   return -1;
 }
 
-int kr_transponder_info_patch_apply(struct kr_transponder_info *info, kr_transponder_info_patch *patch) {
-  const ptrdiff_t off[1] = { offsetof(struct kr_transponder_info, active_paths)
-  };
-  const size_t sz[1] = { sizeof(info->active_paths)  };
-
-  memcpy((char *)info + off[patch->member], &patch->value, sz[patch->member]);
-  return 0;
-}
-
-kr_var *kr_transponder_info_patch_path(kr_transponder_info_patch *patch, kr_path *path) {
-  char *name;
-  int len;
-  if (patch == NULL) return NULL;
-  if (path == NULL) return NULL;
-  len = kr_path_cur_name(path, &name);
-  patch->member = kr_transponder_info_strto_member(name, len);
-  if (patch->member < 1) return NULL;
-  switch(patch->member) {
-    default:
-      if (kr_path_steps_ahead(path) != 0) return NULL;
-      break;
-  }
-  /*patch->value.var.type = NN; not sure about this uhm*/
-  return &patch->value.var;
-}
-
 int kr_transponder_path_io_info_patch_apply(struct kr_transponder_path_io_info *info, kr_transponder_path_io_info_patch *patch) {
   const ptrdiff_t off[2] = { offsetof(struct kr_transponder_path_io_info, type), 
     offsetof(struct kr_transponder_path_io_info, info)
@@ -296,33 +263,6 @@ kr_var *kr_transponder_path_info_patch_path(kr_transponder_path_info_patch *patc
   }
   /*patch->value.var.type = NN; not sure about this uhm*/
   return &patch->value.var;
-}
-
-int kr_transponder_info_init(struct kr_transponder_info *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-
-  return 0;
-}
-
-int kr_transponder_info_valid(struct kr_transponder_info *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-
-  return 0;
-}
-
-int kr_transponder_info_random(struct kr_transponder_info *st) {
-  if (st == NULL) {
-    return -1;
-  }
-
-
-  return 0;
 }
 
 int kr_transponder_path_io_path_info_init(kr_transponder_path_io_path_info *st, int idx) {

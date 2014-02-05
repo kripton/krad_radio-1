@@ -68,23 +68,6 @@ int kr_transponder_path_io_type_fr_ebml(kr_ebml *ebml, void *st) {
   return res;
 }
 
-int kr_transponder_info_fr_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  struct kr_transponder_info *actual;
-
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (struct kr_transponder_info *)st;
-
-  res += kr_ebml2_unpack_element_uint32(ebml, NULL, &actual->active_paths);
-
-  return res;
-}
-
 int kr_transponder_path_io_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;

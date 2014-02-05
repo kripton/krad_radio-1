@@ -25,7 +25,6 @@ struct kr_transponder_path {
 struct kr_transponder {
   kr_mixer *mixer;
   kr_compositor *compositor;
-  kr_transponder_info info;
   kr_adapter *adapter[ADP_TEMP_MAX]; /*FIXME size*/
   kr_pool *path_pool;
   kr_adapter_monitor *adapter_mon;
@@ -295,7 +294,6 @@ int kr_transponder_unlink(kr_xpdr_path *path) {
   if (path == NULL) return -1;
   xpdr = path->xpdr;
   path_destroy(path);
-  xpdr->info.active_paths--;
   event.user = path->xpdr->user;
   event.user_path = path->user;
   event.path = path;
@@ -319,7 +317,6 @@ int kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   path->user = p;
   ret = path_create(path);
   if (ret) return -4;
-  x->info.active_paths++;
   event.user = path->xpdr->user;
   event.user_path = path->user;
   event.path = path;

@@ -469,12 +469,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_adapter_path_info_patch_value";
     case CGEN_KR_ADAPTER_PATH_INFO_PATCH:
       return "kr_adapter_path_info_patch";
-    case CGEN_KR_TRANSPONDER_INFO_MEMBER:
-      return "kr_transponder_info_member";
-    case CGEN_KR_TRANSPONDER_INFO_PATCH_VALUE:
-      return "kr_transponder_info_patch_value";
-    case CGEN_KR_TRANSPONDER_INFO_PATCH:
-      return "kr_transponder_info_patch";
     case CGEN_KR_TRANSPONDER_PATH_IO_INFO_MEMBER:
       return "kr_transponder_path_io_info_member";
     case CGEN_KR_TRANSPONDER_PATH_IO_INFO_PATCH_VALUE:
@@ -531,8 +525,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_link_transport_mode_t";
     case CGEN_KR_TRANSPONDER_PATH_IO_TYPE:
       return "kr_transponder_path_io_type";
-    case CGEN_KR_TRANSPONDER_INFO:
-      return "kr_transponder_info";
     case CGEN_KR_TRANSPONDER_PATH_IO_PATH_INFO:
       return "kr_transponder_path_io_path_info";
     case CGEN_KR_TRANSPONDER_PATH_IO_INFO:
@@ -1345,15 +1337,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_adapter_path_info_patch")) {
     return CGEN_KR_ADAPTER_PATH_INFO_PATCH;
   }
-  if (!strcmp(string,"kr_transponder_info_member")) {
-    return CGEN_KR_TRANSPONDER_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_transponder_info_patch_value")) {
-    return CGEN_KR_TRANSPONDER_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_transponder_info_patch")) {
-    return CGEN_KR_TRANSPONDER_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_transponder_path_io_info_member")) {
     return CGEN_KR_TRANSPONDER_PATH_IO_INFO_MEMBER;
   }
@@ -1437,9 +1420,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_transponder_path_io_type")) {
     return CGEN_KR_TRANSPONDER_PATH_IO_TYPE;
-  }
-  if (!strcmp(string,"kr_transponder_info")) {
-    return CGEN_KR_TRANSPONDER_INFO;
   }
   if (!strcmp(string,"kr_transponder_path_io_path_info")) {
     return CGEN_KR_TRANSPONDER_PATH_IO_PATH_INFO;
@@ -1816,9 +1796,6 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_adapter_path_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_transponder_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_transponder_path_io_info_member")) {
