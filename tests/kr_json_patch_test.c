@@ -338,7 +338,7 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
   switch (tok->type) {
     case JSMN_OBJECT:
       printf("Parsing as JSON partial update\n");
-      ret = handle_json_partial(patchset, path, &tokr, 0);
+      ret = handle_json_partial(patchset, path, &tokr, json_len);
       printf("handle json partial ret %d\n", ret);
       break;
     case JSMN_ARRAY:
