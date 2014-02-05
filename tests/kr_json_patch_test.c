@@ -241,15 +241,20 @@ int handle_json_patch_obj(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr) 
   int ret;
   int oseek;
   char *patch_path;
+  char *name;
+  int ret2;
+  int len2;
   char *value;
   int vstart;
   int vlimit;
   int vret;
+  int patch_path_len;
   //int vlen;
   kr_jtok *tok;
   if (tokr == NULL) return -1;
   oseek = 0;
   or = 0;
+  patch_path_len = 0;
   vstart = 0;
   vlimit = 0;
   vret = 0;
@@ -266,7 +271,25 @@ int handle_json_patch_obj(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr) 
       printf("winner!\n");
       vret = tokr->cur;
       kr_jtokr_tseek(tokr, vstart);
+  kr_path *path2;
+  kr_path_alloca(path2);
+  kr_path_parse(path, patch_path, patch_path_len);
+  for (;;) {
+    len2 = kr_path_cur_name(path2, &name);
+    /*printf("/ (%d) %.*s ", len, len, name);*/
+//    printf("/ %.*s ", len, name);
+    kr_path_push(path, name, len2);
+    ret2 = kr_path_step(path2);
+    if (ret2 != 0) break;
+  }
+  printf("\n");
+
       ret = handle_json_partial(patchset, path, tokr, vlimit);
+while (kr_path_steps(path2)) {
+  kr_path_clear_last(path);
+  kr_path_clear_last(path2);
+}
+
       printf("handle json partial ret %d\n", ret);
       kr_jtokr_tseek(tokr, vret);
       return 0;
@@ -294,6 +317,7 @@ int handle_json_patch_obj(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr) 
           tok = kr_jtokr_iter(tokr);
           //printf("we got path\n");
           patch_path = &tokr->json[tok->start];
+          patch_path_len = tok->end - tok->start;
           continue;
         }
         if ((value == NULL) && (kr_jtokstrcmp(tokr, tok, "value", 5) == 0)) {
@@ -354,7 +378,6 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
   }
   return patchset->used;
 }
-
 
 static int test(char *json_in) {
   int ret;
