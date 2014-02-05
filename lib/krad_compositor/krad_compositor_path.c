@@ -71,7 +71,7 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   kr_vertex_type vertex_type;
   kr_compositor_event event;
   kr_compositor_path *path;
-  if ((path == NULL) || (setup == NULL)) return NULL;
+  if ((comp == NULL) || (setup == NULL)) return NULL;
   ret = path_setup_check(setup);
   if (ret) {
     printke("compositor mkpath failed setup check: %d", ret);
@@ -271,7 +271,8 @@ int kr_compositor_mkinput(kr_compositor_path *to, kr_compositor_path *fr,
   kr_compositor_path *path;
   if ((fr == NULL) || (to == NULL) || (info == NULL) || (user == NULL)) return -1;
   if (fr->compositor != to->compositor) return -2;
-  setup.info = info;
+  setup.info->type = KR_COM_INPUT;
+  setup.info->info.input_info = *info;
   setup.control_user = user;
   setup.frame_user = NULL;
   setup.frame_cb = NULL;
