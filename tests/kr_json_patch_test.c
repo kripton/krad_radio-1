@@ -180,11 +180,13 @@ int handle_json_partial(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr, in
       parents[parent] = tok->size;
       newparent = 0;
     } else {
+      if (parent > 0) {
       if (parents[parent] == 0) {
         kr_path_clear_last(path);
         parent--;
       if (parents[parent]) {
         parents[parent]--;
+      }
       }
       }
     }
