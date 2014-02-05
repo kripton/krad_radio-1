@@ -151,18 +151,42 @@ static void path_print(kr_path *path) {
 int handle_json_partial(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr, int limit) {
   kr_jtok *tok;
   int ret;
+  int parents[10];
+  int parent;
+  int newparent;
   int p;
   int c;
   union {
     int integer;
     float real;
   } value;
+  newparent = 0;
+  parent = 0;
+  memset(&parents, 0, sizeof(parents));
   ret = 0;
   while ((tok = kr_jtokr_iter_limit(tokr, limit))) {
     if (patchset->used == KR_PATCHSET_PATCHES_MAX) {
       /* damn this would be attacker to fail */
       printf("Too many patches\n");
       return -1;
+    }
+    if (newparent) {
+      if (parents[parent]) {
+        parents[parent]--;
+      }
+      if (parents[parent]) {
+        parent++;
+      }
+      parents[parent] = tok->size;
+      newparent = 0;
+    } else {
+      if (parents[parent] == 0) {
+        kr_path_clear_last(path);
+        parent--;
+      if (parents[parent]) {
+        parents[parent]--;
+      }
+      }
     }
     switch (tok->type) {
       case JSMN_OBJECT:
@@ -179,6 +203,7 @@ int handle_json_partial(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr, in
           return -1;
         }
         kr_path_push(path, &tokr->json[tok->start], tok->end - tok->start);
+        newparent++;
         if (0) {
           path_print(path);
           kr_path_rewind(path);
@@ -224,7 +249,7 @@ int handle_json_partial(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr, in
           return -1;
         }
         patchset->used++;
-        kr_path_clear_last(path);
+       // kr_path_clear_last(path);
         break;
       default:
         printf("O dear major jsmn messup!\n");
@@ -261,6 +286,7 @@ int handle_json_patch_obj(kr_patchset *patchset, kr_path *path, kr_jtokr *tokr) 
   //vlen = 0;
   patch_path = NULL;
   value = NULL;
+  name = NULL;
   tok = kr_jtokr_iter(tokr);
   if (tok == NULL) return -3;
   if (tok->type != JSMN_OBJECT) return -1;
