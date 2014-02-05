@@ -4,7 +4,6 @@ int kr_adapter_path_direction_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_adapter_path_direction *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -12,18 +11,15 @@ int kr_adapter_path_direction_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_adapter_path_direction *)st;
-
   type = kr_strfr_kr_adapter_path_direction(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_adapter_api_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_adapter_api *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -31,20 +27,16 @@ int kr_adapter_api_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_adapter_api *)st;
-
   type = kr_strfr_kr_adapter_api(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_adapter_api_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-
   kr_adapter_api_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -52,13 +44,10 @@ int kr_adapter_api_info_to_json(char *json, void *st, int32_t max) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_adapter_api_info *)uber_actual->actual;
-
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->jack);
@@ -101,14 +90,11 @@ int kr_adapter_api_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_adapter_api_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-
   kr_adapter_api_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -116,13 +102,10 @@ int kr_adapter_api_path_info_to_json(char *json, void *st, int32_t max) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_adapter_api_path_info *)uber_actual->actual;
-
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->jack);
@@ -165,14 +148,12 @@ int kr_adapter_api_path_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_adapter_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_adapter_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -180,7 +161,6 @@ int kr_adapter_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_adapter_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"api\": ");
   uber.actual = &(actual->api);
@@ -198,14 +178,12 @@ int kr_adapter_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_adapter_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_adapter_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -213,7 +191,6 @@ int kr_adapter_path_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_adapter_path_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"name\" : \"%s\",",actual->name);
   res += snprintf(&json[res],max-res,"\"dir\": ");
@@ -237,4 +214,3 @@ int kr_adapter_path_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

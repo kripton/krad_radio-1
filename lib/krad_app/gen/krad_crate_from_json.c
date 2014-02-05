@@ -32,7 +32,6 @@ int kr_method_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_crate_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
@@ -45,7 +44,6 @@ int kr_crate_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_crate *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -53,7 +51,6 @@ int kr_crate_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_crate *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -161,4 +158,3 @@ int kr_crate_fr_json(char *json, void *st) {
 
   return res;
 }
-

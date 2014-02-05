@@ -4,7 +4,6 @@ int kr_jack_direction_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_jack_direction *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -12,18 +11,15 @@ int kr_jack_direction_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_jack_direction *)st;
-
   type = kr_strfr_kr_jack_direction(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_jack_state_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_jack_state *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -31,17 +27,14 @@ int kr_jack_state_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_jack_state *)st;
-
   type = kr_strfr_kr_jack_state(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_jack_setup_info_to_json(char *json, void *st, int32_t max) {
   int res;
   kr_jack_setup_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -49,7 +42,6 @@ int kr_jack_setup_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_jack_setup_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"client_name\" : \"%s\",",actual->client_name);
   res += snprintf(&json[res],max-res,"\"server_name\" : \"%s\"",actual->server_name);
@@ -57,12 +49,10 @@ int kr_jack_setup_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_jack_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   kr_jack_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -70,7 +60,6 @@ int kr_jack_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_jack_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"client_name\" : \"%s\",",actual->client_name);
   res += snprintf(&json[res],max-res,"\"server_name\" : \"%s\",",actual->server_name);
@@ -89,12 +78,10 @@ int kr_jack_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_jack_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   kr_jack_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -102,7 +89,6 @@ int kr_jack_path_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_jack_path_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"name\" : \"%s\",",actual->name);
   res += snprintf(&json[res],max-res,"\"channels\" : %d,",actual->channels);
@@ -114,4 +100,3 @@ int kr_jack_path_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

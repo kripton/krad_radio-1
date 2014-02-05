@@ -4,7 +4,6 @@ int kr_v4l2_state_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_v4l2_state *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -12,17 +11,14 @@ int kr_v4l2_state_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_v4l2_state *)st;
-
   type = kr_strfr_kr_v4l2_state(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_v4l2_mode_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_v4l2_mode *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -30,7 +26,6 @@ int kr_v4l2_mode_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_v4l2_mode *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"width\" : %d,",actual->width);
   res += snprintf(&json[res],max-res,"\"height\" : %d,",actual->height);
@@ -41,12 +36,10 @@ int kr_v4l2_mode_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_v4l2_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   struct kr_v4l2_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -54,7 +47,6 @@ int kr_v4l2_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_v4l2_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"dev\" : %d,",actual->dev);
   res += snprintf(&json[res],max-res,"\"priority\" : %d,",actual->priority);
@@ -71,12 +63,10 @@ int kr_v4l2_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_v4l2_open_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   struct kr_v4l2_open_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -84,7 +74,6 @@ int kr_v4l2_open_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_v4l2_open_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"dev\" : %d,",actual->dev);
   res += snprintf(&json[res],max-res,"\"priority\" : %d,",actual->priority);
@@ -96,4 +85,3 @@ int kr_v4l2_open_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

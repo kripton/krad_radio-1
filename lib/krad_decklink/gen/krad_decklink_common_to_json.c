@@ -3,7 +3,6 @@
 int kr_decklink_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_decklink_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -11,18 +10,15 @@ int kr_decklink_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_decklink_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"device\" : \"%s\"",actual->device);
   res += snprintf(&json[res],max-res,"}");
 
   return res;
 }
-
 int kr_decklink_path_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_decklink_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -30,7 +26,6 @@ int kr_decklink_path_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_decklink_path_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"device\" : \"%s\",",actual->device);
   res += snprintf(&json[res],max-res,"\"width\" : %u,",actual->width);
@@ -43,4 +38,3 @@ int kr_decklink_path_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

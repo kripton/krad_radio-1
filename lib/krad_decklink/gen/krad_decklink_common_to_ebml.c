@@ -3,7 +3,6 @@
 int kr_decklink_info_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   struct kr_decklink_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -11,16 +10,13 @@ int kr_decklink_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_decklink_info *)st;
-
   res += kr_ebml_pack_string(ebml, 0xe1, actual->device);
 
   return res;
 }
-
 int kr_decklink_path_info_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   struct kr_decklink_path_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -28,7 +24,6 @@ int kr_decklink_path_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_decklink_path_info *)st;
-
   res += kr_ebml_pack_string(ebml, 0xe1, actual->device);
   res += kr_ebml_pack_uint32(ebml, 0xe1, actual->width);
   res += kr_ebml_pack_uint32(ebml, 0xe1, actual->height);
@@ -39,4 +34,3 @@ int kr_decklink_path_info_to_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-

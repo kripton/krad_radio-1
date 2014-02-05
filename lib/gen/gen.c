@@ -1,3 +1,4 @@
+static int depth_state = 1;
 #include "../krad_alsa/gen/krad_alsa_common_to_ebml.c"
 #include "../krad_alsa/gen/krad_alsa_common_from_ebml.c"
 #include "../krad_alsa/gen/krad_alsa_common_to_text.c"

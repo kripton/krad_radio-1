@@ -32,7 +32,6 @@ int kr_sfx_control_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_sfx_effect_type_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -65,7 +64,6 @@ int kr_sfx_effect_type_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_sfx_effect_control_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -98,7 +96,6 @@ int kr_sfx_effect_control_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_eq_band_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -107,7 +104,6 @@ int kr_eq_band_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_eq_band_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -115,7 +111,6 @@ int kr_eq_band_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_eq_band_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -190,7 +185,6 @@ int kr_eq_band_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_eq_info_fr_json(char *json, void *st) {
   uber_St uber;
   int i;
@@ -201,7 +195,6 @@ int kr_eq_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_eq_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -209,7 +202,6 @@ int kr_eq_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_eq_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -264,7 +256,6 @@ int kr_eq_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_lowpass_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -273,7 +264,6 @@ int kr_lowpass_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_lowpass_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -281,7 +271,6 @@ int kr_lowpass_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_lowpass_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -338,7 +327,6 @@ int kr_lowpass_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_highpass_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -347,7 +335,6 @@ int kr_highpass_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_highpass_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -355,7 +342,6 @@ int kr_highpass_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_highpass_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -412,7 +398,6 @@ int kr_highpass_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_volume_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -421,7 +406,6 @@ int kr_volume_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_volume_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -429,7 +413,6 @@ int kr_volume_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_volume_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -468,7 +451,6 @@ int kr_volume_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_analog_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -477,7 +459,6 @@ int kr_analog_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_analog_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -485,7 +466,6 @@ int kr_analog_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_analog_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -542,4 +522,3 @@ int kr_analog_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

@@ -8,7 +8,6 @@ int kr_pos_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_pos *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -16,7 +15,6 @@ int kr_pos_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_pos *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -73,7 +71,6 @@ int kr_pos_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_perspective_view_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -83,7 +80,6 @@ int kr_perspective_view_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_perspective_view *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -91,7 +87,6 @@ int kr_perspective_view_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_perspective_view *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -212,4 +207,3 @@ int kr_perspective_view_fr_json(char *json, void *st) {
 
   return res;
 }
-

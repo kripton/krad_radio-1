@@ -32,7 +32,6 @@ int kr_adapter_path_direction_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_adapter_api_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -65,7 +64,6 @@ int kr_adapter_api_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_adapter_api_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -75,9 +73,7 @@ int kr_adapter_api_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   uber_St *uber_actual;
-
   kr_adapter_api_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -85,13 +81,10 @@ int kr_adapter_api_info_fr_json(char *json, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_adapter_api_info *)uber_actual->actual;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -172,7 +165,6 @@ int kr_adapter_api_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_adapter_api_path_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -182,9 +174,7 @@ int kr_adapter_api_path_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   uber_St *uber_actual;
-
   kr_adapter_api_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -192,13 +182,10 @@ int kr_adapter_api_path_info_fr_json(char *json, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_adapter_api_path_info *)uber_actual->actual;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -279,7 +266,6 @@ int kr_adapter_api_path_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_adapter_info_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
@@ -292,7 +278,6 @@ int kr_adapter_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_adapter_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -300,7 +285,6 @@ int kr_adapter_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_adapter_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -369,7 +353,6 @@ int kr_adapter_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_adapter_path_info_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
@@ -382,7 +365,6 @@ int kr_adapter_path_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_adapter_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -390,7 +372,6 @@ int kr_adapter_path_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_adapter_path_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -498,4 +479,3 @@ int kr_adapter_path_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

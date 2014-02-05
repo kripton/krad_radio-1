@@ -4,7 +4,6 @@ int kr_method_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_method *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -12,20 +11,17 @@ int kr_method_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_method *)st;
-
   type = kr_strfr_kr_method(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_crate_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_crate *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -33,7 +29,6 @@ int kr_crate_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_crate *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"address\" : \"%s\",",actual->address);
   res += snprintf(&json[res],max-res,"\"method\": ");
@@ -57,4 +52,3 @@ int kr_crate_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

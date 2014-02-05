@@ -3,7 +3,6 @@
 int kr_pos_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_pos *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -11,7 +10,6 @@ int kr_pos_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_pos *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"x\" : %u,",actual->x);
   res += snprintf(&json[res],max-res,"\"y\" : %u",actual->y);
@@ -19,12 +17,10 @@ int kr_pos_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_perspective_view_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   struct kr_perspective_view *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -32,7 +28,6 @@ int kr_perspective_view_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_perspective_view *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"top_left\": ");
   uber.actual = &(actual->top_left);
@@ -57,4 +52,3 @@ int kr_perspective_view_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

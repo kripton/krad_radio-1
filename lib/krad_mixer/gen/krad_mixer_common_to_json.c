@@ -4,7 +4,6 @@ int kr_mixer_channels_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_mixer_channels *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -12,18 +11,15 @@ int kr_mixer_channels_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_mixer_channels *)st;
-
   type = kr_strfr_kr_mixer_channels(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_mixer_path_type_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_mixer_path_type *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -31,18 +27,15 @@ int kr_mixer_path_type_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_mixer_path_type *)st;
-
   type = kr_strfr_kr_mixer_path_type(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   struct kr_mixer_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -50,7 +43,6 @@ int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_mixer_path_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"type\": ");
   uber.actual = &(actual->type);
@@ -90,4 +82,3 @@ int kr_mixer_path_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

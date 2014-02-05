@@ -3,7 +3,6 @@
 int krad_link_av_mode_t_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   krad_link_av_mode_t *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -11,16 +10,13 @@ int krad_link_av_mode_t_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (krad_link_av_mode_t *)st;
-
   res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
-
 int kr_txpdr_su_type_t_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_txpdr_su_type_t *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -28,16 +24,13 @@ int kr_txpdr_su_type_t_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_txpdr_su_type_t *)st;
-
   res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
-
 int krad_link_transport_mode_t_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   krad_link_transport_mode_t *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -45,16 +38,13 @@ int krad_link_transport_mode_t_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (krad_link_transport_mode_t *)st;
-
   res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
-
 int kr_transponder_path_io_type_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_transponder_path_io_type *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -62,19 +52,15 @@ int kr_transponder_path_io_type_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_transponder_path_io_type *)st;
-
   res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
-
 int kr_transponder_path_io_path_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-
   kr_transponder_path_io_path_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -82,13 +68,10 @@ int kr_transponder_path_io_path_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_transponder_path_io_path_info *)uber_actual->actual;
-
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->mixer_path_info);
@@ -113,14 +96,12 @@ int kr_transponder_path_io_path_info_to_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-
 int kr_transponder_path_io_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_transponder_path_io_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -128,7 +109,6 @@ int kr_transponder_path_io_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_transponder_path_io_info *)st;
-
   uber.actual = &(actual->type);
   uber.type = EBML_KR_TRANSPONDER_PATH_IO_TYPE;
   res += info_pack_to_ebml(&ebml[res],&uber);
@@ -141,12 +121,10 @@ int kr_transponder_path_io_info_to_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-
 int kr_transponder_path_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   struct kr_transponder_path_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -154,7 +132,6 @@ int kr_transponder_path_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_transponder_path_info *)st;
-
   uber.actual = &(actual->input);
   uber.type = EBML_KR_TRANSPONDER_PATH_IO_INFO;
   res += info_pack_to_ebml(&ebml[res],&uber);
@@ -164,4 +141,3 @@ int kr_transponder_path_info_to_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-

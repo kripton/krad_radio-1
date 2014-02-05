@@ -3,7 +3,6 @@
 int kr_adapter_path_direction_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_adapter_path_direction *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -11,16 +10,13 @@ int kr_adapter_path_direction_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_adapter_path_direction *)st;
-
   res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
 
   return res;
 }
-
 int kr_adapter_api_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_adapter_api *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -28,19 +24,15 @@ int kr_adapter_api_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_adapter_api *)st;
-
   res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
 
   return res;
 }
-
 int kr_adapter_api_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-
   kr_adapter_api_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -48,13 +40,10 @@ int kr_adapter_api_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_adapter_api_info *)uber_actual->actual;
-
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->jack);
@@ -97,14 +86,11 @@ int kr_adapter_api_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-
 int kr_adapter_api_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-
   kr_adapter_api_path_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -112,13 +98,10 @@ int kr_adapter_api_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_adapter_api_path_info *)uber_actual->actual;
-
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->jack);
@@ -161,14 +144,12 @@ int kr_adapter_api_path_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-
 int kr_adapter_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_adapter_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -176,7 +157,6 @@ int kr_adapter_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_adapter_info *)st;
-
   uber.actual = &(actual->api);
   uber.type = DEBML_KR_ADAPTER_API;
   res += info_unpack_fr_ebml(&ebml[res],&uber);
@@ -189,14 +169,12 @@ int kr_adapter_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-
 int kr_adapter_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_adapter_path_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -204,7 +182,6 @@ int kr_adapter_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_adapter_path_info *)st;
-
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->name , sizeof(actual->name));
   uber.actual = &(actual->dir);
   uber.type = DEBML_KR_ADAPTER_PATH_DIRECTION;
@@ -221,4 +198,3 @@ int kr_adapter_path_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-

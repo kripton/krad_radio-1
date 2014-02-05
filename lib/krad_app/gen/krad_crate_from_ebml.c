@@ -3,7 +3,6 @@
 int kr_method_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_method *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -11,19 +10,16 @@ int kr_method_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_method *)st;
-
   res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
 
   return res;
 }
-
 int kr_crate_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_crate *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -31,7 +27,6 @@ int kr_crate_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_crate *)st;
-
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->address , sizeof(actual->address));
   uber.actual = &(actual->method);
   uber.type = DEBML_KR_METHOD;
@@ -48,4 +43,3 @@ int kr_crate_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-

@@ -3,7 +3,7 @@
 int kr_text_info_to_text(char *text, void *st, int32_t max) {
   int res;
   struct kr_text_info *actual;
-
+  char indent[(depth_state*2)+1];
   res = 0;
 
   if ((text == NULL) || (st == NULL) || (max < 1)) {
@@ -11,13 +11,13 @@ int kr_text_info_to_text(char *text, void *st, int32_t max) {
   }
 
   actual = (struct kr_text_info *)st;
-
-  res += snprintf(&text[res],max-res,"string: %s \n",actual->string);
-  res += snprintf(&text[res],max-res,"font: %s \n",actual->font);
-  res += snprintf(&text[res],max-res,"red: %0.2f \n",actual->red);
-  res += snprintf(&text[res],max-res,"green: %0.2f \n",actual->green);
-  res += snprintf(&text[res],max-res,"blue: %0.2f \n",actual->blue);
+  memset(indent,' ',depth_state*2);
+  indent[depth_state*2] = '\0';
+  res += snprintf(&text[res],max-res,"%sstring: %s \n",indent,actual->string);
+  res += snprintf(&text[res],max-res,"%sfont: %s \n",indent,actual->font);
+  res += snprintf(&text[res],max-res,"%sred: %0.2f \n",indent,actual->red);
+  res += snprintf(&text[res],max-res,"%sgreen: %0.2f \n",indent,actual->green);
+  res += snprintf(&text[res],max-res,"%sblue: %0.2f \n",indent,actual->blue);
 
   return res;
 }
-

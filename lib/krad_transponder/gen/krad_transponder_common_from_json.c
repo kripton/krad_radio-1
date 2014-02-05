@@ -32,7 +32,6 @@ int krad_link_av_mode_t_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_txpdr_su_type_t_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -65,7 +64,6 @@ int kr_txpdr_su_type_t_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int krad_link_transport_mode_t_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -98,7 +96,6 @@ int krad_link_transport_mode_t_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_transponder_path_io_type_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -131,7 +128,6 @@ int kr_transponder_path_io_type_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_transponder_path_io_path_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -141,9 +137,7 @@ int kr_transponder_path_io_path_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   uber_St *uber_actual;
-
   kr_transponder_path_io_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -151,13 +145,10 @@ int kr_transponder_path_io_path_info_fr_json(char *json, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_transponder_path_io_path_info *)uber_actual->actual;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -208,7 +199,6 @@ int kr_transponder_path_io_path_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_transponder_path_io_info_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
@@ -221,7 +211,6 @@ int kr_transponder_path_io_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_transponder_path_io_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -229,7 +218,6 @@ int kr_transponder_path_io_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_transponder_path_io_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -298,7 +286,6 @@ int kr_transponder_path_io_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_transponder_path_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -308,7 +295,6 @@ int kr_transponder_path_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_transponder_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -316,7 +302,6 @@ int kr_transponder_path_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_transponder_path_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -387,4 +372,3 @@ int kr_transponder_path_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

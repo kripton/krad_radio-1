@@ -32,7 +32,6 @@ int kr_compositor_path_type_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_compositor_overlay_type_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -65,7 +64,6 @@ int kr_compositor_overlay_type_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_rect_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -74,7 +72,6 @@ int kr_rect_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_rect *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -82,7 +79,6 @@ int kr_rect_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_rect *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -103,7 +99,6 @@ int kr_rect_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_compositor_output_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -112,7 +107,6 @@ int kr_compositor_output_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_compositor_output_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -120,7 +114,6 @@ int kr_compositor_output_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_compositor_output_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -159,7 +152,6 @@ int kr_compositor_output_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_compositor_bus_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -168,7 +160,6 @@ int kr_compositor_bus_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_compositor_bus_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -176,7 +167,6 @@ int kr_compositor_bus_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_compositor_bus_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -215,7 +205,6 @@ int kr_compositor_bus_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_compositor_input_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -225,7 +214,6 @@ int kr_compositor_input_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_compositor_input_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -233,7 +221,6 @@ int kr_compositor_input_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_compositor_input_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -383,7 +370,6 @@ int kr_compositor_input_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_compositor_source_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -392,7 +378,6 @@ int kr_compositor_source_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_compositor_source_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -400,7 +385,6 @@ int kr_compositor_source_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_compositor_source_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -421,7 +405,6 @@ int kr_compositor_source_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_overlay_type_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -431,9 +414,7 @@ int kr_overlay_type_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   uber_St *uber_actual;
-
   kr_overlay_type_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -441,13 +422,10 @@ int kr_overlay_type_info_fr_json(char *json, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_overlay_type_info *)uber_actual->actual;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -498,7 +476,6 @@ int kr_overlay_type_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_overlay_info_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
@@ -511,7 +488,6 @@ int kr_overlay_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_overlay_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -519,7 +495,6 @@ int kr_overlay_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_overlay_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -588,7 +563,6 @@ int kr_overlay_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_compositor_path_type_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -598,9 +572,7 @@ int kr_compositor_path_type_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   uber_St *uber_actual;
-
   kr_compositor_path_type_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -608,13 +580,10 @@ int kr_compositor_path_type_info_fr_json(char *json, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_compositor_path_type_info *)uber_actual->actual;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -675,7 +644,6 @@ int kr_compositor_path_type_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_compositor_path_info_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
@@ -688,7 +656,6 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_compositor_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -696,7 +663,6 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_compositor_path_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -765,4 +731,3 @@ int kr_compositor_path_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

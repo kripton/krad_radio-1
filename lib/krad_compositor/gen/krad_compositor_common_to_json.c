@@ -4,7 +4,6 @@ int kr_compositor_path_type_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_compositor_path_type *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -12,18 +11,15 @@ int kr_compositor_path_type_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_compositor_path_type *)st;
-
   type = kr_strfr_kr_compositor_path_type(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_compositor_overlay_type_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_compositor_overlay_type *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -31,17 +27,14 @@ int kr_compositor_overlay_type_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_compositor_overlay_type *)st;
-
   type = kr_strfr_kr_compositor_overlay_type(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_rect_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_rect *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -49,17 +42,14 @@ int kr_rect_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_rect *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"}");
 
   return res;
 }
-
 int kr_compositor_output_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_compositor_output_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -67,18 +57,15 @@ int kr_compositor_output_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_compositor_output_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"opacity\" : %0.2f",actual->opacity);
   res += snprintf(&json[res],max-res,"}");
 
   return res;
 }
-
 int kr_compositor_bus_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_compositor_bus_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -86,19 +73,16 @@ int kr_compositor_bus_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_compositor_bus_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"opacity\" : %0.2f",actual->opacity);
   res += snprintf(&json[res],max-res,"}");
 
   return res;
 }
-
 int kr_compositor_input_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   struct kr_compositor_input_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -106,7 +90,6 @@ int kr_compositor_input_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_compositor_input_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"crop\": ");
   uber.actual = &(actual->crop);
@@ -130,11 +113,9 @@ int kr_compositor_input_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_compositor_source_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_compositor_source_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -142,20 +123,16 @@ int kr_compositor_source_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_compositor_source_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"}");
 
   return res;
 }
-
 int kr_overlay_type_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-
   kr_overlay_type_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -163,13 +140,10 @@ int kr_overlay_type_info_to_json(char *json, void *st, int32_t max) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_overlay_type_info *)uber_actual->actual;
-
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->text);
@@ -194,14 +168,12 @@ int kr_overlay_type_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_overlay_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_overlay_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -209,7 +181,6 @@ int kr_overlay_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_overlay_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"type\": ");
   uber.actual = &(actual->type);
@@ -227,14 +198,11 @@ int kr_overlay_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_compositor_path_type_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-
   kr_compositor_path_type_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -242,13 +210,10 @@ int kr_compositor_path_type_info_to_json(char *json, void *st, int32_t max) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_compositor_path_type_info *)uber_actual->actual;
-
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->output_info);
@@ -279,14 +244,12 @@ int kr_compositor_path_type_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_compositor_path_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   uber_St uber_sub;
   int index;
   int res;
   struct kr_compositor_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -294,7 +257,6 @@ int kr_compositor_path_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_compositor_path_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"type\": ");
   uber.actual = &(actual->type);
@@ -312,4 +274,3 @@ int kr_compositor_path_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

@@ -8,7 +8,6 @@ int kr_x11_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_x11_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -16,7 +15,6 @@ int kr_x11_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_x11_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -55,7 +53,6 @@ int kr_x11_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_x11_path_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -64,7 +61,6 @@ int kr_x11_path_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_x11_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -72,7 +68,6 @@ int kr_x11_path_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_x11_path_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -219,4 +214,3 @@ int kr_x11_path_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

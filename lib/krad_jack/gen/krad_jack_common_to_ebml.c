@@ -3,7 +3,6 @@
 int kr_jack_direction_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_jack_direction *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -11,16 +10,13 @@ int kr_jack_direction_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_direction *)st;
-
   res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
-
 int kr_jack_state_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_jack_state *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -28,16 +24,13 @@ int kr_jack_state_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_state *)st;
-
   res += kr_ebml_pack_int32(ebml, 0xe1, (int32_t)*actual);
 
   return res;
 }
-
 int kr_jack_setup_info_to_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_jack_setup_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -45,18 +38,15 @@ int kr_jack_setup_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_setup_info *)st;
-
   res += kr_ebml_pack_string(ebml, 0xe1, actual->client_name);
   res += kr_ebml_pack_string(ebml, 0xe1, actual->server_name);
 
   return res;
 }
-
 int kr_jack_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   kr_jack_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -64,7 +54,6 @@ int kr_jack_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_info *)st;
-
   res += kr_ebml_pack_string(ebml, 0xe1, actual->client_name);
   res += kr_ebml_pack_string(ebml, 0xe1, actual->server_name);
   uber.actual = &(actual->state);
@@ -79,12 +68,10 @@ int kr_jack_info_to_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-
 int kr_jack_path_info_to_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   kr_jack_path_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -92,7 +79,6 @@ int kr_jack_path_info_to_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_path_info *)st;
-
   res += kr_ebml_pack_string(ebml, 0xe1, actual->name);
   res += kr_ebml_pack_int32(ebml, 0xe1, actual->channels);
   uber.actual = &(actual->direction);
@@ -101,4 +87,3 @@ int kr_jack_path_info_to_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-

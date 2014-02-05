@@ -74,18 +74,18 @@ static void codegen_validity_check_gen(gen_format gformat, char *type, FILE *out
   max_check = "";
 
   switch (gformat) {
-    case TEXT: 
+    case TEXT:
     case JSON: {
       max_check = " || (max < 1)";
       break;
     }
     case DEJSON: {
-      rtype = &type[2]; 
+      rtype = &type[2];
       break;
     }
     case EBML: break;
     case DEBML: {
-      rtype = &type[1]; 
+      rtype = &type[1];
       break;
     }
     case CBOR: break;
@@ -175,28 +175,28 @@ static void codegen_prototype_gen(char *prefix, char *type, char *secarg,
   rtype = type;
 
   switch (gformat) {
-    case TEXT: 
+    case TEXT:
     case JSON: {
-      dir = "to"; 
-      argtype = "char"; 
-      thirdarg = ", int32_t max"; 
+      dir = "to";
+      argtype = "char";
+      thirdarg = ", int32_t max";
       break;
     }
     case DEJSON: {
-      dir = "fr"; 
-      argtype = "char"; 
-      rtype = &type[2]; 
+      dir = "fr";
+      argtype = "char";
+      rtype = &type[2];
       break;
     }
     case EBML: {
-      dir = "to"; 
-      argtype = "kr_ebml"; 
+      dir = "to";
+      argtype = "kr_ebml";
       break;
     }
     case DEBML: {
-      dir = "fr"; 
-      argtype = "kr_ebml"; 
-      rtype = &type[1]; 
+      dir = "fr";
+      argtype = "kr_ebml";
+      rtype = &type[1];
       break;
     }
     case CBOR: break;
@@ -208,13 +208,13 @@ static void codegen_prototype_gen(char *prefix, char *type, char *secarg,
   return;
 }
 
-static void codegen_prototype(struct_data *def, char *type, 
+static void codegen_prototype(struct_data *def, char *type,
   gen_format gformat, FILE *out) {
   codegen_prototype_gen(def->info.name,type,"void *st",gformat,out);
   return;
 }
 
-static void codegen_function(struct_data *def, char *type, 
+static void codegen_function(struct_data *def, char *type,
   gen_format gformat, FILE *out) {
 
   int i;
@@ -244,7 +244,7 @@ static void codegen_function(struct_data *def, char *type,
   }
 
   for (i = 0; i < def->info.member_count; i++) {
-    if ((def->info.members[i].type == T_STRUCT) && 
+    if ((def->info.members[i].type == T_STRUCT) &&
       codegen_is_enum(def->info.members[i].type_info.substruct_info.type_name) ) {
       if (gformat == DEJSON) {
         res += sprintf(&decl[res],"  int type;\n");
@@ -254,7 +254,7 @@ static void codegen_function(struct_data *def, char *type,
   }
 
   for (i = 0; i < def->info.member_count; i++) {
-    if ( /* (def->info.members[i-1].type == T_STRUCT && 
+    if ( /* (def->info.members[i-1].type == T_STRUCT &&
       codegen_is_enum(def->info.members[i-1].type_info.substruct_info.type_name))
        && */ memb_struct_check(&def->info.members[i]) &&
       codegen_is_union(def->info.members[i].type_info.substruct_info.type_name) && (i > 0)) {
@@ -282,21 +282,25 @@ static void codegen_function(struct_data *def, char *type,
     res += sprintf(&decl[res],"  jsmn_parser parser;\n  jsmntok_t tokens[%d];\n"
     "  jsmnerr_t err;\n  int ntokens;\n  int k;\n",JSON_MAX_TOKENS);
   }
-  
+
   codegen_prototype(def,type,gformat,out);
 
   if (def->info.type == ST_UNION) {
-    res += sprintf(&decl[res],"  uber_St *uber_actual;\n\n");
-  } 
+    res += sprintf(&decl[res],"  uber_St *uber_actual;\n");
+  }
 
   if (def->info.is_typedef) {
     if (gformat != DEJSON || def->info.type != ST_ENUM) {
-      res += sprintf(&decl[res],"  %s *actual;\n\n",def->info.name);
+      res += sprintf(&decl[res],"  %s *actual;\n",def->info.name);
     }
   } else {
     if (gformat != DEJSON || def->info.type != ST_ENUM) {
-      res += sprintf(&decl[res],"  struct %s *actual;\n\n",def->info.name);
+      res += sprintf(&decl[res],"  struct %s *actual;\n",def->info.name);
     }
+  }
+
+  if (gformat == TEXT) {
+    res += sprintf(&decl[res],"  char indent[(depth_state*2)+1];\n");
   }
 
   fprintf(out," {\n%s",decl);
@@ -306,21 +310,21 @@ static void codegen_function(struct_data *def, char *type,
   codegen_validity_check_gen(gformat,type,out);
 
   if (def->info.type == ST_UNION) {
-    fprintf(out,"  uber_actual = (uber_St *)st;\n\n");
-    fprintf(out,"  if (uber_actual->actual == NULL) {\n    return -1;\n  }\n\n");
+    fprintf(out,"  uber_actual = (uber_St *)st;\n");
+    fprintf(out,"  if (uber_actual->actual == NULL) {\n    return -1;\n  }\n");
     if (def->info.is_typedef) {
-      fprintf(out,"  actual = (%s *)uber_actual->actual;\n\n",def->info.name);
+      fprintf(out,"  actual = (%s *)uber_actual->actual;\n",def->info.name);
     } else {
-      fprintf(out,"  actual = (struct %s *)uber_actual->actual;\n\n",def->info.name);
+      fprintf(out,"  actual = (struct %s *)uber_actual->actual;\n",def->info.name);
     }
   } else {
     if (def->info.is_typedef) {
       if (gformat != DEJSON || def->info.type != ST_ENUM) {
-        fprintf(out,"  actual = (%s *)st;\n\n",def->info.name);
+        fprintf(out,"  actual = (%s *)st;\n",def->info.name);
       }
     } else {
       if (gformat != DEJSON || def->info.type != ST_ENUM) {
-        fprintf(out,"  actual = (struct %s *)st;\n\n",def->info.name);
+        fprintf(out,"  actual = (struct %s *)st;\n",def->info.name);
       }
     }
   }
@@ -333,8 +337,8 @@ static void codegen_function(struct_data *def, char *type,
     case DEBML: codegen_ebml(def,type,EBML_UNPACK,out); break;
     case CBOR: break;
   }
-  
-  fprintf(out,"\n  return res;\n}\n\n");
+
+  fprintf(out,"\n  return res;\n}\n");
 
   return;
 }
@@ -409,7 +413,7 @@ int codegen_enum(header_data *hdata, int nn, char *prefix,
   return 0;
 }
 
-int codegen_array_func(header_data *hdata, int nn, 
+int codegen_array_func(header_data *hdata, int nn,
   char *prefix, char *suffix, char *type, gen_format gformat, FILE *out) {
 
   int i;
@@ -463,7 +467,7 @@ int codegen_array_func(header_data *hdata, int nn,
     codegen_funname_gen(fdefs[i]->info.name,type,out);
     if (i != (n-1)) {
       fprintf(out,",");
-    } 
+    }
     if (!(i%2)) {
       fprintf(out,"\n  ");
     }
@@ -482,7 +486,7 @@ static int codegen_internal(struct_data *defs, int nn, char *prefix,
   int n = 0;
   struct_data *filtered_defs[nn];
   char *formatc = strdup(format);
-  
+
   p = strchr(formatc,'/');
 
   if (!p) {
@@ -518,7 +522,7 @@ static int codegen_internal(struct_data *defs, int nn, char *prefix,
     }
     fprintf(out,";\n");
     codegen_typedef(formatc,out);
-  } 
+  }
 
   if (formatc) {
     free(formatc);

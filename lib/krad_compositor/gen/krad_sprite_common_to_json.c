@@ -3,7 +3,6 @@
 int kr_sprite_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_sprite_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -11,7 +10,6 @@ int kr_sprite_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_sprite_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"filename\" : \"%s\",",actual->filename);
   res += snprintf(&json[res],max-res,"\"rate\" : %d",actual->rate);
@@ -19,4 +17,3 @@ int kr_sprite_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

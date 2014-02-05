@@ -4,7 +4,6 @@ int kr_sfx_control_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_sfx_control *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -12,18 +11,15 @@ int kr_sfx_control_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_sfx_control *)st;
-
   type = kr_strfr_kr_sfx_control(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_sfx_effect_type_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_sfx_effect_type *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -31,18 +27,15 @@ int kr_sfx_effect_type_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_sfx_effect_type *)st;
-
   type = kr_strfr_kr_sfx_effect_type(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_sfx_effect_control_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
   kr_sfx_effect_control *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -50,17 +43,14 @@ int kr_sfx_effect_control_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (kr_sfx_effect_control *)st;
-
   type = kr_strfr_kr_sfx_effect_control(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-
 int kr_eq_band_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_eq_band_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -68,7 +58,6 @@ int kr_eq_band_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_eq_band_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"db\" : %0.2f,",actual->db);
   res += snprintf(&json[res],max-res,"\"bw\" : %0.2f,",actual->bw);
@@ -77,13 +66,11 @@ int kr_eq_band_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_eq_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int i;
   int res;
   struct kr_eq_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -91,7 +78,6 @@ int kr_eq_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_eq_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"band\" : [");
   for (i = 0; i < KR_EQ_MAX_BANDS; i++) {
@@ -107,11 +93,9 @@ int kr_eq_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_lowpass_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_lowpass_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -119,7 +103,6 @@ int kr_lowpass_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_lowpass_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"bw\" : %0.2f,",actual->bw);
   res += snprintf(&json[res],max-res,"\"hz\" : %0.2f",actual->hz);
@@ -127,11 +110,9 @@ int kr_lowpass_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_highpass_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_highpass_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -139,7 +120,6 @@ int kr_highpass_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_highpass_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"bw\" : %0.2f,",actual->bw);
   res += snprintf(&json[res],max-res,"\"hz\" : %0.2f",actual->hz);
@@ -147,11 +127,9 @@ int kr_highpass_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-
 int kr_volume_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_volume_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -159,18 +137,15 @@ int kr_volume_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_volume_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"level\" : %0.2f",actual->level);
   res += snprintf(&json[res],max-res,"}");
 
   return res;
 }
-
 int kr_analog_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_analog_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -178,7 +153,6 @@ int kr_analog_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_analog_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"drive\" : %0.2f,",actual->drive);
   res += snprintf(&json[res],max-res,"\"blend\" : %0.2f",actual->blend);
@@ -186,4 +160,3 @@ int kr_analog_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

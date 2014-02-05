@@ -8,7 +8,6 @@ int kr_nil_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_nil *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -16,7 +15,6 @@ int kr_nil_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_nil *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -55,7 +53,6 @@ int kr_nil_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_payload_type_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -88,7 +85,6 @@ int kr_payload_type_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_payload_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -98,9 +94,7 @@ int kr_payload_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   uber_St *uber_actual;
-
   kr_payload *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -108,13 +102,10 @@ int kr_payload_fr_json(char *json, void *st) {
   }
 
   uber_actual = (uber_St *)st;
-
   if (uber_actual->actual == NULL) {
     return -1;
   }
-
   actual = (kr_payload *)uber_actual->actual;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -175,4 +166,3 @@ int kr_payload_fr_json(char *json, void *st) {
 
   return res;
 }
-

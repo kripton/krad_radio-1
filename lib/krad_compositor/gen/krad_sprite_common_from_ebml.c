@@ -3,7 +3,6 @@
 int kr_sprite_info_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   struct kr_sprite_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -11,10 +10,8 @@ int kr_sprite_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_sprite_info *)st;
-
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->filename , sizeof(actual->filename));
   res += kr_ebml2_unpack_element_int32(ebml, NULL, &actual->rate);
 
   return res;
 }
-

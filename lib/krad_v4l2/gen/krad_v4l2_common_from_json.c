@@ -32,7 +32,6 @@ int kr_v4l2_state_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_v4l2_mode_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -41,7 +40,6 @@ int kr_v4l2_mode_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_v4l2_mode *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -49,7 +47,6 @@ int kr_v4l2_mode_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_v4l2_mode *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -160,7 +157,6 @@ int kr_v4l2_mode_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_v4l2_info_fr_json(char *json, void *st) {
   uber_St uber;
   int type;
@@ -171,7 +167,6 @@ int kr_v4l2_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_v4l2_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -179,7 +174,6 @@ int kr_v4l2_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_v4l2_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -282,7 +276,6 @@ int kr_v4l2_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_v4l2_open_info_fr_json(char *json, void *st) {
   uber_St uber;
   int res;
@@ -292,7 +285,6 @@ int kr_v4l2_open_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_v4l2_open_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -300,7 +292,6 @@ int kr_v4l2_open_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_v4l2_open_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -382,4 +373,3 @@ int kr_v4l2_open_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

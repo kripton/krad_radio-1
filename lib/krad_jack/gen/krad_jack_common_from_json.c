@@ -32,7 +32,6 @@ int kr_jack_direction_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_jack_state_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -65,7 +64,6 @@ int kr_jack_state_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_jack_setup_info_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -74,7 +72,6 @@ int kr_jack_setup_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   kr_jack_setup_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -82,7 +79,6 @@ int kr_jack_setup_info_fr_json(char *json, void *st) {
   }
 
   actual = (kr_jack_setup_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -139,7 +135,6 @@ int kr_jack_setup_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_jack_info_fr_json(char *json, void *st) {
   int type;
   int res;
@@ -149,7 +144,6 @@ int kr_jack_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   kr_jack_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -157,7 +151,6 @@ int kr_jack_info_fr_json(char *json, void *st) {
   }
 
   actual = (kr_jack_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -343,7 +336,6 @@ int kr_jack_info_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_jack_path_info_fr_json(char *json, void *st) {
   int type;
   int res;
@@ -353,7 +345,6 @@ int kr_jack_path_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   kr_jack_path_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -361,7 +352,6 @@ int kr_jack_path_info_fr_json(char *json, void *st) {
   }
 
   actual = (kr_jack_path_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -439,4 +429,3 @@ int kr_jack_path_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

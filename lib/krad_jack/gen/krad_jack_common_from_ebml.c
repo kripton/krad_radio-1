@@ -3,7 +3,6 @@
 int kr_jack_direction_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_jack_direction *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -11,16 +10,13 @@ int kr_jack_direction_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_direction *)st;
-
   res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
 
   return res;
 }
-
 int kr_jack_state_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_jack_state *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -28,16 +24,13 @@ int kr_jack_state_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_state *)st;
-
   res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
 
   return res;
 }
-
 int kr_jack_setup_info_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_jack_setup_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -45,18 +38,15 @@ int kr_jack_setup_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_setup_info *)st;
-
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->client_name , sizeof(actual->client_name));
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->server_name , sizeof(actual->server_name));
 
   return res;
 }
-
 int kr_jack_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   kr_jack_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -64,7 +54,6 @@ int kr_jack_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_info *)st;
-
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->client_name , sizeof(actual->client_name));
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->server_name , sizeof(actual->server_name));
   uber.actual = &(actual->state);
@@ -79,12 +68,10 @@ int kr_jack_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-
 int kr_jack_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   kr_jack_path_info *actual;
-
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -92,7 +79,6 @@ int kr_jack_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (kr_jack_path_info *)st;
-
   res += kr_ebml2_unpack_element_string(ebml, NULL, actual->name , sizeof(actual->name));
   res += kr_ebml2_unpack_element_int32(ebml, NULL, &actual->channels);
   uber.actual = &(actual->direction);
@@ -101,4 +87,3 @@ int kr_jack_path_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-

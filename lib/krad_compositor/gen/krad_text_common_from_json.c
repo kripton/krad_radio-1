@@ -8,7 +8,6 @@ int kr_text_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_text_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -16,7 +15,6 @@ int kr_text_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_text_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -127,4 +125,3 @@ int kr_text_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

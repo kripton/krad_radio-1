@@ -32,7 +32,6 @@ int krad_codec_t_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int krad_container_type_t_fr_json(char *json, void *st) {
   int res;
   jsmn_parser parser;
@@ -65,4 +64,3 @@ int krad_container_type_t_fr_json(char *json, void *st) {
 
   return res;
 }
-

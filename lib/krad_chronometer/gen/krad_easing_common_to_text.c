@@ -3,7 +3,7 @@
 int kr_easing_to_text(char *text, void *st, int32_t max) {
   int res;
   kr_easing *actual;
-
+  char indent[(depth_state*2)+1];
   res = 0;
 
   if ((text == NULL) || (st == NULL) || (max < 1)) {
@@ -11,9 +11,9 @@ int kr_easing_to_text(char *text, void *st, int32_t max) {
   }
 
   actual = (kr_easing *)st;
-
-  res += snprintf(&text[res],max-res,"kr_easing: %s \n",kr_strfr_kr_easing(*actual));
+  memset(indent,' ',depth_state*2);
+  indent[depth_state*2] = '\0';
+  res += snprintf(&text[res],max-res," %s \n",kr_strfr_kr_easing(*actual));
 
   return res;
 }
-

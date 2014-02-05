@@ -3,7 +3,6 @@
 int kr_text_info_to_json(char *json, void *st, int32_t max) {
   int res;
   struct kr_text_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -11,7 +10,6 @@ int kr_text_info_to_json(char *json, void *st, int32_t max) {
   }
 
   actual = (struct kr_text_info *)st;
-
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"string\" : \"%s\",",actual->string);
   res += snprintf(&json[res],max-res,"\"font\" : \"%s\",",actual->font);
@@ -22,4 +20,3 @@ int kr_text_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-

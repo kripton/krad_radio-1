@@ -32,7 +32,6 @@ int kr_vector_type_fr_json(char *json, void *st) {
 
   return res;
 }
-
 int kr_vector_info_fr_json(char *json, void *st) {
   int type;
   int res;
@@ -42,7 +41,6 @@ int kr_vector_info_fr_json(char *json, void *st) {
   int ntokens;
   int k;
   struct kr_vector_info *actual;
-
   res = 0;
 
   if ((json == NULL) || (st == NULL)) {
@@ -50,7 +48,6 @@ int kr_vector_info_fr_json(char *json, void *st) {
   }
 
   actual = (struct kr_vector_info *)st;
-
   jsmn_init(&parser);
   err = jsmn_parse(&parser,json,tokens,512);
   ntokens = parser.toknext;
@@ -146,4 +143,3 @@ int kr_vector_info_fr_json(char *json, void *st) {
 
   return res;
 }
-

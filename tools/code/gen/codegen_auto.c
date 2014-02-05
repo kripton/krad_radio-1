@@ -18,7 +18,7 @@ int is_target_new(char *target, char **targets, int n) {
   return 1;
 }
 
-void common_gen(header_data *hdata, int n, char *prefix, 
+void common_gen(header_data *hdata, int n, char *prefix,
   char *suffix, char *outpath, FILE *genc) {
   FILE *common;
   char outfilen[256];
@@ -39,7 +39,7 @@ void common_gen(header_data *hdata, int n, char *prefix,
   fprintf(common,"typedef struct {\n  int type;\n  void *actual;\n} uber_St;\n\n");
 
   for (i = 0; i < TARGET_TYPES - 1; i++) {
-    
+
     switch (i) {
       case TO_TEXT: format = "text"; break;
       case TO_EBML: format = "ebml"; break;
@@ -122,7 +122,7 @@ void type_common_gen(header_data *hdata, int n, char *prefix,
   return;
 }
 
-void files_gen(header_data *hdata, 
+void files_gen(header_data *hdata,
   int n, char *prefix, char *suffix, FILE *genc) {
 
   FILE *out;
@@ -146,7 +146,7 @@ void files_gen(header_data *hdata,
   for (i = 0; i < n; i++) {
     for (l = 0; l < hdata[i].target_count; l++) {
       if (hdata[i].targets[l].type) {
-        
+
         pp = strrchr(hdata[i].path,'/');
 
         if (!pp) {
@@ -232,7 +232,7 @@ void files_gen(header_data *hdata,
           }
 
           p[1] = 'c';
-        
+
           out = fopen(fname,"a+");
 
           if (!out) {
@@ -255,29 +255,29 @@ void files_gen(header_data *hdata,
           }
 
           p[1] = 'h';
-          
+
           switch (hdata[i].targets[l].type) {
-            case TO_EBML: 
+            case TO_EBML:
             sprintf(format,"ebml/func");
             sprintf(format2,"ebml/proto");
             break;
-            case TO_TEXT: 
+            case TO_TEXT:
             sprintf(format,"text/func");
             sprintf(format2,"text/proto");
             break;
-            case TO_JSON: 
+            case TO_JSON:
             sprintf(format,"json/func");
             sprintf(format2,"json/proto");
             break;
-            case FR_JSON: 
+            case FR_JSON:
             sprintf(format,"dejson/func");
             sprintf(format2,"dejson/proto");
             break;
-            case FR_EBML: 
+            case FR_EBML:
             sprintf(format,"debml/func");
             sprintf(format2,"debml/proto");
             break;
-            case HELPERS: 
+            case HELPERS:
             sprintf(format,"helper");
             sprintf(format2,"helper_proto");
             codegen(hdata[i].defs,hdata[i].def_count,prefix,suffix,"enum_utils",out);
@@ -339,6 +339,8 @@ int main(int argc, char *argv[]) {
     fprintf(stderr,"Error opening file %s\n",gencpath);
     exit(1);
   }
+
+  fprintf(genc,"static int depth_state = 1;\n");
 
   common_gen(hdata,n,argv[2],argv[3],rpath,genc);
 

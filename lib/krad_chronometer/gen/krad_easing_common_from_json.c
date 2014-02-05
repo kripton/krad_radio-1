@@ -32,4 +32,3 @@ int kr_easing_fr_json(char *json, void *st) {
 
   return res;
 }
-
