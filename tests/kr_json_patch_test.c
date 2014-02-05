@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "../lib/gen/jsmn/jsmn.h"
 #include "../lib/gen/jsmn/jsmn.c"
@@ -58,6 +59,8 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
   jsmnerr_t err;
   int ntokens;
   int k;
+  int c;
+  int p;
   union {
     int integer;
     float real;
@@ -66,7 +69,7 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
     return -1;
   }
   printf("Going to parse:\n%s\n", json);
-  if (1) {
+  if (0) {
     path_print(path);
     kr_path_rewind(path);
   }
@@ -79,7 +82,7 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
   if (err != JSMN_SUCCESS || ntokens < 3) {
     return -1;
   }
-  printf("We got %d tokens\n", ntokens);
+  //printf("We got %d tokens\n", ntokens);
   tok = &tokens[k];
   if (tok->type == JSMN_OBJECT) {
     printf("First we got an object!!\n");
@@ -100,41 +103,65 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
     tok = &tokens[k];
     switch (tok->type) {
       case JSMN_OBJECT:
-        printf("Token %d an object\n", k + 1);
+        //printf("Token %d an object\n", k + 1);
         break;
       case JSMN_ARRAY:
-        printf("Token %d an array\n", k + 1);
+        //printf("Token %d an array\n", k + 1);
         break;
       case JSMN_STRING:
-        printf("Token %d a string\n", k + 1);
+        //printf("Token %d a string\n", k + 1);
         if (kr_path_steps_free(path) == 0) {
           /* no sploiting, disconnect this jerk */
           printf("Too many paths\n");
           return -1;
         }
         kr_path_push(path, &json[tok->start], tok->end - tok->start);
-        if (1) {
+        if (0) {
           path_print(path);
           kr_path_rewind(path);
         }
         break;
       case JSMN_PRIMITIVE:
-        printf("Token %d we got us a primitive!\n", k + 1);
-        /* if ((element_value) && (element_value_is_number)) {
-          if (element_is_float) value.real = element_value;
-          if (element_is_int) value.integer = element_value;
-          ret = kr_strarr_to_patch(&patchset->patches[patchset->used], value, path, path_len);
-          */
-          if (ret != 0) {
-            /* damn this patch is invalid as hell */
+        //printf("Token %d we got us a primitive!\n", k + 1);
+        if ((tok->end - tok->start) > 6) {
+          printf("Numbers to dang long, we ain't dealing with that\n");
+          return -1;
+        }
+        p = 0;
+        for (c = tok->start; c < tok->end; c++) {
+          if ((!isdigit(json[c])) && (json[c] != '.')) {
+            /* rage force disconnect the fool who sends a non number */
+            printf("Got a primitive that isn't a number, ragequiting\n");
             return -1;
           }
-          patchset->used++;
-          kr_path_clear_last(path);
-        //} else {
-          /* rage force disconnect the fool who sends a non number */
-//          return -1;
-  //      }
+          if (json[c] == '.') {
+           if (p == 1) {
+             printf("Too many points in your floating bullshit\n");
+             return -1;
+           } else {
+             p = 1;
+           }
+          }
+        }
+        if (1) {
+          path_print(path);
+          kr_path_rewind(path);
+        }
+        if (p == 1) {
+          value.real = atof(&json[tok->start]);
+          printf("We got a %f floater wa doo!\n", value.real);
+        }
+        if (p == 0) {
+          value.integer = atoi(&json[tok->start]);
+          printf("We got a %d integer wee hoo!\n", value.integer);
+        }
+        //ret = kr_strarr_to_patch(&patchset->patches[patchset->used], value, path, path_len);
+        if (ret != 0) {
+          /* damn this patch is invalid as hell */
+          return -1;
+        }
+        patchset->used++;
+        kr_path_clear_last(path);
         break;
       default:
         printf("O dear major jsmn messup!\n");
@@ -146,31 +173,44 @@ int json_to_patchset(kr_path *path, char *json, int json_len, kr_patchset *patch
   return patchset->used;
 }
 
-static int test() {
+static int test(char *json_in) {
+  int ret;
   kr_path *path;
   char *url;
   int url_len;
   char *json;
   int json_len;
   kr_patchset patchset;
+  ret = -1;
   memset(&patchset, 0, sizeof(patchset));
   kr_path_alloca(path);
-  url = "/mixer";
+  url = "/mixer/music1";
   url_len = strlen(url);
   kr_path_parse(path, url, url_len);
-  json = "[{\"bongo\":\"coconut\"}]";
-  json_len = strlen(json);
-  json_to_patchset(path, json, json_len, &patchset);
-  json = "{\"drive\":5}";
-  json_len = strlen(json);
-  kr_path_parse(path, url, url_len);
-  json_to_patchset(path, json, json_len, &patchset);
-  return 0;
+  if (json_in != NULL) {
+    json = json_in;
+    json_len = strlen(json);
+    ret = json_to_patchset(path, json, json_len, &patchset);
+  } else {
+    json = "[{\"bongo\":\"coconut\"}]";
+    json_len = strlen(json);
+    json_to_patchset(path, json, json_len, &patchset);
+    json = "{\"analog\":{\"drive\":5}}";
+    json_len = strlen(json);
+    kr_path_parse(path, url, url_len);
+    ret = json_to_patchset(path, json, json_len, &patchset);
+  }
+  if (ret > 0) return 0;
+  return ret;
 }
 
 int main(int argc, char *argv[]) {
   int ret;
-  ret = test();
+  if (argc == 2) {
+    ret = test(argv[1]);
+  } else {
+    ret = test(NULL);
+  }
   if (ret) {
     fprintf(stderr, "Fail.\n");
   } else {
