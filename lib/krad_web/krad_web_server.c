@@ -45,14 +45,15 @@ typedef enum {
 } kr_web_client_type;
 
 typedef enum {
-  KR_WS_NONE = 0,
-  KR_WS_GET,
-  KR_WS_PUT,
-  KR_WS_SOURCE,
-  KR_WS_POST,
-  KR_WS_HEAD,
-  KR_WS_PATCH,
-  KR_WS_OPTIONS,
+  KR_HTTP_NONE = 0,
+  KR_HTTP_GET,
+  KR_HTTP_PUT,
+  KR_HTTP_SOURCE,
+  KR_HTTP_POST,
+  KR_HTTP_HEAD,
+  KR_HTTP_PATCH,
+  KR_HTTP_DELETE,
+  KR_HTTP_OPTIONS,
 } kr_http_method;
 
 typedef struct kr_web_client kr_web_client;
@@ -168,7 +169,7 @@ ssize_t rest_pack(void *ctx, void *out, size_t max, void *in, size_t len) {
 ssize_t rest_unpack(void *ctx, void *out, size_t max, void *in, size_t len) {
   kr_crate crate;
   memset(&crate, 0, sizeof(crate));
-  strcpy(crate.address, in + 4);
+  strcpy(crate.address, in);
   crate.method = KR_GET;
   kr_crate_to_json(out, &crate, max);
   return len;

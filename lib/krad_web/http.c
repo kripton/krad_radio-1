@@ -87,35 +87,45 @@ int get_address_method(kr_web_client *client) {
   if (memcmp(headers, "GET ", 4) == 0) {
     ret = copy_header(client->http.address, headers, "GET ", sizeof(client->http.address));
     if (ret < 0) return -1;
-    client->http.method = KR_WS_GET;
+    client->http.method = KR_HTTP_GET;
     return 0;
   }
   if (memcmp(headers, "PUT ", 4) == 0) {
     ret = copy_header(client->http.address, headers, "PUT ", sizeof(client->http.address));
     if (ret < 0) return -1;
-    client->http.method = KR_WS_PUT;
+    client->http.method = KR_HTTP_PUT;
     return 0;
   }
   if (memcmp(headers, "HEAD ", 5) == 0) {
-    client->http.method = KR_WS_HEAD;
+    client->http.method = KR_HTTP_HEAD;
     return 0;
   }
   if (memcmp(headers, "SOURCE ", 7) == 0) {
     ret = copy_header(client->http.address, headers, "SOURCE ", sizeof(client->http.address));
     if (ret < 0) return -1;
-    client->http.method = KR_WS_SOURCE;
+    client->http.method = KR_HTTP_SOURCE;
     return 0;
   }
   if (memcmp(headers, "POST ", 5) == 0) {
-    client->http.method = KR_WS_POST;
+    ret = copy_header(client->http.address, headers, "POST ", sizeof(client->http.address));
+    if (ret < 0) return -1;
+    client->http.method = KR_HTTP_POST;
+    return 0;
+  }
+  if (memcmp(headers, "DELETE ", 7) == 0) {
+    ret = copy_header(client->http.address, headers, "DELETE ", sizeof(client->http.address));
+    if (ret < 0) return -1;
+    client->http.method = KR_HTTP_DELETE;
     return 0;
   }
   if (memcmp(headers, "PATCH ", 6) == 0) {
-    client->http.method = KR_WS_PATCH;
+    ret = copy_header(client->http.address, headers, "PATCH ", sizeof(client->http.address));
+    if (ret < 0) return -1;
+    client->http.method = KR_HTTP_PATCH;
     return 0;
   }
   if (memcmp(headers, "OPTIONS ", 8) == 0) {
-    client->http.method = KR_WS_OPTIONS;
+    client->http.method = KR_HTTP_OPTIONS;
     return 0;
   }
   return -1;
@@ -132,12 +142,21 @@ int handle_put(kr_web_client *client) {
   mount_start = NULL;
   mount_len = 0;
   buf = (char *)client->in->rd_buf;
+  /* FIXME hardcoded raaaaa */
+  if ((strncmp("/mix", client->http.address, 4) == 0)
+   || (strncmp("/com", client->http.address, 4) == 0)
+   || (strncmp("/tra", client->http.address, 4) == 0)) {
+    client->type = KR_WS_REST_API;
+    printk("Web Server: REST PUT API Client");
+    kr_io2_pulled(client->in, client->http.header_pos);
+    return 0;
+  }
   switch (client->http.method) {
-    case KR_WS_PUT:
+    case KR_HTTP_PUT:
       mount_start = buf + 4;
       mount_len = strcspn(mount_start, " &?\n\r");
       break;
-    case KR_WS_SOURCE:
+    case KR_HTTP_SOURCE:
       mount_start = buf + 7;
       mount_len = strcspn(mount_start, " &?\n\r");
       break;
@@ -161,9 +180,12 @@ int handle_get(kr_web_client *client) {
   } else {
     if ((strstr(headers, "GET ") != NULL) && (strstr(headers, " HTTP/1") != NULL)) {
       printk("GET %s", client->http.address);
-      if (strncmp("/api", client->http.address, 4) == 0) {
+      /* FIXME hardcoded raaaaa */
+      if ((strncmp("/mix", client->http.address, 4) == 0)
+       || (strncmp("/com", client->http.address, 4) == 0)
+       || (strncmp("/tra", client->http.address, 4) == 0)) {
          client->type = KR_WS_REST_API;
-         printk("Web Server: REST API Client");
+         printk("Web Server: REST GET API Client");
       } else {
         if (!find_stream(client)) {
           client->type = KR_WS_GET_FILE;
@@ -176,6 +198,38 @@ int handle_get(kr_web_client *client) {
   return -1;
 }
 
+int handle_patch(kr_web_client *client) {
+  int ret;
+  ret = -1;
+  printk("PATCH %s", client->http.address);
+  /* FIXME hardcoded raaaaa */
+  if ((strncmp("/mix", client->http.address, 4) == 0)
+   || (strncmp("/com", client->http.address, 4) == 0)
+   || (strncmp("/tra", client->http.address, 4) == 0)) {
+    client->type = KR_WS_REST_API;
+    printk("Web Server: REST PATCH API Client");
+    ret = 0;
+  }
+  kr_io2_pulled(client->in, client->http.header_pos);
+  return ret;
+}
+
+int handle_delete(kr_web_client *client) {
+  int ret;
+  ret = -1;
+  printk("DELETE %s", client->http.address);
+  /* FIXME hardcoded raaaaa */
+  if ((strncmp("/mix", client->http.address, 4) == 0)
+   || (strncmp("/com", client->http.address, 4) == 0)
+   || (strncmp("/tra", client->http.address, 4) == 0)) {
+    client->type = KR_WS_REST_API;
+    printk("Web Server: REST DELETE API Client");
+    ret = 0;
+  }
+  kr_io2_pulled(client->in, client->http.header_pos);
+  return ret;
+}
+
 int handle_http_request(kr_web_client *client) {
   int ret;
   if (!client->http.got_headers) {
@@ -183,14 +237,20 @@ int handle_http_request(kr_web_client *client) {
       ret = get_address_method(client);
       if (ret < 0) return -1;
       switch (client->http.method) {
-        case KR_WS_GET:
+        case KR_HTTP_GET:
           ret = handle_get(client);
           return ret;
-        case KR_WS_POST:
+        case KR_HTTP_PATCH:
+          ret = handle_patch(client);
+          return ret;
+        case KR_HTTP_DELETE:
+          ret = handle_delete(client);
+          return ret;
+        case KR_HTTP_POST:
           ret = handle_post(client);
           return ret;
-        case KR_WS_SOURCE: /* Fallin thru */
-        case KR_WS_PUT:
+        case KR_HTTP_SOURCE: /* Fallin thru */
+        case KR_HTTP_PUT:
           ret = handle_put(client);
           return ret;
         default:
