@@ -291,18 +291,25 @@ int kr_transponder_path_ctl(kr_xpdr_path *path, kr_transponder_path_info_patch *
 
 int kr_transponder_unlink(kr_xpdr_path *path) {
   kr_transponder *xpdr;
+  kr_transponder_event event;
   if (path == NULL) return -1;
   xpdr = path->xpdr;
   path_destroy(path);
   xpdr->info.active_paths--;
+  event.user = path->xpdr->user;
+  event.user_path = path->user;
+  event.path = path;
+  event.type = KR_XPDR_DESTROY;
+  event.info = path->info;
+  path->xpdr->event_cb(&event);
   kr_pool_recycle(xpdr->path_pool, path);
-  /* do event callback */
   return -1;
 }
 
 int kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   int ret;
   kr_transponder_path *path;
+  kr_transponder_event event;
   if ((x == NULL) || (i == NULL)) return -1;
   if (path_info_check(i)) return -2;
   path = kr_pool_slice(x->path_pool);
@@ -313,7 +320,13 @@ int kr_transponder_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   ret = path_create(path);
   if (ret) return -4;
   x->info.active_paths++;
-  /* do event callback */
+  event.user = path->xpdr->user;
+  event.user_path = path->user;
+  event.path = path;
+  event.type = KR_XPDR_CREATE;
+  event.info = path->info;
+  path->xpdr->event_cb(&event);
+  path->user = event.user_path;
   return 0;
 }
 
@@ -358,6 +371,8 @@ kr_transponder *kr_transponder_create(kr_transponder_setup *setup) {
   xpdr->path_pool = pool;
   xpdr->mixer = setup->mixer;
   xpdr->compositor = setup->compositor;
+  xpdr->user = setup->user;
+  xpdr->event_cb = setup->event_cb;
   xpdr->adapter_mon = kr_adapter_monitor_create();
   kr_adapter_monitor_wait(xpdr->adapter_mon, 0);
   printk("Transponder: Created");

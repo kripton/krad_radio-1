@@ -98,7 +98,30 @@ static void compositor_event(kr_compositor_event *event) {
 }
 
 static void xpdr_event(kr_transponder_event *event) {
-  printk("got a xpdr event");
+  kr_radio *radio;
+  kr_route_setup route_setup;
+  radio = (kr_radio *)event->user;
+  switch (event->type) {
+    case KR_XPDR_CREATE:
+      printk("Radio: XPDR path create event");
+      route_setup.ptr = radio->transponder;
+      route_setup.name = event->user_path;
+      route_setup.ctx = event->path;
+      route_setup.payload.transponder_path_info = event->info;
+      event->user_path = kr_app_server_route_create(radio->app, &route_setup);
+      break;
+    case KR_XPDR_PATCH:
+      printk("Radio: XPDR path patch event");
+      /* update the info struct in the route */
+      break;
+    case KR_XPDR_DESTROY:
+      printk("Radio: XPDR path delete event");
+      kr_app_server_route_destroy(radio->app, event->user_path);
+      break;
+    default:
+      printke("Radio: Bad event from compositor");
+      break;
+  }
 }
 
 static int setup_maps(kr_radio *radio) {
@@ -120,7 +143,7 @@ static int setup_maps(kr_radio *radio) {
   setup.ptr = radio->compositor;
   setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
   setup.create = (kr_router_map_create_handler *)kr_compositor_mkbus;
-  setup.connect = NULL;
+  setup.connect = (kr_router_map_connect_handler *)kr_compositor_mkinput;
   setup.patch = (kr_router_map_patch_handler *)kr_compositor_path_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
