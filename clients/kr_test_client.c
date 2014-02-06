@@ -48,137 +48,137 @@ static int test_jack_output_create(kr_client *client) {
   return ret;
 }
 
-// static int test_v4l2_input_create(kr_client *client, int dev) {
-//   int ret;
-//   kr_xpdr_path_info info;
-//   int device_num;
-//   char *name;
-//   int width;
-//   int height;
-//   int num;
-//   int den;
-//   name = "V4L2Test";
-//   device_num = 0;
-//   device_num = dev;
-//   width = 640;
-//   height = 360;
-//   num = 30;
-//   den = 1;
-//   /* init func? */
-//   memset(&info, 0, sizeof(kr_xpdr_path_info));
-//   info.input.type = KR_XPDR_ADAPTER;
-//   info.input.info.adapter_path_info.api = KR_ADP_V4L2;
-//   info.input.info.adapter_path_info.info.v4l2.dev = device_num;
-//   info.input.info.adapter_path_info.info.v4l2.mode.num = num;
-//   info.input.info.adapter_path_info.info.v4l2.mode.den = den;
-//   info.input.info.adapter_path_info.info.v4l2.mode.width = width;
-//   info.input.info.adapter_path_info.info.v4l2.mode.height = height;
-//   info.output.type = KR_XPDR_COMPOSITOR;
-//   info.output.info.compositor_path_info.width = width;
-//   info.output.info.compositor_path_info.height = height;
-//   info.output.info.compositor_path_info.type = KR_CMP_INPUT;
-//   ret = kr_xpdr_mkpath(client, name, &info);
-//   return ret;
-// }
+static int test_v4l2_input_create(kr_client *client, int dev) {
+  int ret;
+  kr_xpdr_path_info info;
+  int device_num;
+  char *name;
+  int width;
+  int height;
+  int num;
+  int den;
+  name = "V4L2Test";
+  device_num = 0;
+  device_num = dev;
+  width = 640;
+  height = 360;
+  num = 30;
+  den = 1;
+  /* init func? */
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  info.input.type = KR_XPDR_ADAPTER;
+  info.input.info.adapter_path_info.api = KR_ADP_V4L2;
+  info.input.info.adapter_path_info.info.v4l2.dev = device_num;
+  info.input.info.adapter_path_info.info.v4l2.mode.num = num;
+  info.input.info.adapter_path_info.info.v4l2.mode.den = den;
+  info.input.info.adapter_path_info.info.v4l2.mode.width = width;
+  info.input.info.adapter_path_info.info.v4l2.mode.height = height;
+  info.output.type = KR_XPDR_COMPOSITOR;
+  info.output.info.compositor_path_info.info.source_info.w = width;
+  info.output.info.compositor_path_info.info.source_info.h = height;
+  info.output.info.compositor_path_info.type = KR_COM_SOURCE;
+  ret = kr_xpdr_mkpath(client, name, &info);
+  return ret;
+}
 
-// static int test_x11_input_create(kr_client *client, int dev) {
-//   int ret;
-//   kr_xpdr_path_info info;
-//   char *name;
-//   int width;
-//   int height;
-//   int num;
-//   int den;
-//   name = "X11Test";
-//   width = 640;
-//   height = 360;
-//   num = 30;
-//   den = 1;
-//   /* init func? */
-//   memset(&info, 0, sizeof(kr_xpdr_path_info));
-//   info.input.type = KR_XPDR_ADAPTER;
-//   info.input.info.adapter_path_info.api = KR_ADP_X11;
-//   strcat(info.input.info.adapter_path_info.info.x11.display, "");
-//   info.input.info.adapter_path_info.info.x11.num = num;
-//   info.input.info.adapter_path_info.info.x11.den = den;
-//   info.input.info.adapter_path_info.info.x11.width = width;
-//   info.input.info.adapter_path_info.info.x11.height = height;
-//   info.output.type = KR_XPDR_COMPOSITOR;
-//   info.output.info.compositor_path_info.width = width;
-//   info.output.info.compositor_path_info.height = height;
-//   info.output.info.compositor_path_info.type = KR_CMP_INPUT;
-//   ret = kr_xpdr_mkpath(client, name, &info);
-//   return ret;
-// }
+static int test_x11_input_create(kr_client *client, int dev) {
+  int ret;
+  kr_xpdr_path_info info;
+  char *name;
+  int width;
+  int height;
+  int num;
+  int den;
+  name = "X11Test";
+  width = 640;
+  height = 360;
+  num = 30;
+  den = 1;
+  /* init func? */
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  info.input.type = KR_XPDR_ADAPTER;
+  info.input.info.adapter_path_info.api = KR_ADP_X11;
+  strcat(info.input.info.adapter_path_info.info.x11.display, "");
+  info.input.info.adapter_path_info.info.x11.num = num;
+  info.input.info.adapter_path_info.info.x11.den = den;
+  info.input.info.adapter_path_info.info.x11.width = width;
+  info.input.info.adapter_path_info.info.x11.height = height;
+  info.output.type = KR_XPDR_COMPOSITOR;
+  info.output.info.compositor_path_info.info.source_info.w = width;
+  info.output.info.compositor_path_info.info.source_info.h = height;
+  info.output.info.compositor_path_info.type = KR_COM_SOURCE;
+  ret = kr_xpdr_mkpath(client, name, &info);
+  return ret;
+}
 
-// static int test_decklink_input_create(kr_client *client, int dev) {
-//   int ret;
-//   kr_xpdr_path_info info;
-//   char *name;
-//   char *video_connector;
-//   char *audio_connector;
-//   int width;
-//   int height;
-//   int num;
-//   int den;
-//   name = "DecklinkTest";
-//   video_connector = "hdmi";
-//   audio_connector = "hdmi";
-//   width = 1280;
-//   height = 720;
-//   num = 60000;
-//   den = 1001;
-//   /* init func? */
-//   memset(&info, 0, sizeof(kr_xpdr_path_info));
-//   info.input.type = KR_XPDR_ADAPTER;
-//   info.input.info.adapter_path_info.api = KR_ADP_DECKLINK;
-//   snprintf(info.input.info.adapter_path_info.info.decklink.device,
-//    sizeof(info.input.info.adapter_path_info.info.decklink.device), "%d", dev);
-//   strcpy(info.input.info.adapter_path_info.info.decklink.video_connector,
-//    video_connector);
-//   strcpy(info.input.info.adapter_path_info.info.decklink.audio_connector,
-//    audio_connector);
-//   info.input.info.adapter_path_info.info.decklink.num = num;
-//   info.input.info.adapter_path_info.info.decklink.den = den;
-//   info.input.info.adapter_path_info.info.decklink.width = width;
-//   info.input.info.adapter_path_info.info.decklink.height = height;
-//   info.output.type = KR_XPDR_COMPOSITOR;
-//   info.output.info.compositor_path_info.width = width;
-//   info.output.info.compositor_path_info.height = height;
-//   info.output.info.compositor_path_info.type = KR_CMP_INPUT;
-//   ret = kr_xpdr_mkpath(client, name, &info);
-//   return ret;
-// }
+static int test_decklink_input_create(kr_client *client, int dev) {
+  int ret;
+  kr_xpdr_path_info info;
+  char *name;
+  char *video_connector;
+  char *audio_connector;
+  int width;
+  int height;
+  int num;
+  int den;
+  name = "DecklinkTest";
+  video_connector = "hdmi";
+  audio_connector = "hdmi";
+  width = 1280;
+  height = 720;
+  num = 60000;
+  den = 1001;
+  /* init func? */
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  info.input.type = KR_XPDR_ADAPTER;
+  info.input.info.adapter_path_info.api = KR_ADP_DECKLINK;
+  snprintf(info.input.info.adapter_path_info.info.decklink.device,
+   sizeof(info.input.info.adapter_path_info.info.decklink.device), "%d", dev);
+  strcpy(info.input.info.adapter_path_info.info.decklink.video_connector,
+   video_connector);
+  strcpy(info.input.info.adapter_path_info.info.decklink.audio_connector,
+   audio_connector);
+  info.input.info.adapter_path_info.info.decklink.num = num;
+  info.input.info.adapter_path_info.info.decklink.den = den;
+  info.input.info.adapter_path_info.info.decklink.width = width;
+  info.input.info.adapter_path_info.info.decklink.height = height;
+  info.output.type = KR_XPDR_COMPOSITOR;
+  info.output.info.compositor_path_info.info.source_info.w = width;
+  info.output.info.compositor_path_info.info.source_info.h = height;
+  info.output.info.compositor_path_info.type = KR_COM_SOURCE;
+  ret = kr_xpdr_mkpath(client, name, &info);
+  return ret;
+}
 
-// static int test_wayland_output_create(kr_client *client) {
-//   int ret;
-//   kr_xpdr_path_info info;
-//   char *name;
-//   char *display_name;
-//   int width;
-//   int height;
-//   int fullscreen;
-//   display_name = "";
-//   name = "WaylandTest";
-//   width = 640;
-//   height = 360;
-//   fullscreen = 0;
-//   /* init func ? */
-//   memset(&info, 0, sizeof(kr_xpdr_path_info));
-//   info.input.type = KR_XPDR_COMPOSITOR;
-//   info.input.info.compositor_path_info.width = width;
-//   info.input.info.compositor_path_info.height = height;
-//   info.input.info.compositor_path_info.type = KR_CMP_OUTPUT;
-//   info.output.type = KR_XPDR_ADAPTER;
-//   info.output.info.adapter_path_info.api = KR_ADP_WAYLAND;
-//   strcpy(info.output.info.adapter_path_info.info.wayland.display_name,
-//    display_name);
-//   info.output.info.adapter_path_info.info.wayland.width = width;
-//   info.output.info.adapter_path_info.info.wayland.height = height;
-//   info.output.info.adapter_path_info.info.wayland.fullscreen = fullscreen;
-//   ret = kr_xpdr_mkpath(client, name, &info);
-//   return ret;
-// }
+static int test_wayland_output_create(kr_client *client) {
+  int ret;
+  kr_xpdr_path_info info;
+  char *name;
+  char *display_name;
+  int width;
+  int height;
+  int fullscreen;
+  display_name = "";
+  name = "WaylandTest";
+  width = 640;
+  height = 360;
+  fullscreen = 0;
+  /* init func ? */
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  info.input.type = KR_XPDR_COMPOSITOR;
+  info.input.info.compositor_path_info.info.output_info.w = width;
+  info.input.info.compositor_path_info.info.output_info.h = height;
+  info.input.info.compositor_path_info.type = KR_COM_OUTPUT;
+  info.output.type = KR_XPDR_ADAPTER;
+  info.output.info.adapter_path_info.api = KR_ADP_WAYLAND;
+  strcpy(info.output.info.adapter_path_info.info.wayland.display_name,
+   display_name);
+  info.output.info.adapter_path_info.info.wayland.width = width;
+  info.output.info.adapter_path_info.info.wayland.height = height;
+  info.output.info.adapter_path_info.info.wayland.fullscreen = fullscreen;
+  ret = kr_xpdr_mkpath(client, name, &info);
+  return ret;
+}
 
 int test_x11_get(kr_client *client) {
   int ret;
@@ -253,10 +253,10 @@ int run_test(kr_client *client, char *test) {
   int ret;
   ret = -1;
   if ((strlen(test) == strlen("wayland")) && (strcmp(test, "wayland") == 0)) {
-    //ret = test_wayland_output_create(client);
+    ret = test_wayland_output_create(client);
   }
   if ((strlen(test) == strlen("x11")) && (strcmp(test, "x11") == 0)) {
-    //ret = test_x11_input_create(client, 0);
+    ret = test_x11_input_create(client, 0);
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("masterbus")) && (strcmp(test, "masterbus") == 0)) {
@@ -288,11 +288,11 @@ int run_test(kr_client *client, char *test) {
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("v4l2")) && (strcmp(test, "v4l2") == 0)) {
-      //ret = test_v4l2_input_create(client, 0);
+      ret = test_v4l2_input_create(client, 0);
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("decklink")) && (strcmp(test, "decklink") == 0)) {
-      //ret = test_decklink_input_create(client, 0);
+      ret = test_decklink_input_create(client, 0);
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("alsa")) && (strcmp(test, "alsa") == 0)) {
