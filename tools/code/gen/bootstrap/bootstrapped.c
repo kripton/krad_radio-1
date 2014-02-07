@@ -517,12 +517,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_transponder_event";
     case CGEN_KR_TRANSPONDER_SETUP:
       return "kr_transponder_setup";
-    case CGEN_KRAD_LINK_AV_MODE_T:
-      return "krad_link_av_mode_t";
-    case CGEN_KR_TXPDR_SU_TYPE_T:
-      return "kr_txpdr_su_type_t";
-    case CGEN_KRAD_LINK_TRANSPORT_MODE_T:
-      return "krad_link_transport_mode_t";
     case CGEN_KR_TRANSPONDER_PATH_IO_TYPE:
       return "kr_transponder_path_io_type";
     case CGEN_KR_TRANSPONDER_PATH_IO_PATH_INFO:
@@ -1409,15 +1403,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_transponder_setup")) {
     return CGEN_KR_TRANSPONDER_SETUP;
   }
-  if (!strcmp(string,"krad_link_av_mode_t")) {
-    return CGEN_KRAD_LINK_AV_MODE_T;
-  }
-  if (!strcmp(string,"kr_txpdr_su_type_t")) {
-    return CGEN_KR_TXPDR_SU_TYPE_T;
-  }
-  if (!strcmp(string,"krad_link_transport_mode_t")) {
-    return CGEN_KRAD_LINK_TRANSPORT_MODE_T;
-  }
   if (!strcmp(string,"kr_transponder_path_io_type")) {
     return CGEN_KR_TRANSPONDER_PATH_IO_TYPE;
   }
@@ -1817,15 +1802,6 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_transponder_event_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"krad_link_av_mode_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_txpdr_su_type_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"krad_link_transport_mode_t")) {
     return 1;
   }
   if (!strcmp(type,"kr_transponder_path_io_type")) {

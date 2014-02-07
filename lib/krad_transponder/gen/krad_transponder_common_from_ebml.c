@@ -1,47 +1,5 @@
 #include "krad_transponder_common_from_ebml.h"
 
-int krad_link_av_mode_t_fr_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  krad_link_av_mode_t *actual;
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (krad_link_av_mode_t *)st;
-  res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
-
-  return res;
-}
-int kr_txpdr_su_type_t_fr_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  kr_txpdr_su_type_t *actual;
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (kr_txpdr_su_type_t *)st;
-  res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
-
-  return res;
-}
-int krad_link_transport_mode_t_fr_ebml(kr_ebml *ebml, void *st) {
-  int res;
-  krad_link_transport_mode_t *actual;
-  res = 0;
-
-  if ((ebml == NULL) || (st == NULL)) {
-    return -1;
-  }
-
-  actual = (krad_link_transport_mode_t *)st;
-  res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
-
-  return res;
-}
 int kr_transponder_path_io_type_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
   kr_transponder_path_io_type *actual;
