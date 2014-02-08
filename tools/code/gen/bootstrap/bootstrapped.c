@@ -457,56 +457,12 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_theora_encoder_St";
     case CGEN_KRAD_THEORA_DECODER_ST:
       return "krad_theora_decoder_St";
-    case CGEN_KR_ADAPTER_INFO_MEMBER:
-      return "kr_adapter_info_member";
-    case CGEN_KR_ADAPTER_INFO_PATCH_VALUE:
-      return "kr_adapter_info_patch_value";
-    case CGEN_KR_ADAPTER_INFO_PATCH:
-      return "kr_adapter_info_patch";
-    case CGEN_KR_ADAPTER_PATH_INFO_MEMBER:
-      return "kr_adapter_path_info_member";
-    case CGEN_KR_ADAPTER_PATH_INFO_PATCH_VALUE:
-      return "kr_adapter_path_info_patch_value";
-    case CGEN_KR_ADAPTER_PATH_INFO_PATCH:
-      return "kr_adapter_path_info_patch";
-    case CGEN_KR_TRANSPONDER_PATH_IO_INFO_MEMBER:
-      return "kr_transponder_path_io_info_member";
-    case CGEN_KR_TRANSPONDER_PATH_IO_INFO_PATCH_VALUE:
-      return "kr_transponder_path_io_info_patch_value";
-    case CGEN_KR_TRANSPONDER_PATH_IO_INFO_PATCH:
-      return "kr_transponder_path_io_info_patch";
     case CGEN_KR_TRANSPONDER_PATH_INFO_MEMBER:
       return "kr_transponder_path_info_member";
     case CGEN_KR_TRANSPONDER_PATH_INFO_PATCH_VALUE:
       return "kr_transponder_path_info_patch_value";
     case CGEN_KR_TRANSPONDER_PATH_INFO_PATCH:
       return "kr_transponder_path_info_patch";
-    case CGEN_KR_ADAPTER_EVENT_TYPE:
-      return "kr_adapter_event_type";
-    case CGEN_KR_ADAPTER_PATH_EVENT_TYPE:
-      return "kr_adapter_path_event_type";
-    case CGEN_KR_ADAPTER_PATH_EVENT_CB_ARG:
-      return "kr_adapter_path_event_cb_arg";
-    case CGEN_KR_ADAPTER_PATH_AV_CB_ARG:
-      return "kr_adapter_path_av_cb_arg";
-    case CGEN_KR_ADAPTER_EVENT_CB_ARG:
-      return "kr_adapter_event_cb_arg";
-    case CGEN_KR_ADAPTER_PATH_SETUP:
-      return "kr_adapter_path_setup";
-    case CGEN_KR_ADAPTER_SETUP:
-      return "kr_adapter_setup";
-    case CGEN_KR_ADAPTER_PATH_DIRECTION:
-      return "kr_adapter_path_direction";
-    case CGEN_KR_ADAPTER_API:
-      return "kr_adapter_api";
-    case CGEN_KR_ADAPTER_API_INFO:
-      return "kr_adapter_api_info";
-    case CGEN_KR_ADAPTER_API_PATH_INFO:
-      return "kr_adapter_api_path_info";
-    case CGEN_KR_ADAPTER_INFO:
-      return "kr_adapter_info";
-    case CGEN_KR_ADAPTER_PATH_INFO:
-      return "kr_adapter_path_info";
     case CGEN_KR_IMAGE:
       return "kr_image";
     case CGEN_KR_AUDIO:
@@ -517,12 +473,10 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_transponder_event";
     case CGEN_KR_TRANSPONDER_SETUP:
       return "kr_transponder_setup";
-    case CGEN_KR_TRANSPONDER_PATH_IO_TYPE:
-      return "kr_transponder_path_io_type";
-    case CGEN_KR_TRANSPONDER_PATH_IO_PATH_INFO:
-      return "kr_transponder_path_io_path_info";
-    case CGEN_KR_TRANSPONDER_PATH_IO_INFO:
-      return "kr_transponder_path_io_info";
+    case CGEN_KR_TRANSPONDER_PATH_TYPE:
+      return "kr_transponder_path_type";
+    case CGEN_KR_TRANSPONDER_PATH_TYPE_INFO:
+      return "kr_transponder_path_type_info";
     case CGEN_KR_TRANSPONDER_PATH_INFO:
       return "kr_transponder_path_info";
     case CGEN_KRAD_SLICE_TRACK_TYPE_T:
@@ -1313,33 +1267,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_theora_decoder_St")) {
     return CGEN_KRAD_THEORA_DECODER_ST;
   }
-  if (!strcmp(string,"kr_adapter_info_member")) {
-    return CGEN_KR_ADAPTER_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_adapter_info_patch_value")) {
-    return CGEN_KR_ADAPTER_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_adapter_info_patch")) {
-    return CGEN_KR_ADAPTER_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_adapter_path_info_member")) {
-    return CGEN_KR_ADAPTER_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_adapter_path_info_patch_value")) {
-    return CGEN_KR_ADAPTER_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_adapter_path_info_patch")) {
-    return CGEN_KR_ADAPTER_PATH_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_transponder_path_io_info_member")) {
-    return CGEN_KR_TRANSPONDER_PATH_IO_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_transponder_path_io_info_patch_value")) {
-    return CGEN_KR_TRANSPONDER_PATH_IO_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_transponder_path_io_info_patch")) {
-    return CGEN_KR_TRANSPONDER_PATH_IO_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_transponder_path_info_member")) {
     return CGEN_KR_TRANSPONDER_PATH_INFO_MEMBER;
   }
@@ -1348,45 +1275,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_transponder_path_info_patch")) {
     return CGEN_KR_TRANSPONDER_PATH_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_adapter_event_type")) {
-    return CGEN_KR_ADAPTER_EVENT_TYPE;
-  }
-  if (!strcmp(string,"kr_adapter_path_event_type")) {
-    return CGEN_KR_ADAPTER_PATH_EVENT_TYPE;
-  }
-  if (!strcmp(string,"kr_adapter_path_event_cb_arg")) {
-    return CGEN_KR_ADAPTER_PATH_EVENT_CB_ARG;
-  }
-  if (!strcmp(string,"kr_adapter_path_av_cb_arg")) {
-    return CGEN_KR_ADAPTER_PATH_AV_CB_ARG;
-  }
-  if (!strcmp(string,"kr_adapter_event_cb_arg")) {
-    return CGEN_KR_ADAPTER_EVENT_CB_ARG;
-  }
-  if (!strcmp(string,"kr_adapter_path_setup")) {
-    return CGEN_KR_ADAPTER_PATH_SETUP;
-  }
-  if (!strcmp(string,"kr_adapter_setup")) {
-    return CGEN_KR_ADAPTER_SETUP;
-  }
-  if (!strcmp(string,"kr_adapter_path_direction")) {
-    return CGEN_KR_ADAPTER_PATH_DIRECTION;
-  }
-  if (!strcmp(string,"kr_adapter_api")) {
-    return CGEN_KR_ADAPTER_API;
-  }
-  if (!strcmp(string,"kr_adapter_api_info")) {
-    return CGEN_KR_ADAPTER_API_INFO;
-  }
-  if (!strcmp(string,"kr_adapter_api_path_info")) {
-    return CGEN_KR_ADAPTER_API_PATH_INFO;
-  }
-  if (!strcmp(string,"kr_adapter_info")) {
-    return CGEN_KR_ADAPTER_INFO;
-  }
-  if (!strcmp(string,"kr_adapter_path_info")) {
-    return CGEN_KR_ADAPTER_PATH_INFO;
   }
   if (!strcmp(string,"kr_image")) {
     return CGEN_KR_IMAGE;
@@ -1403,14 +1291,11 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_transponder_setup")) {
     return CGEN_KR_TRANSPONDER_SETUP;
   }
-  if (!strcmp(string,"kr_transponder_path_io_type")) {
-    return CGEN_KR_TRANSPONDER_PATH_IO_TYPE;
+  if (!strcmp(string,"kr_transponder_path_type")) {
+    return CGEN_KR_TRANSPONDER_PATH_TYPE;
   }
-  if (!strcmp(string,"kr_transponder_path_io_path_info")) {
-    return CGEN_KR_TRANSPONDER_PATH_IO_PATH_INFO;
-  }
-  if (!strcmp(string,"kr_transponder_path_io_info")) {
-    return CGEN_KR_TRANSPONDER_PATH_IO_INFO;
+  if (!strcmp(string,"kr_transponder_path_type_info")) {
+    return CGEN_KR_TRANSPONDER_PATH_TYPE_INFO;
   }
   if (!strcmp(string,"kr_transponder_path_info")) {
     return CGEN_KR_TRANSPONDER_PATH_INFO;
@@ -1590,13 +1475,7 @@ int codegen_is_union(char *type) {
   if (!strcmp(type,"kr_payload")) {
     return 1;
   }
-  if (!strcmp(type,"kr_adapter_api_info")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_adapter_api_path_info")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_transponder_path_io_path_info")) {
+  if (!strcmp(type,"kr_transponder_path_type_info")) {
     return 1;
   }
   return 0;
@@ -1777,34 +1656,13 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_sfx_effect_control")) {
     return 1;
   }
-  if (!strcmp(type,"kr_adapter_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_adapter_path_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_transponder_path_io_info_member")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_transponder_path_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_adapter_event_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_adapter_path_event_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_adapter_path_direction")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_adapter_api")) {
     return 1;
   }
   if (!strcmp(type,"kr_transponder_event_type")) {
     return 1;
   }
-  if (!strcmp(type,"kr_transponder_path_io_type")) {
+  if (!strcmp(type,"kr_transponder_path_type")) {
     return 1;
   }
   if (!strcmp(type,"krad_slice_track_type_t")) {

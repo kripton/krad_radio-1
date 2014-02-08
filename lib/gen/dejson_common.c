@@ -1,6 +1,6 @@
 #include "gen.h"
 int info_unpack_fr_json(char *json, uber_St *uber) {
-  const info_unpack_fr_json_func fr_json_functions[64] = {kr_alsa_info_fr_json,
+  const info_unpack_fr_json_func fr_json_functions[57] = {kr_alsa_info_fr_json,
   kr_alsa_path_info_fr_json,kr_method_fr_json,
   kr_crate_fr_json,kr_easing_fr_json,
   kr_compositor_path_type_fr_json,kr_compositor_overlay_type_fr_json,
@@ -23,16 +23,13 @@ int info_unpack_fr_json(char *json, uber_St *uber) {
   kr_sfx_effect_control_fr_json,kr_eq_band_info_fr_json,
   kr_eq_info_fr_json,kr_lowpass_info_fr_json,
   kr_highpass_info_fr_json,kr_volume_info_fr_json,
-  kr_analog_info_fr_json,kr_adapter_path_direction_fr_json,
-  kr_adapter_api_fr_json,kr_adapter_api_info_fr_json,
-  kr_adapter_api_path_info_fr_json,kr_adapter_info_fr_json,
-  kr_adapter_path_info_fr_json,kr_transponder_path_io_type_fr_json,
-  kr_transponder_path_io_path_info_fr_json,kr_transponder_path_io_info_fr_json,
-  kr_transponder_path_info_fr_json,kr_v4l2_state_fr_json,
-  kr_v4l2_mode_fr_json,kr_v4l2_info_fr_json,
-  kr_v4l2_open_info_fr_json,kr_wayland_info_fr_json,
-  kr_wayland_path_info_fr_json,kr_x11_info_fr_json,
-  kr_x11_path_info_fr_json};
+  kr_analog_info_fr_json,kr_transponder_path_type_fr_json,
+  kr_transponder_path_type_info_fr_json,kr_transponder_path_info_fr_json,
+  kr_v4l2_state_fr_json,kr_v4l2_mode_fr_json,
+  kr_v4l2_info_fr_json,kr_v4l2_open_info_fr_json,
+  kr_wayland_info_fr_json,kr_wayland_path_info_fr_json,
+  kr_x11_info_fr_json,kr_x11_path_info_fr_json
+  };
   return fr_json_functions[uber->type-1](json , uber->actual);
 }
 

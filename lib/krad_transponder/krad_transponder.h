@@ -7,14 +7,8 @@ typedef struct kr_transponder_path kr_transponder_path;
 typedef struct kr_transponder_event kr_transponder_event;
 typedef void (kr_transponder_event_cb)(kr_transponder_event *);
 
-typedef struct kr_transponder kr_xpdr;
-typedef struct kr_transponder_setup kr_xpdr_setup;
-typedef struct kr_transponder_path kr_xpdr_path;
-typedef struct kr_transponder_event kr_xpdr_event;
-typedef void (kr_xpdr_event_cb)(kr_xpdr_event *);
-
 #include "krad_transponder_common.h"
-#include "krad_adapter.h"
+#include "krad_av.h"
 #include "krad_mixer.h"
 #include "krad_compositor.h"
 
@@ -41,9 +35,9 @@ struct kr_transponder_setup {
   int path_count;
 };
 
-int kr_transponder_path_ctl(kr_xpdr_path *path, kr_transponder_path_info_patch *patch);
-int kr_transponder_unlink(kr_xpdr_path *path);
-int kr_transponder_mkpath(kr_xpdr *xpdr, kr_xpdr_path_info *i, void *user);
+int kr_transponder_path_ctl(kr_transponder_path *path, kr_transponder_path_info_patch *patch);
+int kr_transponder_unlink(kr_transponder_path *path);
+int kr_transponder_mkpath(kr_transponder *transponder, kr_transponder_path_info *i, void *user);
 int kr_transponder_destroy(kr_transponder *transponder);
 kr_transponder *kr_transponder_create(kr_transponder_setup *setup);
 

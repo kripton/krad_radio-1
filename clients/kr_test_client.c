@@ -1,5 +1,6 @@
 #include "kr_client.h"
 
+/*
 static int test_jack_input_create(kr_client *client);
 static int test_jack_output_create(kr_client *client);
 static int test_decklink_input_create(kr_client *client, int dev);
@@ -11,7 +12,6 @@ static int test_jack_input_create(kr_client *client) {
   kr_xpdr_path_info info;
   char *name;
   int channels;
-  /* init function? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   channels = 2;
   name = "Music1";
@@ -32,7 +32,6 @@ static int test_jack_output_create(kr_client *client) {
   kr_xpdr_path_info info;
   char *name;
   int channels;
-  /* init func? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   channels = 2;
   name = "Main";
@@ -64,7 +63,6 @@ static int test_v4l2_input_create(kr_client *client, int dev) {
   height = 360;
   num = 30;
   den = 1;
-  /* init func? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   info.input.type = KR_XPDR_ADAPTER;
   info.input.info.adapter_path_info.api = KR_ADP_V4L2;
@@ -94,7 +92,6 @@ static int test_x11_input_create(kr_client *client, int dev) {
   height = 360;
   num = 30;
   den = 1;
-  /* init func? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   info.input.type = KR_XPDR_ADAPTER;
   info.input.info.adapter_path_info.api = KR_ADP_X11;
@@ -128,7 +125,6 @@ static int test_decklink_input_create(kr_client *client, int dev) {
   height = 720;
   num = 60000;
   den = 1001;
-  /* init func? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   info.input.type = KR_XPDR_ADAPTER;
   info.input.info.adapter_path_info.api = KR_ADP_DECKLINK;
@@ -163,7 +159,6 @@ static int test_wayland_output_create(kr_client *client) {
   width = 640;
   height = 360;
   fullscreen = 0;
-  /* init func ? */
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   info.input.type = KR_XPDR_COMPOSITOR;
   info.input.info.compositor_path_info.info.output_info.w = width;
@@ -179,6 +174,7 @@ static int test_wayland_output_create(kr_client *client) {
   ret = kr_xpdr_mkpath(client, name, &info);
   return ret;
 }
+*/
 
 int test_x11_get(kr_client *client) {
   int ret;
@@ -252,13 +248,6 @@ int make_jackinout(kr_client *client) {
 int run_test(kr_client *client, char *test) {
   int ret;
   ret = -1;
-  if ((strlen(test) == strlen("wayland")) && (strcmp(test, "wayland") == 0)) {
-    ret = test_wayland_output_create(client);
-  }
-  if ((strlen(test) == strlen("x11")) && (strcmp(test, "x11") == 0)) {
-    ret = test_x11_input_create(client, 0);
-    if (ret != 0) return ret;
-  }
   if ((strlen(test) == strlen("masterbus")) && (strcmp(test, "masterbus") == 0)) {
     ret = make_masterbus(client);
     if (ret != 0) return ret;
@@ -273,6 +262,14 @@ int run_test(kr_client *client, char *test) {
   }
   if ((strlen(test) == strlen("getx11")) && (strcmp(test, "getx11") == 0)) {
     ret = test_x11_get(client);
+    if (ret != 0) return ret;
+  }
+  /*
+  if ((strlen(test) == strlen("wayland")) && (strcmp(test, "wayland") == 0)) {
+    ret = test_wayland_output_create(client);
+  }
+  if ((strlen(test) == strlen("x11")) && (strcmp(test, "x11") == 0)) {
+    ret = test_x11_input_create(client, 0);
     if (ret != 0) return ret;
   }
   if ((strlen(test) == strlen("jackin")) && (strcmp(test, "jackin") == 0)) {
@@ -298,6 +295,7 @@ int run_test(kr_client *client, char *test) {
   if ((strlen(test) == strlen("alsa")) && (strcmp(test, "alsa") == 0)) {
     if (ret != 0) return ret;
   }
+  */
   return ret;
 }
 

@@ -19,7 +19,6 @@ krad_radio_libkradradio_la_SOURCES = \
 krad_calc/krad_base64.c \
 krad_container/krad_container.c \
 krad_radio/krad_radio.c \
-krad_transponder/krad_adapter.c \
 krad_chronometer/krad_timer.c \
 krad_chronometer/krad_ticker.c \
 krad_coder/krad_coder_common.c \
