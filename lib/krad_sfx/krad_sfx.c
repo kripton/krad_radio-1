@@ -54,7 +54,7 @@ void kr_sfx_destroy(kr_sfx *sfx) {
   int e;
   for (e = 0; e < KR_SFX_MAX; e++) {
     if (sfx->effect[e].active == 1) {
-      effect_remove(sfx, e);
+      effect_remove(sfx, sfx->effect[e].type);
     }
   }
   free(sfx);
