@@ -1,4 +1,10 @@
 static int depth_state = 1;
+#include "../aux/gen/kr_aux_common_to_ebml.c"
+#include "../aux/gen/kr_aux_common_from_ebml.c"
+#include "../aux/gen/kr_aux_common_to_text.c"
+#include "../aux/gen/kr_aux_common_to_json.c"
+#include "../aux/gen/kr_aux_common_from_json.c"
+#include "../aux/gen/kr_aux_common_helpers.c"
 #include "../krad_alsa/gen/krad_alsa_common_to_ebml.c"
 #include "../krad_alsa/gen/krad_alsa_common_from_ebml.c"
 #include "../krad_alsa/gen/krad_alsa_common_to_text.c"

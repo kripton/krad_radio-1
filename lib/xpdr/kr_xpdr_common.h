@@ -7,6 +7,7 @@
 #include "krad_decklink_common.h"
 #include "krad_x11_common.h"
 #include "krad_alsa_common.h"
+#include "kr_aux_common.h"
 
 typedef struct kr_xpdr_path_info kr_xpdr_path_info;
 
@@ -37,7 +38,7 @@ typedef union {
   kr_decklink_info dl;
   kr_x11_info x11;
   kr_alsa_info alsa;
-  void *krad;
+  kr_aux_info aux;
   kr_jack_path_info jack_in;
   kr_jack_path_info jack_out;
   kr_wayland_path_info wl_out;
@@ -46,8 +47,8 @@ typedef union {
   kr_x11_path_info x11_in;
   kr_alsa_path_info alsa_in;
   kr_alsa_path_info alsa_out;
-  void *krad_input;
-  void *krad_output;
+  kr_aux_path_info aux_in;
+  kr_aux_path_info aux_out;
 } kr_xpdr_type_info;
 
 struct kr_xpdr_path_info {

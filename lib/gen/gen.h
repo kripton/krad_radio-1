@@ -19,7 +19,9 @@ int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber);
 typedef int (*info_unpack_fr_ebml_func)(kr_ebml *ebml, void *st);
 
 typedef enum {
-  TEXT_KR_ALSA_INFO = 1,
+  TEXT_KR_AUX_INFO = 1,
+  TEXT_KR_AUX_PATH_INFO,
+  TEXT_KR_ALSA_INFO,
   TEXT_KR_ALSA_PATH_INFO,
   TEXT_KR_METHOD,
   TEXT_KR_CRATE,
@@ -79,11 +81,13 @@ typedef enum {
 } text_enum;
 
 enum {
-  TEXT_ENUM_LAST = 57
+  TEXT_ENUM_LAST = 59
 };
 
 typedef enum {
-  JSON_KR_ALSA_INFO = 1,
+  JSON_KR_AUX_INFO = 1,
+  JSON_KR_AUX_PATH_INFO,
+  JSON_KR_ALSA_INFO,
   JSON_KR_ALSA_PATH_INFO,
   JSON_KR_METHOD,
   JSON_KR_CRATE,
@@ -143,11 +147,13 @@ typedef enum {
 } json_enum;
 
 enum {
-  JSON_ENUM_LAST = 57
+  JSON_ENUM_LAST = 59
 };
 
 typedef enum {
-  DEJSON_KR_ALSA_INFO = 1,
+  DEJSON_KR_AUX_INFO = 1,
+  DEJSON_KR_AUX_PATH_INFO,
+  DEJSON_KR_ALSA_INFO,
   DEJSON_KR_ALSA_PATH_INFO,
   DEJSON_KR_METHOD,
   DEJSON_KR_CRATE,
@@ -207,11 +213,13 @@ typedef enum {
 } dejson_enum;
 
 enum {
-  DEJSON_ENUM_LAST = 57
+  DEJSON_ENUM_LAST = 59
 };
 
 typedef enum {
-  EBML_KR_ALSA_INFO = 1,
+  EBML_KR_AUX_INFO = 1,
+  EBML_KR_AUX_PATH_INFO,
+  EBML_KR_ALSA_INFO,
   EBML_KR_ALSA_PATH_INFO,
   EBML_KR_METHOD,
   EBML_KR_CRATE,
@@ -273,11 +281,13 @@ typedef enum {
 } ebml_enum;
 
 enum {
-  EBML_ENUM_LAST = 59
+  EBML_ENUM_LAST = 61
 };
 
 typedef enum {
-  DEBML_KR_ALSA_INFO = 1,
+  DEBML_KR_AUX_INFO = 1,
+  DEBML_KR_AUX_PATH_INFO,
+  DEBML_KR_ALSA_INFO,
   DEBML_KR_ALSA_PATH_INFO,
   DEBML_KR_METHOD,
   DEBML_KR_CRATE,
@@ -337,11 +347,13 @@ typedef enum {
 } debml_enum;
 
 enum {
-  DEBML_ENUM_LAST = 57
+  DEBML_ENUM_LAST = 59
 };
 
 typedef enum {
-  HELPERS_KR_ALSA_INFO = 1,
+  HELPERS_KR_AUX_INFO = 1,
+  HELPERS_KR_AUX_PATH_INFO,
+  HELPERS_KR_ALSA_INFO,
   HELPERS_KR_ALSA_PATH_INFO,
   HELPERS_KR_METHOD,
   HELPERS_KR_CRATE,
@@ -401,7 +413,7 @@ typedef enum {
 } helpers_enum;
 
 enum {
-  HELPERS_ENUM_LAST = 57
+  HELPERS_ENUM_LAST = 59
 };
 
 

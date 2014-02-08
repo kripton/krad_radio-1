@@ -4,6 +4,7 @@
 #include "krad_decklink.h"
 #include "krad_x11.h"
 #include "krad_alsa.h"
+#include "kr_aux.h"
 
 #include "kr_adapter.h"
 
@@ -60,12 +61,12 @@ static const kr_adapter_spec adapters[] = {
     .destroy = NULL,
     .create = NULL
   },{ /* KR_AUX */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
-    .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .pctl = kr_aux_pctl,
+    .rmpath = kr_aux_rmpath,
+    .mkpath = kr_aux_mkpath,
+    .ctl = kr_aux_ctl,
+    .destroy = kr_aux_destroy,
+    .create = kr_aux_create
   },{ /* KR_ */
     .pctl = NULL,
     .rmpath = NULL,

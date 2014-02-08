@@ -1,6 +1,7 @@
 #include "gen.h"
 int info_pack_to_text(char *text, uber_St *uber, int32_t max) {
-  const info_pack_to_text_func to_text_functions[57] = {kr_alsa_info_to_text,
+  const info_pack_to_text_func to_text_functions[59] = {kr_aux_info_to_text,
+  kr_aux_path_info_to_text,kr_alsa_info_to_text,
   kr_alsa_path_info_to_text,kr_method_to_text,
   kr_crate_to_text,kr_easing_to_text,
   kr_compositor_path_type_to_text,kr_compositor_overlay_type_to_text,

@@ -57,6 +57,7 @@ krad_opus/krad_opus.c \
 krad_opus/opus_header.c \
 krad_ring/krad_ring.c \
 xpdr/xpdr.c \
+aux/aux.c \
 krad_web/krad_web_server.c \
 krad_transmitter/krad_transmitter.c \
 krad_ogg/krad_ogg.c \
@@ -156,6 +157,7 @@ krad_compositor/krad_compositor_client.h \
 krad_compositor/krad_compositor_common.h \
 xpdr/kr_xpdr_client.h \
 xpdr/kr_xpdr_common.h \
+aux/kr_aux_common.h \
 krad_ebml/krad_ebml.h \
 krad_ebml/krad_ebml_ids.h \
 krad_ebml/krad_ebmlx.h \

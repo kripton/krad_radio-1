@@ -3,18 +3,6 @@
 
 char *codegen_enum_to_string(cgen_enum val) {
   switch (val) {
-    case CGEN_KR_ALSA_INFO_MEMBER:
-      return "kr_alsa_info_member";
-    case CGEN_KR_ALSA_INFO_PATCH_VALUE:
-      return "kr_alsa_info_patch_value";
-    case CGEN_KR_ALSA_INFO_PATCH:
-      return "kr_alsa_info_patch";
-    case CGEN_KR_ALSA_PATH_INFO_MEMBER:
-      return "kr_alsa_path_info_member";
-    case CGEN_KR_ALSA_PATH_INFO_PATCH_VALUE:
-      return "kr_alsa_path_info_patch_value";
-    case CGEN_KR_ALSA_PATH_INFO_PATCH:
-      return "kr_alsa_path_info_patch";
     case CGEN_KR_ALSA_INFO:
       return "kr_alsa_info";
     case CGEN_KR_ALSA_PATH_INFO:
@@ -67,60 +55,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_medium_St";
     case CGEN_KR_ENCODER_MACHINE_SECTOR_ST:
       return "kr_encoder_machine_sector_St";
-    case CGEN_KR_COMPOSITOR_OUTPUT_INFO_MEMBER:
-      return "kr_compositor_output_info_member";
-    case CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH_VALUE:
-      return "kr_compositor_output_info_patch_value";
-    case CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH:
-      return "kr_compositor_output_info_patch";
-    case CGEN_KR_COMPOSITOR_BUS_INFO_MEMBER:
-      return "kr_compositor_bus_info_member";
-    case CGEN_KR_COMPOSITOR_BUS_INFO_PATCH_VALUE:
-      return "kr_compositor_bus_info_patch_value";
-    case CGEN_KR_COMPOSITOR_BUS_INFO_PATCH:
-      return "kr_compositor_bus_info_patch";
-    case CGEN_KR_COMPOSITOR_INPUT_INFO_MEMBER:
-      return "kr_compositor_input_info_member";
-    case CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH_VALUE:
-      return "kr_compositor_input_info_patch_value";
-    case CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH:
-      return "kr_compositor_input_info_patch";
-    case CGEN_KR_COMPOSITOR_SOURCE_INFO_MEMBER:
-      return "kr_compositor_source_info_member";
-    case CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH_VALUE:
-      return "kr_compositor_source_info_patch_value";
-    case CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH:
-      return "kr_compositor_source_info_patch";
-    case CGEN_KR_OVERLAY_INFO_MEMBER:
-      return "kr_overlay_info_member";
-    case CGEN_KR_OVERLAY_INFO_PATCH_VALUE:
-      return "kr_overlay_info_patch_value";
-    case CGEN_KR_OVERLAY_INFO_PATCH:
-      return "kr_overlay_info_patch";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER:
-      return "kr_compositor_path_info_member";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE:
-      return "kr_compositor_path_info_patch_value";
-    case CGEN_KR_COMPOSITOR_PATH_INFO_PATCH:
-      return "kr_compositor_path_info_patch";
-    case CGEN_KR_SPRITE_INFO_MEMBER:
-      return "kr_sprite_info_member";
-    case CGEN_KR_SPRITE_INFO_PATCH_VALUE:
-      return "kr_sprite_info_patch_value";
-    case CGEN_KR_SPRITE_INFO_PATCH:
-      return "kr_sprite_info_patch";
-    case CGEN_KR_TEXT_INFO_MEMBER:
-      return "kr_text_info_member";
-    case CGEN_KR_TEXT_INFO_PATCH_VALUE:
-      return "kr_text_info_patch_value";
-    case CGEN_KR_TEXT_INFO_PATCH:
-      return "kr_text_info_patch";
-    case CGEN_KR_VECTOR_INFO_MEMBER:
-      return "kr_vector_info_member";
-    case CGEN_KR_VECTOR_INFO_PATCH_VALUE:
-      return "kr_vector_info_patch_value";
-    case CGEN_KR_VECTOR_INFO_PATCH:
-      return "kr_vector_info_patch";
     case CGEN_KR_COMPOSITOR_SETUP:
       return "kr_compositor_setup";
     case CGEN_KR_COMPOSITOR_EVENT_TYPE:
@@ -177,18 +111,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_container_type_t";
     case CGEN_KRAD_CONTAINER_ST:
       return "krad_container_St";
-    case CGEN_KR_DECKLINK_INFO_MEMBER:
-      return "kr_decklink_info_member";
-    case CGEN_KR_DECKLINK_INFO_PATCH_VALUE:
-      return "kr_decklink_info_patch_value";
-    case CGEN_KR_DECKLINK_INFO_PATCH:
-      return "kr_decklink_info_patch";
-    case CGEN_KR_DECKLINK_PATH_INFO_MEMBER:
-      return "kr_decklink_path_info_member";
-    case CGEN_KR_DECKLINK_PATH_INFO_PATCH_VALUE:
-      return "kr_decklink_path_info_patch_value";
-    case CGEN_KR_DECKLINK_PATH_INFO_PATCH:
-      return "kr_decklink_path_info_patch";
     case CGEN_KR_DECKLINK:
       return "kr_decklink";
     case CGEN_KRAD_DECKLINK_CAPTURE_ST:
@@ -223,24 +145,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_io2_St";
     case CGEN_KR_STREAM:
       return "kr_stream";
-    case CGEN_KR_JACK_SETUP_INFO_MEMBER:
-      return "kr_jack_setup_info_member";
-    case CGEN_KR_JACK_SETUP_INFO_PATCH_VALUE:
-      return "kr_jack_setup_info_patch_value";
-    case CGEN_KR_JACK_SETUP_INFO_PATCH:
-      return "kr_jack_setup_info_patch";
-    case CGEN_KR_JACK_INFO_MEMBER:
-      return "kr_jack_info_member";
-    case CGEN_KR_JACK_INFO_PATCH_VALUE:
-      return "kr_jack_info_patch_value";
-    case CGEN_KR_JACK_INFO_PATCH:
-      return "kr_jack_info_patch";
-    case CGEN_KR_JACK_PATH_INFO_MEMBER:
-      return "kr_jack_path_info_member";
-    case CGEN_KR_JACK_PATH_INFO_PATCH_VALUE:
-      return "kr_jack_path_info_patch_value";
-    case CGEN_KR_JACK_PATH_INFO_PATCH:
-      return "kr_jack_path_info_patch";
     case CGEN_KR_JACK_EVENT_TYPE:
       return "kr_jack_event_type";
     case CGEN_KR_JACK_PATH_EVENT_CB_ARG:
@@ -273,12 +177,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_webm_dash_vod_t";
     case CGEN_KR_POOL_SETUP:
       return "kr_pool_setup";
-    case CGEN_KR_MIXER_PATH_INFO_MEMBER:
-      return "kr_mixer_path_info_member";
-    case CGEN_KR_MIXER_PATH_INFO_PATCH_VALUE:
-      return "kr_mixer_path_info_patch_value";
-    case CGEN_KR_MIXER_PATH_INFO_PATCH:
-      return "kr_mixer_path_info_patch";
     case CGEN_KR_MIXER_EVENT_TYPE:
       return "kr_mixer_event_type";
     case CGEN_KR_MIXER_EVENT:
@@ -377,42 +275,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_rc_tx_St";
     case CGEN_KRAD_RESAMPLE_RING_ST:
       return "krad_resample_ring_St";
-    case CGEN_KR_EQ_BAND_INFO_MEMBER:
-      return "kr_eq_band_info_member";
-    case CGEN_KR_EQ_BAND_INFO_PATCH_VALUE:
-      return "kr_eq_band_info_patch_value";
-    case CGEN_KR_EQ_BAND_INFO_PATCH:
-      return "kr_eq_band_info_patch";
-    case CGEN_KR_EQ_INFO_MEMBER:
-      return "kr_eq_info_member";
-    case CGEN_KR_EQ_INFO_PATCH_VALUE:
-      return "kr_eq_info_patch_value";
-    case CGEN_KR_EQ_INFO_PATCH:
-      return "kr_eq_info_patch";
-    case CGEN_KR_LOWPASS_INFO_MEMBER:
-      return "kr_lowpass_info_member";
-    case CGEN_KR_LOWPASS_INFO_PATCH_VALUE:
-      return "kr_lowpass_info_patch_value";
-    case CGEN_KR_LOWPASS_INFO_PATCH:
-      return "kr_lowpass_info_patch";
-    case CGEN_KR_HIGHPASS_INFO_MEMBER:
-      return "kr_highpass_info_member";
-    case CGEN_KR_HIGHPASS_INFO_PATCH_VALUE:
-      return "kr_highpass_info_patch_value";
-    case CGEN_KR_HIGHPASS_INFO_PATCH:
-      return "kr_highpass_info_patch";
-    case CGEN_KR_VOLUME_INFO_MEMBER:
-      return "kr_volume_info_member";
-    case CGEN_KR_VOLUME_INFO_PATCH_VALUE:
-      return "kr_volume_info_patch_value";
-    case CGEN_KR_VOLUME_INFO_PATCH:
-      return "kr_volume_info_patch";
-    case CGEN_KR_ANALOG_INFO_MEMBER:
-      return "kr_analog_info_member";
-    case CGEN_KR_ANALOG_INFO_PATCH_VALUE:
-      return "kr_analog_info_patch_value";
-    case CGEN_KR_ANALOG_INFO_PATCH:
-      return "kr_analog_info_patch";
     case CGEN_KR_PASS_INFO:
       return "kr_pass_info";
     case CGEN_KR_PASS_SETUP:
@@ -469,18 +331,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_rebuilder_St";
     case CGEN_KRAD_UDP_ST:
       return "krad_udp_St";
-    case CGEN_KR_V4L2_INFO_MEMBER:
-      return "kr_v4l2_info_member";
-    case CGEN_KR_V4L2_INFO_PATCH_VALUE:
-      return "kr_v4l2_info_patch_value";
-    case CGEN_KR_V4L2_INFO_PATCH:
-      return "kr_v4l2_info_patch";
-    case CGEN_KR_V4L2_OPEN_INFO_MEMBER:
-      return "kr_v4l2_open_info_member";
-    case CGEN_KR_V4L2_OPEN_INFO_PATCH_VALUE:
-      return "kr_v4l2_open_info_patch_value";
-    case CGEN_KR_V4L2_OPEN_INFO_PATCH:
-      return "kr_v4l2_open_info_patch";
     case CGEN_KR_V4L2_SETUP:
       return "kr_v4l2_setup";
     case CGEN_KR_V4L2_STATE:
@@ -497,18 +347,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_vpx_encoder_St";
     case CGEN_KRAD_VPX_DECODER_ST:
       return "krad_vpx_decoder_St";
-    case CGEN_KR_WAYLAND_INFO_MEMBER:
-      return "kr_wayland_info_member";
-    case CGEN_KR_WAYLAND_INFO_PATCH_VALUE:
-      return "kr_wayland_info_patch_value";
-    case CGEN_KR_WAYLAND_INFO_PATCH:
-      return "kr_wayland_info_patch";
-    case CGEN_KR_WAYLAND_PATH_INFO_MEMBER:
-      return "kr_wayland_path_info_member";
-    case CGEN_KR_WAYLAND_PATH_INFO_PATCH_VALUE:
-      return "kr_wayland_path_info_patch_value";
-    case CGEN_KR_WAYLAND_PATH_INFO_PATCH:
-      return "kr_wayland_path_info_patch";
     case CGEN_KR_WAYLAND_EVENT_TYPE:
       return "kr_wayland_event_type";
     case CGEN_KR_WAYLAND_POINTER_EVENT:
@@ -533,18 +371,6 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_web_event";
     case CGEN_KR_WEB_SERVER_SETUP:
       return "kr_web_server_setup";
-    case CGEN_KR_X11_INFO_MEMBER:
-      return "kr_x11_info_member";
-    case CGEN_KR_X11_INFO_PATCH_VALUE:
-      return "kr_x11_info_patch_value";
-    case CGEN_KR_X11_INFO_PATCH:
-      return "kr_x11_info_patch";
-    case CGEN_KR_X11_PATH_INFO_MEMBER:
-      return "kr_x11_path_info_member";
-    case CGEN_KR_X11_PATH_INFO_PATCH_VALUE:
-      return "kr_x11_path_info_patch_value";
-    case CGEN_KR_X11_PATH_INFO_PATCH:
-      return "kr_x11_path_info_patch";
     case CGEN_KR_X11:
       return "kr_x11";
     case CGEN_KR_X11_PATH:
@@ -568,24 +394,6 @@ char *codegen_enum_to_string(cgen_enum val) {
 }
 
 cgen_enum codegen_string_to_enum(char *string) {
-  if (!strcmp(string,"kr_alsa_info_member")) {
-    return CGEN_KR_ALSA_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_alsa_info_patch_value")) {
-    return CGEN_KR_ALSA_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_alsa_info_patch")) {
-    return CGEN_KR_ALSA_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_alsa_path_info_member")) {
-    return CGEN_KR_ALSA_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_alsa_path_info_patch_value")) {
-    return CGEN_KR_ALSA_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_alsa_path_info_patch")) {
-    return CGEN_KR_ALSA_PATH_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_alsa_info")) {
     return CGEN_KR_ALSA_INFO;
   }
@@ -663,87 +471,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_encoder_machine_sector_St")) {
     return CGEN_KR_ENCODER_MACHINE_SECTOR_ST;
-  }
-  if (!strcmp(string,"kr_compositor_output_info_member")) {
-    return CGEN_KR_COMPOSITOR_OUTPUT_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_compositor_output_info_patch_value")) {
-    return CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_compositor_output_info_patch")) {
-    return CGEN_KR_COMPOSITOR_OUTPUT_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_compositor_bus_info_member")) {
-    return CGEN_KR_COMPOSITOR_BUS_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_compositor_bus_info_patch_value")) {
-    return CGEN_KR_COMPOSITOR_BUS_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_compositor_bus_info_patch")) {
-    return CGEN_KR_COMPOSITOR_BUS_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_compositor_input_info_member")) {
-    return CGEN_KR_COMPOSITOR_INPUT_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_compositor_input_info_patch_value")) {
-    return CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_compositor_input_info_patch")) {
-    return CGEN_KR_COMPOSITOR_INPUT_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_compositor_source_info_member")) {
-    return CGEN_KR_COMPOSITOR_SOURCE_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_compositor_source_info_patch_value")) {
-    return CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_compositor_source_info_patch")) {
-    return CGEN_KR_COMPOSITOR_SOURCE_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_overlay_info_member")) {
-    return CGEN_KR_OVERLAY_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_overlay_info_patch_value")) {
-    return CGEN_KR_OVERLAY_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_overlay_info_patch")) {
-    return CGEN_KR_OVERLAY_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_compositor_path_info_member")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_compositor_path_info_patch_value")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_compositor_path_info_patch")) {
-    return CGEN_KR_COMPOSITOR_PATH_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_sprite_info_member")) {
-    return CGEN_KR_SPRITE_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_sprite_info_patch_value")) {
-    return CGEN_KR_SPRITE_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_sprite_info_patch")) {
-    return CGEN_KR_SPRITE_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_text_info_member")) {
-    return CGEN_KR_TEXT_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_text_info_patch_value")) {
-    return CGEN_KR_TEXT_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_text_info_patch")) {
-    return CGEN_KR_TEXT_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_vector_info_member")) {
-    return CGEN_KR_VECTOR_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_vector_info_patch_value")) {
-    return CGEN_KR_VECTOR_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_vector_info_patch")) {
-    return CGEN_KR_VECTOR_INFO_PATCH;
   }
   if (!strcmp(string,"kr_compositor_setup")) {
     return CGEN_KR_COMPOSITOR_SETUP;
@@ -829,24 +556,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_container_St")) {
     return CGEN_KRAD_CONTAINER_ST;
   }
-  if (!strcmp(string,"kr_decklink_info_member")) {
-    return CGEN_KR_DECKLINK_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_decklink_info_patch_value")) {
-    return CGEN_KR_DECKLINK_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_decklink_info_patch")) {
-    return CGEN_KR_DECKLINK_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_decklink_path_info_member")) {
-    return CGEN_KR_DECKLINK_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_decklink_path_info_patch_value")) {
-    return CGEN_KR_DECKLINK_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_decklink_path_info_patch")) {
-    return CGEN_KR_DECKLINK_PATH_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_decklink")) {
     return CGEN_KR_DECKLINK;
   }
@@ -898,33 +607,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_stream")) {
     return CGEN_KR_STREAM;
   }
-  if (!strcmp(string,"kr_jack_setup_info_member")) {
-    return CGEN_KR_JACK_SETUP_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_jack_setup_info_patch_value")) {
-    return CGEN_KR_JACK_SETUP_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_jack_setup_info_patch")) {
-    return CGEN_KR_JACK_SETUP_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_jack_info_member")) {
-    return CGEN_KR_JACK_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_jack_info_patch_value")) {
-    return CGEN_KR_JACK_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_jack_info_patch")) {
-    return CGEN_KR_JACK_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_jack_path_info_member")) {
-    return CGEN_KR_JACK_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_jack_path_info_patch_value")) {
-    return CGEN_KR_JACK_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_jack_path_info_patch")) {
-    return CGEN_KR_JACK_PATH_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_jack_event_type")) {
     return CGEN_KR_JACK_EVENT_TYPE;
   }
@@ -972,15 +654,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_pool_setup")) {
     return CGEN_KR_POOL_SETUP;
-  }
-  if (!strcmp(string,"kr_mixer_path_info_member")) {
-    return CGEN_KR_MIXER_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_mixer_path_info_patch_value")) {
-    return CGEN_KR_MIXER_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_mixer_path_info_patch")) {
-    return CGEN_KR_MIXER_PATH_INFO_PATCH;
   }
   if (!strcmp(string,"kr_mixer_event_type")) {
     return CGEN_KR_MIXER_EVENT_TYPE;
@@ -1129,60 +802,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_resample_ring_St")) {
     return CGEN_KRAD_RESAMPLE_RING_ST;
   }
-  if (!strcmp(string,"kr_eq_band_info_member")) {
-    return CGEN_KR_EQ_BAND_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_eq_band_info_patch_value")) {
-    return CGEN_KR_EQ_BAND_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_eq_band_info_patch")) {
-    return CGEN_KR_EQ_BAND_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_eq_info_member")) {
-    return CGEN_KR_EQ_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_eq_info_patch_value")) {
-    return CGEN_KR_EQ_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_eq_info_patch")) {
-    return CGEN_KR_EQ_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_lowpass_info_member")) {
-    return CGEN_KR_LOWPASS_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_lowpass_info_patch_value")) {
-    return CGEN_KR_LOWPASS_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_lowpass_info_patch")) {
-    return CGEN_KR_LOWPASS_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_highpass_info_member")) {
-    return CGEN_KR_HIGHPASS_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_highpass_info_patch_value")) {
-    return CGEN_KR_HIGHPASS_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_highpass_info_patch")) {
-    return CGEN_KR_HIGHPASS_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_volume_info_member")) {
-    return CGEN_KR_VOLUME_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_volume_info_patch_value")) {
-    return CGEN_KR_VOLUME_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_volume_info_patch")) {
-    return CGEN_KR_VOLUME_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_analog_info_member")) {
-    return CGEN_KR_ANALOG_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_analog_info_patch_value")) {
-    return CGEN_KR_ANALOG_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_analog_info_patch")) {
-    return CGEN_KR_ANALOG_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_pass_info")) {
     return CGEN_KR_PASS_INFO;
   }
@@ -1267,24 +886,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_udp_St")) {
     return CGEN_KRAD_UDP_ST;
   }
-  if (!strcmp(string,"kr_v4l2_info_member")) {
-    return CGEN_KR_V4L2_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_v4l2_info_patch_value")) {
-    return CGEN_KR_V4L2_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_v4l2_info_patch")) {
-    return CGEN_KR_V4L2_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_v4l2_open_info_member")) {
-    return CGEN_KR_V4L2_OPEN_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_v4l2_open_info_patch_value")) {
-    return CGEN_KR_V4L2_OPEN_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_v4l2_open_info_patch")) {
-    return CGEN_KR_V4L2_OPEN_INFO_PATCH;
-  }
   if (!strcmp(string,"kr_v4l2_setup")) {
     return CGEN_KR_V4L2_SETUP;
   }
@@ -1308,24 +909,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"krad_vpx_decoder_St")) {
     return CGEN_KRAD_VPX_DECODER_ST;
-  }
-  if (!strcmp(string,"kr_wayland_info_member")) {
-    return CGEN_KR_WAYLAND_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_wayland_info_patch_value")) {
-    return CGEN_KR_WAYLAND_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_wayland_info_patch")) {
-    return CGEN_KR_WAYLAND_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_wayland_path_info_member")) {
-    return CGEN_KR_WAYLAND_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_wayland_path_info_patch_value")) {
-    return CGEN_KR_WAYLAND_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_wayland_path_info_patch")) {
-    return CGEN_KR_WAYLAND_PATH_INFO_PATCH;
   }
   if (!strcmp(string,"kr_wayland_event_type")) {
     return CGEN_KR_WAYLAND_EVENT_TYPE;
@@ -1362,24 +945,6 @@ cgen_enum codegen_string_to_enum(char *string) {
   }
   if (!strcmp(string,"kr_web_server_setup")) {
     return CGEN_KR_WEB_SERVER_SETUP;
-  }
-  if (!strcmp(string,"kr_x11_info_member")) {
-    return CGEN_KR_X11_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_x11_info_patch_value")) {
-    return CGEN_KR_X11_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_x11_info_patch")) {
-    return CGEN_KR_X11_INFO_PATCH;
-  }
-  if (!strcmp(string,"kr_x11_path_info_member")) {
-    return CGEN_KR_X11_PATH_INFO_MEMBER;
-  }
-  if (!strcmp(string,"kr_x11_path_info_patch_value")) {
-    return CGEN_KR_X11_PATH_INFO_PATCH_VALUE;
-  }
-  if (!strcmp(string,"kr_x11_path_info_patch")) {
-    return CGEN_KR_X11_PATH_INFO_PATCH;
   }
   if (!strcmp(string,"kr_x11")) {
     return CGEN_KR_X11;
@@ -1434,12 +999,6 @@ int codegen_is_union(char *type) {
 }
 
 int codegen_is_enum(char *type) {
-  if (!strcmp(type,"kr_alsa_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_alsa_path_info_member")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_method")) {
     return 1;
   }
@@ -1450,33 +1009,6 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_mtype_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_compositor_output_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_compositor_bus_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_compositor_input_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_compositor_source_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_overlay_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_compositor_path_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_sprite_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_text_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_vector_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_compositor_event_type")) {
@@ -1497,12 +1029,6 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"krad_container_type_t")) {
     return 1;
   }
-  if (!strcmp(type,"kr_decklink_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_decklink_path_info_member")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_edge_dir")) {
     return 1;
   }
@@ -1510,15 +1036,6 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"krad_io_mode_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_jack_setup_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_jack_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_jack_path_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_jack_event_type")) {
@@ -1534,9 +1051,6 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"krad_list_parse_state_t")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_mixer_path_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_mixer_event_type")) {
@@ -1581,24 +1095,6 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"krad_rc_type_t")) {
     return 1;
   }
-  if (!strcmp(type,"kr_eq_band_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_eq_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_lowpass_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_highpass_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_volume_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_analog_info_member")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_sfx_control")) {
     return 1;
   }
@@ -1611,31 +1107,13 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"krad_slice_track_type_t")) {
     return 1;
   }
-  if (!strcmp(type,"kr_v4l2_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_v4l2_open_info_member")) {
-    return 1;
-  }
   if (!strcmp(type,"kr_v4l2_state")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_wayland_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_wayland_path_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_wayland_event_type")) {
     return 1;
   }
   if (!strcmp(type,"kr_web_event_type")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_x11_info_member")) {
-    return 1;
-  }
-  if (!strcmp(type,"kr_x11_path_info_member")) {
     return 1;
   }
   if (!strcmp(type,"krad_xmms_playback_cmd_t")) {

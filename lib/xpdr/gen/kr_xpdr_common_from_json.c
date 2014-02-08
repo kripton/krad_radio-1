@@ -79,8 +79,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 1: {
-      uber.actual = &(actual->jack_in);
-      uber.type = DEJSON_KR_JACK_PATH_INFO;
+      uber.actual = &(actual->wl);
+      uber.type = DEJSON_KR_WAYLAND_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -89,8 +89,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 2: {
-      uber.actual = &(actual->jack_out);
-      uber.type = DEJSON_KR_JACK_PATH_INFO;
+      uber.actual = &(actual->v4l2);
+      uber.type = DEJSON_KR_V4L2_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -99,8 +99,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 3: {
-      uber.actual = &(actual->wl);
-      uber.type = DEJSON_KR_WAYLAND_INFO;
+      uber.actual = &(actual->dl);
+      uber.type = DEJSON_KR_DECKLINK_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -109,8 +109,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 4: {
-      uber.actual = &(actual->wl_out);
-      uber.type = DEJSON_KR_WAYLAND_PATH_INFO;
+      uber.actual = &(actual->x11);
+      uber.type = DEJSON_KR_X11_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -118,29 +118,9 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       }
       break;
     }
-    case 5: {
-      uber.actual = &(actual->v4l2);
-      uber.type = DEJSON_KR_V4L2_INFO;
-      json[tokens[k].end] = '\0';
-      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
-      if (res < 0) {
-        return -6;
-      }
-      break;
-    }
-    case 6: {
-      uber.actual = &(actual->v4l2_in);
-      uber.type = DEJSON_KR_V4L2_OPEN_INFO;
-      json[tokens[k].end] = '\0';
-      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
-      if (res < 0) {
-        return -7;
-      }
-      break;
-    }
     case 7: {
-      uber.actual = &(actual->dl);
-      uber.type = DEJSON_KR_DECKLINK_INFO;
+      uber.actual = &(actual->jack_in);
+      uber.type = DEJSON_KR_JACK_PATH_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -149,8 +129,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 8: {
-      uber.actual = &(actual->dl_in);
-      uber.type = DEJSON_KR_DECKLINK_PATH_INFO;
+      uber.actual = &(actual->jack_out);
+      uber.type = DEJSON_KR_JACK_PATH_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -159,8 +139,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 9: {
-      uber.actual = &(actual->x11);
-      uber.type = DEJSON_KR_X11_INFO;
+      uber.actual = &(actual->wl_out);
+      uber.type = DEJSON_KR_WAYLAND_PATH_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -169,8 +149,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 10: {
-      uber.actual = &(actual->x11_in);
-      uber.type = DEJSON_KR_X11_PATH_INFO;
+      uber.actual = &(actual->v4l2_in);
+      uber.type = DEJSON_KR_V4L2_OPEN_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -179,8 +159,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 11: {
-      uber.actual = &(actual->alsa);
-      uber.type = DEJSON_KR_ALSA_INFO;
+      uber.actual = &(actual->dl_in);
+      uber.type = DEJSON_KR_DECKLINK_PATH_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -189,8 +169,8 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 12: {
-      uber.actual = &(actual->alsa_in);
-      uber.type = DEJSON_KR_ALSA_PATH_INFO;
+      uber.actual = &(actual->x11_in);
+      uber.type = DEJSON_KR_X11_PATH_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
@@ -199,12 +179,22 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       break;
     }
     case 13: {
-      uber.actual = &(actual->alsa_out);
+      uber.actual = &(actual->alsa_in);
       uber.type = DEJSON_KR_ALSA_PATH_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {
         return -14;
+      }
+      break;
+    }
+    case 14: {
+      uber.actual = &(actual->alsa_out);
+      uber.type = DEJSON_KR_ALSA_PATH_INFO;
+      json[tokens[k].end] = '\0';
+      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+      if (res < 0) {
+        return -15;
       }
       break;
     }

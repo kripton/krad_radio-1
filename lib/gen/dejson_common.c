@@ -1,6 +1,7 @@
 #include "gen.h"
 int info_unpack_fr_json(char *json, uber_St *uber) {
-  const info_unpack_fr_json_func fr_json_functions[57] = {kr_alsa_info_fr_json,
+  const info_unpack_fr_json_func fr_json_functions[59] = {kr_aux_info_fr_json,
+  kr_aux_path_info_fr_json,kr_alsa_info_fr_json,
   kr_alsa_path_info_fr_json,kr_method_fr_json,
   kr_crate_fr_json,kr_easing_fr_json,
   kr_compositor_path_type_fr_json,kr_compositor_overlay_type_fr_json,
