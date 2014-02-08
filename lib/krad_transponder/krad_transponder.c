@@ -3,13 +3,7 @@
 #include "krad_pool.h"
 #include "krad_av.h"
 #include "krad_compositor_so_path.h"
-
-#include "krad_jack.h"
-#include "krad_wayland.h"
-#include "krad_v4l2.h"
-#include "krad_decklink.h"
-#include "krad_x11.h"
-#include "krad_alsa.h"
+#include "krad_adapter.h"
 
 typedef enum {
   INVALID = -1,
@@ -22,14 +16,6 @@ typedef enum {
   KR_XPDR_COMPOSITOR,
   KR_XPDR_ADAPTER
 } path_io_type;
-
-typedef struct {
-  int coconut;
-} kr_adapter;
-
-typedef struct {
-  int coconut;
-} kr_adapter_path;
 
 typedef union {
   void *exists;
