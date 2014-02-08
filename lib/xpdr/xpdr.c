@@ -30,6 +30,7 @@ struct kr_xpdr_path {
   kr_xpdr_path_info info;
   path_type type;
   kr_adapter *adapter;
+  kr_xpdr_type adapter_type;
   path_io_type input_type;
   path_io input;
   path_io_type output_type;
@@ -51,10 +52,11 @@ struct kr_xpdr {
 
 static void compositor_frame(kr_frame_event *event);
 static void mixer_audio(kr_audio_event *event);
+static void adapter_event(kr_adapter_event *event);
 static void path_io_destroy(path_io *io, path_io_type type);
 static void path_io_create(kr_xpdr_path *path);
 static int path_setup(kr_xpdr_path *info);
-static void path_destroy(kr_xpdr_path *path);
+static int path_destroy(kr_xpdr_path *path);
 static int path_create(kr_xpdr_path *path);
 
 static void compositor_frame(kr_frame_event *event) {
@@ -76,27 +78,31 @@ static void adapter_av(kr_adapter_path_av_cb_arg *arg) {
   path->audio = arg->audio;
   path->image = arg->image;
 }
+*/
 
-static void adapter_event(kr_adapter_event_cb_arg *arg) {
+static void adapter_event(kr_adapter_event *event) {
+  /*
   kr_xpdr *xpdr;
   kr_xpdr_path *path;
   kr_adapter_info info;
   int i;
-  xpdr = (kr_xpdr *)arg->user;
-  *//* Created / destroyed? or is that on xpdr ? *//*
-  if (arg->type == KR_ADAPTER_DISCONNECTED) {
+  path = (kr_xpdr_path *)event->user;
+  */
+  /* Created / destroyed? or is that on xpdr ? */
+  if (event->type == KR_ADAPTER_DISCONNECTED) {
     printk("Adapter Disconnected");
     return;
   }
-  if (arg->type == KR_ADAPTER_RECONNECTED) {
+  if (event->type == KR_ADAPTER_RECONNECTED) {
     printk("Adapter Reconnected");
     return;
   }
-  if (arg->type != KR_ADAPTER_PROCESS) {
+  if (event->type != KR_ADAPTER_PROCESS) {
     printk("Wasn't a process event");
     return;
   }
-  kr_adapter_get_info(arg->adapter, &info);
+  /*
+  kr_adapter_get_info(event->adapter, &info);
   *//* I think we should trigger all of the mixer ports that are connected
    * to this adapter path *//*
   int test = 0;
@@ -112,8 +118,8 @@ static void adapter_event(kr_adapter_event_cb_arg *arg) {
       test++;
     }
   }
+  */
 }
-*/
 
 static void path_io_destroy(path_io *io, path_io_type type) {
   switch (type) {
@@ -200,10 +206,11 @@ static int path_setup(kr_xpdr_path *path) {
     case KR_V4L2:
     case KR_X11:
     case KR_ALSA:
-    case KR_AUX:
     case KR_DECKLINK:
+    case KR_AUX:
+      path->adapter_type = path->info.type;
       path->type = ADAPTER_CTX;
-      break;
+      return 0;
     case KR_DECKLINK_IN: /* FIXME this */
     case KR_X11_IN:
     case KR_V4L2_IN:
@@ -230,31 +237,43 @@ static int path_setup(kr_xpdr_path *path) {
       path->type = ADAPTER_PATH;
       return 0;
     default:
-      return -1;
+      return -2;
   }
-  return -1;
+  return -3;
 }
 
-static void path_destroy(kr_xpdr_path *path) {
+static int path_destroy(kr_xpdr_path *path) {
+  int ret;
+  ret = 0;
   if (path->type == ADAPTER_CTX) {
-    /* kr_adapter_destroy(path->adapter); */
+    ret = adapters[path->adapter_type].destroy(path->adapter);
   } else {
     path_io_destroy(&path->input, path->input_type);
     path_io_destroy(&path->output, path->output_type);
   }
+  return ret;
 }
 
 static int path_create(kr_xpdr_path *path) {
   int ret;
+  kr_adapter_setup setup;
   ret = path_setup(path);
-  if (ret != 0) return ret;
+  if (ret != 0) {
+    printke("XPDR: path setup returned %d", ret);
+    return ret;
+  }
   switch (path->type) {
     case INVALID: return -1;
     case ADAPTER_CTX:
-      //path->adapter = kr_adapter_create();
+      setup.info = path->info;
+      setup.event_cb = adapter_event;
+      setup.user = path;
+      printk("XPDR: adapter context create");
+      path->adapter = adapters[path->adapter_type].create(&setup);
       if (path->adapter == NULL) return -1;
       return 0;
     case ADAPTER_PATH:
+      printk("XPDR: adapter path create");
       path_io_create(path);
       path_io_create(path);
       return 0;
@@ -265,6 +284,7 @@ static int path_create(kr_xpdr_path *path) {
 int kr_xpdr_path_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
   int ret;
   if ((path == NULL) || (patch == NULL)) return -1;
+  printk("XPDR: control");
   ret = kr_xpdr_path_info_patch_apply(&path->info, patch);
   return ret;
 }
@@ -274,6 +294,7 @@ int kr_xpdr_unlink(kr_xpdr_path *path) {
   kr_xpdr_event event;
   if (path == NULL) return -1;
   xpdr = path->xpdr;
+  printk("XPDR: unlink");
   path_destroy(path);
   event.user = path->xpdr->user;
   event.user_path = path->user;
@@ -293,9 +314,10 @@ int kr_xpdr_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   /*if (path_info_check(i)) return -2;*/
   path = kr_pool_slice(x->path_pool);
   if (path == NULL) return -3;
-  memcpy(&path->info, i, sizeof(kr_xpdr_path_info));
+  path->info = *i;
   path->xpdr = x;
   path->user = p;
+  printk("XPDR: mkpath");
   ret = path_create(path);
   if (ret) return -4;
   event.user = path->xpdr->user;
@@ -313,15 +335,20 @@ int kr_xpdr_destroy(kr_xpdr *xpdr) {
   int ret;
   kr_xpdr_path *path;
   if (xpdr == NULL) return -1;
-  printk("Transponder: Destroying");
+  printk("XPDR: Destroying");
   kr_adapter_monitor_destroy(xpdr->adapter_mon);
   i = 0;
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
+    if (path->type == ADAPTER_CTX) continue;
     ret = kr_xpdr_unlink(path);
-    if (ret) printke("trouble unlinking an path..");
+    if (ret) printke("XPDR: Failure removing an adapter context");
+  }
+  while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
+    ret = kr_xpdr_unlink(path);
+    if (ret) printke("XPDR: Failure removing an adapter path");
   }
   kr_pool_destroy(xpdr->path_pool);
-  printk("Transponder: Destroyed");
+  printk("XPDR: Destroyed");
   return 0;
 }
 
@@ -330,7 +357,7 @@ kr_xpdr *kr_xpdr_create(kr_xpdr_setup *setup) {
   kr_pool *pool;
   kr_pool_setup pool_setup;
   if (setup == NULL) return NULL;
-  printk("Transponder: Creating");
+  printk("XPDR: Creating");
   pool_setup.shared = 0;
   pool_setup.overlay = NULL;
   pool_setup.overlay_sz = sizeof(kr_xpdr);
@@ -346,6 +373,6 @@ kr_xpdr *kr_xpdr_create(kr_xpdr_setup *setup) {
   xpdr->event_cb = setup->event_cb;
   xpdr->adapter_mon = kr_adapter_monitor_create();
   kr_adapter_monitor_wait(xpdr->adapter_mon, 0);
-  printk("Transponder: Created");
+  printk("XPDR: Created");
   return xpdr;
 }

@@ -1,12 +1,40 @@
 #include "kr_client.h"
 
+static int test_aux_create(kr_client *client);
+static int test_aux_in_create(kr_client *client);
 /*
 static int test_jack_input_create(kr_client *client);
 static int test_jack_output_create(kr_client *client);
 static int test_decklink_input_create(kr_client *client, int dev);
 static int test_v4l2_input_create(kr_client *client, int dev);
 static int test_wayland_output_create(kr_client *client);
+*/
 
+static int test_aux_create(kr_client *client) {
+  int ret;
+  kr_xpdr_path_info info;
+  char *name;
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  name = "Auxilirator";
+  strcpy(info.adp.aux.monkeyname, "Bongo");
+  info.type = KR_AUX;
+  ret = kr_xpdr_make(client, name, &info);
+  return ret;
+}
+
+static int test_aux_in_create(kr_client *client) {
+  int ret;
+  kr_xpdr_path_info info;
+  char *name;
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  name = "AUX INPUT";
+  info.type = KR_AUX_IN;
+  info.adp.aux_in.ncoconuts = 45;
+  ret = kr_xpdr_make(client, name, &info);
+  return ret;
+}
+
+/*
 static int test_jack_input_create(kr_client *client) {
   int ret;
   kr_xpdr_path_info info;
@@ -245,54 +273,63 @@ int make_jackinout(kr_client *client) {
   return ret;
 }
 
+static int strmatch(char *str1, char *str2) {
+  if ((strlen(str1) == strlen(str2)) && (strcmp(str1, str2) == 0)) return 1;
+  return 0;
+}
+
 int run_test(kr_client *client, char *test) {
   int ret;
   ret = -1;
-  if ((strlen(test) == strlen("masterbus")) && (strcmp(test, "masterbus") == 0)) {
-    ret = make_masterbus(client);
+  if (strmatch(test, "aux")) {
+    ret = test_aux_create(client);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("musicbus")) && (strcmp(test, "musicbus") == 0)) {
+  if (strmatch(test, "auxin")) {
+    ret = test_aux_in_create(client);
+    if (ret != 0) return ret;
+  }
+  if (strmatch(test, "musicbus")) {
     ret = make_musicbus(client);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("musicmaster")) && (strcmp(test, "musicmaster") == 0)) {
+  if (strmatch(test, "musicmaster")) {
     ret = make_musicmaster(client);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("getx11")) && (strcmp(test, "getx11") == 0)) {
+  if (strmatch(test, "getx11")) {
     ret = test_x11_get(client);
     if (ret != 0) return ret;
   }
   /*
-  if ((strlen(test) == strlen("wayland")) && (strcmp(test, "wayland") == 0)) {
+  if (strmatch(test, "wayland")) {
     ret = test_wayland_output_create(client);
   }
-  if ((strlen(test) == strlen("x11")) && (strcmp(test, "x11") == 0)) {
+  if (strmatch(test, "x11")) {
     ret = test_x11_input_create(client, 0);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("jackin")) && (strcmp(test, "jackin") == 0)) {
+  if (strmatch(test, "jackin")) {
     ret = test_jack_input_create(client);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("jackout")) && (strcmp(test, "jackout") == 0)) {
+  if (strmatch(test, "jackout")) {
     ret = test_jack_output_create(client);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("jackinout")) && (strcmp(test, "jackinout") == 0)) {
+  if (strmatch(test, "jackinout")) {
     ret = make_jackinout(client);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("v4l2")) && (strcmp(test, "v4l2") == 0)) {
+  if (strmatch(test, "v4l2s")) {
       ret = test_v4l2_input_create(client, 0);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("decklink")) && (strcmp(test, "decklink") == 0)) {
+  if (strmatch(test, "decklink")) {
       ret = test_decklink_input_create(client, 0);
     if (ret != 0) return ret;
   }
-  if ((strlen(test) == strlen("alsa")) && (strcmp(test, "alsa") == 0)) {
+  if (strmatch(test, "alsa")) {
     if (ret != 0) return ret;
   }
   */

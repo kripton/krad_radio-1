@@ -38,11 +38,11 @@ typedef struct {
   kr_adapter *adapter;
   void *user;
   kr_adapter_event_type type;
-} kr_adapter_event_cb_arg;
+} kr_adapter_event;
 
 typedef int (kr_adapter_process_function)(kr_adapter *);
 typedef int (kr_adapter_path_process_function)(kr_adapter_path *);
-typedef void (kr_adapter_event_cb)(kr_adapter_event_cb_arg *);
+typedef void (kr_adapter_event_cb)(kr_adapter_event *);
 typedef void (kr_adapter_path_av_cb)(kr_adapter_path_av_cb_arg *);
 
 struct kr_adapter_path_setup {
