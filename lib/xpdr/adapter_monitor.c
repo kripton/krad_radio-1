@@ -1,4 +1,4 @@
-#include "krad_adapter_monitor.h"
+#include "adapter_monitor.h"
 
 struct kr_adapter_monitor {
   struct udev *udev;

@@ -56,7 +56,7 @@ krad_flac/krad_flac.c \
 krad_opus/krad_opus.c \
 krad_opus/opus_header.c \
 krad_ring/krad_ring.c \
-krad_transponder/krad_transponder.c \
+xpdr/xpdr.c \
 krad_web/krad_web_server.c \
 krad_transmitter/krad_transmitter.c \
 krad_ogg/krad_ogg.c \
@@ -66,7 +66,7 @@ krad_graph/krad_graph.c
 
 if HAVE_JACK
 krad_radio_libkradradio_la_SOURCES += krad_jack/krad_jack.c
-AM_CPPFLAGS += -DKR_JACK
+AM_CPPFLAGS += -DKR_USE_JACK
 endif
 
 if HAVE_XMMS2
@@ -75,18 +75,18 @@ AM_CPPFLAGS += -DKR_XMMS2
 endif
 
 if HAVE_LIBUDEV
-krad_radio_libkradradio_la_SOURCES += krad_transponder/krad_adapter_monitor.c
+krad_radio_libkradradio_la_SOURCES += xpdr/adapter_monitor.c
 AM_CPPFLAGS += -DKR_LIBUDEV
 endif
 
 if HAVE_WAYLAND
 krad_radio_libkradradio_la_SOURCES += krad_wayland/krad_wayland.c
-AM_CPPFLAGS += -DKR_WAYLAND
+AM_CPPFLAGS += -DKR_USE_WAYLAND
 endif
 
 if HAVE_X11
 krad_radio_libkradradio_la_SOURCES += krad_x11/krad_x11.c
-AM_CPPFLAGS += -DKR_X11
+AM_CPPFLAGS += -DKR_USE_X11
 endif
 
 if HAVE_TURBOJPEG
@@ -102,7 +102,7 @@ endif
 if KR_DECKLINK
 krad_radio_libkradradio_la_SOURCES += krad_decklink/vendor/linux/DeckLinkAPIDispatch.cpp \
  krad_decklink/krad_decklink.c krad_decklink/krad_decklink_capture.cpp
-AM_CPPFLAGS += -DKR_DECKLINK
+AM_CPPFLAGS += -DKR_USE_DECKLINK
 if KR_LINUX
 AM_CPPFLAGS += -Ikrad_decklink/vendor/linux
 endif
@@ -110,12 +110,12 @@ endif
 
 if KR_ALSA
 krad_radio_libkradradio_la_SOURCES += krad_alsa/krad_alsa.c
-AM_CPPFLAGS += -DKR_ALSA
+AM_CPPFLAGS += -DKR_USE_ALSA
 endif
 
 if KR_V4L2
 krad_radio_libkradradio_la_SOURCES += krad_v4l2/krad_v4l2.c
-AM_CPPFLAGS += -DKR_V4L2
+AM_CPPFLAGS += -DKR_USE_V4L2
 endif
 
 krad_radio_libkradclient_la_CFLAGS =
@@ -137,7 +137,7 @@ krad_radio/krad_radio_client_ctl.c \
 krad_radio/krad_radio_client.c \
 krad_mixer/krad_mixer_client.c \
 krad_compositor/krad_compositor_client.c \
-krad_transponder/krad_transponder_client.c \
+xpdr/xpdr_client.c \
 krad_radio/krad_radio_common.c \
 krad_compositor/krad_compositor_common.c \
 krad_graph/krad_graph.c \
@@ -154,8 +154,8 @@ krad_mixer/krad_mixer_client.h \
 krad_mixer/krad_mixer_common.h \
 krad_compositor/krad_compositor_client.h \
 krad_compositor/krad_compositor_common.h \
-krad_transponder/krad_transponder_client.h \
-krad_transponder/krad_transponder_common.h \
+xpdr/kr_xpdr_client.h \
+xpdr/kr_xpdr_common.h \
 krad_ebml/krad_ebml.h \
 krad_ebml/krad_ebml_ids.h \
 krad_ebml/krad_ebmlx.h \

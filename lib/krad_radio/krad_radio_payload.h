@@ -2,7 +2,7 @@
 #define KRAD_RADIO_PAYLOAD_H
 
 #include "krad_radio_common.h"
-#include "krad_transponder_common.h"
+#include "kr_xpdr_common.h"
 #include "krad_compositor_common.h"
 #include "krad_mixer_common.h"
 
@@ -14,14 +14,14 @@ struct kr_nil {
 
 typedef enum {
   PL_KR_NIL,
-  PL_KR_TRANSPONDER_PATH_INFO,
+  PL_KR_XPDR_PATH_INFO,
   PL_KR_MIXER_PATH_INFO,
   PL_KR_COMPOSITOR_PATH_INFO
 } kr_payload_type;
 
 typedef union {
   kr_nil nil;
-  kr_transponder_path_info transponder_path_info;
+  kr_xpdr_path_info xpdr_path_info;
   kr_mixer_path_info mixer_path_info;
   kr_compositor_path_info compositor_path_info;
 } kr_payload;

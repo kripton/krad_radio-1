@@ -23,12 +23,12 @@ int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
   kr_sfx_effect_control_to_json,kr_eq_band_info_to_json,
   kr_eq_info_to_json,kr_lowpass_info_to_json,
   kr_highpass_info_to_json,kr_volume_info_to_json,
-  kr_analog_info_to_json,kr_transponder_path_type_to_json,
-  kr_transponder_path_type_info_to_json,kr_transponder_path_info_to_json,
-  kr_v4l2_state_to_json,kr_v4l2_mode_to_json,
-  kr_v4l2_info_to_json,kr_v4l2_open_info_to_json,
-  kr_wayland_info_to_json,kr_wayland_path_info_to_json,
-  kr_x11_info_to_json,kr_x11_path_info_to_json
+  kr_analog_info_to_json,kr_v4l2_state_to_json,
+  kr_v4l2_mode_to_json,kr_v4l2_info_to_json,
+  kr_v4l2_open_info_to_json,kr_wayland_info_to_json,
+  kr_wayland_path_info_to_json,kr_x11_info_to_json,
+  kr_x11_path_info_to_json,kr_xpdr_type_to_json,
+  kr_xpdr_type_info_to_json,kr_xpdr_path_info_to_json
   };
   return to_json_functions[uber->type-1](json , uber->actual, max);
 }

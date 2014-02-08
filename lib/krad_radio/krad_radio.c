@@ -1,7 +1,7 @@
 #include "krad_radio.h"
 #include "krad_mixer.h"
 #include "krad_compositor.h"
-#include "krad_transponder.h"
+#include "kr_xpdr.h"
 #include "krad_web_server.h"
 #include "krad_app_server.h"
 #include "krad_router.h"
@@ -10,7 +10,7 @@
 struct kr_radio {
   kr_mixer *mixer;
   kr_compositor *compositor;
-  kr_transponder *transponder;
+  kr_xpdr *xpdr;
   kr_web_server *web;
   kr_app_server *app;
 };
@@ -18,7 +18,7 @@ struct kr_radio {
 static void web_event(kr_web_event *event);
 static void mixer_event(kr_mixer_event *event);
 static void compositor_event(kr_compositor_event *event);
-static void xpdr_event(kr_transponder_event *event);
+static void xpdr_event(kr_xpdr_event *event);
 static int setup_maps(kr_radio *radio);
 
 static void web_event(kr_web_event *event) {
@@ -97,17 +97,17 @@ static void compositor_event(kr_compositor_event *event) {
   }
 }
 
-static void xpdr_event(kr_transponder_event *event) {
+static void xpdr_event(kr_xpdr_event *event) {
   kr_radio *radio;
   kr_route_setup route_setup;
   radio = (kr_radio *)event->user;
   switch (event->type) {
     case KR_XPDR_CREATE:
       printk("Radio: XPDR path create event");
-      route_setup.ptr = radio->transponder;
+      route_setup.ptr = radio->xpdr;
       route_setup.name = event->user_path;
       route_setup.ctx = event->path;
-      route_setup.payload.transponder_path_info = event->info;
+      route_setup.payload.xpdr_path_info = event->info;
       event->user_path = kr_app_server_route_create(radio->app, &route_setup);
       break;
     case KR_XPDR_PATCH:
@@ -151,13 +151,13 @@ static int setup_maps(kr_radio *radio) {
     printke("Radio: router map was null");
     return -1;
   }
-  setup.prefix = "/transponder";
-  setup.ptr = radio->transponder;
-  setup.payload_type = PL_KR_TRANSPONDER_PATH_INFO;
-  setup.create = (kr_router_map_create_handler *)kr_transponder_mkpath;
+  setup.prefix = "/xpdr";
+  setup.ptr = radio->xpdr;
+  setup.payload_type = PL_KR_XPDR_PATH_INFO;
+  setup.create = (kr_router_map_create_handler *)kr_xpdr_mkpath;
   setup.connect = NULL;
-  setup.patch = (kr_router_map_patch_handler *)kr_transponder_path_ctl;
-  setup.destroy = (kr_router_map_destroy_handler *)kr_transponder_unlink;
+  setup.patch = (kr_router_map_patch_handler *)kr_xpdr_path_ctl;
+  setup.destroy = (kr_router_map_destroy_handler *)kr_xpdr_unlink;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {
     printke("Radio: router map was null");
@@ -173,7 +173,7 @@ kr_radio *kr_radio_create(char *sysname) {
   kr_app_server_setup app_setup;
   kr_mixer_setup mixer_setup;
   kr_compositor_setup compositor_setup;
-  kr_transponder_setup transponder_setup;
+  kr_xpdr_setup xpdr_setup;
   printk("Radio: Creating");
   radio = kr_allocz(1, sizeof(kr_radio));
   strncpy(app_setup.appname, "krad_radio", sizeof(app_setup.appname));
@@ -190,15 +190,15 @@ kr_radio *kr_radio_create(char *sysname) {
       compositor_setup.user = radio;
       radio->compositor = kr_compositor_create(&compositor_setup);
       if (radio->compositor) {
-        transponder_setup.mixer = radio->mixer;
-        transponder_setup.compositor = radio->compositor;
-        transponder_setup.user = radio;
-        transponder_setup.event_cb = xpdr_event;
-        transponder_setup.path_count = 32;
+        xpdr_setup.mixer = radio->mixer;
+        xpdr_setup.compositor = radio->compositor;
+        xpdr_setup.user = radio;
+        xpdr_setup.event_cb = xpdr_event;
+        xpdr_setup.path_count = 32;
         /* FIXME need to enable adapter monitor after maps setup
          * so that we can pick up the adapter paths */
-        radio->transponder = kr_transponder_create(&transponder_setup);
-        if (radio->transponder) {
+        radio->xpdr = kr_xpdr_create(&xpdr_setup);
+        if (radio->xpdr) {
           memset(&web_setup, 0, sizeof(kr_web_server_setup));
           web_setup.sysname = sysname;
           web_setup.event_cb = web_event;
@@ -239,9 +239,9 @@ int kr_radio_destroy(kr_radio *radio) {
     kr_web_server_destroy(&radio->web);
   }
   kr_timer_status(timer);
-  if (radio->transponder != NULL) {
-    kr_transponder_destroy(radio->transponder);
-    radio->transponder = NULL;
+  if (radio->xpdr != NULL) {
+    kr_xpdr_destroy(radio->xpdr);
+    radio->xpdr = NULL;
   }
   kr_timer_status(timer);
   if (radio->mixer != NULL) {

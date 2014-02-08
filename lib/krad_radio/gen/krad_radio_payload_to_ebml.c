@@ -51,12 +51,6 @@ int kr_payload_to_ebml(kr_ebml *ebml, void *st) {
       res += info_pack_to_ebml(&ebml[res],&uber);
       break;
     }
-    case 1: {
-      uber.actual = &(actual->transponder_path_info);
-      uber.type = EBML_KR_TRANSPONDER_PATH_INFO;
-      res += info_pack_to_ebml(&ebml[res],&uber);
-      break;
-    }
     case 2: {
       uber.actual = &(actual->mixer_path_info);
       uber.type = EBML_KR_MIXER_PATH_INFO;

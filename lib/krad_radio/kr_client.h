@@ -6,6 +6,6 @@
 #include "krad_radio_client.h"
 #include "krad_mixer_client.h"
 #include "krad_compositor_client.h"
-#include "krad_transponder_client.h"
+#include "kr_xpdr_client.h"
 
 #endif

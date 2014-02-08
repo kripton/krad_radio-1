@@ -7,14 +7,8 @@ typedef struct kr_adapter_spec kr_adapter_spec;
 typedef struct kr_adapter_path kr_adapter_path;
 typedef struct kr_adapter_path_setup kr_adapter_path_setup;
 
-#include "krad_transponder_common.h"
+#include "kr_xpdr_common.h"
 #include "krad_av.h"
-#include "krad_jack.h"
-#include "krad_wayland.h"
-#include "krad_v4l2.h"
-#include "krad_decklink.h"
-#include "krad_x11.h"
-#include "krad_alsa.h"
 
 typedef enum {
   KR_ADAPTER_PROCESS, /* Process all paths: jack,alsa,decklink */
@@ -52,13 +46,13 @@ typedef void (kr_adapter_event_cb)(kr_adapter_event_cb_arg *);
 typedef void (kr_adapter_path_av_cb)(kr_adapter_path_av_cb_arg *);
 
 struct kr_adapter_path_setup {
-  kr_transponder_path_info info;
+  kr_xpdr_path_info info;
   void *user;
   kr_adapter_path_av_cb *av_cb;
 };
 
 struct kr_adapter_setup {
-  kr_transponder_path_info info;
+  kr_xpdr_path_info info;
   void *user;
   kr_adapter_event_cb *event_cb;
 };

@@ -1,26 +1,26 @@
-#include "krad_transponder_common_to_json.h"
+#include "kr_xpdr_common_to_json.h"
 
-int kr_transponder_path_type_to_json(char *json, void *st, int32_t max) {
+int kr_xpdr_type_to_json(char *json, void *st, int32_t max) {
   char *type;
   int res;
-  kr_transponder_path_type *actual;
+  kr_xpdr_type *actual;
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
     return -1;
   }
 
-  actual = (kr_transponder_path_type *)st;
-  type = kr_strfr_kr_transponder_path_type(*actual);
+  actual = (kr_xpdr_type *)st;
+  type = kr_strfr_kr_xpdr_type(*actual);
   res += snprintf(&json[res],max-res,"\"%s\"",type);
 
   return res;
 }
-int kr_transponder_path_type_info_to_json(char *json, void *st, int32_t max) {
+int kr_xpdr_type_info_to_json(char *json, void *st, int32_t max) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-  kr_transponder_path_type_info *actual;
+  kr_xpdr_type_info *actual;
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
@@ -31,7 +31,7 @@ int kr_transponder_path_type_info_to_json(char *json, void *st, int32_t max) {
   if (uber_actual->actual == NULL) {
     return -1;
   }
-  actual = (kr_transponder_path_type_info *)uber_actual->actual;
+  actual = (kr_xpdr_type_info *)uber_actual->actual;
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->jack);
@@ -40,25 +40,25 @@ int kr_transponder_path_type_info_to_json(char *json, void *st, int32_t max) {
       break;
     }
     case 1: {
-      uber.actual = &(actual->jack_input);
+      uber.actual = &(actual->jack_in);
       uber.type = JSON_KR_JACK_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
     case 2: {
-      uber.actual = &(actual->jack_output);
+      uber.actual = &(actual->jack_out);
       uber.type = JSON_KR_JACK_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
     case 3: {
-      uber.actual = &(actual->wayland);
+      uber.actual = &(actual->wl);
       uber.type = JSON_KR_WAYLAND_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
     case 4: {
-      uber.actual = &(actual->wayland_output);
+      uber.actual = &(actual->wl_out);
       uber.type = JSON_KR_WAYLAND_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
@@ -70,19 +70,19 @@ int kr_transponder_path_type_info_to_json(char *json, void *st, int32_t max) {
       break;
     }
     case 6: {
-      uber.actual = &(actual->v4l2_input);
+      uber.actual = &(actual->v4l2_in);
       uber.type = JSON_KR_V4L2_OPEN_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
     case 7: {
-      uber.actual = &(actual->decklink);
+      uber.actual = &(actual->dl);
       uber.type = JSON_KR_DECKLINK_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
     case 8: {
-      uber.actual = &(actual->decklink_input);
+      uber.actual = &(actual->dl_in);
       uber.type = JSON_KR_DECKLINK_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
@@ -94,7 +94,7 @@ int kr_transponder_path_type_info_to_json(char *json, void *st, int32_t max) {
       break;
     }
     case 10: {
-      uber.actual = &(actual->x11_input);
+      uber.actual = &(actual->x11_in);
       uber.type = JSON_KR_X11_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
@@ -106,13 +106,13 @@ int kr_transponder_path_type_info_to_json(char *json, void *st, int32_t max) {
       break;
     }
     case 12: {
-      uber.actual = &(actual->alsa_input);
+      uber.actual = &(actual->alsa_in);
       uber.type = JSON_KR_ALSA_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
     case 13: {
-      uber.actual = &(actual->alsa_output);
+      uber.actual = &(actual->alsa_out);
       uber.type = JSON_KR_ALSA_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
@@ -122,32 +122,17 @@ int kr_transponder_path_type_info_to_json(char *json, void *st, int32_t max) {
 
   return res;
 }
-int kr_transponder_path_info_to_json(char *json, void *st, int32_t max) {
-  uber_St uber;
-  uber_St uber_sub;
-  int index;
+int kr_xpdr_path_info_to_json(char *json, void *st, int32_t max) {
   int res;
-  struct kr_transponder_path_info *actual;
+  struct kr_xpdr_path_info *actual;
   res = 0;
 
   if ((json == NULL) || (st == NULL) || (max < 1)) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_info *)st;
+  actual = (struct kr_xpdr_path_info *)st;
   res += snprintf(&json[res],max-res,"{");
-  res += snprintf(&json[res],max-res,"\"type\": ");
-  uber.actual = &(actual->type);
-  uber.type = JSON_KR_TRANSPONDER_PATH_TYPE;
-  res += info_pack_to_json(&json[res],&uber,max-res);
-  res += snprintf(&json[res],max-res,",");
-  index = kr_transponder_path_type_to_index(actual->type);
-  uber_sub.type = index;
-  uber_sub.actual = &(actual->aio);
-  uber.actual = &(uber_sub);
-  uber.type = JSON_KR_TRANSPONDER_PATH_TYPE_INFO;
-  res += snprintf(&json[res],max-res,"\"aio\": ");
-  res += info_pack_to_json(&json[res],&uber,max-res);
   res += snprintf(&json[res],max-res,"}");
 
   return res;

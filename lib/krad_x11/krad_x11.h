@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <sys/shm.h>
 
-#ifdef KR_X11
+#ifdef KR_USE_X11
 #include <xcb/xcb.h>
 #include <xcb/xcb_util.h>
 #include <xcb/xcb_image.h>
@@ -36,7 +36,7 @@ struct kr_x11 {
   int screen_height;
   int fullscreen;
   int *krad_x11_shutdown;
-#ifdef KR_X11
+#ifdef KR_USE_X11
   xcb_screen_t *screen;
   xcb_screen_iterator_t iter;
   xcb_connection_t *connection;

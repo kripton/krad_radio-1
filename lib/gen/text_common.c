@@ -23,12 +23,12 @@ int info_pack_to_text(char *text, uber_St *uber, int32_t max) {
   kr_sfx_effect_control_to_text,kr_eq_band_info_to_text,
   kr_eq_info_to_text,kr_lowpass_info_to_text,
   kr_highpass_info_to_text,kr_volume_info_to_text,
-  kr_analog_info_to_text,kr_transponder_path_type_to_text,
-  kr_transponder_path_type_info_to_text,kr_transponder_path_info_to_text,
-  kr_v4l2_state_to_text,kr_v4l2_mode_to_text,
-  kr_v4l2_info_to_text,kr_v4l2_open_info_to_text,
-  kr_wayland_info_to_text,kr_wayland_path_info_to_text,
-  kr_x11_info_to_text,kr_x11_path_info_to_text
+  kr_analog_info_to_text,kr_v4l2_state_to_text,
+  kr_v4l2_mode_to_text,kr_v4l2_info_to_text,
+  kr_v4l2_open_info_to_text,kr_wayland_info_to_text,
+  kr_wayland_path_info_to_text,kr_x11_info_to_text,
+  kr_x11_path_info_to_text,kr_xpdr_type_to_text,
+  kr_xpdr_type_info_to_text,kr_xpdr_path_info_to_text
   };
   return to_text_functions[uber->type-1](text , uber->actual, max);
 }

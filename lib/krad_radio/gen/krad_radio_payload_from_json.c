@@ -131,16 +131,6 @@ int kr_payload_fr_json(char *json, void *st) {
       }
       break;
     }
-    case 1: {
-      uber.actual = &(actual->transponder_path_info);
-      uber.type = DEJSON_KR_TRANSPONDER_PATH_INFO;
-      json[tokens[k].end] = '\0';
-      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
-      if (res < 0) {
-        return -2;
-      }
-      break;
-    }
     case 2: {
       uber.actual = &(actual->mixer_path_info);
       uber.type = DEJSON_KR_MIXER_PATH_INFO;

@@ -43,7 +43,6 @@ typedef struct krad_ogg_track_St krad_ogg_track_t;
 #include "krad_codec_header.h"
 #include "krad_coder_common.h"
 #include "krad_transmitter.h"
-#include "krad_transponder_common.h"
 
 #define KRAD_OGG_DEFAULT_MAX_PACKETS_PER_PAGE 7
 #ifndef KRAD_OGG_MAX_TRACKS

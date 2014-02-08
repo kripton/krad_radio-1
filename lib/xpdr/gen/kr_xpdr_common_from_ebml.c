@@ -1,24 +1,24 @@
-#include "krad_transponder_common_from_ebml.h"
+#include "kr_xpdr_common_from_ebml.h"
 
-int kr_transponder_path_type_fr_ebml(kr_ebml *ebml, void *st) {
+int kr_xpdr_type_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
-  kr_transponder_path_type *actual;
+  kr_xpdr_type *actual;
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
     return -1;
   }
 
-  actual = (kr_transponder_path_type *)st;
+  actual = (kr_xpdr_type *)st;
   res += kr_ebml2_unpack_element_int32(ebml, NULL, (int32_t *)actual);
 
   return res;
 }
-int kr_transponder_path_type_info_fr_ebml(kr_ebml *ebml, void *st) {
+int kr_xpdr_type_info_fr_ebml(kr_ebml *ebml, void *st) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-  kr_transponder_path_type_info *actual;
+  kr_xpdr_type_info *actual;
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
@@ -29,7 +29,7 @@ int kr_transponder_path_type_info_fr_ebml(kr_ebml *ebml, void *st) {
   if (uber_actual->actual == NULL) {
     return -1;
   }
-  actual = (kr_transponder_path_type_info *)uber_actual->actual;
+  actual = (kr_xpdr_type_info *)uber_actual->actual;
   switch (uber_actual->type) {
     case 0: {
       uber.actual = &(actual->jack);
@@ -38,25 +38,25 @@ int kr_transponder_path_type_info_fr_ebml(kr_ebml *ebml, void *st) {
       break;
     }
     case 1: {
-      uber.actual = &(actual->jack_input);
+      uber.actual = &(actual->jack_in);
       uber.type = DEBML_KR_JACK_PATH_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
     case 2: {
-      uber.actual = &(actual->jack_output);
+      uber.actual = &(actual->jack_out);
       uber.type = DEBML_KR_JACK_PATH_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
     case 3: {
-      uber.actual = &(actual->wayland);
+      uber.actual = &(actual->wl);
       uber.type = DEBML_KR_WAYLAND_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
     case 4: {
-      uber.actual = &(actual->wayland_output);
+      uber.actual = &(actual->wl_out);
       uber.type = DEBML_KR_WAYLAND_PATH_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
@@ -68,19 +68,19 @@ int kr_transponder_path_type_info_fr_ebml(kr_ebml *ebml, void *st) {
       break;
     }
     case 6: {
-      uber.actual = &(actual->v4l2_input);
+      uber.actual = &(actual->v4l2_in);
       uber.type = DEBML_KR_V4L2_OPEN_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
     case 7: {
-      uber.actual = &(actual->decklink);
+      uber.actual = &(actual->dl);
       uber.type = DEBML_KR_DECKLINK_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
     case 8: {
-      uber.actual = &(actual->decklink_input);
+      uber.actual = &(actual->dl_in);
       uber.type = DEBML_KR_DECKLINK_PATH_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
@@ -92,7 +92,7 @@ int kr_transponder_path_type_info_fr_ebml(kr_ebml *ebml, void *st) {
       break;
     }
     case 10: {
-      uber.actual = &(actual->x11_input);
+      uber.actual = &(actual->x11_in);
       uber.type = DEBML_KR_X11_PATH_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
@@ -104,13 +104,13 @@ int kr_transponder_path_type_info_fr_ebml(kr_ebml *ebml, void *st) {
       break;
     }
     case 12: {
-      uber.actual = &(actual->alsa_input);
+      uber.actual = &(actual->alsa_in);
       uber.type = DEBML_KR_ALSA_PATH_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
     case 13: {
-      uber.actual = &(actual->alsa_output);
+      uber.actual = &(actual->alsa_out);
       uber.type = DEBML_KR_ALSA_PATH_INFO;
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
@@ -120,28 +120,16 @@ int kr_transponder_path_type_info_fr_ebml(kr_ebml *ebml, void *st) {
 
   return res;
 }
-int kr_transponder_path_info_fr_ebml(kr_ebml *ebml, void *st) {
-  uber_St uber;
-  uber_St uber_sub;
-  int index;
+int kr_xpdr_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   int res;
-  struct kr_transponder_path_info *actual;
+  struct kr_xpdr_path_info *actual;
   res = 0;
 
   if ((ebml == NULL) || (st == NULL)) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_info *)st;
-  uber.actual = &(actual->type);
-  uber.type = DEBML_KR_TRANSPONDER_PATH_TYPE;
-  res += info_unpack_fr_ebml(&ebml[res],&uber);
-  index = kr_transponder_path_type_to_index(actual->type);
-  uber_sub.type = index;
-  uber_sub.actual = &(actual->aio);
-  uber.actual = &(uber_sub);
-  uber.type = DEBML_KR_TRANSPONDER_PATH_TYPE_INFO;
-  res += info_unpack_fr_ebml(&ebml[res],&uber);
+  actual = (struct kr_xpdr_path_info *)st;
 
   return res;
 }

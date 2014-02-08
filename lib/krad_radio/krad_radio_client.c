@@ -2,12 +2,12 @@
 
 #include "krad_radio_common.h"
 #include "krad_compositor_common.h"
-#include "krad_transponder_common.h"
+#include "kr_xpdr_common.h"
 #include "krad_mixer_common.h"
 #include "krad_app_client.h"
 #include "krad_radio_client.h"
 #include "krad_compositor_client.h"
-#include "krad_transponder_client.h"
+#include "kr_xpdr_client.h"
 #include "krad_mixer_client.h"
 
 struct kr_client {

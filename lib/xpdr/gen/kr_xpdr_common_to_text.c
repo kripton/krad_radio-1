@@ -1,8 +1,8 @@
-#include "krad_transponder_common_to_text.h"
+#include "kr_xpdr_common_to_text.h"
 
-int kr_transponder_path_type_to_text(char *text, void *st, int32_t max) {
+int kr_xpdr_type_to_text(char *text, void *st, int32_t max) {
   int res;
-  kr_transponder_path_type *actual;
+  kr_xpdr_type *actual;
   char indent[(depth_state*2)+1];
   res = 0;
 
@@ -10,18 +10,18 @@ int kr_transponder_path_type_to_text(char *text, void *st, int32_t max) {
     return -1;
   }
 
-  actual = (kr_transponder_path_type *)st;
+  actual = (kr_xpdr_type *)st;
   memset(indent,' ',depth_state*2);
   indent[depth_state*2] = '\0';
-  res += snprintf(&text[res],max-res," %s \n",kr_strfr_kr_transponder_path_type(*actual));
+  res += snprintf(&text[res],max-res," %s \n",kr_strfr_kr_xpdr_type(*actual));
 
   return res;
 }
-int kr_transponder_path_type_info_to_text(char *text, void *st, int32_t max) {
+int kr_xpdr_type_info_to_text(char *text, void *st, int32_t max) {
   uber_St uber;
   int res;
   uber_St *uber_actual;
-  kr_transponder_path_type_info *actual;
+  kr_xpdr_type_info *actual;
   char indent[(depth_state*2)+1];
   res = 0;
 
@@ -33,7 +33,7 @@ int kr_transponder_path_type_info_to_text(char *text, void *st, int32_t max) {
   if (uber_actual->actual == NULL) {
     return -1;
   }
-  actual = (kr_transponder_path_type_info *)uber_actual->actual;
+  actual = (kr_xpdr_type_info *)uber_actual->actual;
   memset(indent,' ',depth_state*2);
   indent[depth_state*2] = '\0';
   switch (uber_actual->type) {
@@ -44,25 +44,25 @@ int kr_transponder_path_type_info_to_text(char *text, void *st, int32_t max) {
       break;
     }
     case 1: {
-      uber.actual = &(actual->jack_input);
+      uber.actual = &(actual->jack_in);
       uber.type = TEXT_KR_JACK_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
     case 2: {
-      uber.actual = &(actual->jack_output);
+      uber.actual = &(actual->jack_out);
       uber.type = TEXT_KR_JACK_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
     case 3: {
-      uber.actual = &(actual->wayland);
+      uber.actual = &(actual->wl);
       uber.type = TEXT_KR_WAYLAND_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
     case 4: {
-      uber.actual = &(actual->wayland_output);
+      uber.actual = &(actual->wl_out);
       uber.type = TEXT_KR_WAYLAND_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
@@ -74,19 +74,19 @@ int kr_transponder_path_type_info_to_text(char *text, void *st, int32_t max) {
       break;
     }
     case 6: {
-      uber.actual = &(actual->v4l2_input);
+      uber.actual = &(actual->v4l2_in);
       uber.type = TEXT_KR_V4L2_OPEN_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
     case 7: {
-      uber.actual = &(actual->decklink);
+      uber.actual = &(actual->dl);
       uber.type = TEXT_KR_DECKLINK_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
     case 8: {
-      uber.actual = &(actual->decklink_input);
+      uber.actual = &(actual->dl_in);
       uber.type = TEXT_KR_DECKLINK_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
@@ -98,7 +98,7 @@ int kr_transponder_path_type_info_to_text(char *text, void *st, int32_t max) {
       break;
     }
     case 10: {
-      uber.actual = &(actual->x11_input);
+      uber.actual = &(actual->x11_in);
       uber.type = TEXT_KR_X11_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
@@ -110,13 +110,13 @@ int kr_transponder_path_type_info_to_text(char *text, void *st, int32_t max) {
       break;
     }
     case 12: {
-      uber.actual = &(actual->alsa_input);
+      uber.actual = &(actual->alsa_in);
       uber.type = TEXT_KR_ALSA_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
     case 13: {
-      uber.actual = &(actual->alsa_output);
+      uber.actual = &(actual->alsa_out);
       uber.type = TEXT_KR_ALSA_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
@@ -126,12 +126,9 @@ int kr_transponder_path_type_info_to_text(char *text, void *st, int32_t max) {
 
   return res;
 }
-int kr_transponder_path_info_to_text(char *text, void *st, int32_t max) {
-  uber_St uber;
-  uber_St uber_sub;
-  int index;
+int kr_xpdr_path_info_to_text(char *text, void *st, int32_t max) {
   int res;
-  struct kr_transponder_path_info *actual;
+  struct kr_xpdr_path_info *actual;
   char indent[(depth_state*2)+1];
   res = 0;
 
@@ -139,23 +136,9 @@ int kr_transponder_path_info_to_text(char *text, void *st, int32_t max) {
     return -1;
   }
 
-  actual = (struct kr_transponder_path_info *)st;
+  actual = (struct kr_xpdr_path_info *)st;
   memset(indent,' ',depth_state*2);
   indent[depth_state*2] = '\0';
-  res += snprintf(&text[res],max-res,"%stype:",indent);
-  uber.actual = &(actual->type);
-  uber.type = TEXT_KR_TRANSPONDER_PATH_TYPE;
-  depth_state++;
-  res += info_pack_to_text(&text[res],&uber,max-res);
-  depth_state--;
-  index = kr_transponder_path_type_to_index(actual->type);
-  uber_sub.type = index;
-  uber_sub.actual = &(actual->aio);
-  uber.actual = &(uber_sub);
-  uber.type = TEXT_KR_TRANSPONDER_PATH_TYPE_INFO;
-  depth_state++;
-  res += info_pack_to_text(&text[res],&uber,max-res);
-  depth_state--;
 
   return res;
 }

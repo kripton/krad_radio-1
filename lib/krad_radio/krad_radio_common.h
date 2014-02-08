@@ -4,7 +4,7 @@
 #include "krad_radio_version.h"
 #include "krad_mixer_common.h"
 #include "krad_compositor_common.h"
-#include "krad_transponder_common.h"
+#include "kr_xpdr_common.h"
 
 
 #endif

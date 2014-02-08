@@ -24,12 +24,12 @@ int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber) {
   kr_sfx_effect_control_fr_ebml,kr_eq_band_info_fr_ebml,
   kr_eq_info_fr_ebml,kr_lowpass_info_fr_ebml,
   kr_highpass_info_fr_ebml,kr_volume_info_fr_ebml,
-  kr_analog_info_fr_ebml,kr_transponder_path_type_fr_ebml,
-  kr_transponder_path_type_info_fr_ebml,kr_transponder_path_info_fr_ebml,
-  kr_v4l2_state_fr_ebml,kr_v4l2_mode_fr_ebml,
-  kr_v4l2_info_fr_ebml,kr_v4l2_open_info_fr_ebml,
-  kr_wayland_info_fr_ebml,kr_wayland_path_info_fr_ebml,
-  kr_x11_info_fr_ebml,kr_x11_path_info_fr_ebml
+  kr_analog_info_fr_ebml,kr_v4l2_state_fr_ebml,
+  kr_v4l2_mode_fr_ebml,kr_v4l2_info_fr_ebml,
+  kr_v4l2_open_info_fr_ebml,kr_wayland_info_fr_ebml,
+  kr_wayland_path_info_fr_ebml,kr_x11_info_fr_ebml,
+  kr_x11_path_info_fr_ebml,kr_xpdr_type_fr_ebml,
+  kr_xpdr_type_info_fr_ebml,kr_xpdr_path_info_fr_ebml
   };
   return fr_ebml_functions[uber->type-1](ebml , uber->actual);
 }
