@@ -61,6 +61,12 @@ int kr_xpdr_type_info_fr_ebml(kr_ebml *ebml, void *st) {
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
+    case 5: {
+      uber.actual = &(actual->alsa);
+      uber.type = DEBML_KR_ALSA_INFO;
+      res += info_unpack_fr_ebml(&ebml[res],&uber);
+      break;
+    }
     case 7: {
       uber.actual = &(actual->jack_in);
       uber.type = DEBML_KR_JACK_PATH_INFO;

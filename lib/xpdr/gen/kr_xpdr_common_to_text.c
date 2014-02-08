@@ -67,6 +67,12 @@ int kr_xpdr_type_info_to_text(char *text, void *st, int32_t max) {
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
+    case 5: {
+      uber.actual = &(actual->alsa);
+      uber.type = TEXT_KR_ALSA_INFO;
+      res += info_pack_to_text(&text[res],&uber,max-res);
+      break;
+    }
     case 7: {
       uber.actual = &(actual->jack_in);
       uber.type = TEXT_KR_JACK_PATH_INFO;

@@ -49,24 +49,24 @@ struct kr_xpdr {
   kr_xpdr_event_cb *event_cb;
 };
 
-static void compositor_frame(kr_compositor_path_frame_cb_arg *arg);
-static void mixer_audio(kr_mixer_path_audio_cb_arg *arg);
+static void compositor_frame(kr_frame_event *event);
+static void mixer_audio(kr_audio_event *event);
 static void path_io_destroy(path_io *io, path_io_type type);
 static void path_io_create(kr_xpdr_path *path);
 static int path_setup(kr_xpdr_path *info);
 static void path_destroy(kr_xpdr_path *path);
 static int path_create(kr_xpdr_path *path);
 
-static void compositor_frame(kr_compositor_path_frame_cb_arg *arg) {
+static void compositor_frame(kr_frame_event *event) {
   kr_xpdr_path *path;
-  path = (kr_xpdr_path *)arg->user;
-  arg->image = path->image;
+  path = (kr_xpdr_path *)event->user;
+  event->image = path->image;
 }
 
-static void mixer_audio(kr_mixer_path_audio_cb_arg *arg) {
+static void mixer_audio(kr_audio_event *event) {
   kr_xpdr_path *path;
-  path = (kr_xpdr_path *)arg->user;
-  arg->audio = path->audio;
+  path = (kr_xpdr_path *)event->user;
+  event->audio = path->audio;
 }
 
 /*

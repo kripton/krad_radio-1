@@ -200,6 +200,10 @@ int kr_xpdr_type_info_init(kr_xpdr_type_info *st, int idx) {
       kr_x11_info_init(&st->x11);
       break;
     }
+    case 5: {
+      kr_alsa_info_init(&st->alsa);
+      break;
+    }
     case 7: {
       kr_jack_path_info_init(&st->jack_in);
       break;
@@ -262,6 +266,10 @@ int kr_xpdr_type_info_valid(kr_xpdr_type_info *st, int idx) {
     }
     case 4: {
       kr_x11_info_valid(&st->x11);
+      break;
+    }
+    case 5: {
+      kr_alsa_info_valid(&st->alsa);
       break;
     }
     case 7: {
@@ -327,6 +335,10 @@ int kr_xpdr_type_info_random(kr_xpdr_type_info *st, int idx) {
     }
     case 4: {
       kr_x11_info_random(&st->x11);
+      break;
+    }
+    case 5: {
+      kr_alsa_info_random(&st->alsa);
       break;
     }
     case 7: {

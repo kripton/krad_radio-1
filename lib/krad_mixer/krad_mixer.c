@@ -21,7 +21,7 @@ typedef struct {
   kr_mixer_path_info *info;
   void *control_user;
   void *audio_user;
-  kr_mixer_path_audio_cb *audio_cb;
+  kr_audio_cb *audio_cb;
   kr_mixer_path *from;
   kr_mixer_path *to;
 } kr_mixer_path_setup;
@@ -33,7 +33,7 @@ struct kr_mixer_path {
   int nframes;
   int sample_rate;
   mixer_path_state state;
-  kr_mixer_path_audio_cb *audio_cb;
+  kr_audio_cb *audio_cb;
   void *audio_user;
   void *control_user;
   kr_mixer *mixer;
@@ -114,20 +114,20 @@ static void sum_samples(float **dst, float **src, int nc, int ns) {
 }
 
 static void transport(kr_mixer_path *path) {
-  kr_mixer_path_audio_cb_arg cb_arg;
-  cb_arg.audio.channels = path->channels;
+  kr_audio_event event;
+  event.audio.channels = path->channels;
   if (path->type == KR_MXR_OUTPUT) {
-    cb_arg.audio.count = path->nframes;
+    event.audio.count = path->nframes;
   }
   //FIXME
-  cb_arg.audio.rate = 48000;
-  cb_arg.user = path->audio_user;
-  path->audio_cb(&cb_arg);
+  event.audio.rate = 48000;
+  event.user = path->audio_user;
+  path->audio_cb(&event);
   if (path->type == KR_MXR_SOURCE) {
-    path->nframes = cb_arg.audio.count;
-    copy_samples(path->samples, cb_arg.audio.samples, path->channels, path->nframes);
+    path->nframes = event.audio.count;
+    copy_samples(path->samples, event.audio.samples, path->channels, path->nframes);
   } else {
-    copy_samples(cb_arg.audio.samples, path->samples, path->channels, path->nframes);
+    copy_samples(event.audio.samples, path->samples, path->channels, path->nframes);
   }
 }
 

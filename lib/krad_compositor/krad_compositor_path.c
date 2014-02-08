@@ -12,7 +12,7 @@ struct kr_compositor_path {
   kr_compositor_path_info info;
   void *frame_user;
   void *control_user;
-  kr_compositor_path_frame_cb *frame_cb;
+  kr_frame_cb *frame_cb;
   kr_compositor *compositor;
   kr_convert converter;
   kr_perspective *perspective;
@@ -27,7 +27,7 @@ typedef struct {
   kr_compositor_path_info *info;
   void *control_user;
   void *frame_user;
-  kr_compositor_path_frame_cb *frame_cb;
+  kr_frame_cb *frame_cb;
   kr_compositor_path *from;
   kr_compositor_path *to;
 } kr_compositor_path_setup;
@@ -123,10 +123,10 @@ static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
 }
 
 static void path_output(kr_compositor_path *path, kr_image *image) {
-  kr_compositor_path_frame_cb_arg cb_arg;
-  cb_arg.user = path->frame_user;
-  path->frame_cb(&cb_arg);
-  memcpy(cb_arg.image.px, image->px, image->w * image->h * 4);
+  kr_frame_event event;
+  event.user = path->frame_user;
+  path->frame_cb(&event);
+  memcpy(event.image.px, image->px, image->w * image->h * 4);
 }
 
 static int path_render(kr_compositor_path *path,

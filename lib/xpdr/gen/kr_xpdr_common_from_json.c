@@ -118,6 +118,16 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       }
       break;
     }
+    case 5: {
+      uber.actual = &(actual->alsa);
+      uber.type = DEJSON_KR_ALSA_INFO;
+      json[tokens[k].end] = '\0';
+      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+      if (res < 0) {
+        return -6;
+      }
+      break;
+    }
     case 7: {
       uber.actual = &(actual->jack_in);
       uber.type = DEJSON_KR_JACK_PATH_INFO;
