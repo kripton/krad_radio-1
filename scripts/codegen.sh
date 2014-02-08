@@ -56,7 +56,7 @@ fi
 
 run_codegen_precheck
 
-for dir in $(ls -d $path/krad_*/); do
+for dir in $(ls -d $path/*/); do
   prefix=$(basename $dir)
   localpath="${path}/${prefix}"
   gendir="${localpath}/gen"

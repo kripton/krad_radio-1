@@ -236,6 +236,14 @@ int kr_xpdr_type_info_init(kr_xpdr_type_info *st, int idx) {
       kr_alsa_path_info_init(&st->alsa_out);
       break;
     }
+    case 15: {
+      kr_aux_path_info_init(&st->aux_in);
+      break;
+    }
+    case 16: {
+      kr_aux_path_info_init(&st->aux_out);
+      break;
+    }
   }
 
 
@@ -302,6 +310,14 @@ int kr_xpdr_type_info_valid(kr_xpdr_type_info *st, int idx) {
     }
     case 14: {
       kr_alsa_path_info_valid(&st->alsa_out);
+      break;
+    }
+    case 15: {
+      kr_aux_path_info_valid(&st->aux_in);
+      break;
+    }
+    case 16: {
+      kr_aux_path_info_valid(&st->aux_out);
       break;
     }
   }
@@ -373,6 +389,14 @@ int kr_xpdr_type_info_random(kr_xpdr_type_info *st, int idx) {
       kr_alsa_path_info_random(&st->alsa_out);
       break;
     }
+    case 15: {
+      kr_aux_path_info_random(&st->aux_in);
+      break;
+    }
+    case 16: {
+      kr_aux_path_info_random(&st->aux_out);
+      break;
+    }
   }
 
 
@@ -385,6 +409,7 @@ int kr_xpdr_path_info_init(struct kr_xpdr_path_info *st) {
   }
 
   memset(st, 0, sizeof(struct kr_xpdr_path_info));
+  kr_xpdr_type_info_init(&st->adp,kr_xpdr_type_to_index(st->type));
 
   return 0;
 }
@@ -394,6 +419,7 @@ int kr_xpdr_path_info_valid(struct kr_xpdr_path_info *st) {
     return -1;
   }
 
+  kr_xpdr_type_info_valid(&st->adp,kr_xpdr_type_to_index(st->type));
 
   return 0;
 }
@@ -404,6 +430,7 @@ int kr_xpdr_path_info_random(struct kr_xpdr_path_info *st) {
   }
 
   memset(st, 0, sizeof(struct kr_xpdr_path_info));
+  kr_xpdr_type_info_random(&st->adp,kr_xpdr_type_to_index(st->type));
 
   return 0;
 }

@@ -82,6 +82,10 @@ int kr_payload_init(kr_payload *st, int idx) {
       kr_nil_init(&st->nil);
       break;
     }
+    case 1: {
+      kr_xpdr_path_info_init(&st->xpdr_path_info);
+      break;
+    }
     case 2: {
       kr_mixer_path_info_init(&st->mixer_path_info);
       break;
@@ -104,6 +108,10 @@ int kr_payload_valid(kr_payload *st, int idx) {
   switch (idx) {
     case 0: {
       kr_nil_valid(&st->nil);
+      break;
+    }
+    case 1: {
+      kr_xpdr_path_info_valid(&st->xpdr_path_info);
       break;
     }
     case 2: {
@@ -129,6 +137,10 @@ int kr_payload_random(kr_payload *st, int idx) {
   switch (idx) {
     case 0: {
       kr_nil_random(&st->nil);
+      break;
+    }
+    case 1: {
+      kr_xpdr_path_info_random(&st->xpdr_path_info);
       break;
     }
     case 2: {

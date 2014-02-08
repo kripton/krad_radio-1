@@ -3,6 +3,10 @@
 
 char *codegen_enum_to_string(cgen_enum val) {
   switch (val) {
+    case CGEN_KR_AUX_INFO:
+      return "kr_aux_info";
+    case CGEN_KR_AUX_PATH_INFO:
+      return "kr_aux_path_info";
     case CGEN_KR_ALSA_INFO_MEMBER:
       return "kr_alsa_info_member";
     case CGEN_KR_ALSA_INFO_PATCH_VALUE:
@@ -559,6 +563,40 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_xmms_St";
     case CGEN_KRAD_Y4M_ST:
       return "krad_y4m_St";
+    case CGEN_KR_ADAPTER_EVENT_TYPE:
+      return "kr_adapter_event_type";
+    case CGEN_KR_ADAPTER_PATH_EVENT_TYPE:
+      return "kr_adapter_path_event_type";
+    case CGEN_KR_ADAPTER_PATH_EVENT_CB_ARG:
+      return "kr_adapter_path_event_cb_arg";
+    case CGEN_KR_ADAPTER_PATH_AV_CB_ARG:
+      return "kr_adapter_path_av_cb_arg";
+    case CGEN_KR_ADAPTER_EVENT:
+      return "kr_adapter_event";
+    case CGEN_KR_ADAPTER_PATH_SETUP:
+      return "kr_adapter_path_setup";
+    case CGEN_KR_ADAPTER_SETUP:
+      return "kr_adapter_setup";
+    case CGEN_KR_ADAPTER:
+      return "kr_adapter";
+    case CGEN_KR_ADAPTER_PATH:
+      return "kr_adapter_path";
+    case CGEN_KR_PATCHSET:
+      return "kr_patchset";
+    case CGEN_KR_ADAPTER_SPEC:
+      return "kr_adapter_spec";
+    case CGEN_KR_XPDR_EVENT_TYPE:
+      return "kr_xpdr_event_type";
+    case CGEN_KR_XPDR_EVENT:
+      return "kr_xpdr_event";
+    case CGEN_KR_XPDR_SETUP:
+      return "kr_xpdr_setup";
+    case CGEN_KR_XPDR_TYPE:
+      return "kr_xpdr_type";
+    case CGEN_KR_XPDR_TYPE_INFO:
+      return "kr_xpdr_type_info";
+    case CGEN_KR_XPDR_PATH_INFO:
+      return "kr_xpdr_path_info";
     case CGEN_KR_IMAGE:
       return "kr_image";
     case CGEN_KR_AUDIO:
@@ -568,6 +606,12 @@ char *codegen_enum_to_string(cgen_enum val) {
 }
 
 cgen_enum codegen_string_to_enum(char *string) {
+  if (!strcmp(string,"kr_aux_info")) {
+    return CGEN_KR_AUX_INFO;
+  }
+  if (!strcmp(string,"kr_aux_path_info")) {
+    return CGEN_KR_AUX_PATH_INFO;
+  }
   if (!strcmp(string,"kr_alsa_info_member")) {
     return CGEN_KR_ALSA_INFO_MEMBER;
   }
@@ -1402,6 +1446,57 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_y4m_St")) {
     return CGEN_KRAD_Y4M_ST;
   }
+  if (!strcmp(string,"kr_adapter_event_type")) {
+    return CGEN_KR_ADAPTER_EVENT_TYPE;
+  }
+  if (!strcmp(string,"kr_adapter_path_event_type")) {
+    return CGEN_KR_ADAPTER_PATH_EVENT_TYPE;
+  }
+  if (!strcmp(string,"kr_adapter_path_event_cb_arg")) {
+    return CGEN_KR_ADAPTER_PATH_EVENT_CB_ARG;
+  }
+  if (!strcmp(string,"kr_adapter_path_av_cb_arg")) {
+    return CGEN_KR_ADAPTER_PATH_AV_CB_ARG;
+  }
+  if (!strcmp(string,"kr_adapter_event")) {
+    return CGEN_KR_ADAPTER_EVENT;
+  }
+  if (!strcmp(string,"kr_adapter_path_setup")) {
+    return CGEN_KR_ADAPTER_PATH_SETUP;
+  }
+  if (!strcmp(string,"kr_adapter_setup")) {
+    return CGEN_KR_ADAPTER_SETUP;
+  }
+  if (!strcmp(string,"kr_adapter")) {
+    return CGEN_KR_ADAPTER;
+  }
+  if (!strcmp(string,"kr_adapter_path")) {
+    return CGEN_KR_ADAPTER_PATH;
+  }
+  if (!strcmp(string,"kr_patchset")) {
+    return CGEN_KR_PATCHSET;
+  }
+  if (!strcmp(string,"kr_adapter_spec")) {
+    return CGEN_KR_ADAPTER_SPEC;
+  }
+  if (!strcmp(string,"kr_xpdr_event_type")) {
+    return CGEN_KR_XPDR_EVENT_TYPE;
+  }
+  if (!strcmp(string,"kr_xpdr_event")) {
+    return CGEN_KR_XPDR_EVENT;
+  }
+  if (!strcmp(string,"kr_xpdr_setup")) {
+    return CGEN_KR_XPDR_SETUP;
+  }
+  if (!strcmp(string,"kr_xpdr_type")) {
+    return CGEN_KR_XPDR_TYPE;
+  }
+  if (!strcmp(string,"kr_xpdr_type_info")) {
+    return CGEN_KR_XPDR_TYPE_INFO;
+  }
+  if (!strcmp(string,"kr_xpdr_path_info")) {
+    return CGEN_KR_XPDR_PATH_INFO;
+  }
   if (!strcmp(string,"kr_image")) {
     return CGEN_KR_IMAGE;
   }
@@ -1428,6 +1523,9 @@ int codegen_is_union(char *type) {
     return 1;
   }
   if (!strcmp(type,"kr_payload")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_xpdr_type_info")) {
     return 1;
   }
   return 0;
@@ -1639,6 +1737,18 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"krad_xmms_playback_cmd_t")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_adapter_event_type")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_adapter_path_event_type")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_xpdr_event_type")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_xpdr_type")) {
     return 1;
   }
   return 0;

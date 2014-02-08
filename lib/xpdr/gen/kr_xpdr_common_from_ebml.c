@@ -115,12 +115,27 @@ int kr_xpdr_type_info_fr_ebml(kr_ebml *ebml, void *st) {
       res += info_unpack_fr_ebml(&ebml[res],&uber);
       break;
     }
+    case 15: {
+      uber.actual = &(actual->aux_in);
+      uber.type = DEBML_KR_AUX_PATH_INFO;
+      res += info_unpack_fr_ebml(&ebml[res],&uber);
+      break;
+    }
+    case 16: {
+      uber.actual = &(actual->aux_out);
+      uber.type = DEBML_KR_AUX_PATH_INFO;
+      res += info_unpack_fr_ebml(&ebml[res],&uber);
+      break;
+    }
   }
 
 
   return res;
 }
 int kr_xpdr_path_info_fr_ebml(kr_ebml *ebml, void *st) {
+  uber_St uber;
+  uber_St uber_sub;
+  int index;
   int res;
   struct kr_xpdr_path_info *actual;
   res = 0;
@@ -130,6 +145,15 @@ int kr_xpdr_path_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_xpdr_path_info *)st;
+  uber.actual = &(actual->type);
+  uber.type = DEBML_KR_XPDR_TYPE;
+  res += info_unpack_fr_ebml(&ebml[res],&uber);
+  index = kr_xpdr_type_to_index(actual->type);
+  uber_sub.type = index;
+  uber_sub.actual = &(actual->adp);
+  uber.actual = &(uber_sub);
+  uber.type = DEBML_KR_XPDR_TYPE_INFO;
+  res += info_unpack_fr_ebml(&ebml[res],&uber);
 
   return res;
 }

@@ -121,12 +121,27 @@ int kr_xpdr_type_info_to_text(char *text, void *st, int32_t max) {
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
+    case 15: {
+      uber.actual = &(actual->aux_in);
+      uber.type = TEXT_KR_AUX_PATH_INFO;
+      res += info_pack_to_text(&text[res],&uber,max-res);
+      break;
+    }
+    case 16: {
+      uber.actual = &(actual->aux_out);
+      uber.type = TEXT_KR_AUX_PATH_INFO;
+      res += info_pack_to_text(&text[res],&uber,max-res);
+      break;
+    }
   }
 
 
   return res;
 }
 int kr_xpdr_path_info_to_text(char *text, void *st, int32_t max) {
+  uber_St uber;
+  uber_St uber_sub;
+  int index;
   int res;
   struct kr_xpdr_path_info *actual;
   char indent[(depth_state*2)+1];
@@ -139,6 +154,20 @@ int kr_xpdr_path_info_to_text(char *text, void *st, int32_t max) {
   actual = (struct kr_xpdr_path_info *)st;
   memset(indent,' ',depth_state*2);
   indent[depth_state*2] = '\0';
+  res += snprintf(&text[res],max-res,"%stype:",indent);
+  uber.actual = &(actual->type);
+  uber.type = TEXT_KR_XPDR_TYPE;
+  depth_state++;
+  res += info_pack_to_text(&text[res],&uber,max-res);
+  depth_state--;
+  index = kr_xpdr_type_to_index(actual->type);
+  uber_sub.type = index;
+  uber_sub.actual = &(actual->adp);
+  uber.actual = &(uber_sub);
+  uber.type = TEXT_KR_XPDR_TYPE_INFO;
+  depth_state++;
+  res += info_pack_to_text(&text[res],&uber,max-res);
+  depth_state--;
 
   return res;
 }

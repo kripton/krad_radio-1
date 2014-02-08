@@ -55,6 +55,12 @@ int kr_payload_to_json(char *json, void *st, int32_t max) {
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
+    case 1: {
+      uber.actual = &(actual->xpdr_path_info);
+      uber.type = JSON_KR_XPDR_PATH_INFO;
+      res += info_pack_to_json(&json[res],&uber,max-res);
+      break;
+    }
     case 2: {
       uber.actual = &(actual->mixer_path_info);
       uber.type = JSON_KR_MIXER_PATH_INFO;

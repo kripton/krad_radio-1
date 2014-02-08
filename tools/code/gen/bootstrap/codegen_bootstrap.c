@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  n = gather_struct_definitions(hdata,"krad",argv[1]);
+  n = gather_struct_definitions(hdata,"kr",argv[1]);
 
   codegen_bootstrap(hdata,n,argv[2],argv[3],header);
   fprintf(header,"\ntypedef struct {\n  int type;\n  void *actual;\n} uber_St;\n\n");

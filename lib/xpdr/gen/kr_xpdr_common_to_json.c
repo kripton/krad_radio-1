@@ -117,12 +117,27 @@ int kr_xpdr_type_info_to_json(char *json, void *st, int32_t max) {
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }
+    case 15: {
+      uber.actual = &(actual->aux_in);
+      uber.type = JSON_KR_AUX_PATH_INFO;
+      res += info_pack_to_json(&json[res],&uber,max-res);
+      break;
+    }
+    case 16: {
+      uber.actual = &(actual->aux_out);
+      uber.type = JSON_KR_AUX_PATH_INFO;
+      res += info_pack_to_json(&json[res],&uber,max-res);
+      break;
+    }
   }
 
 
   return res;
 }
 int kr_xpdr_path_info_to_json(char *json, void *st, int32_t max) {
+  uber_St uber;
+  uber_St uber_sub;
+  int index;
   int res;
   struct kr_xpdr_path_info *actual;
   res = 0;
@@ -133,6 +148,18 @@ int kr_xpdr_path_info_to_json(char *json, void *st, int32_t max) {
 
   actual = (struct kr_xpdr_path_info *)st;
   res += snprintf(&json[res],max-res,"{");
+  res += snprintf(&json[res],max-res,"\"type\": ");
+  uber.actual = &(actual->type);
+  uber.type = JSON_KR_XPDR_TYPE;
+  res += info_pack_to_json(&json[res],&uber,max-res);
+  res += snprintf(&json[res],max-res,",");
+  index = kr_xpdr_type_to_index(actual->type);
+  uber_sub.type = index;
+  uber_sub.actual = &(actual->adp);
+  uber.actual = &(uber_sub);
+  uber.type = JSON_KR_XPDR_TYPE_INFO;
+  res += snprintf(&json[res],max-res,"\"adp\": ");
+  res += info_pack_to_json(&json[res],&uber,max-res);
   res += snprintf(&json[res],max-res,"}");
 
   return res;

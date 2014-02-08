@@ -208,12 +208,36 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
       }
       break;
     }
+    case 15: {
+      uber.actual = &(actual->aux_in);
+      uber.type = DEJSON_KR_AUX_PATH_INFO;
+      json[tokens[k].end] = '\0';
+      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+      if (res < 0) {
+        return -16;
+      }
+      break;
+    }
+    case 16: {
+      uber.actual = &(actual->aux_out);
+      uber.type = DEJSON_KR_AUX_PATH_INFO;
+      json[tokens[k].end] = '\0';
+      res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+      if (res < 0) {
+        return -17;
+      }
+      break;
+    }
   }
 
 
   return res;
 }
 int kr_xpdr_path_info_fr_json(char *json, void *st) {
+  uber_St uber;
+  int type;
+  uber_St uber_sub;
+  int index;
   int res;
   jsmn_parser parser;
   jsmntok_t tokens[512];
@@ -243,6 +267,54 @@ int kr_xpdr_path_info_fr_json(char *json, void *st) {
   }
 
   k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"type",4)) {
+    return -1;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  type = kr_strto_kr_xpdr_type(&json[tokens[k].start]);
+  if (type < 0) {
+    return -1;
+  }
+  actual->type = type;
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -2;
+  }
+
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"adp",3)) {
+    return -2;
+  }
+
+  k++;
+  if (ntokens > k && tokens[k].type != JSMN_OBJECT) {
+    return -2;
+  }
+
+  index = kr_xpdr_type_to_index(actual->type);
+  uber_sub.type = index;
+  uber_sub.actual = &(actual->adp);
+  uber.actual = &(uber_sub);
+  uber.type = DEJSON_KR_XPDR_TYPE_INFO;
+  json[tokens[k].end] = '\0';
+  res += info_unpack_fr_json(&json[tokens[k].start],&uber);
+  if (res < 0) {
+    return -2;
+  }
+
+  k += res;
 
   res = k;
 

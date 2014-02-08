@@ -60,6 +60,12 @@ int kr_payload_to_text(char *text, void *st, int32_t max) {
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
+    case 1: {
+      uber.actual = &(actual->xpdr_path_info);
+      uber.type = TEXT_KR_XPDR_PATH_INFO;
+      res += info_pack_to_text(&text[res],&uber,max-res);
+      break;
+    }
     case 2: {
       uber.actual = &(actual->mixer_path_info);
       uber.type = TEXT_KR_MIXER_PATH_INFO;
