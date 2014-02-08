@@ -1,7 +1,7 @@
 #ifndef KRAD_SFX_COMMON_H
 #define KRAD_SFX_COMMON_H
 
-#define KR_SFX_MAX 6
+#define KR_SFX_MAX 8
 #define KR_SFX_MAX_CHANNELS 8
 #define KR_EQ_MAX_BANDS 32
 

@@ -289,6 +289,10 @@ int run_test(kr_client *client, char *test) {
     ret = test_aux_in_create(client);
     if (ret != 0) return ret;
   }
+  if (strmatch(test, "masterbus")) {
+    ret = make_masterbus(client);
+    if (ret != 0) return ret;
+  }
   if (strmatch(test, "musicbus")) {
     ret = make_musicbus(client);
     if (ret != 0) return ret;

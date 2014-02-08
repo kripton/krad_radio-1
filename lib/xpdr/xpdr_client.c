@@ -10,10 +10,14 @@ int kr_xpdr_make(kr_client *client, char *name, kr_xpdr_path_info *info) {
   //if (kr_xpdr_path_info_valid(info) < 0) {
   // return -1;
   //}
+  char string[8192];
+  kr_xpdr_path_info_to_text(string, info, sizeof(string));
+  printk("XPDR: mkpath-\n%s", string);
+
   snprintf(crate.address, sizeof(crate.address), "/xpdr/%s", name);
   crate.method = KR_PUT;
   crate.payload_type = PL_KR_XPDR_PATH_INFO;
-  memcpy(&crate.payload.xpdr_path_info, info, sizeof(kr_xpdr_path_info));
+  crate.payload.xpdr_path_info = *info;
   ret = kr_crate_send(client, &crate);
   return ret;
 }

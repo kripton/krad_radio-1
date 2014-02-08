@@ -200,6 +200,9 @@ static void path_io_create(kr_xpdr_path *path) {
 }
 
 static int path_setup(kr_xpdr_path *path) {
+  char string[8192];
+  kr_xpdr_path_info_to_text(string, &path->info, sizeof(string));
+  printk("XPDR: path setup\n%s", string);
   switch (path->info.type) {
     case KR_JACK:
     case KR_WAYLAND:
@@ -307,6 +310,9 @@ int kr_xpdr_unlink(kr_xpdr_path *path) {
 }
 
 int kr_xpdr_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
+  char string[8192];
+  kr_xpdr_path_info_to_text(string, i, sizeof(string));
+  printk("XPDR: mkpath-\n%s", string);
   int ret;
   kr_xpdr_path *path;
   kr_xpdr_event event;
@@ -319,7 +325,10 @@ int kr_xpdr_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
   path->user = p;
   printk("XPDR: mkpath");
   ret = path_create(path);
-  if (ret) return -4;
+  if (ret) {
+    kr_pool_recycle(x->path_pool, path);
+    return -4;
+  }
   event.user = path->xpdr->user;
   event.user_path = path->user;
   event.path = path;
