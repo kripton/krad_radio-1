@@ -17,6 +17,7 @@
 #include <linux/uvcvideo.h>
 
 #include "krad_system.h"
+#include "kr_adapter.h"
 #include "krad_convert.h"
 #include "krad_av.h"
 #include "krad_v4l2_common.h"
@@ -41,6 +42,11 @@ int kr_v4l2_stat(kr_v4l2 *v4l2, kr_v4l2_info **info);
 int kr_v4l2_destroy(kr_v4l2 *v4l2);
 kr_v4l2 *kr_v4l2_create(kr_v4l2_setup *setup);
 
-int kr_v4l2_dev_count();
+int kr_v4l2_pctl(kr_adapter_path *, kr_patchset *);
+int kr_v4l2_rmpath(kr_adapter_path *);
+kr_adapter_path *kr_v4l2_mkpath(kr_adapter *, kr_adapter_path_setup *);
+int kr_v4l2_ctl(kr_adapter *, kr_patchset *);
+/*int kr_v4l2_destroy(kr_adapter *);*/
+kr_adapter *kr_aux_create(kr_adapter_setup *);
 
 #endif

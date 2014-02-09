@@ -249,7 +249,7 @@ static int path_destroy(kr_xpdr_path *path) {
   int ret;
   ret = 0;
   if (path->type == ADAPTER_CTX) {
-    ret = adapters[path->adapter_type].destroy(path->adapter);
+    ret = adapters[path->adapter_type].close(path->adapter);
   } else {
     path_io_destroy(&path->input, path->input_type);
     path_io_destroy(&path->output, path->output_type);
@@ -272,7 +272,7 @@ static int path_create(kr_xpdr_path *path) {
       setup.event_cb = adapter_event;
       setup.user = path;
       printk("XPDR: adapter context create");
-      path->adapter = adapters[path->adapter_type].create(&setup);
+      path->adapter = adapters[path->adapter_type].open(&setup);
       if (path->adapter == NULL) return -1;
       return 0;
     case ADAPTER_PATH:

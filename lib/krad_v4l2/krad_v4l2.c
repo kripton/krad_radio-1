@@ -151,16 +151,13 @@ static void kr_v4l2_unmap(kr_v4l2 *v4l2) {
 }
 
 static void kr_v4l2_map(kr_v4l2 *v4l2) {
-
   int i;
   struct v4l2_buffer buf;
   struct v4l2_requestbuffers req;
-
   memset(&req, 0, sizeof(req));
   req.count = KR_V4L2_BUFS_DEF;
   req.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   req.memory = V4L2_MEMORY_MMAP;
-
   if (-1 == xioctl(v4l2->fd, VIDIOC_REQBUFS, &req)) {
     if (EINVAL == errno) {
       printke("Krad V4L2: device does not support memory mapping");
@@ -198,7 +195,6 @@ static void kr_v4l2_map(kr_v4l2 *v4l2) {
 }
 
 int kr_v4l2_mode_set(kr_v4l2 *v4l2, kr_v4l2_mode *mode) {
-
   struct v4l2_format fmt;
   struct v4l2_streamparm stream_parameters;
   if ((v4l2 == NULL) || (mode == NULL)) return -1;
@@ -250,11 +246,9 @@ static void kr_v4l2_close(kr_v4l2 *v4l2) {
 }
 
 static void kr_v4l2_open(kr_v4l2 *v4l2) {
-
   struct stat st;
   char device[128];
   struct v4l2_capability cap;
-
   snprintf(device, sizeof(device), "/dev/video%d", v4l2->info.dev);
   if (-1 == stat(device, &st)) {
     printke("Krad V4L2: Cannot identify '%s': %d, %s", device, errno,
@@ -271,7 +265,6 @@ static void kr_v4l2_open(kr_v4l2 *v4l2) {
      strerror(errno));
     return;
   }
-
   if (-1 == xioctl(v4l2->fd, VIDIOC_QUERYCAP, &cap)) {
     printke("Krad V4L2: VIDIOC_QUERYCAP");
     kr_v4l2_close(v4l2);
@@ -299,39 +292,11 @@ int kr_v4l2_destroy(kr_v4l2 *v4l2) {
 }
 
 kr_v4l2 *kr_v4l2_create(kr_v4l2_setup *setup) {
-
   kr_v4l2 *v4l2;
-
   if (setup == NULL) return NULL;
-
   v4l2 = kr_allocz(1, sizeof(kr_v4l2));
   v4l2->info.dev = setup->dev;
   v4l2->info.priority = setup->priority;
   kr_v4l2_open(v4l2);
-
   return v4l2;
-}
-
-int kr_v4l2_dev_count() {
-
-  DIR *dp;
-  struct dirent *ep;
-  int count;
-
-  count = 0;
-  dp = opendir("/dev");
-
-  if (dp == NULL) {
-    printke("Couldn't open the /dev directory");
-    return 0;
-  }
-
-  while ((ep = readdir(dp))) {
-    if (memcmp(ep->d_name, "video", 5) == 0) {
-      printk("Found V4L2 Device: /dev/%s", ep->d_name);
-      count++;
-    }
-  }
-  closedir(dp);
-  return count;
 }

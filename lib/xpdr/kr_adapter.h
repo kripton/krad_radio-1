@@ -70,20 +70,20 @@ typedef struct {
   int coconut;
 } kr_patchset;
 
-typedef int (kr_adapter_pctl)(kr_adapter_path *, kr_patchset *);
-typedef int (kr_adapter_rmpath)(kr_adapter_path *);
-typedef kr_adapter_path *(kr_adapter_mkpath)(kr_adapter *, kr_adapter_path_setup *);
+typedef int (kr_adapter_lctl)(kr_adapter_path *, kr_patchset *);
+typedef int (kr_adapter_unlink)(kr_adapter_path *);
+typedef kr_adapter_path *(kr_adapter_link)(kr_adapter *, kr_adapter_path_setup *);
 typedef int (kr_adapter_ctl)(kr_adapter *, kr_patchset *);
-typedef int (kr_adapter_destroy)(kr_adapter *);
-typedef kr_adapter *(kr_adapter_create)(kr_adapter_setup *);
+typedef int (kr_adapter_close)(kr_adapter *);
+typedef kr_adapter *(kr_adapter_open)(kr_adapter_setup *);
 
 struct kr_adapter_spec {
-  kr_adapter_pctl *pctl;
-  kr_adapter_rmpath *rmpath;
-  kr_adapter_mkpath *mkpath;
+  kr_adapter_lctl *lctl;
+  kr_adapter_unlink *unlink;
+  kr_adapter_link *link;
   kr_adapter_ctl *ctl;
-  kr_adapter_destroy *destroy;
-  kr_adapter_create *create;
+  kr_adapter_close *close;
+  kr_adapter_open *open;
 };
 
 #endif

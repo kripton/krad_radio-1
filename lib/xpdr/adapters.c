@@ -12,81 +12,81 @@
 
 static const kr_adapter_spec adapters[] = {
   { /* First is NULL */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_JACK */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_WAYLAND */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_V4L2 */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_DECKLINK */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_X11 */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_ALSA */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_AUX */
-    .pctl = kr_aux_pctl,
-    .rmpath = kr_aux_rmpath,
-    .mkpath = kr_aux_mkpath,
+    .lctl = kr_aux_lctl,
+    .unlink = kr_aux_unlink,
+    .link = kr_aux_link,
     .ctl = kr_aux_ctl,
-    .destroy = kr_aux_destroy,
-    .create = kr_aux_create
+    .close = kr_aux_close,
+    .open = kr_aux_open
   },{ /* KR_ */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_ */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   },{ /* KR_ */
-    .pctl = NULL,
-    .rmpath = NULL,
-    .mkpath = NULL,
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
     .ctl = NULL,
-    .destroy = NULL,
-    .create = NULL
+    .close = NULL,
+    .open = NULL
   }
 };
