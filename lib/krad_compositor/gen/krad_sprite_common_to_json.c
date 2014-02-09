@@ -12,7 +12,9 @@ int kr_sprite_info_to_json(char *json, void *st, int32_t max) {
   actual = (struct kr_sprite_info *)st;
   res += snprintf(&json[res],max-res,"{");
   res += snprintf(&json[res],max-res,"\"filename\" : \"%s\",",actual->filename);
-  res += snprintf(&json[res],max-res,"\"rate\" : %d",actual->rate);
+  res += snprintf(&json[res],max-res,"\"rate\" : %d,",actual->rate);
+  res += snprintf(&json[res],max-res,"\"w\" : %d,",actual->w);
+  res += snprintf(&json[res],max-res,"\"h\" : %d",actual->h);
   res += snprintf(&json[res],max-res,"}");
 
   return res;

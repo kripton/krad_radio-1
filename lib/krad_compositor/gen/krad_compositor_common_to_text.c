@@ -47,6 +47,10 @@ int kr_rect_to_text(char *text, void *st, int32_t max) {
   actual = (struct kr_rect *)st;
   memset(indent,' ',depth_state*2);
   indent[depth_state*2] = '\0';
+  res += snprintf(&text[res],max-res,"%sx: %d \n",indent,actual->x);
+  res += snprintf(&text[res],max-res,"%sy: %d \n",indent,actual->y);
+  res += snprintf(&text[res],max-res,"%sw: %d \n",indent,actual->w);
+  res += snprintf(&text[res],max-res,"%sh: %d \n",indent,actual->h);
 
   return res;
 }
@@ -63,6 +67,8 @@ int kr_compositor_output_info_to_text(char *text, void *st, int32_t max) {
   actual = (struct kr_compositor_output_info *)st;
   memset(indent,' ',depth_state*2);
   indent[depth_state*2] = '\0';
+  res += snprintf(&text[res],max-res,"%sw: %d \n",indent,actual->w);
+  res += snprintf(&text[res],max-res,"%sh: %d \n",indent,actual->h);
   res += snprintf(&text[res],max-res,"%sopacity: %0.2f \n",indent,actual->opacity);
 
   return res;
@@ -135,6 +141,8 @@ int kr_compositor_source_info_to_text(char *text, void *st, int32_t max) {
   actual = (struct kr_compositor_source_info *)st;
   memset(indent,' ',depth_state*2);
   indent[depth_state*2] = '\0';
+  res += snprintf(&text[res],max-res,"%sw: %d \n",indent,actual->w);
+  res += snprintf(&text[res],max-res,"%sh: %d \n",indent,actual->h);
 
   return res;
 }

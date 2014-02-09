@@ -335,7 +335,6 @@ int kr_rect_init(struct kr_rect *st) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_rect));
 
   return 0;
 }
@@ -354,7 +353,6 @@ int kr_rect_random(struct kr_rect *st) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_rect));
 
   return 0;
 }
@@ -364,7 +362,6 @@ int kr_compositor_output_info_init(struct kr_compositor_output_info *st) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_compositor_output_info));
 
   return 0;
 }
@@ -383,7 +380,6 @@ int kr_compositor_output_info_random(struct kr_compositor_output_info *st) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_compositor_output_info));
 
   return 0;
 }
@@ -458,7 +454,6 @@ int kr_compositor_source_info_init(struct kr_compositor_source_info *st) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_compositor_source_info));
 
   return 0;
 }
@@ -477,7 +472,6 @@ int kr_compositor_source_info_random(struct kr_compositor_source_info *st) {
     return -1;
   }
 
-  memset(st, 0, sizeof(struct kr_compositor_source_info));
 
   return 0;
 }

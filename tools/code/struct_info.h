@@ -12,9 +12,13 @@ typedef struct struct_data struct_data;
 typedef struct member_info member_info;
 
 typedef struct char_member_info char_member_info;
+typedef struct int8_member_info int8_member_info;
+typedef struct int16_member_info int16_member_info;
 typedef struct int32_member_info int32_member_info;
-typedef struct uint32_member_info uint32_member_info;
 typedef struct int64_member_info int64_member_info;
+typedef struct uint8_member_info uint8_member_info;
+typedef struct uint16_member_info uint16_member_info;
+typedef struct uint32_member_info uint32_member_info;
 typedef struct uint64_member_info uint64_member_info;
 typedef struct float_member_info float_member_info;
 typedef struct double_member_info double_member_info;
@@ -23,6 +27,18 @@ typedef struct struct_member_info struct_member_info;
 struct char_member_info {
   int32_t max;
   int notnull;
+};
+
+struct int8_member_info {
+  int8_t init;
+  int8_t min;
+  int8_t max;
+};
+
+struct int16_member_info {
+  int16_t init;
+  int16_t min;
+  int16_t max;
 };
 
 struct int32_member_info {
@@ -37,16 +53,28 @@ struct int64_member_info {
   int64_t max;
 };
 
-struct uint64_member_info {
-  uint64_t init;
-  uint64_t min;
-  uint64_t max;
+struct uint8_member_info {
+  uint8_t init;
+  uint8_t min;
+  uint8_t max;
+};
+
+struct uint16_member_info {
+  uint16_t init;
+  uint16_t min;
+  uint16_t max;
 };
 
 struct uint32_member_info {
   uint32_t init;
   uint32_t min;
   uint32_t max;
+};
+
+struct uint64_member_info {
+  uint64_t init;
+  uint64_t min;
+  uint64_t max;
 };
 
 struct float_member_info {
@@ -67,8 +95,12 @@ struct struct_member_info {
 
 typedef enum {
   T_CHAR,
+  T_INT8,
+  T_INT16,
   T_INT32,
   T_INT64,
+  T_UINT8,
+  T_UINT16,
   T_UINT32,
   T_UINT64,
   T_FLOAT,
@@ -84,9 +116,13 @@ typedef enum {
 
 typedef union {
   char_member_info char_info;
+  int8_member_info int8_info;
+  int16_member_info int16_info;
   int32_member_info int32_info;
-  uint32_member_info uint32_info;
   int64_member_info int64_info;
+  uint8_member_info uint8_info;
+  uint16_member_info uint16_info;
+  uint32_member_info uint32_info;
   uint64_member_info uint64_info;
   float_member_info float_info;
   double_member_info double_info;

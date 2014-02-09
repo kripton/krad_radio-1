@@ -86,6 +86,28 @@ static void get_memb_data_info (char *line,
   }
 
   switch(memb->type) {
+    case T_INT8: {
+      if (i == 3) {
+        memb->type_info.int8_info.init = atoi(info[0]);
+        memb->type_info.int8_info.min = atoi(info[1]);
+        memb->type_info.int8_info.max = atoi(info[2]);
+      } else if (i == 2) {
+        memb->type_info.int8_info.min = atoi(info[0]);
+        memb->type_info.int8_info.max = atoi(info[1]);
+      }
+      break;
+    }
+    case T_INT16: {
+      if (i == 3) {
+        memb->type_info.int16_info.init = atoi(info[0]);
+        memb->type_info.int16_info.min = atoi(info[1]);
+        memb->type_info.int16_info.max = atoi(info[2]);
+      } else if (i == 2) {
+        memb->type_info.int16_info.min = atoi(info[0]);
+        memb->type_info.int16_info.max = atoi(info[1]);
+      }
+      break;
+    }
     case T_INT32: {
       if (i == 3) {
         memb->type_info.int32_info.init = atoi(info[0]);
@@ -105,6 +127,28 @@ static void get_memb_data_info (char *line,
       } else if (i == 2) {
         memb->type_info.int64_info.min = atol(info[0]);
         memb->type_info.int64_info.max = atol(info[1]);
+      }
+      break;
+    }
+    case T_UINT8: {
+      if (i == 3) {
+        memb->type_info.uint8_info.init = atoi(info[0]);
+        memb->type_info.uint8_info.min = atoi(info[1]);
+        memb->type_info.uint8_info.max = atoi(info[2]);
+      } else if (i == 2) {
+        memb->type_info.uint8_info.min = atoi(info[0]);
+        memb->type_info.uint8_info.max = atoi(info[1]);
+      }
+      break;
+    }
+    case T_UINT16: {
+      if (i == 3) {
+        memb->type_info.uint16_info.init = atoi(info[0]);
+        memb->type_info.uint16_info.min = atoi(info[1]);
+        memb->type_info.uint16_info.max = atoi(info[2]);
+      } else if (i == 2) {
+        memb->type_info.uint16_info.min = atoi(info[0]);
+        memb->type_info.uint16_info.max = atoi(info[1]);
       }
       break;
     }
@@ -159,13 +203,21 @@ static void get_memb_data_info (char *line,
 }
 
 member_type str_to_member_type(char *str) {
-  if (!strncmp(str,"int32_t",7) || !strcmp(str,"int")) {
+  if (!strncmp(str,"int8_t",6)) {
+    return T_INT8;
+  } else if (!strncmp(str,"int16_t",7)) {
+    return T_INT16;
+  } else if (!strncmp(str,"int32_t",7) || !strcmp(str,"int")) {
     return T_INT32;
   } else if (!strncmp(str,"int64_t",7)) {
     return T_INT64;
   } else if (!strncmp(str,"char",4)) {
     return T_CHAR;
-  } else if (!strncmp(str,"uint32_t",8) || !strncmp(str,"uint16_t",8) || !strcmp(str,"uint")) {
+  } else if (!strncmp(str,"uint8_t",7)) {
+    return T_UINT8;
+  } else if (!strncmp(str,"uint16_t",8)) {
+    return T_UINT16;
+  } else if (!strncmp(str,"uint32_t",8) || !strcmp(str,"uint")) {
     return T_UINT32;
   } else if (!strncmp(str,"uint64_t",8)) {
     return T_UINT64;
@@ -183,11 +235,23 @@ char *member_type_to_str(member_type type) {
     case T_CHAR: {
       return "char";
     }
+    case T_INT8: {
+      return "int8_t";
+    }
+    case T_INT16: {
+      return "int16_t";
+    }
     case T_INT32: {
       return "int32_t";
     }
     case T_INT64: {
       return "int64_t";
+    }
+    case T_UINT8: {
+      return "uint8_t";
+    }
+    case T_UINT16: {
+      return "uint16_t";
     }
     case T_UINT32: {
       return "uint32_t";

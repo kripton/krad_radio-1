@@ -95,6 +95,78 @@ int kr_rect_fr_json(char *json, void *st) {
 
   k++;
 
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"x",1)) {
+    return -1;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -1;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->x = atoi(&json[tokens[k].start]);
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -2;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"y",1)) {
+    return -2;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -2;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->y = atoi(&json[tokens[k].start]);
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -3;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"w",1)) {
+    return -3;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -3;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->w = atoi(&json[tokens[k].start]);
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -4;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"h",1)) {
+    return -4;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -4;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->h = atoi(&json[tokens[k].start]);
+  k++;
+
   res = k;
 
   return res;
@@ -128,6 +200,42 @@ int kr_compositor_output_info_fr_json(char *json, void *st) {
     return -1;
   }
 
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"w",1)) {
+    return -1;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -1;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->w = atoi(&json[tokens[k].start]);
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -2;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"h",1)) {
+    return -2;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -2;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->h = atoi(&json[tokens[k].start]);
   k++;
 
   if (ntokens > k && tokens[k].type != JSMN_STRING) {
@@ -399,6 +507,42 @@ int kr_compositor_source_info_fr_json(char *json, void *st) {
     return -1;
   }
 
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -1;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"w",1)) {
+    return -1;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -1;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->w = atoi(&json[tokens[k].start]);
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -2;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"h",1)) {
+    return -2;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -2;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->h = atoi(&json[tokens[k].start]);
   k++;
 
   res = k;

@@ -9,51 +9,62 @@ char *ebml_pack_or_unpack(uint8_t type) {
 }
 
 char *memb_type_to_str(member_info *memb) {
-
-  char *type;
-
-  type = member_type_to_str(memb->type);
-
-  if (!strcmp(type,"int") || !strncmp(type,"int32_t",7)) {
-    if (!memb->ptr)
-      return "_int32";
-  }
-
-  if (!strcmp(type,"uint") || !strncmp(type,"uint32_t",8)) {
-    if (!memb->ptr)
-      return "_uint32";
-  }
-
-  if (!strncmp(type,"int64_t",7)) {
-    if (!memb->ptr)
-      return "_int64";
-  }
-
-  if (!strncmp(type,"uint64_t",8)) {
-    if (!memb->ptr)
-      return "_uint64";
-  }
-
-  if (!strncmp(type,"float",5)) {
-    if (!memb->ptr)
-      return "_float";
-  }
-
-  if (!strncmp(type,"char",4)) {
-    if (memb->arr) {
-      return "_string";
-    } else  if (memb->ptr) {
+  switch(memb->type) {
+    case T_CHAR: {
+      if (memb->arr) {
+        return "_string";
+      } else  if (memb->ptr) {
         if (memb->ptr == 1) {
           return "_string";
         } else {
           return NULL;
         }
-    } else {
-      return "_int8";
+      } else {
+        return "_int8";
+      }
     }
+    case T_INT8: {
+      if (!memb->ptr)
+        return "_int8";
+    }
+    case T_INT16: {
+      if (!memb->ptr)
+        return "_int16";
+    }
+    case T_INT32: {
+      if (!memb->ptr)
+        return "_int32";
+    }
+    case T_INT64: {
+      if (!memb->ptr)
+        return "_int64";
+    }
+    case T_UINT8: {
+      if (!memb->ptr)
+        return "_uint8";
+    }
+    case T_UINT16: {
+      if (!memb->ptr)
+        return "_uint16";
+    }
+    case T_UINT32: {
+      if (!memb->ptr)
+        return "_uint32";
+    }
+    case T_UINT64: {
+      if (!memb->ptr)
+        return "_uint64";
+    }
+    case T_FLOAT: {
+      if (!memb->ptr)
+        return "_float";
+    }
+    case T_DOUBLE: {
+      if (!memb->ptr)
+        return "_double";
+    }
+    default: return NULL;
   }
-
-  return NULL;
 }
 
 static void codegen_ebml_union_content_from_type(struct_data *def, 

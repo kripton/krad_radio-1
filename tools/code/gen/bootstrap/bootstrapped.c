@@ -3,6 +3,18 @@
 
 char *codegen_enum_to_string(cgen_enum val) {
   switch (val) {
+    case CGEN_KR_AUX_INFO_MEMBER:
+      return "kr_aux_info_member";
+    case CGEN_KR_AUX_INFO_PATCH_VALUE:
+      return "kr_aux_info_patch_value";
+    case CGEN_KR_AUX_INFO_PATCH:
+      return "kr_aux_info_patch";
+    case CGEN_KR_AUX_PATH_INFO_MEMBER:
+      return "kr_aux_path_info_member";
+    case CGEN_KR_AUX_PATH_INFO_PATCH_VALUE:
+      return "kr_aux_path_info_patch_value";
+    case CGEN_KR_AUX_PATH_INFO_PATCH:
+      return "kr_aux_path_info_patch";
     case CGEN_KR_AUX_INFO:
       return "kr_aux_info";
     case CGEN_KR_AUX_PATH_INFO:
@@ -563,6 +575,12 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "krad_xmms_St";
     case CGEN_KRAD_Y4M_ST:
       return "krad_y4m_St";
+    case CGEN_KR_XPDR_PATH_INFO_MEMBER:
+      return "kr_xpdr_path_info_member";
+    case CGEN_KR_XPDR_PATH_INFO_PATCH_VALUE:
+      return "kr_xpdr_path_info_patch_value";
+    case CGEN_KR_XPDR_PATH_INFO_PATCH:
+      return "kr_xpdr_path_info_patch";
     case CGEN_KR_ADAPTER_EVENT_TYPE:
       return "kr_adapter_event_type";
     case CGEN_KR_ADAPTER_PATH_EVENT_TYPE:
@@ -606,6 +624,24 @@ char *codegen_enum_to_string(cgen_enum val) {
 }
 
 cgen_enum codegen_string_to_enum(char *string) {
+  if (!strcmp(string,"kr_aux_info_member")) {
+    return CGEN_KR_AUX_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_aux_info_patch_value")) {
+    return CGEN_KR_AUX_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_aux_info_patch")) {
+    return CGEN_KR_AUX_INFO_PATCH;
+  }
+  if (!strcmp(string,"kr_aux_path_info_member")) {
+    return CGEN_KR_AUX_PATH_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_aux_path_info_patch_value")) {
+    return CGEN_KR_AUX_PATH_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_aux_path_info_patch")) {
+    return CGEN_KR_AUX_PATH_INFO_PATCH;
+  }
   if (!strcmp(string,"kr_aux_info")) {
     return CGEN_KR_AUX_INFO;
   }
@@ -1446,6 +1482,15 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"krad_y4m_St")) {
     return CGEN_KRAD_Y4M_ST;
   }
+  if (!strcmp(string,"kr_xpdr_path_info_member")) {
+    return CGEN_KR_XPDR_PATH_INFO_MEMBER;
+  }
+  if (!strcmp(string,"kr_xpdr_path_info_patch_value")) {
+    return CGEN_KR_XPDR_PATH_INFO_PATCH_VALUE;
+  }
+  if (!strcmp(string,"kr_xpdr_path_info_patch")) {
+    return CGEN_KR_XPDR_PATH_INFO_PATCH;
+  }
   if (!strcmp(string,"kr_adapter_event_type")) {
     return CGEN_KR_ADAPTER_EVENT_TYPE;
   }
@@ -1532,6 +1577,12 @@ int codegen_is_union(char *type) {
 }
 
 int codegen_is_enum(char *type) {
+  if (!strcmp(type,"kr_aux_info_member")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_aux_path_info_member")) {
+    return 1;
+  }
   if (!strcmp(type,"kr_alsa_info_member")) {
     return 1;
   }
@@ -1737,6 +1788,9 @@ int codegen_is_enum(char *type) {
     return 1;
   }
   if (!strcmp(type,"krad_xmms_playback_cmd_t")) {
+    return 1;
+  }
+  if (!strcmp(type,"kr_xpdr_path_info_member")) {
     return 1;
   }
   if (!strcmp(type,"kr_adapter_event_type")) {

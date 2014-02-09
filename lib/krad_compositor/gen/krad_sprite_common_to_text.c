@@ -15,6 +15,8 @@ int kr_sprite_info_to_text(char *text, void *st, int32_t max) {
   indent[depth_state*2] = '\0';
   res += snprintf(&text[res],max-res,"%sfilename: %s \n",indent,actual->filename);
   res += snprintf(&text[res],max-res,"%srate: %d \n",indent,actual->rate);
+  res += snprintf(&text[res],max-res,"%sw: %d \n",indent,actual->w);
+  res += snprintf(&text[res],max-res,"%sh: %d \n",indent,actual->h);
 
   return res;
 }

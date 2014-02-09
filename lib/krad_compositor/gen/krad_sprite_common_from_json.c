@@ -67,6 +67,42 @@ int kr_sprite_info_fr_json(char *json, void *st) {
   actual->rate = atoi(&json[tokens[k].start]);
   k++;
 
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -3;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"w",1)) {
+    return -3;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -3;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->w = atoi(&json[tokens[k].start]);
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_STRING) {
+    return -4;
+  }
+  json[tokens[k].end] = '\0';
+  if (strncmp(&json[tokens[k].start],"h",1)) {
+    return -4;
+  }
+
+  k++;
+
+  if (ntokens > k && tokens[k].type != JSMN_PRIMITIVE) {
+    return -4;
+  }
+
+  json[tokens[k].end] = '\0';
+  actual->h = atoi(&json[tokens[k].start]);
+  k++;
+
   res = k;
 
   return res;

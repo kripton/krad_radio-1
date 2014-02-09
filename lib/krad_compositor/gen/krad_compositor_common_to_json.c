@@ -43,6 +43,10 @@ int kr_rect_to_json(char *json, void *st, int32_t max) {
 
   actual = (struct kr_rect *)st;
   res += snprintf(&json[res],max-res,"{");
+  res += snprintf(&json[res],max-res,"\"x\" : %d,",actual->x);
+  res += snprintf(&json[res],max-res,"\"y\" : %d,",actual->y);
+  res += snprintf(&json[res],max-res,"\"w\" : %d,",actual->w);
+  res += snprintf(&json[res],max-res,"\"h\" : %d",actual->h);
   res += snprintf(&json[res],max-res,"}");
 
   return res;
@@ -58,6 +62,8 @@ int kr_compositor_output_info_to_json(char *json, void *st, int32_t max) {
 
   actual = (struct kr_compositor_output_info *)st;
   res += snprintf(&json[res],max-res,"{");
+  res += snprintf(&json[res],max-res,"\"w\" : %d,",actual->w);
+  res += snprintf(&json[res],max-res,"\"h\" : %d,",actual->h);
   res += snprintf(&json[res],max-res,"\"opacity\" : %0.2f",actual->opacity);
   res += snprintf(&json[res],max-res,"}");
 
@@ -124,6 +130,8 @@ int kr_compositor_source_info_to_json(char *json, void *st, int32_t max) {
 
   actual = (struct kr_compositor_source_info *)st;
   res += snprintf(&json[res],max-res,"{");
+  res += snprintf(&json[res],max-res,"\"w\" : %d,",actual->w);
+  res += snprintf(&json[res],max-res,"\"h\" : %d",actual->h);
   res += snprintf(&json[res],max-res,"}");
 
   return res;

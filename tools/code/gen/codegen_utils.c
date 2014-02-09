@@ -10,56 +10,56 @@ int memb_struct_check(member_info *memb) {
 
 int memb_to_print_format(member_info *memb, char *code) {
 
-  char *type;
-
-  type = member_type_to_str(memb->type);
-
-  if (!strcmp(type,"int") || !strncmp(type,"int32_t",7)) {
-    strncpy(code,"%d",2);
-    code[2] = '\0';
-    return 1;
-  }
-
-  if (!strcmp(type,"uint") || !strncmp(type,"uint32_t",8)) {
-    strncpy(code,"%u",2);
-    code[2] = '\0';
-    return 1;
-  }
-
-  if (!strncmp(type,"int64_t",7)) {
-    strncpy(code,"%jd",3);
-    code[3] = '\0';
-    return 1;
-  }
-
-  if (!strncmp(type,"uint64_t",8)) {
-    strncpy(code,"%ju",3);
-    code[3] = '\0';
-    return 1;
-  }
-
-  if (!strncmp(type,"float",5) || !strncmp(type,"double",6)) {
-    strncpy(code,"%0.2f",5);
-    code[5] = '\0';
-    return 1;
-  }
-
-  if (!strncmp(type,"char",4)) {
-    if (memb->arr) {
-      strncpy(code,"%s",2);
-      code[2] = '\0';
-      return 1;
-    } else  if (memb->ptr) {
+  switch (memb->type) {
+    case T_CHAR: {
+      if (memb->arr) {
+        strncpy(code,"%s",2);
+        code[2] = '\0';
+        return 1;
+      } else  if (memb->ptr) {
         if (memb->ptr == 1) {
           strncpy(code,"%s",2);
           code[2] = '\0';
         } else {
           return 0;
         }
-    } else {
-      strncpy(code,"%c",2);
-      code[2] = '\0';
+      } else {
+        strncpy(code,"%c",2);
+        code[2] = '\0';
+      }
+      return 1;
     }
+    case T_INT8:
+    case T_INT16:
+    case T_INT32: {
+      strncpy(code,"%d",2);
+      code[2] = '\0';
+      return 1;
+    }
+    case T_INT64: {
+      strncpy(code,"%jd",3);
+      code[3] = '\0';
+      return 1;
+    }
+    case T_UINT8:
+    case T_UINT16:
+    case T_UINT32: {
+      strncpy(code,"%u",2);
+      code[2] = '\0';
+      return 1;
+    }
+    case T_UINT64: {
+      strncpy(code,"%ju",3);
+      code[3] = '\0';
+      return 1;
+    }
+    case T_FLOAT:
+    case T_DOUBLE: {
+      strncpy(code,"%0.2f",5);
+      code[5] = '\0';
+      return 1;
+    }
+    default: return 0;
   }
 
   return 0;

@@ -38,6 +38,10 @@ int kr_rect_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_rect *)st;
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->x);
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->y);
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->w);
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->h);
 
   return res;
 }
@@ -51,6 +55,8 @@ int kr_compositor_output_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_compositor_output_info *)st;
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->w);
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->h);
   res += kr_ebml2_unpack_element_float(ebml, NULL, &actual->opacity);
 
   return res;
@@ -105,6 +111,8 @@ int kr_compositor_source_info_fr_ebml(kr_ebml *ebml, void *st) {
   }
 
   actual = (struct kr_compositor_source_info *)st;
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->w);
+  res += kr_ebml2_unpack_element_int16(ebml, NULL, &actual->h);
 
   return res;
 }

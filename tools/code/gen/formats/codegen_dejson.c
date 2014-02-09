@@ -22,47 +22,13 @@ static char *memb_to_json_type(member_info *memb) {
 }
 
 static char *memb_type_to_fun(member_info *memb, char *str, char *array) {
-
-  char *type;
-
-  type = member_type_to_str(memb->type);
-
-  if (!strcmp(type,"int") || !strncmp(type,"int32_t",7)) {
-    if (!memb->ptr)
-      sprintf(str,"actual->%s%s = atoi(&json[tokens[k].start]);",memb->name,array);
-      return str;
-  }
-
-  if (!strcmp(type,"uint") || !strncmp(type,"uint32_t",8)) {
-    if (!memb->ptr)
-      sprintf(str,"actual->%s%s = atoi(&json[tokens[k].start]);",memb->name,array);
-      return str;
-  }
-
-  if (!strncmp(type,"int64_t",7)) {
-    if (!memb->ptr)
-      sprintf(str,"actual->%s%s = atoi(&json[tokens[k].start]);",memb->name,array);
-      return str;
-  }
-
-  if (!strncmp(type,"uint64_t",8)) {
-    if (!memb->ptr)
-      sprintf(str,"actual->%s%s = atoi(&json[tokens[k].start]);",memb->name,array);
-      return str;
-  }
-
-  if (!strncmp(type,"float",5)) {
-    if (!memb->ptr)
-      sprintf(str,"actual->%s%s = atof(&json[tokens[k].start]);",memb->name,array);
-      return str;
-  }
-
-  if (!strncmp(type,"char",4)) {
-    if (memb->arr) {
-      sprintf(str,"snprintf(actual->%s%s, sizeof(actual->%s%s), \"%%s\", &json[tokens[k].start]);",
-        memb->name,array,memb->name,array);
-      return str;
-    } else  if (memb->ptr) {
+  switch (memb->type) {
+    case T_CHAR: {
+      if (memb->arr) {
+        sprintf(str,"snprintf(actual->%s%s, sizeof(actual->%s%s), \"%%s\", &json[tokens[k].start]);",
+          memb->name,array,memb->name,array);
+        return str;
+      } else  if (memb->ptr) {
         if (memb->ptr == 1) {
           sprintf(str,"actual->%s%s = strdup(&json[tokens[k].start]);",memb->name,array);
           return str;
@@ -70,12 +36,31 @@ static char *memb_type_to_fun(member_info *memb, char *str, char *array) {
           str[0] = '\0';
           return str;
         }
-    } else {
-      sprintf(str,"actual->%s%s = atoi(&json[tokens[k].start]);",memb->name,array);
-      return str;
+      } else {
+        sprintf(str,"actual->%s%s = atoi(&json[tokens[k].start]);",memb->name,array);
+        return str;
+      }
     }
+    case T_INT8:
+    case T_INT16:
+    case T_INT32:
+    case T_INT64:
+    case T_UINT8:
+    case T_UINT16:
+    case T_UINT32:
+    case T_UINT64: {
+      if (!memb->ptr)
+        sprintf(str,"actual->%s%s = atoi(&json[tokens[k].start]);",memb->name,array);
+        return str;
+    }
+    case T_FLOAT:
+    case T_DOUBLE: {
+      if (!memb->ptr)
+        sprintf(str,"actual->%s%s = atof(&json[tokens[k].start]);",memb->name,array);
+        return str;
+    }
+    default: break;
   }
-
   str[0] = '\0';
   return str;
 }

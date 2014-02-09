@@ -12,6 +12,8 @@ int kr_sprite_info_to_ebml(kr_ebml *ebml, void *st) {
   actual = (struct kr_sprite_info *)st;
   res += kr_ebml_pack_string(ebml, 0xe1, actual->filename);
   res += kr_ebml_pack_int32(ebml, 0xe1, actual->rate);
+  res += kr_ebml_pack_int16(ebml, 0xe1, actual->w);
+  res += kr_ebml_pack_int16(ebml, 0xe1, actual->h);
 
   return res;
 }
