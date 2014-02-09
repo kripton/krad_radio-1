@@ -284,7 +284,7 @@ static int path_create(kr_xpdr_path *path) {
   return -1;
 }
 
-int kr_xpdr_path_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
+int kr_xpdr_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
   int ret;
   if ((path == NULL) || (patch == NULL)) return -1;
   printk("XPDR: control");
@@ -292,12 +292,12 @@ int kr_xpdr_path_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
   return ret;
 }
 
-int kr_xpdr_unlink(kr_xpdr_path *path) {
+int kr_xpdr_remove(kr_xpdr_path *path) {
   kr_xpdr *xpdr;
   kr_xpdr_event event;
   if (path == NULL) return -1;
   xpdr = path->xpdr;
-  printk("XPDR: unlink");
+  printk("XPDR: remove");
   path_destroy(path);
   event.user = path->xpdr->user;
   event.user_path = path->user;
@@ -309,24 +309,30 @@ int kr_xpdr_unlink(kr_xpdr_path *path) {
   return -1;
 }
 
-int kr_xpdr_mkpath(kr_xpdr *x, kr_xpdr_path_info *i, void *p) {
+int kr_xpdr_link(kr_xpdr *xpdr, kr_xpdr_path_info *info, void *user) {
+  if ((xpdr == NULL) || (info == NULL)) return -1;
+  printke("Coming soon!");
+  return -1;
+}
+
+int kr_xpdr_open(kr_xpdr *xpdr, kr_xpdr_path_info *info, void *user) {
   char string[8192];
-  kr_xpdr_path_info_to_text(string, i, sizeof(string));
+  kr_xpdr_path_info_to_text(string, info, sizeof(string));
   printk("XPDR: mkpath-\n%s", string);
   int ret;
   kr_xpdr_path *path;
   kr_xpdr_event event;
-  if ((x == NULL) || (i == NULL)) return -1;
+  if ((xpdr == NULL) || (info == NULL)) return -1;
   /*if (path_info_check(i)) return -2;*/
-  path = kr_pool_slice(x->path_pool);
+  path = kr_pool_slice(xpdr->path_pool);
   if (path == NULL) return -3;
-  path->info = *i;
-  path->xpdr = x;
-  path->user = p;
+  path->info = *info;
+  path->xpdr = xpdr;
+  path->user = user;
   printk("XPDR: mkpath");
   ret = path_create(path);
   if (ret) {
-    kr_pool_recycle(x->path_pool, path);
+    kr_pool_recycle(xpdr->path_pool, path);
     return -4;
   }
   event.user = path->xpdr->user;
@@ -349,11 +355,11 @@ int kr_xpdr_destroy(kr_xpdr *xpdr) {
   i = 0;
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
     if (path->type == ADAPTER_CTX) continue;
-    ret = kr_xpdr_unlink(path);
+    ret = kr_xpdr_remove(path);
     if (ret) printke("XPDR: Failure removing an adapter context");
   }
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
-    ret = kr_xpdr_unlink(path);
+    ret = kr_xpdr_remove(path);
     if (ret) printke("XPDR: Failure removing an adapter path");
   }
   kr_pool_destroy(xpdr->path_pool);

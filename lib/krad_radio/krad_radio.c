@@ -154,10 +154,10 @@ static int setup_maps(kr_radio *radio) {
   setup.prefix = "/xpdr";
   setup.ptr = radio->xpdr;
   setup.payload_type = PL_KR_XPDR_PATH_INFO;
-  setup.create = (kr_router_map_create_handler *)kr_xpdr_mkpath;
-  setup.connect = NULL;
-  setup.patch = (kr_router_map_patch_handler *)kr_xpdr_path_ctl;
-  setup.destroy = (kr_router_map_destroy_handler *)kr_xpdr_unlink;
+  setup.create = (kr_router_map_create_handler *)kr_xpdr_open;
+  setup.connect = (kr_router_map_connect_handler *)kr_xpdr_link;
+  setup.patch = (kr_router_map_patch_handler *)kr_xpdr_ctl;
+  setup.destroy = (kr_router_map_destroy_handler *)kr_xpdr_remove;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {
     printke("Radio: router map was null");
