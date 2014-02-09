@@ -8,10 +8,10 @@
 typedef struct kr_compositor_path kr_compositor_path;
 
 int kr_compositor_process(kr_compositor_path *path);
-int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch);
-int kr_compositor_unlink(kr_compositor_path *path);
-int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user);
-int kr_compositor_mkinput(kr_compositor_path *output, kr_compositor_path *from,
+int kr_compositor_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch);
+int kr_compositor_remove(kr_compositor_path *path);
+int kr_compositor_bus(kr_compositor *c, kr_compositor_path_info *i, void *user);
+int kr_compositor_link(kr_compositor_path *output, kr_compositor_path *from,
   kr_compositor_path_info *info, void *user);
 int kr_compositor_path_info_get(kr_compositor_path *path,
  kr_compositor_path_info *info);

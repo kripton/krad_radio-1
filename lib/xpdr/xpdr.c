@@ -130,7 +130,7 @@ static void path_io_destroy(path_io *io, path_io_type type) {
       kr_mixer_remove(io->mixer_path);
       break;
     case COMPOSITOR:
-      kr_compositor_unlink(io->compositor_path);
+      kr_compositor_remove(io->compositor_path);
       break;
   }
 }
@@ -142,7 +142,7 @@ static void path_io_create(kr_xpdr_path *path) {
   kr_compositor *compositor;
   /*kr_adapter *adapter;*/
   kr_mixer_port_setup mp_setup;
-  kr_compositor_io_path_setup cp_setup;
+  kr_compositor_port_setup cp_setup;
   mixer = path->xpdr->mixer;
   compositor = path->xpdr->compositor;
   if (path->output.exists) {
@@ -191,7 +191,7 @@ static void path_io_create(kr_xpdr_path *path) {
       cp_setup.frame_cb = compositor_frame;
       cp_setup.frame_user = path;
       cp_setup.control_user = path->user;
-      io->compositor_path = kr_compositor_mkso(compositor, &cp_setup);
+      io->compositor_path = kr_compositor_port(compositor, &cp_setup);
       if (io->compositor_path == NULL) {
         printke("compositor mkpath returned NULL");
       }

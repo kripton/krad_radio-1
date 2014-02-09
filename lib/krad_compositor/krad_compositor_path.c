@@ -172,7 +172,7 @@ int kr_compositor_process(kr_compositor_path *path) {
   return 0;
 }
 
-int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch) {
+int kr_compositor_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch) {
   int ret;
   if ((path == NULL) || (patch == NULL)) return -1;
   ret = kr_compositor_path_info_patch_apply(&path->info, patch);
@@ -235,14 +235,14 @@ int kr_compositor_path_ctl(kr_compositor_path *path, kr_compositor_path_info_pat
   return ret;
 }
 
-int kr_compositor_unlink(kr_compositor_path *path) {
+int kr_compositor_remove(kr_compositor_path *path) {
   if (path == NULL) return -1;
   /*FIXME*/
   /* do destroy event callback */
   return 0;
 }
 
-int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
+int kr_compositor_bus(kr_compositor *c, kr_compositor_path_info *i, void *user) {
   kr_compositor_path *path;
   kr_compositor_path_setup setup;
   if ((c == NULL) || (i == NULL) || (user == NULL)) return -1;
@@ -255,18 +255,18 @@ int kr_compositor_mkbus(kr_compositor *c, kr_compositor_path_info *i, void *user
   return 0;
 }
 
-kr_compositor_path *kr_compositor_mkso(kr_compositor *com,
- kr_compositor_io_path_setup *io_setup) {
+kr_compositor_path *kr_compositor_port(kr_compositor *com,
+ kr_compositor_port_setup *port_setup) {
   kr_compositor_path_setup setup;
-  if ((com == NULL) || (io_setup == NULL)) return NULL;
-  setup.info = &io_setup->info;
-  setup.control_user = io_setup->control_user;
-  setup.frame_user = io_setup->frame_user;
-  setup.frame_cb = io_setup->frame_cb;
+  if ((com == NULL) || (port_setup == NULL)) return NULL;
+  setup.info = &port_setup->info;
+  setup.control_user = port_setup->control_user;
+  setup.frame_user = port_setup->frame_user;
+  setup.frame_cb = port_setup->frame_cb;
   return path_create(com, &setup);
 }
 
-int kr_compositor_mkinput(kr_compositor_path *to, kr_compositor_path *fr,
+int kr_compositor_link(kr_compositor_path *to, kr_compositor_path *fr,
   kr_compositor_path_info *info, void *user) {
   kr_compositor_path_setup setup;
   kr_compositor_path *path;

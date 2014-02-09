@@ -142,10 +142,10 @@ static int setup_maps(kr_radio *radio) {
   setup.prefix = "/compositor";
   setup.ptr = radio->compositor;
   setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
-  setup.create = (kr_router_map_create_handler *)kr_compositor_mkbus;
-  setup.connect = (kr_router_map_connect_handler *)kr_compositor_mkinput;
-  setup.patch = (kr_router_map_patch_handler *)kr_compositor_path_ctl;
-  setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_unlink;
+  setup.create = (kr_router_map_create_handler *)kr_compositor_bus;
+  setup.connect = (kr_router_map_connect_handler *)kr_compositor_link;
+  setup.patch = (kr_router_map_patch_handler *)kr_compositor_ctl;
+  setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_remove;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {
     printke("Radio: router map was null");
