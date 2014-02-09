@@ -1,13 +1,6 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <math.h>
-#include <inttypes.h>
-
 #include "krad_system.h"
 #include "krad_av.h"
+#include "kr_adapter.h"
 
 #define KRAD_DECKLINK_H
 #include "krad_decklink_capture.h"

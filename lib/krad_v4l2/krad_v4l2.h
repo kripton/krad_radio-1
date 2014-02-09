@@ -42,11 +42,11 @@ int kr_v4l2_stat(kr_v4l2 *v4l2, kr_v4l2_info **info);
 int kr_v4l2_destroy(kr_v4l2 *v4l2);
 kr_v4l2 *kr_v4l2_create(kr_v4l2_setup *setup);
 
-int kr_v4l2_pctl(kr_adapter_path *, kr_patchset *);
-int kr_v4l2_rmpath(kr_adapter_path *);
-kr_adapter_path *kr_v4l2_mkpath(kr_adapter *, kr_adapter_path_setup *);
+int kr_v4l2_lctl(kr_adapter_path *, kr_patchset *);
+int kr_v4l2_unlink(kr_adapter_path *);
+kr_adapter_path *kr_v4l2_link(kr_adapter *, kr_adapter_path_setup *);
 int kr_v4l2_ctl(kr_adapter *, kr_patchset *);
-/*int kr_v4l2_destroy(kr_adapter *);*/
-kr_adapter *kr_aux_create(kr_adapter_setup *);
+int kr_v4l2_close(kr_adapter *);
+kr_adapter *kr_v4l2_open(kr_adapter_setup *);
 
 #endif

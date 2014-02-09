@@ -20,8 +20,8 @@ static int xioctl(int fd, int request, void *arg);
 static int kr_v4l2_buf_release(void *ptr);
 static void kr_v4l2_unmap(kr_v4l2 *v4l2);
 static void kr_v4l2_map(kr_v4l2 *v4l2);
-static void kr_v4l2_close(kr_v4l2 *v4l2);
-static void kr_v4l2_open(kr_v4l2 *v4l2);
+static void v4l2_close(kr_v4l2 *v4l2);
+static void v4l2_open(kr_v4l2 *v4l2);
 
 static int xioctl(int fd, int request, void *arg) {
   int r;
@@ -236,7 +236,7 @@ int kr_v4l2_mode_set(kr_v4l2 *v4l2, kr_v4l2_mode *mode) {
   return 0;
 }
 
-static void kr_v4l2_close(kr_v4l2 *v4l2) {
+static void v4l2_close(kr_v4l2 *v4l2) {
   if (v4l2->fd > -1) {
     kr_v4l2_unmap(v4l2);
     close(v4l2->fd);
@@ -245,7 +245,7 @@ static void kr_v4l2_close(kr_v4l2 *v4l2) {
   }
 }
 
-static void kr_v4l2_open(kr_v4l2 *v4l2) {
+static void v4l2_open(kr_v4l2 *v4l2) {
   struct stat st;
   char device[128];
   struct v4l2_capability cap;
@@ -267,17 +267,17 @@ static void kr_v4l2_open(kr_v4l2 *v4l2) {
   }
   if (-1 == xioctl(v4l2->fd, VIDIOC_QUERYCAP, &cap)) {
     printke("Krad V4L2: VIDIOC_QUERYCAP");
-    kr_v4l2_close(v4l2);
+    v4l2_close(v4l2);
     return;
   } else {
     if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
       printke("Krad V4L2: %s is no video capture device", device);
-      kr_v4l2_close(v4l2);
+      v4l2_close(v4l2);
       return;
     }
     if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
       printke("Krad V4L2: %s does not support streaming i/o", device);
-      kr_v4l2_close(v4l2);
+      v4l2_close(v4l2);
       return;
     }
   }
@@ -286,7 +286,7 @@ static void kr_v4l2_open(kr_v4l2 *v4l2) {
 
 int kr_v4l2_destroy(kr_v4l2 *v4l2) {
   if (v4l2 == NULL) return -1;
-  kr_v4l2_close(v4l2);
+  v4l2_close(v4l2);
   free(v4l2);
   return 0;
 }
@@ -297,6 +297,45 @@ kr_v4l2 *kr_v4l2_create(kr_v4l2_setup *setup) {
   v4l2 = kr_allocz(1, sizeof(kr_v4l2));
   v4l2->info.dev = setup->dev;
   v4l2->info.priority = setup->priority;
-  kr_v4l2_open(v4l2);
+  v4l2_open(v4l2);
   return v4l2;
+}
+
+int kr_v4l2_lctl(kr_adapter_path *path, kr_patchset *patchset) {
+  if (path == NULL) return -1;
+  if (patchset == NULL) return -2;
+  printk("V4L2 adapter path controlled");
+  return 0;
+}
+
+int kr_v4l2_unlink(kr_adapter_path *path) {
+  if (path == NULL) return -1;
+  printk("V4L2 adapter path removed");
+  return 0;
+}
+
+kr_adapter_path *kr_v4l2_link(kr_adapter *adp, kr_adapter_path_setup *setup) {
+  if (adp == NULL) return NULL;
+  if (setup == NULL) return NULL;
+  printk("V4L2 adapter path created");
+  return NULL;
+}
+
+int kr_v4l2_ctl(kr_adapter *adp, kr_patchset *patchset) {
+  if (adp == NULL) return -1;
+  if (patchset == NULL) return -2;
+  printk("V4L2 adapter controlled");
+  return 0;
+}
+
+int kr_v4l2_close(kr_adapter *adp) {
+  if (adp == NULL) return -1;
+  printk("V4L2 adapter closed");
+  return 0;
+}
+
+kr_adapter *kr_v4l2_open(kr_adapter_setup *setup) {
+  if (setup == NULL) return NULL;
+  printk("V4L2 adapter opened");
+  return NULL;
 }

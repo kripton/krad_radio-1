@@ -1,3 +1,16 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <math.h>
+#include <inttypes.h>
+#include <stdbool.h>
+#include <sys/mman.h>
+#include <signal.h>
+#include <wayland-client.h>
+#include <xkbcommon/xkbcommon.h>
+#include "krad_system.h"
 #include "krad_wayland.h"
 
 struct kr_wayland_path {
@@ -860,4 +873,43 @@ kr_wayland *kr_wayland_create(kr_wayland_setup *setup) {
   wl_display_roundtrip(wayland->display);
   wayland->display_fd = wl_display_get_fd(wayland->display);
   return wayland;
+}
+
+int kr_wl_lctl(kr_adapter_path *path, kr_patchset *patchset) {
+  if (path == NULL) return -1;
+  if (patchset == NULL) return -2;
+  printk("Wayland window controlled");
+  return 0;
+}
+
+int kr_wl_unlink(kr_adapter_path *path) {
+  if (path == NULL) return -1;
+  printk("Wayland window removed");
+  return 0;
+}
+
+kr_adapter_path *kr_wl_link(kr_adapter *adp, kr_adapter_path_setup *setup) {
+  if (adp == NULL) return NULL;
+  if (setup == NULL) return NULL;
+  printk("Wayland window created");
+  return NULL;
+}
+
+int kr_wl_ctl(kr_adapter *adp, kr_patchset *patchset) {
+  if (adp == NULL) return -1;
+  if (patchset == NULL) return -2;
+  printk("Wayland adapter controlled");
+  return 0;
+}
+
+int kr_wl_close(kr_adapter *adp) {
+  if (adp == NULL) return -1;
+  printk("Wayland adapter closed");
+  return 0;
+}
+
+kr_adapter *kr_wl_open(kr_adapter_setup *setup) {
+  if (setup == NULL) return NULL;
+  printk("Wayland adapter opened");
+  return NULL;
 }

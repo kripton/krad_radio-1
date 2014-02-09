@@ -167,8 +167,8 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_compositor_path_info";
     case CGEN_KR_FRAME_EVENT:
       return "kr_frame_event";
-    case CGEN_KR_COMPOSITOR_IO_PATH_SETUP:
-      return "kr_compositor_io_path_setup";
+    case CGEN_KR_COMPOSITOR_PORT_SETUP:
+      return "kr_compositor_port_setup";
     case CGEN_KR_CROP:
       return "kr_crop";
     case CGEN_KR_CONVERT:
@@ -301,8 +301,8 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_mixer_event";
     case CGEN_KR_AUDIO_EVENT:
       return "kr_audio_event";
-    case CGEN_KR_MIXER_IO_PATH_SETUP:
-      return "kr_mixer_io_path_setup";
+    case CGEN_KR_MIXER_PORT_SETUP:
+      return "kr_mixer_port_setup";
     case CGEN_KR_MIXER_SETUP:
       return "kr_mixer_setup";
     case CGEN_KR_MIXER_CHANNELS:
@@ -870,8 +870,8 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_frame_event")) {
     return CGEN_KR_FRAME_EVENT;
   }
-  if (!strcmp(string,"kr_compositor_io_path_setup")) {
-    return CGEN_KR_COMPOSITOR_IO_PATH_SETUP;
+  if (!strcmp(string,"kr_compositor_port_setup")) {
+    return CGEN_KR_COMPOSITOR_PORT_SETUP;
   }
   if (!strcmp(string,"kr_crop")) {
     return CGEN_KR_CROP;
@@ -1071,8 +1071,8 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_audio_event")) {
     return CGEN_KR_AUDIO_EVENT;
   }
-  if (!strcmp(string,"kr_mixer_io_path_setup")) {
-    return CGEN_KR_MIXER_IO_PATH_SETUP;
+  if (!strcmp(string,"kr_mixer_port_setup")) {
+    return CGEN_KR_MIXER_PORT_SETUP;
   }
   if (!strcmp(string,"kr_mixer_setup")) {
     return CGEN_KR_MIXER_SETUP;

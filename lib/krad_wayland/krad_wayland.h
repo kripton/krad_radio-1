@@ -1,18 +1,5 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <math.h>
 #include <inttypes.h>
-#include <stdbool.h>
-#include <sys/mman.h>
-#include <signal.h>
-
-#include <wayland-client.h>
-#include <xkbcommon/xkbcommon.h>
-
-#include "krad_system.h"
+#include "kr_adapter.h"
 #include "krad_wayland_common.h"
 
 #ifndef KRAD_WAYLAND_H
@@ -72,5 +59,12 @@ int kr_wayland_get_fd(kr_wayland *wayland);
 int kr_wayland_process(kr_wayland *wayland);
 int kr_wayland_destroy(kr_wayland **wl);
 kr_wayland *kr_wayland_create(kr_wayland_setup *setup);
+
+int kr_wl_lctl(kr_adapter_path *, kr_patchset *);
+int kr_wl_unlink(kr_adapter_path *);
+kr_adapter_path *kr_wl_link(kr_adapter *, kr_adapter_path_setup *);
+int kr_wl_ctl(kr_adapter *, kr_patchset *);
+int kr_wl_close(kr_adapter *);
+kr_adapter *kr_wl_open(kr_adapter_setup *);
 
 #endif
