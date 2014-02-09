@@ -130,10 +130,10 @@ static int setup_maps(kr_radio *radio) {
   setup.prefix = "/mixer";
   setup.ptr = radio->mixer;
   setup.payload_type = PL_KR_MIXER_PATH_INFO;
-  setup.create = (kr_router_map_create_handler *)kr_mixer_mkbus;
-  setup.connect = (kr_router_map_connect_handler *)kr_mixer_mkinput;
-  setup.patch = (kr_router_map_patch_handler *)kr_mixer_path_ctl;
-  setup.destroy = (kr_router_map_destroy_handler *)kr_mixer_unlink;
+  setup.create = (kr_router_map_create_handler *)kr_mixer_bus;
+  setup.connect = (kr_router_map_connect_handler *)kr_mixer_link;
+  setup.patch = (kr_router_map_patch_handler *)kr_mixer_ctl;
+  setup.destroy = (kr_router_map_destroy_handler *)kr_mixer_remove;
   map = kr_app_server_map_create(radio->app, &setup);
   if (map == NULL) {
     printke("Radio: router map was null");

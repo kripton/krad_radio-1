@@ -374,7 +374,7 @@ static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {
   return path;
 }
 
-int kr_mixer_path_ctl(kr_mixer_path *path, kr_mixer_path_info_patch *patch) {
+int kr_mixer_ctl(kr_mixer_path *path, kr_mixer_path_info_patch *patch) {
   int ret;
   if ((path == NULL) || (patch == NULL)) return -1;
   ret = kr_mixer_path_info_patch_apply(&path->info, patch);
@@ -408,10 +408,10 @@ int kr_mixer_path_info_get(kr_mixer_path *path, kr_mixer_path_info *info) {
   return 0;
 }
 
-int kr_mixer_unlink(kr_mixer_path *path) {
+int kr_mixer_remove(kr_mixer_path *path) {
   kr_mixer_event event;
   if (path == NULL) {
-    printke("mixer path unlink called with null value");
+    printke("mixer path remove called with null value");
     return -1;
   }
   event.user = path->mixer->user;
@@ -428,7 +428,7 @@ int kr_mixer_unlink(kr_mixer_path *path) {
   return 0;
 }
 
-kr_mixer_path *kr_mixer_mkso(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
+kr_mixer_path *kr_mixer_port(kr_mixer *mixer, kr_mixer_port_setup *setup) {
   kr_mixer_path_setup path_setup;
   if ((mixer == NULL) || (setup == NULL)) return NULL;
   path_setup.info = &setup->info;
@@ -438,7 +438,7 @@ kr_mixer_path *kr_mixer_mkso(kr_mixer *mixer, kr_mixer_io_path_setup *setup) {
   return path_create(mixer, &path_setup);
 }
 
-int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
+int kr_mixer_bus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
   kr_mixer_path *path;
   kr_mixer_path_setup setup;
   if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
@@ -451,7 +451,7 @@ int kr_mixer_mkbus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
   return 0;
 }
 
-int kr_mixer_mkinput(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user) {
+int kr_mixer_link(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user) {
   kr_mixer_path *path;
   kr_mixer_path_setup setup;
   if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
@@ -473,7 +473,7 @@ int kr_mixer_destroy(kr_mixer *mixer) {
   i = 0;
   while ((path = kr_pool_iterate_active(mixer->path_pool, &i))) {
     if (path->state != KR_MXP_NIL) {
-      kr_mixer_unlink(path);
+      kr_mixer_remove(path);
     }
   }
   kr_graph_destroy(mixer->graph);
