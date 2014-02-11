@@ -24,7 +24,7 @@ typedef struct {
   kr_audio_cb *audio_cb;
   kr_mixer_path *from;
   kr_mixer_path *to;
-} kr_mixer_path_setup;
+} mixer_path_setup;
 
 struct kr_mixer_path {
   kr_mixer_path_type type;
@@ -55,12 +55,12 @@ static void transport(kr_mixer_path *path);
 static void update_state(kr_mixer *mixer);
 static void path_release(kr_mixer_path *path);
 static int path_info_check(kr_mixer_path_info *info);
-static int path_setup_check(kr_mixer_path_setup *setup);
+static int path_setup_check(mixer_path_setup *setup);
 static void path_sfx_create(kr_mixer_path *path);
 static kr_vertex_type path_vertex_type(kr_mixer_path_type type);
 static int kr_mixer_process_path(kr_mixer_path *path);
-static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup);
-static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup);
+static void path_setup(kr_mixer_path *path, mixer_path_setup *setup);
+static kr_mixer_path *path_create(kr_mixer *mixer, mixer_path_setup *setup);
 
 static kr_vertex_type path_vertex_type(kr_mixer_path_type type) {
   switch (type) {
@@ -281,7 +281,7 @@ static int path_info_check(kr_mixer_path_info *info) {
   return 0;
 }
 
-static int path_setup_check(kr_mixer_path_setup *setup) {
+static int path_setup_check(mixer_path_setup *setup) {
   if ((setup->info->type == KR_MXR_INPUT)
    || (setup->info->type == KR_MXR_BUS)) {
     if (setup->audio_cb != NULL) return -1;
@@ -321,7 +321,7 @@ static void path_sfx_create(kr_mixer_path *path) {
   kr_sfx_ctl(path->sfx, &cmd);
 }
 
-static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
+static void path_setup(kr_mixer_path *path, mixer_path_setup *setup) {
   int c;
   kr_mixer_event event;
   path->channels = setup->info->channels;
@@ -343,7 +343,7 @@ static void path_setup(kr_mixer_path *path, kr_mixer_path_setup *setup) {
   path->control_user = event.user_path;
 }
 
-static kr_mixer_path *path_create(kr_mixer *mixer, kr_mixer_path_setup *setup) {
+static kr_mixer_path *path_create(kr_mixer *mixer, mixer_path_setup *setup) {
   int ret;
   kr_mixer_path *path;
   kr_vertex_type vertex_type;
@@ -429,7 +429,7 @@ int kr_mixer_remove(kr_mixer_path *path) {
 }
 
 kr_mixer_path *kr_mixer_port(kr_mixer *mixer, kr_mixer_port_setup *setup) {
-  kr_mixer_path_setup path_setup;
+  mixer_path_setup path_setup;
   if ((mixer == NULL) || (setup == NULL)) return NULL;
   path_setup.info = &setup->info;
   path_setup.control_user = setup->control_user;
@@ -440,7 +440,7 @@ kr_mixer_path *kr_mixer_port(kr_mixer *mixer, kr_mixer_port_setup *setup) {
 
 int kr_mixer_bus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
   kr_mixer_path *path;
-  kr_mixer_path_setup setup;
+  mixer_path_setup setup;
   if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
   setup.info = info;
   setup.control_user = user;
@@ -453,7 +453,7 @@ int kr_mixer_bus(kr_mixer *mixer, kr_mixer_path_info *info, void *user) {
 
 int kr_mixer_link(kr_mixer *mixer, kr_mixer_path_info *info, kr_mixer_path *from, kr_mixer_path *to, void *user) {
   kr_mixer_path *path;
-  kr_mixer_path_setup setup;
+  mixer_path_setup setup;
   if ((mixer == NULL) || (info == NULL) || (user == NULL)) return -1;
   setup.info = info;
   setup.control_user = user;

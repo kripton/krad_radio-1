@@ -7,6 +7,8 @@
 #include "krad_router.h"
 #include "krad_timer.h"
 
+/* kradradio! */
+
 struct kr_radio {
   kr_mixer *mixer;
   kr_compositor *compositor;

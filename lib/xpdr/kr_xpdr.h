@@ -37,7 +37,7 @@ struct kr_xpdr_setup {
 
 int kr_xpdr_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch);
 int kr_xpdr_remove(kr_xpdr_path *path);
-int kr_xpdr_link(kr_xpdr *xpdr, kr_xpdr_path_info *info, void *user);
+int kr_xpdr_link(kr_xpdr_path *path, kr_xpdr_path_info *info, void *user);
 int kr_xpdr_open(kr_xpdr *xpdr, kr_xpdr_path_info *info, void *user);
 int kr_xpdr_destroy(kr_xpdr *xpdr);
 kr_xpdr *kr_xpdr_create(kr_xpdr_setup *setup);
