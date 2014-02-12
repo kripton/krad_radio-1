@@ -11,7 +11,7 @@ typedef void (kr_graph_edge_destroy_cb)(void *user);
 typedef void (kr_graph_vertex_process_cb)(void *user_to, void **user_from, int from_len);
 
 typedef enum {
-  IN,
+  IN = 1,
   OUT
 } kr_edge_dir;
 
@@ -56,6 +56,7 @@ kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *us
 kr_graph *kr_graph_create(kr_graph_setup *setup);
 int kr_graph_destroy(kr_graph *graph);
 int kr_vertex_deps(kr_graph *graph, kr_vertex *vertex, kr_vertex **deps, int max);
+int kr_vertex_indeps(kr_graph *graph, kr_vertex *vertex, kr_vertex **indeps, int max);
 int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex, int dir, void **user, int max);
 
 #endif
