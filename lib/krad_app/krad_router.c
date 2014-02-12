@@ -33,7 +33,9 @@ struct kr_router_map {
   void *ptr; /* for create */
   kr_payload_type payload_type;
   kr_router_map_create_handler *create;
+  kr_router_map_create_in_handler *create_in;
   kr_router_map_connect_handler *connect;
+  kr_router_map_mux_handler *mux;
   kr_router_map_patch_handler *patch;
   kr_router_map_destroy_handler *destroy;
 };
@@ -351,13 +353,23 @@ int kr_router_handle(kr_router *router, kr_crate *crate) {
         route = find_route(router, map, sliced.slice[1]);
         if (route == NULL) return 0;
         route2 = find_route(router, map, sliced.slice[2]);
-        if (route2 == NULL) return 0;
-        snprintf(temp, sizeof(temp), "%s/%s", sliced.slice[1], sliced.slice[2]);
-        name = create_name(router, temp);
-        if (!name) return -6;
-        //printk("I will call %p with %p - %p - %p - %p!", map->connect, map->ptr, route->ptr, route2->ptr, name);
-        ret = map->connect(map->ptr, (void *)&crate->payload, route->ptr, route2->ptr, name);
-        return ret;
+        if ((route2 != NULL) && (map->connect == NULL)) return 0;
+        if ((route2 == NULL) && (map->create_in == NULL)) return 0;
+        if ((route2 == NULL) && (map->create_in != NULL)) {
+          name = create_name(router, sliced.slice[2]);
+          if (!name) return -6;
+          //printk("I will call %p with %p - %p - %p - %p!", map->create_in, map->ptr, route->ptr, route2->ptr, name);
+          ret = map->create_in(route->ptr, (void *)&crate->payload, route2->ptr, name);
+          return ret;
+        }
+        if ((route2 != NULL) && (map->connect != NULL)) {
+          snprintf(temp, sizeof(temp), "%s/%s", sliced.slice[1], sliced.slice[2]);
+          name = create_name(router, temp);
+          if (!name) return -6;
+          //printk("I will call %p with %p - %p - %p - %p!", map->connect, map->ptr, route->ptr, route2->ptr, name);
+          ret = map->connect(map->ptr, (void *)&crate->payload, route->ptr, route2->ptr, name);
+          return ret;
+        }
       }
       printke("hrm wtf!");
       return -4;
@@ -384,7 +396,9 @@ kr_router_map *kr_router_map_create(kr_router *router, kr_router_map_setup *setu
   strncpy(map->prefix, setup->prefix, sizeof(map->prefix));
   map->ptr = setup->ptr;
   map->create = setup->create;
+  map->create_in = setup->create_in;
   map->connect = setup->connect;
+  map->mux = setup->mux;
   map->patch = setup->patch;
   map->destroy = setup->destroy;
   map->payload_type = setup->payload_type;

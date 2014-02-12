@@ -133,7 +133,9 @@ static int setup_maps(kr_radio *radio) {
   setup.ptr = radio->mixer;
   setup.payload_type = PL_KR_MIXER_PATH_INFO;
   setup.create = (kr_router_map_create_handler *)kr_mixer_bus;
+  setup.create_in = NULL;
   setup.connect = (kr_router_map_connect_handler *)kr_mixer_link;
+  setup.mux = NULL;
   setup.patch = (kr_router_map_patch_handler *)kr_mixer_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_mixer_remove;
   map = kr_app_server_map_create(radio->app, &setup);
@@ -145,7 +147,9 @@ static int setup_maps(kr_radio *radio) {
   setup.ptr = radio->compositor;
   setup.payload_type = PL_KR_COMPOSITOR_PATH_INFO;
   setup.create = (kr_router_map_create_handler *)kr_compositor_bus;
+  setup.create_in = NULL;
   setup.connect = (kr_router_map_connect_handler *)kr_compositor_link;
+  setup.mux = NULL;
   setup.patch = (kr_router_map_patch_handler *)kr_compositor_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_compositor_remove;
   map = kr_app_server_map_create(radio->app, &setup);
@@ -157,7 +161,9 @@ static int setup_maps(kr_radio *radio) {
   setup.ptr = radio->xpdr;
   setup.payload_type = PL_KR_XPDR_PATH_INFO;
   setup.create = (kr_router_map_create_handler *)kr_xpdr_open;
-  setup.connect = (kr_router_map_connect_handler *)kr_xpdr_link;
+  setup.create_in = (kr_router_map_create_in_handler *)kr_xpdr_link;
+  setup.connect = NULL;
+  setup.mux = NULL;
   setup.patch = (kr_router_map_patch_handler *)kr_xpdr_ctl;
   setup.destroy = (kr_router_map_destroy_handler *)kr_xpdr_remove;
   map = kr_app_server_map_create(radio->app, &setup);
