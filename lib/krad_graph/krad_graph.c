@@ -4,6 +4,11 @@
 #include <string.h>
 #include "krad_graph.h"
 
+enum deps_indeps {
+  DEPS = 1,
+  INDEPS
+};
+
 static int vertex_index(kr_graph *graph, kr_vertex *v) {
   int8_t i;
   for (i = 0; i < MAX_VERTICES; i++) {
@@ -75,6 +80,46 @@ static int get_out_edges(kr_graph *graph, kr_vertex *vertex, void **user, int ma
     return count;
 }
 
+static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex, 
+  kr_vertex **out, int max, int type) {
+  kr_vertex *vertices[MAX_VERTICES];
+  kr_vertex *done[MAX_VERTICES];
+  uint16_t *vrts;
+  uint16_t k;
+  int16_t i;
+  int16_t j;
+  int16_t count;
+
+  k = 0;
+  count = 0;
+  vertices[k++] = vertex;
+
+  while (k) {
+    vertex = vertices[--k];
+    if (type == DEPS)
+      vrts = vertex->deps;
+    else
+      vrts = vertex->adj;
+    for (i = 0; i < MAX_VERTICES; i++) {
+      if (vrts[i]) {
+        for (j = 0; j < vrts[i]; j++) {
+          done[count++] = &graph->vertices[i];
+        }
+        vertices[k++] = &graph->vertices[i];
+      }
+    }
+  }
+
+  k = 0;
+
+  for (i = count-1; i >= 0; i--) {
+    if (k >= max) return k;
+    out[k++] = done[i];
+  }
+
+  return k;
+}
+
 int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex, 
   int dir, void **user, int max) {
   int count;
@@ -95,38 +140,16 @@ int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex,
   return count;
 }
 
+int kr_vertex_indeps(kr_graph *graph, kr_vertex *vertex, 
+  kr_vertex **indeps, int max) {
+  if (max == 0) return 0;
+  return vertex_deps_indeps(graph, vertex, indeps, max, INDEPS);
+}
+
 int kr_vertex_deps(kr_graph *graph, kr_vertex *vertex, 
   kr_vertex **deps, int max) {
-  kr_vertex *vertices[MAX_VERTICES];
-  kr_vertex *done[MAX_VERTICES];
-  uint16_t k;
-  int16_t i;
-  int16_t count;
-
   if (max == 0) return 0;
-
-  k = 0;
-  count = 0;
-  vertices[k++] = vertex;
-
-  while (k) {
-    vertex = vertices[--k];
-    for (i = 0; i < MAX_VERTICES; i++) {
-      if (vertex->deps[i]) {
-        done[count++] = &graph->vertices[i];
-        vertices[k++] = &graph->vertices[i];
-      }
-    }
-  }
-
-  k = 0;
-
-  for (i = count-1; i >= 0; i--) {
-    if (k >= max) return k;
-    deps[k++] = done[i];
-  }
-
-  return k;
+  return vertex_deps_indeps(graph, vertex, deps, max, DEPS);
 }
 
 static int kr_graph_edge_destroy_internal(kr_graph *graph, kr_edge *edge) {
