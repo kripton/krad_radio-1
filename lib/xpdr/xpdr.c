@@ -237,6 +237,10 @@ static int path_setup(kr_xpdr_path *path, xpdr_path_setup *setup) {
       adapter_setup.event_cb = adapter_event;
       adapter_setup.user = path;
       path->state.adapter.adapter_type = path->info.type;
+      if (adapters[path->state.adapter.adapter_type].open == NULL) {
+        printk("XPDR: Adapter type is not supported on this system.");
+        return -2;
+      }
       printk("XPDR: adapter context create");
       path->state.adapter.adapter = adapters[path->state.adapter.adapter_type].open(&adapter_setup);
       if (path->state.adapter.adapter == NULL) return -1;
@@ -414,5 +418,6 @@ kr_xpdr *kr_xpdr_create(kr_xpdr_setup *setup) {
   xpdr->user = setup->user;
   xpdr->event_cb = setup->event_cb;
   printk("XPDR: Created");
+  kr_adapters_debug_info();
   return xpdr;
 }
