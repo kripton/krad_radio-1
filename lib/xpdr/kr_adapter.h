@@ -55,6 +55,7 @@ struct kr_adapter_setup {
   kr_xpdr_path_info info;
   void *user;
   kr_adapter_event_cb *event_cb;
+  kr_adapter *adapter;
 };
 
 struct kr_adapter {
