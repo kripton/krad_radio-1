@@ -167,15 +167,16 @@ static const int nadapter_types = (sizeof(adapters) / sizeof(adapters[0]));
 
 void kr_adapters_debug_info() {
   int i;
-  char string[512];
+  char *string;
   i = 0;
   printk("%d Adapter types", nadapter_types - 1);
   for (i = 1; i < nadapter_types; i++) {
-    kr_xpdr_type_to_text(string, &i, sizeof(string));
+    string = kr_strfr_kr_xpdr_type(i);
+    if ((strlen(string) > 3) && (memcmp(string, "kr_", 3) == 0)) string += 3;
     if (adapters[i].open == NULL) {
-      printk("XPDR: Adapter type %s is NOT available. (Not compiled or code incomplete)", string);
+      printk("XPDR: %s adapter type NOT available. (Not compiled or code incomplete)", string);
     } else {
-      printk("XPDR: Adapter type %s is available.", string);
+      printk("XPDR: %s adapter type is available.", string);
     }
   }
 }
