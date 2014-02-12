@@ -7,6 +7,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <sys/mman.h>
+#include <errno.h>
 #include <signal.h>
 #include <wayland-client.h>
 #include <xkbcommon/xkbcommon.h>
@@ -328,14 +329,41 @@ int kr_wayland_unlink(kr_wayland_path **win) {
   *win = NULL;
   return 0;
 }
+*/
 
-int kr_wayland_process(kr_wayland *wayland) {
-  *//* TODO Check for disconnect etc *//*
-  wl_display_dispatch(wayland->display);
-  wl_display_roundtrip(wayland->display);
+int kr_wayland_handle_out(kr_wayland *kw) {
+  int ret;
+  while (wl_display_prepare_read(kw->display) != 0) {
+    ret = wl_display_dispatch_pending(kw->display);
+    if (ret == -1) {
+      printke("Wayland: Error on dispatch pending");
+    }
+  }
+  ret = wl_display_flush(kw->display);
+  if ((ret == -1) && (errno != EAGAIN)) {
+    ret = errno;
+    printke("Wayland: Error on display flush: %s", strerror(ret));
+    return -1;
+  }
+  /* Can poll now */
   return 0;
 }
-*/
+
+int kr_wayland_handle_in(kr_wayland *kw) {
+  int ret;
+  ret = wl_display_read_events(kw->display);
+  if (ret == -1) {
+    ret = errno;
+    printke("Wayland: Error on read events: %s", strerror(ret));
+    return -1;
+  }
+  ret = wl_display_dispatch_pending(kw->display);
+  if (ret == -1) {
+    printke("Wayland: Error on dispatch pending");
+    return -1;
+  }
+  return 0;
+}
 
 int kr_wl_close(kr_adapter *adp) {
   kr_wayland *kw;
