@@ -49,7 +49,6 @@ struct kr_wayland {
   struct wl_shell *shell;
   struct wl_shm *shm;
   uint32_t formats;
-  uint32_t mask;
   struct wl_shm_listener shm_listener;
   struct wl_seat *seat;
   struct wl_pointer *pointer;
