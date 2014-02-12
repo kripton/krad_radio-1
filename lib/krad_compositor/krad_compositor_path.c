@@ -172,20 +172,19 @@ int kr_compositor_process(kr_compositor_path *path) {
   int i;
   int n;
   if (path == NULL) return -1;
-
   if (path->info.type == KR_COM_OUTPUT) {
     //if (path->writeable) {
       //output_render(path);
     //}
     return 0;
   } else {
-
     if (path->info.type == KR_COM_INPUT) {
-      n = kr_vertex_indeps(path->compositor->graph,path->g.edge->to,connected,16);
+      n = kr_vertex_indeps(path->compositor->graph,
+        path->g.edge->to, connected, 16);
     } else {
-      n = kr_vertex_indeps(path->compositor->graph,path->g.vertex,connected,16);
+      n = kr_vertex_indeps(path->compositor->graph,
+        path->g.vertex, connected, 16);
     }
-
     for (i = 0; i < n; i++) {
       if (connected[i]->type == KR_VERTEX_OUTPUT) {
         output = (kr_compositor_path *)connected[i]->user;
@@ -195,7 +194,6 @@ int kr_compositor_process(kr_compositor_path *path) {
       }
     }
   }
-
   return 0;
 }
 
