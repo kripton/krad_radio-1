@@ -28,7 +28,7 @@ static int test_aux_in_create(kr_client *client) {
   char *name;
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   name = "AUX INPUT";
-  info.type = KR_AUX_IN;
+  info.type = KR_AUX_VIDEO_IN;
   info.adp.aux_in.ncoconuts = 45;
   ret = kr_xpdr_make(client, name, &info);
   return ret;

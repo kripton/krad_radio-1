@@ -34,18 +34,24 @@ int kr_xpdr_type_to_index(int val) {
       return 9;
     case KR_V4L2_IN:
       return 10;
-    case KR_DECKLINK_IN:
+    case KR_DECKLINK_VIDEO_IN:
       return 11;
-    case KR_X11_IN:
+    case KR_DECKLINK_AUDIO_IN:
       return 12;
-    case KR_ALSA_IN:
+    case KR_X11_IN:
       return 13;
-    case KR_ALSA_OUT:
+    case KR_ALSA_IN:
       return 14;
-    case KR_AUX_IN:
+    case KR_ALSA_OUT:
       return 15;
-    case KR_AUX_OUT:
+    case KR_AUX_VIDEO_IN:
       return 16;
+    case KR_AUX_VIDEO_OUT:
+      return 17;
+    case KR_AUX_AUDIO_IN:
+      return 18;
+    case KR_AUX_AUDIO_OUT:
+      return 19;
   }
   return -1;
 }
@@ -74,18 +80,24 @@ char *kr_strfr_kr_xpdr_type(int val) {
       return "kr_wayland_out";
     case KR_V4L2_IN:
       return "kr_v4l2_in";
-    case KR_DECKLINK_IN:
-      return "kr_decklink_in";
+    case KR_DECKLINK_VIDEO_IN:
+      return "kr_decklink_video_in";
+    case KR_DECKLINK_AUDIO_IN:
+      return "kr_decklink_audio_in";
     case KR_X11_IN:
       return "kr_x11_in";
     case KR_ALSA_IN:
       return "kr_alsa_in";
     case KR_ALSA_OUT:
       return "kr_alsa_out";
-    case KR_AUX_IN:
-      return "kr_aux_in";
-    case KR_AUX_OUT:
-      return "kr_aux_out";
+    case KR_AUX_VIDEO_IN:
+      return "kr_aux_video_in";
+    case KR_AUX_VIDEO_OUT:
+      return "kr_aux_video_out";
+    case KR_AUX_AUDIO_IN:
+      return "kr_aux_audio_in";
+    case KR_AUX_AUDIO_OUT:
+      return "kr_aux_audio_out";
   }
   return NULL;
 }
@@ -124,8 +136,11 @@ int kr_strto_kr_xpdr_type(char *string) {
   if (!strcmp(string,"kr_v4l2_in")) {
     return KR_V4L2_IN;
   }
-  if (!strcmp(string,"kr_decklink_in")) {
-    return KR_DECKLINK_IN;
+  if (!strcmp(string,"kr_decklink_video_in")) {
+    return KR_DECKLINK_VIDEO_IN;
+  }
+  if (!strcmp(string,"kr_decklink_audio_in")) {
+    return KR_DECKLINK_AUDIO_IN;
   }
   if (!strcmp(string,"kr_x11_in")) {
     return KR_X11_IN;
@@ -136,11 +151,17 @@ int kr_strto_kr_xpdr_type(char *string) {
   if (!strcmp(string,"kr_alsa_out")) {
     return KR_ALSA_OUT;
   }
-  if (!strcmp(string,"kr_aux_in")) {
-    return KR_AUX_IN;
+  if (!strcmp(string,"kr_aux_video_in")) {
+    return KR_AUX_VIDEO_IN;
   }
-  if (!strcmp(string,"kr_aux_out")) {
-    return KR_AUX_OUT;
+  if (!strcmp(string,"kr_aux_video_out")) {
+    return KR_AUX_VIDEO_OUT;
+  }
+  if (!strcmp(string,"kr_aux_audio_in")) {
+    return KR_AUX_AUDIO_IN;
+  }
+  if (!strcmp(string,"kr_aux_audio_out")) {
+    return KR_AUX_AUDIO_OUT;
   }
   return -1;
 }
