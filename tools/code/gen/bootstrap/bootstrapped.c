@@ -525,20 +525,8 @@ char *codegen_enum_to_string(cgen_enum val) {
       return "kr_wayland_path_info_patch_value";
     case CGEN_KR_WAYLAND_PATH_INFO_PATCH:
       return "kr_wayland_path_info_patch";
-    case CGEN_KR_WAYLAND_EVENT_TYPE:
-      return "kr_wayland_event_type";
-    case CGEN_KR_WAYLAND_POINTER_EVENT:
-      return "kr_wayland_pointer_event";
-    case CGEN_KR_WAYLAND_KEY_EVENT:
-      return "kr_wayland_key_event";
-    case CGEN_KR_WAYLAND_FRAME_EVENT:
-      return "kr_wayland_frame_event";
-    case CGEN_KR_WAYLAND_EVENT:
-      return "kr_wayland_event";
-    case CGEN_KR_WAYLAND_PATH_SETUP:
-      return "kr_wayland_path_setup";
-    case CGEN_KR_WAYLAND_SETUP:
-      return "kr_wayland_setup";
+    case CGEN_KR_WAYLAND_STATE:
+      return "kr_wayland_state";
     case CGEN_KR_WAYLAND_INFO:
       return "kr_wayland_info";
     case CGEN_KR_WAYLAND_PATH_INFO:
@@ -1407,26 +1395,8 @@ cgen_enum codegen_string_to_enum(char *string) {
   if (!strcmp(string,"kr_wayland_path_info_patch")) {
     return CGEN_KR_WAYLAND_PATH_INFO_PATCH;
   }
-  if (!strcmp(string,"kr_wayland_event_type")) {
-    return CGEN_KR_WAYLAND_EVENT_TYPE;
-  }
-  if (!strcmp(string,"kr_wayland_pointer_event")) {
-    return CGEN_KR_WAYLAND_POINTER_EVENT;
-  }
-  if (!strcmp(string,"kr_wayland_key_event")) {
-    return CGEN_KR_WAYLAND_KEY_EVENT;
-  }
-  if (!strcmp(string,"kr_wayland_frame_event")) {
-    return CGEN_KR_WAYLAND_FRAME_EVENT;
-  }
-  if (!strcmp(string,"kr_wayland_event")) {
-    return CGEN_KR_WAYLAND_EVENT;
-  }
-  if (!strcmp(string,"kr_wayland_path_setup")) {
-    return CGEN_KR_WAYLAND_PATH_SETUP;
-  }
-  if (!strcmp(string,"kr_wayland_setup")) {
-    return CGEN_KR_WAYLAND_SETUP;
+  if (!strcmp(string,"kr_wayland_state")) {
+    return CGEN_KR_WAYLAND_STATE;
   }
   if (!strcmp(string,"kr_wayland_info")) {
     return CGEN_KR_WAYLAND_INFO;
@@ -1775,7 +1745,7 @@ int codegen_is_enum(char *type) {
   if (!strcmp(type,"kr_wayland_path_info_member")) {
     return 1;
   }
-  if (!strcmp(type,"kr_wayland_event_type")) {
+  if (!strcmp(type,"kr_wayland_state")) {
     return 1;
   }
   if (!strcmp(type,"kr_web_event_type")) {

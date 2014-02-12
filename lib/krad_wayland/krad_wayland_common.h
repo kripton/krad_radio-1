@@ -1,14 +1,17 @@
 #ifndef KRAD_WAYLAND_COMMON_H
 #define KRAD_WAYLAND_COMMON_H
 
-typedef struct {
-  int state;
-  char display_name[128];
-} kr_wayland_info;
+typedef enum {
+  KR_WL_DISCONNECTED = 1,
+  KR_WL_CONNECTED
+} kr_wayland_state;
 
 typedef struct {
   char display_name[128];
-  int state;
+  kr_wayland_state state;
+} kr_wayland_info;
+
+typedef struct {
   int width;
   int height;
   int fullscreen;

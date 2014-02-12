@@ -1,6 +1,6 @@
 #include "gen.h"
 int info_unpack_fr_json(char *json, uber_St *uber) {
-  const info_unpack_fr_json_func fr_json_functions[59] = {kr_aux_info_fr_json,
+  const info_unpack_fr_json_func fr_json_functions[60] = {kr_aux_info_fr_json,
   kr_aux_path_info_fr_json,kr_alsa_info_fr_json,
   kr_alsa_path_info_fr_json,kr_method_fr_json,
   kr_crate_fr_json,kr_easing_fr_json,
@@ -26,11 +26,11 @@ int info_unpack_fr_json(char *json, uber_St *uber) {
   kr_highpass_info_fr_json,kr_volume_info_fr_json,
   kr_analog_info_fr_json,kr_v4l2_state_fr_json,
   kr_v4l2_mode_fr_json,kr_v4l2_info_fr_json,
-  kr_v4l2_open_info_fr_json,kr_wayland_info_fr_json,
-  kr_wayland_path_info_fr_json,kr_x11_info_fr_json,
-  kr_x11_path_info_fr_json,kr_xpdr_type_fr_json,
-  kr_xpdr_type_info_fr_json,kr_xpdr_path_info_fr_json
-  };
+  kr_v4l2_open_info_fr_json,kr_wayland_state_fr_json,
+  kr_wayland_info_fr_json,kr_wayland_path_info_fr_json,
+  kr_x11_info_fr_json,kr_x11_path_info_fr_json,
+  kr_xpdr_type_fr_json,kr_xpdr_type_info_fr_json,
+  kr_xpdr_path_info_fr_json};
   return fr_json_functions[uber->type-1](json , uber->actual);
 }
 

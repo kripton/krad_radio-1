@@ -71,6 +71,7 @@ typedef enum {
   TEXT_KR_V4L2_MODE,
   TEXT_KR_V4L2_INFO,
   TEXT_KR_V4L2_OPEN_INFO,
+  TEXT_KR_WAYLAND_STATE,
   TEXT_KR_WAYLAND_INFO,
   TEXT_KR_WAYLAND_PATH_INFO,
   TEXT_KR_X11_INFO,
@@ -81,7 +82,7 @@ typedef enum {
 } text_enum;
 
 enum {
-  TEXT_ENUM_LAST = 59
+  TEXT_ENUM_LAST = 60
 };
 
 typedef enum {
@@ -137,6 +138,7 @@ typedef enum {
   JSON_KR_V4L2_MODE,
   JSON_KR_V4L2_INFO,
   JSON_KR_V4L2_OPEN_INFO,
+  JSON_KR_WAYLAND_STATE,
   JSON_KR_WAYLAND_INFO,
   JSON_KR_WAYLAND_PATH_INFO,
   JSON_KR_X11_INFO,
@@ -147,7 +149,7 @@ typedef enum {
 } json_enum;
 
 enum {
-  JSON_ENUM_LAST = 59
+  JSON_ENUM_LAST = 60
 };
 
 typedef enum {
@@ -203,6 +205,7 @@ typedef enum {
   DEJSON_KR_V4L2_MODE,
   DEJSON_KR_V4L2_INFO,
   DEJSON_KR_V4L2_OPEN_INFO,
+  DEJSON_KR_WAYLAND_STATE,
   DEJSON_KR_WAYLAND_INFO,
   DEJSON_KR_WAYLAND_PATH_INFO,
   DEJSON_KR_X11_INFO,
@@ -213,7 +216,7 @@ typedef enum {
 } dejson_enum;
 
 enum {
-  DEJSON_ENUM_LAST = 59
+  DEJSON_ENUM_LAST = 60
 };
 
 typedef enum {
@@ -271,6 +274,7 @@ typedef enum {
   EBML_KR_V4L2_MODE,
   EBML_KR_V4L2_INFO,
   EBML_KR_V4L2_OPEN_INFO,
+  EBML_KR_WAYLAND_STATE,
   EBML_KR_WAYLAND_INFO,
   EBML_KR_WAYLAND_PATH_INFO,
   EBML_KR_X11_INFO,
@@ -281,7 +285,7 @@ typedef enum {
 } ebml_enum;
 
 enum {
-  EBML_ENUM_LAST = 61
+  EBML_ENUM_LAST = 62
 };
 
 typedef enum {
@@ -337,6 +341,7 @@ typedef enum {
   DEBML_KR_V4L2_MODE,
   DEBML_KR_V4L2_INFO,
   DEBML_KR_V4L2_OPEN_INFO,
+  DEBML_KR_WAYLAND_STATE,
   DEBML_KR_WAYLAND_INFO,
   DEBML_KR_WAYLAND_PATH_INFO,
   DEBML_KR_X11_INFO,
@@ -347,7 +352,7 @@ typedef enum {
 } debml_enum;
 
 enum {
-  DEBML_ENUM_LAST = 59
+  DEBML_ENUM_LAST = 60
 };
 
 typedef enum {
@@ -403,6 +408,7 @@ typedef enum {
   HELPERS_KR_V4L2_MODE,
   HELPERS_KR_V4L2_INFO,
   HELPERS_KR_V4L2_OPEN_INFO,
+  HELPERS_KR_WAYLAND_STATE,
   HELPERS_KR_WAYLAND_INFO,
   HELPERS_KR_WAYLAND_PATH_INFO,
   HELPERS_KR_X11_INFO,
@@ -413,7 +419,7 @@ typedef enum {
 } helpers_enum;
 
 enum {
-  HELPERS_ENUM_LAST = 59
+  HELPERS_ENUM_LAST = 60
 };
 
 
