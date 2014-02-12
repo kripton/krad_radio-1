@@ -89,14 +89,12 @@ static void mixer_audio(kr_audio_event *event) {
   event->audio = path->state.link.audio;
 }
 
-/*
 static void adapter_av(kr_adapter_path_av_cb_arg *arg) {
   kr_xpdr_path *path;
   path = (kr_xpdr_path *)arg->user;
-  path->audio = arg->audio;
-  path->image = arg->image;
+  path->state.link.audio = arg->audio;
+  path->state.link.image = arg->image;
 }
-*/
 
 static void adapter_event(kr_adapter_event *event) {
   /*
@@ -168,11 +166,13 @@ static void link_io_create(kr_xpdr_path *path) {
   link_io_type type;
   kr_mixer *mixer;
   kr_compositor *compositor;
-  /*kr_adapter *adapter;*/
+  kr_adapter *adapter;
   kr_mixer_port_setup mp_setup;
   kr_compositor_port_setup cp_setup;
+  kr_adapter_path_setup ap_setup;
   mixer = path->xpdr->mixer;
   compositor = path->xpdr->compositor;
+  adapter = path->state.link.adapter->adapter;
   if (path->state.link.output.exists) {
     type = path->state.link.input_type;
     io = &path->state.link.input;
@@ -182,27 +182,13 @@ static void link_io_create(kr_xpdr_path *path) {
   }
   switch (type) {
     case ADAPTER:
-      /*
-      memcpy(&ap_setup.info, &info->info.adapter_path_info,
-       sizeof(kr_adapter_path_info));
-      if (io == &path->input) {
-        ap_setup.info.dir = KR_ADP_PATH_INPUT;
-      } else {
-        ap_setup.info.dir = KR_ADP_PATH_OUTPUT;
-      }
-      ap_setup.ev_cb = xpdr_adapter_path_event_cb;
-      ap_setup.av_cb = xpdr_adapter_path_av_cb;
+      ap_setup.info = path->info;
+      ap_setup.av_cb = adapter_av;
       ap_setup.user = path;
-      //adapter = adapter_get(path->xpdr, &ap_setup);
-      if (adapter == NULL) {
-        printke("get_adapter returned NULL");
-      } else {
-        io->adapter_path = kr_adapter_mkpath(adapter, &ap_setup);
-        if (io->adapter_path == NULL) {
-          printke("adapter mkpath returned NULL");
-        }
+      io->adapter_path = adapters[path->state.link.adapter->adapter_type].link(adapter, &ap_setup);
+      if (io->adapter_path == NULL) {
+        printke("adapter mkpath returned NULL");
       }
-      */
       break;
     case MIXER:
       /* mp_setup.info setup srate?channels? FIXME */
