@@ -1,5 +1,11 @@
 #include "adapter_monitor.h"
 
+typedef enum {
+  KR_MON_ALSA = 1,
+  KR_MON_V4L2,
+  KR_MON_BM
+} kr_mon_type;
+
 struct kr_adapter_monitor {
   struct udev *udev;
   int fd;
@@ -15,61 +21,88 @@ static void handle_device(kr_adapter_monitor *m, struct udev_device *dev) {
   const char *name;
   const char *subsys;
   const char *action;
+  const char *bus;
   int name_len;
+  int action_len;
   int subsys_len;
-
+  kr_mon_type type;
+  type = 0;
+  bus = "";
   name = udev_device_get_sysname(dev);
   if (!name) return;
   subsys = udev_device_get_subsystem(dev);
   if (!subsys) return;
+  action = udev_device_get_action(dev);
+  if (action == NULL) action = "got";
   name_len = strlen(name);
+  action_len = strlen(action);
   subsys_len = strlen(subsys);
   if ((subsys_len == 5) && (name_len > 4)
    && (memcmp(subsys, "sound", 5) == 0)
    && (memcmp(name, "card", 4) == 0)) {
-    printk("Got ALSA device");
+    type = KR_MON_ALSA;
   } else {
     if ((subsys_len == 4) && (name_len > 10)
      && (memcmp(subsys, "misc", 4) == 0)
      && (memcmp(name, "blackmagic", 10) == 0)) {
-      printk("Got Blackmagic device");
+      type = KR_MON_BM;
     } else {
       if ((subsys_len == 11) && (name_len > 5)
        && (memcmp(subsys, "video4linux", 4) == 0)
        && (memcmp(name, "video", 5) == 0)) {
-        printk("Got V4L2 device");
+        type = KR_MON_V4L2;
       } else {
         return;
       }
     }
   }
-  action = udev_device_get_action(dev);
-  printk("   syspath: %s", udev_device_get_syspath(dev));
-  printk("   sysname: %s", udev_device_get_sysname(dev));
-  printk("   sysnum: %s", udev_device_get_sysnum(dev));
-  printk("   Node: %s", udev_device_get_devnode(dev));
-  printk("   Subsystem: %s", udev_device_get_subsystem(dev));
-  printk("   Action: %s", udev_device_get_action(dev));
-  if (!((action == NULL) || ((strlen(action) == 3)
-   && (memcmp(action, "add", 3) == 0))))  {
-    return;
-  }
-  parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
-   "usb_device");
-  if (parent) {
-    printk("  VID/PID: %s %s",
-     udev_device_get_sysattr_value(parent,"idVendor"),
-     udev_device_get_sysattr_value(parent, "idProduct"));
-    printk("  serial: %s",
-     udev_device_get_sysattr_value(parent, "serial"));
-  } else {
-    parent = udev_device_get_parent_with_subsystem_devtype(dev, "pci", NULL);
+  if ((action_len == 3) && ((memcmp(action, "add", 3) == 0)
+   || (memcmp(action, "got", 3) == 0)))  {
+    parent = udev_device_get_parent_with_subsystem_devtype(dev, "usb",
+     "usb_device");
     if (parent) {
-      printk("  vendor: %s",
-       udev_device_get_sysattr_value(parent, "vendor"));
-      printk("  device: %s",
-       udev_device_get_sysattr_value(parent, "device"));
+      bus = "on USB bus";
+      /*
+      printk("  VID/PID: %s %s",
+      udev_device_get_sysattr_value(parent,"idVendor"),
+      udev_device_get_sysattr_value(parent, "idProduct"));
+      printk("  serial: %s",
+        udev_device_get_sysattr_value(parent, "serial"));
+      */
+    } else {
+      parent = udev_device_get_parent_with_subsystem_devtype(dev, "pci", NULL);
+      if (parent) {
+        bus = "on PCI bus";
+        /*
+          printk("  vendor: %s",
+           udev_device_get_sysattr_value(parent, "vendor"));
+          printk("  device: %s",
+           udev_device_get_sysattr_value(parent, "device"));
+        */
+      } else {
+        bus = "on unknown bus";
+      }
     }
+  }
+  switch (type) {
+    case KR_MON_ALSA:
+      printk("XPDR Monitor: %s ALSA %s %s", action, name, bus);
+      break;
+    case KR_MON_V4L2:
+      printk("XPDR Monitor: %s V4L2 %s %s", action, name, bus);
+      break;
+    case KR_MON_BM:
+      printk("XPDR Monitor: %s Blackmagic %s %s", action, name, bus);
+      break;
+    default:
+      printke("XPDR Monitor: Undesired %s %s %s %s!", action, subsys, name,
+       bus);
+      return;
+  }
+  if (0) {
+    printk("   syspath: %s", udev_device_get_syspath(dev));
+    printk("   sysnum: %s", udev_device_get_sysnum(dev));
+    printk("   Node: %s", udev_device_get_devnode(dev));
   }
 }
 
@@ -102,7 +135,6 @@ static void setup(kr_adapter_monitor *m) {
     udev_device_unref(dev);
   }
   udev_enumerate_unref(enumerate);
-
   enumerate = udev_enumerate_new(m->udev);
 	udev_enumerate_add_match_subsystem(enumerate, "misc");
   for (i = 0; i < 24; i++) {
@@ -118,7 +150,6 @@ static void setup(kr_adapter_monitor *m) {
     udev_device_unref(dev);
   }
   udev_enumerate_unref(enumerate);
-
   m->initialized = 1;
 }
 
