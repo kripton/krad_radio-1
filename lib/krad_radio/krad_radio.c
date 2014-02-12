@@ -203,8 +203,6 @@ kr_radio *kr_radio_create(char *sysname) {
         xpdr_setup.user = radio;
         xpdr_setup.event_cb = xpdr_event;
         xpdr_setup.path_count = 32;
-        /* FIXME need to enable adapter monitor after maps setup
-         * so that we can pick up the adapter paths */
         radio->xpdr = kr_xpdr_create(&xpdr_setup);
         if (radio->xpdr) {
           memset(&web_setup, 0, sizeof(kr_web_server_setup));
@@ -219,8 +217,11 @@ kr_radio *kr_radio_create(char *sysname) {
             if (ret == 0) {
               ret = kr_app_server_enable(radio->app);
               if (ret == 0) {
-                printk("Radio: Created");
-                return radio;
+                ret = kr_xpdr_monitor(radio->xpdr, 1);
+                if (ret == 0) {
+                  printk("Radio: Created");
+                  return radio;
+                }
               }
             }
           }

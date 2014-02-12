@@ -63,7 +63,7 @@ struct kr_xpdr {
   kr_mixer *mixer;
   kr_compositor *compositor;
   kr_pool *path_pool;
-  kr_adapter_monitor *adapter_mon;
+  kr_adapter_monitor *monitor;
   void *user;
   kr_xpdr_event_cb *event_cb;
 };
@@ -349,13 +349,36 @@ int kr_xpdr_open(kr_xpdr *xpdr, kr_xpdr_path_info *info, void *user) {
   return 0;
 }
 
+int kr_xpdr_monitor(kr_xpdr *xpdr, int on) {
+  if (xpdr == NULL) return -1;
+  if ((on != 0) && (on != 1)) return -2;
+  if (on == 1) {
+    if (xpdr->monitor != NULL) {
+      printke("XPDR: Monitor was already enabled");
+      return -3;
+    }
+    xpdr->monitor = kr_adapter_monitor_create();
+    printk("XPDR: Enabled adapter monitor");
+    kr_adapter_monitor_wait(xpdr->monitor, 0);
+  } else {
+    if (xpdr->monitor == NULL) {
+      printke("XPDR: Monitor was already disabled");
+      return -4;
+    }
+    kr_adapter_monitor_destroy(xpdr->monitor);
+    xpdr->monitor = NULL;
+    printk("XPDR: Disabled adapter monitor");
+  }
+  return 0;
+}
+
 int kr_xpdr_destroy(kr_xpdr *xpdr) {
   int i;
   int ret;
   kr_xpdr_path *path;
   if (xpdr == NULL) return -1;
   printk("XPDR: Destroying");
-  kr_adapter_monitor_destroy(xpdr->adapter_mon);
+  kr_xpdr_monitor(xpdr, 0);
   i = 0;
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
     if (path->type == ADAPTER_CTX) continue;
@@ -390,8 +413,6 @@ kr_xpdr *kr_xpdr_create(kr_xpdr_setup *setup) {
   xpdr->compositor = setup->compositor;
   xpdr->user = setup->user;
   xpdr->event_cb = setup->event_cb;
-  xpdr->adapter_mon = kr_adapter_monitor_create();
-  kr_adapter_monitor_wait(xpdr->adapter_mon, 0);
   printk("XPDR: Created");
   return xpdr;
 }
