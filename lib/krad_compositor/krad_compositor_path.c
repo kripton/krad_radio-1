@@ -166,32 +166,59 @@ static int path_setup_check(kr_compositor_path_setup *setup) {
   return 0;
 }
 
+
+static void output_source_render(kr_compositor_path *output, kr_compositor_path *source) {
+  void ***user_chains;
+  int n;
+  int i;
+  user_chains = alloca(sizeof(void**)*16);
+  for (i = 0; i < 16; i++) {
+    user_chains[i] = alloca(sizeof(void*)*16);
+  }
+  n = kr_graph_chains(output->compositor->graph, output->g.vertex, source->g.vertex, user_chains, 16, 16);
+  for (i = 0; i < n; i++) {
+    //transform = get_transform(user_chains, len);
+    //render(output, source, transform);
+  }
+}
+
+static void output_render(kr_compositor_path *output) {
+  void *source_users[16];
+  kr_compositor_path *source;
+  int i;
+  int n;
+  n = kr_graph_source_users_from(output->compositor->graph,
+    output->g.vertex, source_users, 16);
+  for (i = 0; i < n; i++) {
+    source = (kr_compositor_path *)source_users[i];
+    output_source_render(output, source);
+  }
+}
+
 int kr_compositor_process(kr_compositor_path *path) {
-  kr_vertex *connected[16];
+  void *output_users[16];
   kr_compositor_path *output;
   int i;
   int n;
   if (path == NULL) return -1;
   if (path->info.type == KR_COM_OUTPUT) {
     //if (path->writeable) {
-      //output_render(path);
+      output_render(path);
     //}
     return 0;
   } else {
     if (path->info.type == KR_COM_INPUT) {
-      n = kr_vertex_indeps(path->compositor->graph,
-        path->g.edge->to, connected, 16);
+      n = kr_graph_output_users_from(path->compositor->graph,
+        path->g.edge->to, output_users, 16);
     } else {
-      n = kr_vertex_indeps(path->compositor->graph,
-        path->g.vertex, connected, 16);
+      n = kr_graph_output_users_from(path->compositor->graph,
+        path->g.vertex, output_users, 16);
     }
     for (i = 0; i < n; i++) {
-      if (connected[i]->type == KR_VERTEX_OUTPUT) {
-        output = (kr_compositor_path *)connected[i]->user;
-        //if (output->writeable) {
-          //output_render(output);
-        //}
-      }
+      output = (kr_compositor_path *)output_users[i];
+      //if (output->writeable) {
+      output_render(output);
+      //}
     }
   }
   return 0;
