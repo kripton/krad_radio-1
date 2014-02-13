@@ -54,6 +54,17 @@ void print_graph_info(kr_graph *graph) {
   }
 }
 
+void print_random_chains(kr_graph *graph, kr_vertex **vertices, int vertex_count) {
+  int from;
+  int to;
+  if (vertex_count) {
+    from = randr(0,vertex_count);
+    to = randr(0,vertex_count);
+    printf("Chains from %p \n",vertices[from]);
+    kr_graph_print_chains(graph,vertices[from]);
+  }
+}
+
 void print_random_deps_info(kr_graph *graph, kr_vertex **vertices, int vertex_count) {
     int v;
     int dep_count;
@@ -96,7 +107,7 @@ int random_edges_gen(kr_graph *graph, int n, int vcount, kr_vertex **vertices) {
     j = randr(0,vcount);
     k = randr(0,vcount);
     printf("Generating random edge from %p to %p\n",vertices[k],vertices[j]);
-    if (!kr_graph_edge_create(graph,vertices[j],vertices[k],NULL)) {
+    if (kr_graph_edge_create(graph,vertices[j],vertices[k],NULL)) {
       l++;
     }
   }
@@ -156,7 +167,9 @@ int main(int argc, char const *argv[]) {
   print_graph_info(graph);
 
   print_random_deps_info(graph,vertices,vertex_count);
-  
+
+  //print_random_chains(graph,vertices,vertex_count);
+
   printf("destroying graph now.\n");
   kr_graph_destroy(graph);
 
