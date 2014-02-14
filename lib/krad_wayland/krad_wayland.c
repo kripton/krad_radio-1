@@ -13,9 +13,10 @@
 #include <xkbcommon/xkbcommon.h>
 #include "krad_system.h"
 #include "krad_wayland.h"
+#include "krad_image_pool.h"
 
 #define KR_WL_MAX_WINDOWS 4
-#define KR_WL_BUFFER_COUNT 1
+#define KR_WL_BUFFER_COUNT 2
 
 typedef struct kr_wayland kr_wayland;
 typedef struct kr_wayland_path kr_wayland_path;
@@ -51,8 +52,6 @@ typedef struct {
 } kr_wayland_event;
 
 struct kr_wayland_path {
-  int width;
-  int height;
   int pointer_x;
   int pointer_y;
   int click;
@@ -62,16 +61,14 @@ struct kr_wayland_path {
   int fullscreen;
   struct wl_surface *surface;
   struct wl_shell_surface *shell_surface;
-  struct wl_buffer *buffer;
-  void *shm_data;
   struct wl_callback *callback;
   struct wl_shell_surface_listener surface_listener;
   struct wl_callback_listener frame_listener;
-  int current_buffer;
-  int frame_size;
   struct wl_buffer *buffers[KR_WL_BUFFER_COUNT];
+  kr_image_pool *frame_pool;
   int (*user_callback)(void *, kr_wayland_event *);
   void *user;
+  kr_wayland_path_info *info;
   kr_wayland *wayland;
 };
 
@@ -157,47 +154,6 @@ static void handle_global(void *data, struct wl_registry *registry,
 }
 
 /*
-static int kw_create_shm_buffer(kr_wayland_path *window,
- int width, int height, int frames, uint32_t format, void **data_out) {
-  char filename[] = "/tmp/wayland-shm-XXXXXX";
-  struct wl_shm_pool *pool;
-  int fd;
-  int size;
-  int stride;
-  void *data;
-  int b;
-  b = 0;
-  fd = mkstemp(filename);
-  if (fd < 0) {
-    fprintf(stderr, "open %s failed: %m\n", filename);
-    return -1;
-  }
-  stride = width * 4;
-  window->frame_size = stride * height;
-  size = window->frame_size * frames;
-  if (ftruncate(fd, size) < 0) {
-    fprintf (stderr, "ftruncate failed: %m\n");
-    close(fd);
-    return -1;
-  }
-  data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-  unlink(filename);
-  if (data == MAP_FAILED) {
-    fprintf(stderr, "mmap failed: %m\n");
-    close(fd);
-    return -1;
-  }
-  pool = wl_shm_create_pool(window->wayland->shm, fd, size);
-  for (b = 0; b < KR_WL_BUFFER_COUNT; b++) {
-    window->buffers[b] = wl_shm_pool_create_buffer(pool,
-     b * window->frame_size, width, height, stride, format);
-  }
-  wl_shm_pool_destroy(pool);
-  close(fd);
-  *data_out = data;
-  return 0;
-}
-
 static void kw_frame_listener(void *data,
  struct wl_callback *callback, uint32_t time) {
   kr_wayland_path *window;
@@ -225,96 +181,6 @@ static void kw_frame_listener(void *data,
   wl_callback_add_listener(window->callback, &window->frame_listener,
    window);
   wl_surface_commit(window->surface);
-}
-
-kr_wayland_path *kr_wayland_mkpath(kr_wayland *wayland,
- kr_wayland_path_setup *setup) {
-  kr_wayland_path *window;
-  struct wl_region *opaque;
-  int ret;
-  int i;
-  if ((wayland == NULL) || (setup == NULL)) {
-    return NULL;
-  }
-  if ((setup->info.width == 0) || (setup->info.height == 0) ||
-      (setup->info.width > 8192) || (setup->info.height > 8192)
-      || setup->callback == NULL) {
-    return NULL;
-  }
-  for (i = 0; i < KR_WL_MAX_WINDOWS; i++) {
-    if (wayland->window[i].active == 0) {
-      break;
-    }
-  }
-  if (i == KR_WL_MAX_WINDOWS) {
-    return NULL;
-  }
-  window = &wayland->window[i];
-  window->wayland = wayland;
-  window->user_callback = setup->callback;
-  window->user = setup->user;
-  window->width = setup->info.width;
-  window->height = setup->info.height;
-  window->fullscreen = setup->info.fullscreen;
-  ret = kw_create_shm_buffer(window, window->width,
-   window->height, KR_WL_BUFFER_COUNT, WL_SHM_FORMAT_XRGB8888,
-   &window->shm_data);
-  if (ret != 0) {
-    wayland->window[i].active = 0;
-    return NULL;
-  }
-  window->current_buffer = 0;
-  window->buffer = window->buffers[window->current_buffer];
-  window->surface_listener.ping = handle_ping;
-  window->surface_listener.configure = handle_configure;
-  window->surface_listener.popup_done = handle_popup_done;
-  window->surface = wl_compositor_create_surface(wayland->compositor);
-  window->shell_surface = wl_shell_get_shell_surface(wayland->shell,
-   window->surface);
-  opaque = wl_compositor_create_region(wayland->compositor);
-  wl_region_add(opaque, 0, 0, window->width, window->height);
-  wl_surface_set_opaque_region(window->surface, opaque);
-  wl_region_destroy(opaque);
-  *//*wl_shell_surface_set_title(wayland->window->shell_surface,
-   wayland->window->title);*//*
-   wl_shell_surface_add_listener(window->shell_surface,
-    &window->surface_listener, window);
-  wl_shell_surface_set_toplevel(window->shell_surface);
-  kw_frame_listener(window, NULL, 0);
-  wl_display_roundtrip(wayland->display);
-  if (window->fullscreen == 1) {
-    wl_shell_surface_set_fullscreen(window->shell_surface, 1, 0, NULL);
-  }
-  wayland->window[i].active = 1;
-  return window;
-}
-
-int kr_wayland_unlink(kr_wayland_path **win) {
-  int i;
-  kr_wayland_path *window;
-  kr_wayland *wayland;
-  if ((win == NULL) || (*win == NULL)) {
-    return -1;
-  }
-  window = *win;
-  wayland = window->wayland;
-  for (i = 0; i < KR_WL_MAX_WINDOWS; i++) {
-    if (&wayland->window[i] == window) {
-      break;
-    }
-  }
-  wl_display_sync(wayland->display);
-  if (window->callback) {
-    wl_callback_destroy(window->callback);
-  }
-  wl_display_sync(wayland->display);
-  wl_buffer_destroy(window->buffer);
-  wl_shell_surface_destroy(window->shell_surface);
-  wl_surface_destroy(window->surface);
-  wl_display_sync(wayland->display);
-  wayland->window[i].active = 0;
-  *win = NULL;
-  return 0;
 }
 */
 
@@ -452,14 +318,86 @@ int kr_wl_lctl(kr_adapter_path *path, kr_patchset *patchset) {
 }
 
 int kr_wl_unlink(kr_adapter_path *path) {
+  int i;
+  kr_wayland_path *window;
+  kr_wayland *kw;
   if (path == NULL) return -1;
   printk("Wayland window removed");
+  window = (kr_wayland_path *)path->handle;
+  kw = window->wayland;
+  for (i = 0; i < KR_WL_MAX_WINDOWS; i++) {
+    if (&kw->window[i] == window) {
+      break;
+    }
+  }
+  wl_display_sync(kw->display);
+  if (window->callback) {
+    wl_callback_destroy(window->callback);
+  }
+  wl_display_sync(kw->display);
+  //wl_buffer_destroy(window->buffer);
+  wl_shell_surface_destroy(window->shell_surface);
+  wl_surface_destroy(window->surface);
+  wl_display_sync(kw->display);
+  kw->window[i].active = 0;
   return 0;
 }
 
-int kr_wl_link(kr_adapter *adp, kr_adapter_path *setup) {
-  if (adp == NULL) return -1;
-  if (setup == NULL) return -2;
+int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
+  kr_wayland *kw;
+  kr_wayland_path *window;
+  kr_wayland_path_info *info;
+  struct wl_region *opaque;
+  int i;
+  if (adapter == NULL) return -1;
+  if (path == NULL) return -2;
+  kw = (kr_wayland *)adapter->handle;
+  info = &path->info->adp.wl_out;
+  if ((info->width == 0) || (info->height == 0)
+   || (info->width > 8192) || (info->height > 8192)) {
+    printke("Wayland: window too big");
+    return -2;
+  }
+  for (i = 0; i < KR_WL_MAX_WINDOWS; i++) {
+    if (kw->window[i].active == 0) {
+      break;
+    }
+  }
+  if (i == KR_WL_MAX_WINDOWS) {
+    return -1;
+  }
+  window = &kw->window[i];
+  window->wayland = kw;
+  window->info = &path->info->adp.wl_out;
+  window->user = path->user;
+  /*
+  window->frame_pool = wl_shm_create_pool(window->wayland->shm, fd, size);
+  for (i = 0; i < KR_WL_BUFFER_COUNT; i++) {
+    window->buffers[i] = wl_shm_pool_create_buffer(pool,
+     i * window->frame_size, width, height, stride, WL_SHM_FORMAT_XRGB8888);
+  }
+  wl_shm_pool_destroy(pool);
+  */
+  window->surface_listener.ping = handle_ping;
+  window->surface_listener.configure = handle_configure;
+  window->surface_listener.popup_done = handle_popup_done;
+  window->surface = wl_compositor_create_surface(kw->compositor);
+  window->shell_surface = wl_shell_get_shell_surface(kw->shell, window->surface);
+  opaque = wl_compositor_create_region(kw->compositor);
+  wl_region_add(opaque, 0, 0, window->info->width, window->info->height);
+  wl_surface_set_opaque_region(window->surface, opaque);
+  wl_region_destroy(opaque);
+  /*wl_shell_surface_set_title(wayland->window->shell_surface,
+   wayland->window->title);*/
+  wl_shell_surface_add_listener(window->shell_surface,
+   &window->surface_listener, window);
+  wl_shell_surface_set_toplevel(window->shell_surface);
+  //kw_frame_listener(window, NULL, 0);
+  if (window->fullscreen == 1) {
+    wl_shell_surface_set_fullscreen(window->shell_surface, 1, 0, NULL);
+  }
+  window->active = 1;
+  path->handle = window;
   printk("Wayland window created");
   return 0;
 }
@@ -492,5 +430,6 @@ int kr_wl_open(kr_adapter *adapter) {
   kw->info = &adapter->info->adp.wl;
   kw_init(kw);
   kw_connect(kw);
+  adapter->fd = kw->fd;
   return 0;
 }
