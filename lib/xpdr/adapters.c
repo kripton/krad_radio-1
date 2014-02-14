@@ -17,7 +17,7 @@ typedef enum {
 } kr_xpdr_path_mode;
 
 static const kr_xpdr_path_mode xpdr_type_modes[] = {
-  [0] = KR_ADAPTER_CTX,
+  [0] = 0,
   [KR_JACK] = KR_ADAPTER_CTX,
   [KR_WAYLAND] = KR_ADAPTER_CTX,
   [KR_V4L2] = KR_ADAPTER_CTX,
