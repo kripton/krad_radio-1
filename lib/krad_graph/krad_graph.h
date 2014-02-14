@@ -27,15 +27,15 @@ typedef struct {
   kr_graph_vertex_process_cb *vertex_process_cb;
 } kr_graph_setup;
 
+int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex, int dir, void **user, int max);
+int kr_graph_output_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
+int kr_graph_output_users_from_edge(kr_graph *graph, kr_edge *edge, void **user, int max);
+int kr_graph_source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
+int kr_graph_chains(kr_graph *graph, kr_vertex *to, kr_vertex *from, void ***user, int max, int max_len);
 int kr_graph_edge_destroy(kr_graph *graph, kr_edge *edge);
 kr_edge *kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, void *user);
 int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex);
 kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *user);
-kr_graph *kr_graph_create(kr_graph_setup *setup);
 int kr_graph_destroy(kr_graph *graph);
-int kr_graph_output_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
-int kr_graph_output_users_from_edge(kr_graph *graph, kr_edge *edge, void **user, int max);
-int kr_graph_source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
-int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex, int dir, void **user, int max);
-int kr_graph_chains(kr_graph *graph, kr_vertex *to, kr_vertex *from, void ***user, int max, int max_len);
+kr_graph *kr_graph_create(kr_graph_setup *setup);
 #endif
