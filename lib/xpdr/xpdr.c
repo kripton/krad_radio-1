@@ -7,9 +7,6 @@
 
 #include "adapters.c"
 
-typedef struct {
-} adapter_link;
-
 struct kr_xpdr_path {
   union {
     kr_adapter adapter;
@@ -41,6 +38,7 @@ struct kr_xpdr {
 
 static void compositor_frame(kr_frame_event *event);
 static void mixer_audio(kr_audio_event *event);
+static void adapter_av(kr_adapter_path_av_event *event);
 static void adapter_event(kr_adapter_event *event);
 static int link_destroy(kr_xpdr_path *path);
 static int link_create(kr_xpdr_path *path);
@@ -58,11 +56,11 @@ static void mixer_audio(kr_audio_event *event) {
   event->audio = path->link.audio;
 }
 
-static void adapter_av(kr_adapter_path_av_cb_arg *arg) {
+static void adapter_av(kr_adapter_path_av_event *event) {
   kr_xpdr_path *path;
-  path = (kr_xpdr_path *)arg->user;
-  path->link.audio = arg->audio;
-  path->link.image = arg->image;
+  path = (kr_xpdr_path *)event->user;
+  path->link.audio = event->audio;
+  path->link.image = event->image;
 }
 
 static void adapter_event(kr_adapter_event *event) {
