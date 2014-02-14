@@ -1,7 +1,7 @@
 #include "gen.h"
 #include "krad_ebmlx.h"
 int info_pack_to_ebml(kr_ebml *ebml, uber_St *uber) {
-  const info_pack_to_ebml_func to_ebml_functions[61] = {kr_aux_info_to_ebml,
+  const info_pack_to_ebml_func to_ebml_functions[62] = {kr_aux_info_to_ebml,
   kr_aux_path_info_to_ebml,kr_alsa_info_to_ebml,
   kr_alsa_path_info_to_ebml,kr_method_to_ebml,
   kr_crate_to_ebml,kr_easing_to_ebml,
@@ -28,11 +28,11 @@ int info_pack_to_ebml(kr_ebml *ebml, uber_St *uber) {
   kr_highpass_info_to_ebml,kr_volume_info_to_ebml,
   kr_analog_info_to_ebml,kr_v4l2_state_to_ebml,
   kr_v4l2_mode_to_ebml,kr_v4l2_info_to_ebml,
-  kr_v4l2_open_info_to_ebml,kr_wayland_info_to_ebml,
-  kr_wayland_path_info_to_ebml,kr_x11_info_to_ebml,
-  kr_x11_path_info_to_ebml,kr_xpdr_type_to_ebml,
-  kr_xpdr_type_info_to_ebml,kr_xpdr_path_info_to_ebml
-  };
+  kr_v4l2_open_info_to_ebml,kr_wayland_state_to_ebml,
+  kr_wayland_info_to_ebml,kr_wayland_path_info_to_ebml,
+  kr_x11_info_to_ebml,kr_x11_path_info_to_ebml,
+  kr_xpdr_type_to_ebml,kr_xpdr_type_info_to_ebml,
+  kr_xpdr_path_info_to_ebml};
   return to_ebml_functions[uber->type-1](ebml , uber->actual);
 }
 

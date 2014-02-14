@@ -1,6 +1,6 @@
 #include "gen.h"
 int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
-  const info_pack_to_json_func to_json_functions[59] = {kr_aux_info_to_json,
+  const info_pack_to_json_func to_json_functions[60] = {kr_aux_info_to_json,
   kr_aux_path_info_to_json,kr_alsa_info_to_json,
   kr_alsa_path_info_to_json,kr_method_to_json,
   kr_crate_to_json,kr_easing_to_json,
@@ -26,11 +26,11 @@ int info_pack_to_json(char *json, uber_St *uber, int32_t max) {
   kr_highpass_info_to_json,kr_volume_info_to_json,
   kr_analog_info_to_json,kr_v4l2_state_to_json,
   kr_v4l2_mode_to_json,kr_v4l2_info_to_json,
-  kr_v4l2_open_info_to_json,kr_wayland_info_to_json,
-  kr_wayland_path_info_to_json,kr_x11_info_to_json,
-  kr_x11_path_info_to_json,kr_xpdr_type_to_json,
-  kr_xpdr_type_info_to_json,kr_xpdr_path_info_to_json
-  };
+  kr_v4l2_open_info_to_json,kr_wayland_state_to_json,
+  kr_wayland_info_to_json,kr_wayland_path_info_to_json,
+  kr_x11_info_to_json,kr_x11_path_info_to_json,
+  kr_xpdr_type_to_json,kr_xpdr_type_info_to_json,
+  kr_xpdr_path_info_to_json};
   return to_json_functions[uber->type-1](json , uber->actual, max);
 }
 

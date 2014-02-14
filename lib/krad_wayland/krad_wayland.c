@@ -7,6 +7,7 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <sys/mman.h>
+#include <errno.h>
 #include <signal.h>
 #include <wayland-client.h>
 #include <xkbcommon/xkbcommon.h>
@@ -85,7 +86,7 @@ struct kr_wayland_path {
 };
 
 struct kr_wayland {
-  int display_fd;
+  int fd;
   kr_wayland_path window[KR_WL_MAX_WINDOWS];
   kr_wayland_path *key_window;
   kr_wayland_path *pointer_window;
@@ -113,9 +114,6 @@ struct kr_wayland {
   } xkb;
   kr_wayland_info info;
 };
-
-static int kw_create_shm_buffer(kr_wayland_path *window,
- int width, int height, int frames, uint32_t format, void **data_out);
 
 static void handle_configure(void *data, struct wl_shell_surface *ss,
  uint32_t edges, int32_t width, int32_t height);
@@ -328,20 +326,44 @@ int kr_wayland_unlink(kr_wayland_path **win) {
   *win = NULL;
   return 0;
 }
-
-int kr_wayland_process(kr_wayland *wayland) {
-  *//* TODO Check for disconnect etc *//*
-  wl_display_dispatch(wayland->display);
-  wl_display_roundtrip(wayland->display);
-  return 0;
-}
 */
 
-int kr_wl_close(kr_adapter *adp) {
-  kr_wayland *kw;
-  if (adp == NULL) return -1;
-  printk("Wayland: Adapter Closing");
-  kw = (kr_wayland *)adp->handle;
+int kr_wayland_handle_out(kr_wayland *kw) {
+  int ret;
+  while (wl_display_prepare_read(kw->display) != 0) {
+    ret = wl_display_dispatch_pending(kw->display);
+    if (ret == -1) {
+      printke("Wayland: Error on dispatch pending");
+    }
+  }
+  ret = wl_display_flush(kw->display);
+  if ((ret == -1) && (errno != EAGAIN)) {
+    ret = errno;
+    printke("Wayland: Error on display flush: %s", strerror(ret));
+    return -1;
+  }
+  /* Can poll now */
+  return 0;
+}
+
+int kr_wayland_handle_in(kr_wayland *kw) {
+  int ret;
+  ret = wl_display_read_events(kw->display);
+  if (ret == -1) {
+    ret = errno;
+    printke("Wayland: Error on read events: %s", strerror(ret));
+    return -1;
+  }
+  ret = wl_display_dispatch_pending(kw->display);
+  if (ret == -1) {
+    printke("Wayland: Error on dispatch pending");
+    return -1;
+  }
+  return 0;
+}
+
+void kw_teardown(kr_wayland *kw) {
+  if (kw == NULL) return;
   if (kw->pointer != NULL) {
     wl_pointer_destroy(kw->pointer);
     kw->pointer = NULL;
@@ -357,6 +379,10 @@ int kr_wl_close(kr_adapter *adp) {
   if (kw->xkb.keymap) {
     xkb_map_unref(kw->xkb.keymap);
     kw->xkb.keymap = NULL;
+  }
+  if (kw->seat) {
+    wl_seat_destroy(kw->seat);
+    kw->seat = NULL;
   }
   if (kw->xkb.context) {
     xkb_context_unref(kw->xkb.context);
@@ -374,19 +400,25 @@ int kr_wl_close(kr_adapter *adp) {
     wl_compositor_destroy(kw->compositor);
     kw->compositor = NULL;
   }
-  if (kw->seat) {
-    wl_seat_destroy(kw->seat);
-    kw->seat = NULL;
-  }
   if (kw->registry) {
     wl_registry_destroy(kw->registry);
     kw->registry = NULL;
   }
   if (kw->display) {
+    /* FIXME We only want to run flush if !EPOLLERR && !EPOLLHUP on the fd */
     wl_display_flush(kw->display);
     wl_display_disconnect(kw->display);
     kw->display = NULL;
   }
+  kw->info.state = KR_WL_DISCONNECTED;
+}
+
+int kr_wl_close(kr_adapter *adp) {
+  kr_wayland *kw;
+  if (adp == NULL) return -1;
+  printk("Wayland: Adapter Closing");
+  kw = (kr_wayland *)adp->handle;
+  kw_teardown(kw);
   free(kw);
   adp->handle = NULL;
   printk("Wayland: Adapter Closed");
@@ -404,19 +436,21 @@ static void kw_connect(kr_wayland *kw) {
     display_name = "default";
   }
   if (kw->display == NULL) {
+    kw->info.state = KR_WL_DISCONNECTED;
     printke("Wayland: Unable to connect to %s display", display_name);
     return;
   }
   printk("Wayland: Connected to %s display", display_name);
+  kw->fd = wl_display_get_fd(kw->display);
+  kw->info.state = KR_WL_CONNECTED;
+  kw->xkb.context = xkb_context_new(0);
   kw->registry = wl_display_get_registry(kw->display);
   wl_registry_add_listener(kw->registry, &kw->registry_listener, kw);
   wl_display_roundtrip(kw->display);
-  kw->display_fd = wl_display_get_fd(kw->display);
 }
 
 static void kw_init(kr_wayland *kw) {
   kw->formats = 0;
-  kw->xkb.context = xkb_context_new(0);
   kw->pointer_listener.enter = pointer_handle_enter;
   kw->pointer_listener.leave = pointer_handle_leave;
   kw->pointer_listener.motion = pointer_handle_motion;
