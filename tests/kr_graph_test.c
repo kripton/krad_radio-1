@@ -18,6 +18,29 @@ void print_usage(const char *cmd) {
   printf("Usage:\n  %s num_of_vertices num_of_edges\n",cmd);
 }
 
+void print_chain(kr_graph_chain *chain) {
+  int i;
+  for (i = 0; i < chain->len; i++) {
+    printf("%p ",chain->chain[i]);
+    if (i != (chain->len - 1))
+      printf("--> ");
+  }
+}
+
+void kr_graph_print_chains(kr_graph *graph, kr_vertex *from) {
+  kr_graph_chain chains[MAX_VERTICES];
+  int n;
+  int i;
+  memset(&chains,0,sizeof(chains));
+  n = kr_graph_all_chains_from(graph, from, chains);
+  printf("we have %d chains\n",n);
+  printf("iter version\n");
+  for (i = 0; i < n; i++) {
+    print_chain(&chains[i]);
+    printf("\n");
+  }
+}
+
 char *kr_graph_vertex_type_to_str(kr_vertex_type type) {
   switch (type) {
     case KR_VERTEX_SOURCE: return "SOURCE";

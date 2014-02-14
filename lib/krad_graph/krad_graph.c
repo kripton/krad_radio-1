@@ -39,6 +39,23 @@ typedef struct {
   int len;
 } kr_graph_chain;
 
+static int vertex_index(kr_graph *graph, kr_vertex *v);
+static int visit(kr_graph *graph, uint8_t v, uint8_t *marked);
+static int kr_graph_is_cyclic(kr_graph *graph);
+static int get_in_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max);
+static int get_out_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max);
+static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
+  kr_vertex **out, int max, int type);
+static int kr_vertex_deps(kr_graph *graph, kr_vertex *vertex,
+  kr_vertex **deps, int max);
+static int kr_vertex_indeps(kr_graph *graph, kr_vertex *vertex,
+  kr_vertex **indeps, int max);
+static void chain_push_vertex(kr_graph_chain *chain, kr_vertex *vertex);
+static void chain_pop_vertex(kr_graph_chain *chain);
+static int kr_graph_all_chains_from(kr_graph *graph, kr_vertex *from, kr_graph_chain *chains);
+static int kr_graph_edge_destroy_internal(kr_graph *graph, kr_edge *edge);
+static int kr_graph_vertex_destroy_internal(kr_graph *graph, kr_vertex *vertex);
+
 static int vertex_index(kr_graph *graph, kr_vertex *v) {
   int8_t i;
   for (i = 0; i < MAX_VERTICES; i++) {
@@ -85,32 +102,32 @@ static int kr_graph_is_cyclic(kr_graph *graph) {
 }
 
 static int get_in_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max) {
-    uint16_t i;
-    int count;
-    for (i = count = 0; i < MAX_EDGES; i++) {
-      if (graph->edges[i].to == vertex) {
-        if (graph->edges[i].user) {
-          user[count++] = graph->edges[i].user;
-        }
+  uint16_t i;
+  int count;
+  for (i = count = 0; i < MAX_EDGES; i++) {
+    if (graph->edges[i].to == vertex) {
+      if (graph->edges[i].user) {
+        user[count++] = graph->edges[i].user;
       }
     }
-    return count;
+  }
+  return count;
 }
 
 static int get_out_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max) {
-    uint16_t i;
-    int count;
-    for (i = count = 0; i < MAX_EDGES; i++) {
-      if (graph->edges[i].from == vertex) {
-        if (graph->edges[i].user) {
-          user[count++] = graph->edges[i].user;
-        }
+  uint16_t i;
+  int count;
+  for (i = count = 0; i < MAX_EDGES; i++) {
+    if (graph->edges[i].from == vertex) {
+      if (graph->edges[i].user) {
+        user[count++] = graph->edges[i].user;
       }
     }
-    return count;
+  }
+  return count;
 }
 
-static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex, 
+static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
   kr_vertex **out, int max, int type) {
   kr_vertex *vertices[MAX_VERTICES];
   kr_vertex *done[MAX_EDGES];
@@ -119,11 +136,9 @@ static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
   int16_t i;
   //int16_t j;
   int16_t count;
-
   k = 0;
   count = 0;
   vertices[k++] = vertex;
-
   while (k) {
     vertex = vertices[--k];
     if (type == DEPS)
@@ -140,27 +155,57 @@ static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
       }
     }
   }
-
   k = 0;
-
   for (i = count-1; i >= 0; i--) {
     if (k >= max) return k;
     out[k++] = done[i];
   }
-
   return k;
 }
 
-static int kr_vertex_indeps(kr_graph *graph, kr_vertex *vertex, 
+static int kr_vertex_deps(kr_graph *graph, kr_vertex *vertex,
+  kr_vertex **deps, int max) {
+  if (max == 0) return 0;
+  return vertex_deps_indeps(graph, vertex, deps, max, DEPS);
+}
+
+static int kr_vertex_indeps(kr_graph *graph, kr_vertex *vertex,
   kr_vertex **indeps, int max) {
   if (max == 0) return 0;
   return vertex_deps_indeps(graph, vertex, indeps, max, INDEPS);
 }
 
-int kr_vertex_deps(kr_graph *graph, kr_vertex *vertex, 
-  kr_vertex **deps, int max) {
-  if (max == 0) return 0;
-  return vertex_deps_indeps(graph, vertex, deps, max, DEPS);
+static void chain_push_vertex(kr_graph_chain *chain, kr_vertex *vertex) {
+  chain->chain[chain->len++] = vertex;
+}
+
+static void chain_pop_vertex(kr_graph_chain *chain) {
+  chain->len--;
+}
+
+static int kr_graph_all_chains_from(kr_graph *graph, kr_vertex *from, kr_graph_chain *chains) {
+  kr_graph_chain ch;
+  kr_graph_chain chain_stack[256];
+  int i;
+  int n;
+  int k;
+  memset(&chain_stack, 0, sizeof(chain_stack));
+  n = 0;
+  k = 0;
+  chain_push_vertex(&chain_stack[k++], from);
+  while (k) {
+    ch = chain_stack[--k];
+    chains[n++] = ch;
+    for (i = 0; i < MAX_VERTICES; i++) {
+      if (ch.chain[ch.len-1]->adj[i]) {
+        if (k >= 256) return -1;
+        chain_push_vertex(&ch, &graph->vertices[i]);
+        chain_stack[k++] = ch;
+        chain_pop_vertex(&ch);
+      }
+    }
+  }
+  return n;
 }
 
 static int kr_graph_edge_destroy_internal(kr_graph *graph, kr_edge *edge) {
@@ -176,6 +221,19 @@ static int kr_graph_edge_destroy_internal(kr_graph *graph, kr_edge *edge) {
     memset(edge, 0, sizeof(kr_edge));
     return 0;
   }
+}
+
+static int kr_graph_vertex_destroy_internal(kr_graph *graph, kr_vertex *vertex) {
+  uint16_t i;
+  for (i = 0; i < MAX_EDGES; i++) {
+    if (graph->edges[i].from == vertex || graph->edges[i].to == vertex) {
+      if (kr_graph_edge_destroy_internal(graph, &graph->edges[i])) {
+        return 1;
+      }
+    }
+  }
+  memset(vertex, 0, sizeof(kr_vertex));
+  return 0;
 }
 
 int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex, 
@@ -214,7 +272,7 @@ int kr_graph_output_users_from(kr_graph *graph, kr_vertex *vertex, void **user, 
 }
 
 int kr_graph_output_users_from_edge(kr_graph *graph, kr_edge *edge, void **user, int max) {
-  return kr_graph_output_users_from(graph,edge->to,user,max);
+  return kr_graph_output_users_from(graph, edge->to, user, max);
 }
 
 int kr_graph_source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max){
@@ -234,62 +292,6 @@ int kr_graph_source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, 
     }
   }
   return k;
-}
-
-static void print_chain(kr_graph_chain *chain) {
-  int i;
-  for (i = 0; i < chain->len; i++) {
-    printf("%p ",chain->chain[i]);
-    if (i != (chain->len - 1))
-      printf("--> ");
-  }
-}
-
-static void chain_push_vertex(kr_graph_chain *chain, kr_vertex *vertex) {
-  chain->chain[chain->len++] = vertex;
-}
-
-static void chain_pop_vertex(kr_graph_chain *chain) {
-  chain->len--;
-}
-
-static int kr_graph_all_chains_from(kr_graph *graph, kr_vertex *from, kr_graph_chain *chains) {
-  kr_graph_chain ch;
-  kr_graph_chain chain_stack[256];
-  int i;
-  int n;
-  int k;
-  memset(&chain_stack,0,sizeof(chain_stack));
-  n = 0;
-  k = 0;
-  chain_push_vertex(&chain_stack[k++],from);
-  while (k) {
-    ch = chain_stack[--k];
-    chains[n++] = ch;
-    for (i = 0; i < MAX_VERTICES; i++) {
-      if (ch.chain[ch.len-1]->adj[i]) {
-        if (k >= 256) return -1;
-        chain_push_vertex(&ch,&graph->vertices[i]);
-        chain_stack[k++] = ch;
-        chain_pop_vertex(&ch);
-      }
-    }
-  }
-  return n;
-}
-
-void kr_graph_print_chains(kr_graph *graph, kr_vertex *from) {
-  kr_graph_chain chains[MAX_VERTICES];
-  int n;
-  int i;
-  memset(&chains,0,sizeof(chains));
-  n = kr_graph_all_chains_from(graph, from, chains);
-  printf("we have %d chains\n",n);
-  printf("iter version\n");
-  for (i = 0; i < n; i++) {
-    print_chain(&chains[i]);
-    printf("\n");
-  }
 }
 
 int kr_graph_chains(kr_graph *graph, kr_vertex *to, kr_vertex *from, void ***user, int max, int max_len) {
@@ -344,6 +346,11 @@ kr_edge *kr_graph_edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, v
   return NULL;
 }
 
+int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex) {
+  if (graph == NULL || vertex == NULL) return 1;
+  return kr_graph_vertex_destroy_internal(graph, vertex);
+}
+
 kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *user) {
   uint8_t i;
   if (graph == NULL || type == 0) return NULL;
@@ -357,22 +364,10 @@ kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *us
   return NULL;
 }
 
-static int kr_graph_vertex_destroy_internal(kr_graph *graph, kr_vertex *vertex) {
-  uint16_t i;
-  for (i = 0; i < MAX_EDGES; i++) {
-    if (graph->edges[i].from == vertex || graph->edges[i].to == vertex) {
-      if (kr_graph_edge_destroy_internal(graph, &graph->edges[i])) {
-        return 1;
-      }
-    }
-  }
-  memset(vertex,0,sizeof(kr_vertex));
+int kr_graph_destroy(kr_graph *graph) {
+  if (graph == NULL) return 1;
+  free(graph);
   return 0;
-}
-
-int kr_graph_vertex_destroy(kr_graph *graph, kr_vertex *vertex) {
-  if (graph == NULL || vertex == NULL) return 1;
-  return kr_graph_vertex_destroy_internal(graph, vertex);
 }
 
 kr_graph *kr_graph_create(kr_graph_setup *setup) {
@@ -382,10 +377,4 @@ kr_graph *kr_graph_create(kr_graph_setup *setup) {
   graph->edge_destroy_cb = setup->edge_destroy_cb;
   graph->vertex_process_cb = setup->vertex_process_cb;
   return graph;
-}
-
-int kr_graph_destroy(kr_graph *graph) {
-  if (graph == NULL) return 1;
-  free(graph);
-  return 0;
 }
