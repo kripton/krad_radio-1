@@ -17,8 +17,7 @@ struct kr_compositor_path {
   kr_convert converter;
   kr_perspective *perspective;
   union {
-    kr_vertex *vertex;
-    kr_edge *edge;
+    kr_graph_elem elem;
     void *ptr;
   } g;
 };
@@ -84,10 +83,10 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   }
   path->g.ptr = NULL;
   if (setup->info->type == KR_COM_INPUT) {
-    path->g.edge = kr_graph_edge_create(comp->graph, setup->to->g.vertex, setup->from->g.vertex, path);
+    path->g.elem = kr_graph_link(comp->graph, &setup->to->g.elem, &setup->from->g.elem, path);
   } else {
     vertex_type = path_vertex_type(setup->info->type);
-    path->g.vertex = kr_graph_vertex_create(comp->graph, vertex_type, path);
+    path->g.elem = kr_graph_vertex(comp->graph, vertex_type, path);
   }
   if (path->g.ptr == NULL) {
     kr_pool_recycle(comp->path_pool, path);
@@ -114,11 +113,7 @@ static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
     kr_perspective_destroy(&path->perspective);
   }
   kr_image_convert_clear(&path->converter);
-  if (path->info.type == KR_COM_INPUT) {
-    kr_graph_edge_destroy(path->compositor->graph, path->g.edge);
-  } else {
-    kr_graph_vertex_destroy(path->compositor->graph, path->g.vertex);
-  }
+  kr_graph_remove(path->compositor->graph, &path->g.elem);
   kr_pool_recycle(path->compositor->path_pool, path);
 }
 
@@ -175,7 +170,7 @@ static void output_source_render(kr_compositor_path *output, kr_compositor_path 
   for (i = 0; i < 16; i++) {
     user_chains[i] = alloca(sizeof(void*)*16);
   }
-  n = kr_graph_chains(output->compositor->graph, output->g.vertex, source->g.vertex, user_chains, 16, 16);
+  n = kr_graph_chains(output->compositor->graph, &output->g.elem, &source->g.elem, user_chains, 16, 16);
   for (i = 0; i < n; i++) {
     //transform = get_transform(user_chains, len);
     //render(output, source, transform);
@@ -187,8 +182,8 @@ static void output_render(kr_compositor_path *output) {
   kr_compositor_path *source;
   int i;
   int n;
-  n = kr_graph_source_users_from(output->compositor->graph,
-    output->g.vertex, source_users, 16);
+  n = kr_graph_sources(output->compositor->graph,
+    &output->g.elem, source_users, 16);
   for (i = 0; i < n; i++) {
     source = (kr_compositor_path *)source_users[i];
     output_source_render(output, source);
@@ -207,13 +202,8 @@ int kr_compositor_process(kr_compositor_path *path) {
     //}
     return 0;
   } else {
-    if (path->info.type == KR_COM_INPUT) {
-      n = kr_graph_output_users_from_edge(path->compositor->graph,
-        path->g.edge, output_users, 16);
-    } else {
-      n = kr_graph_output_users_from(path->compositor->graph,
-        path->g.vertex, output_users, 16);
-    }
+    n = kr_graph_outputs(path->compositor->graph,
+        &path->g.elem, output_users, 16);
     for (i = 0; i < n; i++) {
       output = (kr_compositor_path *)output_users[i];
       //if (output->writeable) {
