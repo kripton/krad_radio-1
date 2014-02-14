@@ -8,20 +8,21 @@
 #include "adapters.c"
 
 typedef struct {
-  kr_adapter *adapter;
-  kr_adapter_path adapter_path;
-  union {
-    kr_mixer_path *mixer_port;
-    kr_compositor_path *compositor_port;
-  };
-  kr_audio audio;
-  kr_image image;
 } adapter_link;
 
 struct kr_xpdr_path {
   union {
     kr_adapter adapter;
-    adapter_link link;
+    struct {
+      kr_adapter *adapter;
+      kr_adapter_path adapter_path;
+      union {
+        kr_mixer_path *mixer_port;
+        kr_compositor_path *compositor_port;
+      };
+      kr_audio audio;
+      kr_image image;
+    } link;
   };
   kr_xpdr_path_mode mode;
   kr_xpdr_path_info info;
@@ -157,6 +158,11 @@ static int link_create(kr_xpdr_path *path) {
     }
   }
   if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_AUDIO_OUT)) {
+    if (path->mode == KR_AUDIO_IN) {
+      mp_setup.info.type = KR_MXR_SOURCE;
+    } else {
+      mp_setup.info.type = KR_MXR_OUTPUT;
+    }
     mp_setup.audio_cb = mixer_audio;
     mp_setup.audio_user = path;
     mp_setup.control_user = path->user;
@@ -167,6 +173,11 @@ static int link_create(kr_xpdr_path *path) {
     }
   }
   if ((path->mode == KR_VIDEO_IN) || (path->mode = KR_VIDEO_OUT)) {
+    if (path->mode == KR_VIDEO_IN) {
+      cp_setup.info.type = KR_COM_SOURCE;
+    } else {
+      cp_setup.info.type = KR_COM_OUTPUT;
+    }
     cp_setup.frame_cb = compositor_frame;
     cp_setup.frame_user = path;
     cp_setup.control_user = path->user;
