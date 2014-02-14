@@ -6,38 +6,17 @@
 
 typedef struct kr_graph kr_graph;
 typedef struct kr_vertex kr_vertex;
+typedef struct kr_edge kr_edge;
+typedef enum kr_vertex_type kr_vertex_type;
+typedef enum kr_edge_dir kr_edge_dir;
+
 typedef void (kr_graph_edge_destroy_cb)(void *user);
 typedef void (kr_graph_vertex_process_cb)(void *user_to, void **user_from, int from_len);
 
-typedef enum {
-  IN = 1,
-  OUT
-} kr_edge_dir;
-
-typedef enum {
+enum kr_vertex_type {
   KR_VERTEX_SOURCE = 1,
   KR_VERTEX_BUS,
   KR_VERTEX_OUTPUT
-} kr_vertex_type;
-
-typedef struct {
-  kr_vertex *from;
-  kr_vertex *to;
-  void *user;
-} kr_edge;
-
-struct kr_vertex {
-  uint16_t adj[MAX_VERTICES];
-  uint16_t deps[MAX_VERTICES];
-  kr_vertex_type type;
-  void *user;
-};
-
-struct kr_graph {
-  kr_vertex vertices[MAX_VERTICES];
-  kr_edge edges[MAX_EDGES];
-  kr_graph_edge_destroy_cb *edge_destroy_cb;
-  kr_graph_vertex_process_cb *vertex_process_cb;
 };
 
 typedef struct {
@@ -55,6 +34,7 @@ kr_vertex *kr_graph_vertex_create(kr_graph *graph, kr_vertex_type type, void *us
 kr_graph *kr_graph_create(kr_graph_setup *setup);
 int kr_graph_destroy(kr_graph *graph);
 int kr_graph_output_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
+int kr_graph_output_users_from_edge(kr_graph *graph, kr_edge *edge, void **user, int max);
 int kr_graph_source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
 int kr_graph_in_out_edges(kr_graph *graph, kr_vertex *vertex, int dir, void **user, int max);
 int kr_graph_chains(kr_graph *graph, kr_vertex *to, kr_vertex *from, void ***user, int max, int max_len);
