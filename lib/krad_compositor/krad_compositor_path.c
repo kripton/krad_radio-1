@@ -208,8 +208,8 @@ int kr_compositor_process(kr_compositor_path *path) {
     return 0;
   } else {
     if (path->info.type == KR_COM_INPUT) {
-      n = kr_graph_output_users_from(path->compositor->graph,
-        path->g.edge->to, output_users, 16);
+      n = kr_graph_output_users_from_edge(path->compositor->graph,
+        path->g.edge, output_users, 16);
     } else {
       n = kr_graph_output_users_from(path->compositor->graph,
         path->g.vertex, output_users, 16);
