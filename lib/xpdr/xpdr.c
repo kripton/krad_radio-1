@@ -7,57 +7,27 @@
 
 #include "adapters.c"
 
-typedef enum {
-  INVALID = -1,
-  ADAPTER_CTX,
-  ADAPTER_LINK
-} path_type;
-
-typedef enum {
-  MIXER,
-  COMPOSITOR,
-  ADAPTER
-} link_io_type;
-
-typedef union {
-  void *exists;
-  kr_mixer_path *mixer_port;
-  kr_compositor_path *compositor_port;
-  kr_adapter_path *adapter_path;
-} link_io;
-
 typedef struct {
   kr_adapter *adapter;
-  kr_xpdr_type adapter_type;
-} xpdr_adapter;
-
-typedef struct {
-  xpdr_adapter *adapter;
-  link_io_type input_type;
-  link_io input;
-  link_io_type output_type;
-  link_io output;
+  kr_adapter_path adapter_path;
+  union {
+    kr_mixer_path *mixer_port;
+    kr_compositor_path *compositor_port;
+  };
   kr_audio audio;
   kr_image image;
 } adapter_link;
 
 struct kr_xpdr_path {
   union {
-    xpdr_adapter adapter;
+    kr_adapter adapter;
     adapter_link link;
-  } state;
-  path_type type;
+  };
+  kr_xpdr_path_mode mode;
   kr_xpdr_path_info info;
   void *user;
   kr_xpdr *xpdr;
 };
-
-typedef struct {
-  path_type type;
-  kr_xpdr_path_info *info;
-  kr_xpdr_path *adapter_path;
-  void *user;
-} xpdr_path_setup;
 
 struct kr_xpdr {
   kr_mixer *mixer;
@@ -71,29 +41,27 @@ struct kr_xpdr {
 static void compositor_frame(kr_frame_event *event);
 static void mixer_audio(kr_audio_event *event);
 static void adapter_event(kr_adapter_event *event);
-static void link_io_destroy(kr_xpdr_path *path);
-static void link_io_create(kr_xpdr_path *path);
-static int path_destroy(kr_xpdr_path *path);
-static int path_setup(kr_xpdr_path *path, xpdr_path_setup *setup);
-static kr_xpdr_path *path_create(kr_xpdr *xpdr, xpdr_path_setup *setup);
+static int link_destroy(kr_xpdr_path *path);
+static int link_create(kr_xpdr_path *path);
+static int path_create(kr_xpdr *xpdr, kr_xpdr_path *ap, kr_xpdr_path_info *info, void *user);
 
 static void compositor_frame(kr_frame_event *event) {
   kr_xpdr_path *path;
   path = (kr_xpdr_path *)event->user;
-  event->image = path->state.link.image;
+  event->image = path->link.image;
 }
 
 static void mixer_audio(kr_audio_event *event) {
   kr_xpdr_path *path;
   path = (kr_xpdr_path *)event->user;
-  event->audio = path->state.link.audio;
+  event->audio = path->link.audio;
 }
 
 static void adapter_av(kr_adapter_path_av_cb_arg *arg) {
   kr_xpdr_path *path;
   path = (kr_xpdr_path *)arg->user;
-  path->state.link.audio = arg->audio;
-  path->state.link.image = arg->image;
+  path->link.audio = arg->audio;
+  path->link.image = arg->image;
 }
 
 static void adapter_event(kr_adapter_event *event) {
@@ -137,165 +105,126 @@ static void adapter_event(kr_adapter_event *event) {
   */
 }
 
-static void link_io_destroy(kr_xpdr_path *path) {
-  link_io *io;
-  link_io_type type;
-  if (path->state.link.input.exists) {
-    type = path->state.link.input_type;
-    io = &path->state.link.input;
-  } else {
-    type = path->state.link.output_type;
-    io = &path->state.link.output;
-  }
-  switch (type) {
-    case ADAPTER:
-      adapters[path->state.link.adapter->adapter_type].unlink(io->adapter_path);
-      break;
-    case MIXER:
-      kr_mixer_remove(io->mixer_port);
-      break;
-    case COMPOSITOR:
-      kr_compositor_remove(io->compositor_port);
-      break;
-  }
-  io->exists = NULL;
-}
-
-static void link_io_create(kr_xpdr_path *path) {
-  link_io *io;
-  link_io_type type;
-  kr_mixer *mixer;
-  kr_compositor *compositor;
-  kr_adapter *adapter;
-  kr_mixer_port_setup mp_setup;
-  kr_compositor_port_setup cp_setup;
-  kr_adapter_path_setup ap_setup;
-  mixer = path->xpdr->mixer;
-  compositor = path->xpdr->compositor;
-  adapter = path->state.link.adapter->adapter;
-  if (path->state.link.output.exists) {
-    type = path->state.link.input_type;
-    io = &path->state.link.input;
-  } else {
-    type = path->state.link.output_type;
-    io = &path->state.link.output;
-  }
-  switch (type) {
-    case ADAPTER:
-      ap_setup.info = path->info;
-      ap_setup.av_cb = adapter_av;
-      ap_setup.user = path;
-      io->adapter_path = adapters[path->state.link.adapter->adapter_type].link(adapter, &ap_setup);
-      if (io->adapter_path == NULL) {
-        printke("adapter mkpath returned NULL");
-      }
-      break;
-    case MIXER:
-      /* mp_setup.info setup srate?channels? FIXME */
-      mp_setup.audio_cb = mixer_audio;
-      mp_setup.audio_user = path;
-      mp_setup.control_user = path->user;
-      io->mixer_port = kr_mixer_port(mixer, &mp_setup);
-      if (io->mixer_port == NULL) {
-        printke("mixer port returned NULL");
-      }
-      break;
-    case COMPOSITOR:
-      /* cp_setup.info setup frame size? FIXME */
-      cp_setup.frame_cb = compositor_frame;
-      cp_setup.frame_user = path;
-      cp_setup.control_user = path->user;
-      io->compositor_port = kr_compositor_port(compositor, &cp_setup);
-      if (io->compositor_port == NULL) {
-        printke("compositor port returned NULL");
-      }
-      break;
-  }
-}
-
-static int path_destroy(kr_xpdr_path *path) {
+static int link_destroy(kr_xpdr_path *path) {
   int ret;
+  int r;
   ret = 0;
-  if (path->type == ADAPTER_CTX) {
-    ret = adapters[path->state.adapter.adapter_type].close(path->state.adapter.adapter);
-  } else {
-    link_io_destroy(path);
-    link_io_destroy(path);
+  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_VIDEO_IN)) {
+    r = adapters[path->info.type].unlink(&path->link.adapter_path);
+    if (r != 0) {
+      printke("XPDR: Problem unlinking adapter path");
+      ret += r;
+    }
+  }
+  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_AUDIO_OUT)) {
+    r = kr_mixer_remove(path->link.mixer_port);
+    if (r != 0) {
+      printke("XPDR: Problem removing mixer port");
+      ret += r;
+    }
+  }
+  if ((path->mode == KR_VIDEO_IN) || (path->mode = KR_VIDEO_OUT)) {
+    r = kr_compositor_remove(path->link.compositor_port);
+    if (r != 0) {
+      printke("XPDR: Problem removing compositor port");
+      ret += r;
+    }
+  }
+  if ((path->mode == KR_AUDIO_OUT) || (path->mode = KR_VIDEO_OUT)) {
+    r = adapters[path->info.type].unlink(&path->link.adapter_path);
+    if (r != 0) {
+      printke("XPDR: Problem unlinking adapter path");
+      ret += r;
+    }
   }
   return ret;
 }
 
-static int path_setup(kr_xpdr_path *path, xpdr_path_setup *setup) {
-  path->info = *setup->info;
-  path->user = setup->user;
-  path->type = setup->type;
-  kr_adapter_setup adapter_setup;
-  switch (path->type) {
-    case INVALID: return -1;
-    case ADAPTER_CTX:
-      adapter_setup.info = path->info;
-      adapter_setup.event_cb = adapter_event;
-      adapter_setup.user = path;
-      path->state.adapter.adapter_type = path->info.type;
-      if ((path->state.adapter.adapter_type < 1)
-       || (path->state.adapter.adapter_type >= nadapter_types)) {
-        printke("XPDR: Adapter type invalid.");
-        return -2;
-      }
-      if (adapters[path->state.adapter.adapter_type].open == NULL) {
-        printke("XPDR: Adapter type is not supported on this system.");
-        return -3;
-      }
-      printk("XPDR: adapter context create");
-      path->state.adapter.adapter = adapters[path->state.adapter.adapter_type].open(&adapter_setup);
-      if (path->state.adapter.adapter == NULL) return -1;
-      return 0;
-    case ADAPTER_LINK:
-      printk("XPDR: adapter path create");
-      path->state.link.adapter = &setup->adapter_path->state.adapter;
-      switch (xpdr_type_modes[path->info.type]) {
-        case KR_VIDEO_IN:
-          path->state.link.input_type = ADAPTER;
-          path->state.link.output_type = COMPOSITOR;
-          break;
-        case KR_VIDEO_OUT:
-          path->state.link.input_type = COMPOSITOR;
-          path->state.link.output_type = ADAPTER;
-          break;
-        case KR_AUDIO_IN:
-          path->state.link.input_type = ADAPTER;
-          path->state.link.output_type = MIXER;
-          break;
-        case KR_AUDIO_OUT:
-          path->state.link.input_type = MIXER;
-          path->state.link.output_type = ADAPTER;
-          break;
-        default:
-          return -2;
-      }
-      link_io_create(path);
-      link_io_create(path);
-      return 0;
+static int link_create(kr_xpdr_path *path) {
+  int ret;
+  int r;
+  kr_mixer_port_setup mp_setup;
+  kr_compositor_port_setup cp_setup;
+  ret = 0;
+  path->link.adapter_path.av_cb = adapter_av;
+  path->link.adapter_path.user = path;
+  path->link.adapter_path.info = &path->info;
+  if ((path->mode == KR_AUDIO_OUT) || (path->mode = KR_VIDEO_OUT)) {
+    r = adapters[path->info.type].link(path->link.adapter, &path->link.adapter_path);
+    if (r != 0) {
+      printke("XPDR: Adapter create link problem");
+      ret += r;
+    }
   }
-  return -3;
+  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_AUDIO_OUT)) {
+    mp_setup.audio_cb = mixer_audio;
+    mp_setup.audio_user = path;
+    mp_setup.control_user = path->user;
+    path->link.mixer_port = kr_mixer_port(path->xpdr->mixer, &mp_setup);
+    if (path->link.mixer_port == NULL) {
+      printke("XPDR: Creating mixer port returned NULL");
+      ret += -1;
+    }
+  }
+  if ((path->mode == KR_VIDEO_IN) || (path->mode = KR_VIDEO_OUT)) {
+    cp_setup.frame_cb = compositor_frame;
+    cp_setup.frame_user = path;
+    cp_setup.control_user = path->user;
+    path->link.compositor_port = kr_compositor_port(path->xpdr->compositor, &cp_setup);
+    if (path->link.compositor_port == NULL) {
+      printke("XPDR: Creating compositor port returned NULL");
+      ret += -1;
+    }
+  }
+  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_VIDEO_IN)) {
+    r = adapters[path->info.type].link(path->link.adapter, &path->link.adapter_path);
+    if (r != 0) {
+      printke("XPDR: Adapter create link problem");
+      ret += r;
+    }
+  }
+  return ret;
 }
 
-static kr_xpdr_path *path_create(kr_xpdr *xpdr, xpdr_path_setup *setup) {
+static int path_create(kr_xpdr *xpdr, kr_xpdr_path *ap, kr_xpdr_path_info *info, void *user) {
   /*Start debug*/
   char string[8192];
-  kr_xpdr_path_info_to_text(string, setup->info, sizeof(string));
+  kr_xpdr_path_info_to_text(string, info, sizeof(string));
   printk("XPDR: path_create:\n%s", string);
   /*End debug*/
   int ret;
   kr_xpdr_path *path;
   kr_xpdr_event event;
   path = kr_pool_slice(xpdr->path_pool);
-  if (path == NULL) return NULL;
+  if (path == NULL) return -1;
   path->xpdr = xpdr;
-  ret = path_setup(path, setup);
+  path->info = *info;
+  path->user = user;
+  path->link.adapter = &ap->adapter;
+  path->mode = xpdr_type_modes[path->info.type];
+  if (path->mode == KR_ADAPTER_CTX) {
+    path->adapter.info = &path->info;
+    path->adapter.event_cb = adapter_event;
+    path->adapter.user = path;
+    if ((path->info.type < 1)
+     || (path->info.type >= nadapter_types)) {
+      printke("XPDR: Adapter type invalid.");
+      ret = -2;
+    } else {
+      if (adapters[path->info.type].open == NULL) {
+        printke("XPDR: Adapter type is not supported on this system.");
+        ret = -3;
+      } else {
+        printk("XPDR: adapter context create");
+        ret = adapters[path->info.type].open(&path->adapter);
+      }
+    }
+  } else {
+    ret = link_create(path);
+  }
   if (ret) {
     kr_pool_recycle(xpdr->path_pool, path);
-    return NULL;
+    return -4;
   }
   event.user = path->xpdr->user;
   event.user_path = path->user;
@@ -304,7 +233,7 @@ static kr_xpdr_path *path_create(kr_xpdr *xpdr, xpdr_path_setup *setup) {
   event.info = path->info;
   path->xpdr->event_cb(&event);
   path->user = event.user_path;
-  return path;
+  return ret;
 }
 
 int kr_xpdr_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
@@ -316,12 +245,21 @@ int kr_xpdr_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
 }
 
 int kr_xpdr_remove(kr_xpdr_path *path) {
+  int ret;
+  ret = -1;
   kr_xpdr *xpdr;
   kr_xpdr_event event;
   if (path == NULL) return -1;
   xpdr = path->xpdr;
   printk("XPDR: remove");
-  path_destroy(path);
+  if (path->mode == KR_ADAPTER_CTX) {
+    ret = adapters[path->info.type].close(&path->adapter);
+    if (ret != 0) {
+      printke("XPDR: Problem closing adapter ctx");
+    }
+  } else {
+    ret = link_destroy(path);
+  }
   event.user = path->xpdr->user;
   event.user_path = path->user;
   event.path = path;
@@ -329,33 +267,21 @@ int kr_xpdr_remove(kr_xpdr_path *path) {
   event.info = path->info;
   path->xpdr->event_cb(&event);
   kr_pool_recycle(xpdr->path_pool, path);
-  return -1;
+  return ret;
 }
 
 int kr_xpdr_link(kr_xpdr_path *path, kr_xpdr_path_info *info, void *user) {
-  kr_xpdr_path *new_path;
-  xpdr_path_setup path_setup;
+  int ret;
   if ((path == NULL) || (info == NULL)) return -1;
-  path_setup.info = info;
-  path_setup.user = user;
-  path_setup.adapter_path = path;
-  path_setup.type = ADAPTER_LINK;
-  new_path = path_create(path->xpdr, &path_setup);
-  if (new_path == NULL) return -2;
-  return 0;
+  ret = path_create(path->xpdr, path, info, user);
+  return ret;
 }
 
 int kr_xpdr_open(kr_xpdr *xpdr, kr_xpdr_path_info *info, void *user) {
-  kr_xpdr_path *path;
-  xpdr_path_setup path_setup;
+  int ret;
   if ((xpdr == NULL) || (info == NULL)) return -1;
-  path_setup.info = info;
-  path_setup.user = user;
-  path_setup.adapter_path = NULL;
-  path_setup.type = ADAPTER_CTX;
-  path = path_create(xpdr, &path_setup);
-  if (path == NULL) return -2;
-  return 0;
+  ret = path_create(xpdr, NULL, info, user);
+  return ret;
 }
 
 int kr_xpdr_monitor(kr_xpdr *xpdr, int on) {
@@ -390,7 +316,7 @@ int kr_xpdr_destroy(kr_xpdr *xpdr) {
   kr_xpdr_monitor(xpdr, 0);
   i = 0;
   while ((path = kr_pool_iterate_active(xpdr->path_pool, &i))) {
-    if (path->type == ADAPTER_CTX) continue;
+    if (path->mode == KR_ADAPTER_CTX) continue;
     ret = kr_xpdr_remove(path);
     if (ret) printke("XPDR: Failure removing an adapter context");
   }

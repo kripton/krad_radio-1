@@ -2,10 +2,8 @@
 #define KRAD_ADAPTER_H
 
 typedef struct kr_adapter kr_adapter;
-typedef struct kr_adapter_setup kr_adapter_setup;
 typedef struct kr_adapter_spec kr_adapter_spec;
 typedef struct kr_adapter_path kr_adapter_path;
-typedef struct kr_adapter_path_setup kr_adapter_path_setup;
 
 #include "kr_xpdr_common.h"
 #include "krad_av.h"
@@ -45,26 +43,19 @@ typedef int (kr_adapter_path_process_function)(kr_adapter_path *);
 typedef void (kr_adapter_event_cb)(kr_adapter_event *);
 typedef void (kr_adapter_path_av_cb)(kr_adapter_path_av_cb_arg *);
 
-struct kr_adapter_path_setup {
-  kr_xpdr_path_info info;
-  void *user;
-  kr_adapter_path_av_cb *av_cb;
-};
-
-struct kr_adapter_setup {
-  kr_xpdr_path_info info;
-  void *user;
-  kr_adapter_event_cb *event_cb;
-  kr_adapter *adapter;
-};
-
 struct kr_adapter {
   void *handle;
   int fd;
+  void *user;
+  kr_adapter_event_cb *event_cb;
+  kr_xpdr_path_info *info;
 };
 
 struct kr_adapter_path {
   void *handle;
+  void *user;
+  kr_adapter_path_av_cb *av_cb;
+  kr_xpdr_path_info *info;
 };
 
 typedef struct {
@@ -73,10 +64,10 @@ typedef struct {
 
 typedef int (kr_adapter_lctl)(kr_adapter_path *, kr_patchset *);
 typedef int (kr_adapter_unlink)(kr_adapter_path *);
-typedef kr_adapter_path *(kr_adapter_link)(kr_adapter *, kr_adapter_path_setup *);
+typedef int (kr_adapter_link)(kr_adapter *, kr_adapter_path *);
 typedef int (kr_adapter_ctl)(kr_adapter *, kr_patchset *);
 typedef int (kr_adapter_close)(kr_adapter *);
-typedef kr_adapter *(kr_adapter_open)(kr_adapter_setup *);
+typedef int (kr_adapter_open)(kr_adapter *);
 
 struct kr_adapter_spec {
   kr_adapter_lctl *lctl;

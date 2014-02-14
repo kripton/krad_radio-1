@@ -13,11 +13,11 @@ int kr_aux_unlink(kr_adapter_path *path) {
   return 0;
 }
 
-kr_adapter_path *kr_aux_link(kr_adapter *adp, kr_adapter_path_setup *setup) {
-  if (adp == NULL) return NULL;
-  if (setup == NULL) return NULL;
+int kr_aux_link(kr_adapter *adp, kr_adapter_path *path) {
+  if (adp == NULL) return -1;
+  if (path == NULL) return -2;
   printk("Aux adapter path created");
-  return NULL;
+  return 0;
 }
 
 int kr_aux_ctl(kr_adapter *adp, kr_patchset *patchset) {
@@ -33,8 +33,8 @@ int kr_aux_close(kr_adapter *adp) {
   return 0;
 }
 
-kr_adapter *kr_aux_open(kr_adapter_setup *setup) {
-  if (setup == NULL) return NULL;
+int kr_aux_open(kr_adapter *adapter) {
+  if (adapter == NULL) return -1;
   printk("Aux adapter created");
-  return NULL;
+  return 0;
 }

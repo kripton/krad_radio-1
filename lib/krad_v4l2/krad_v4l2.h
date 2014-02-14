@@ -44,9 +44,9 @@ kr_v4l2 *kr_v4l2_create(kr_v4l2_setup *setup);
 
 int kr_v4l2_lctl(kr_adapter_path *, kr_patchset *);
 int kr_v4l2_unlink(kr_adapter_path *);
-kr_adapter_path *kr_v4l2_link(kr_adapter *, kr_adapter_path_setup *);
+int kr_v4l2_link(kr_adapter *, kr_adapter_path *);
 int kr_v4l2_ctl(kr_adapter *, kr_patchset *);
 int kr_v4l2_close(kr_adapter *);
-kr_adapter *kr_v4l2_open(kr_adapter_setup *);
+int kr_v4l2_open(kr_adapter *);
 
 #endif

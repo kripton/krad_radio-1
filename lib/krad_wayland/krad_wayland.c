@@ -50,16 +50,6 @@ typedef struct {
   kr_wayland_frame_event frame_event;
 } kr_wayland_event;
 
-typedef struct {
-  kr_wayland_path_info info;
-  int (*callback)(void *, kr_wayland_event *);
-  void *user;
-} kr_wayland_path_setup;
-
-typedef struct {
-  kr_wayland_info info;
-} kr_wayland_setup;
-
 struct kr_wayland_path {
   int width;
   int height;
@@ -112,7 +102,7 @@ struct kr_wayland {
     xkb_mod_mask_t alt_mask;
     xkb_mod_mask_t shift_mask;
   } xkb;
-  kr_wayland_info info;
+  kr_wayland_info *info;
 };
 
 static void handle_configure(void *data, struct wl_shell_surface *ss,
@@ -410,39 +400,27 @@ void kw_teardown(kr_wayland *kw) {
     wl_display_disconnect(kw->display);
     kw->display = NULL;
   }
-  kw->info.state = KR_WL_DISCONNECTED;
-}
-
-int kr_wl_close(kr_adapter *adp) {
-  kr_wayland *kw;
-  if (adp == NULL) return -1;
-  printk("Wayland: Adapter Closing");
-  kw = (kr_wayland *)adp->handle;
-  kw_teardown(kw);
-  free(kw);
-  adp->handle = NULL;
-  printk("Wayland: Adapter Closed");
-  return 0;
+  kw->info->state = KR_WL_DISCONNECTED;
 }
 
 static void kw_connect(kr_wayland *kw) {
   char *display_name;
   display_name = NULL;
-  if (strnlen(kw->info.display_name, sizeof(kw->info.display_name))) {
-    display_name = kw->info.display_name;
+  if (strnlen(kw->info->display_name, sizeof(kw->info->display_name))) {
+    display_name = kw->info->display_name;
   }
   kw->display = wl_display_connect(display_name);
   if (display_name == NULL) {
     display_name = "default";
   }
   if (kw->display == NULL) {
-    kw->info.state = KR_WL_DISCONNECTED;
+    kw->info->state = KR_WL_DISCONNECTED;
     printke("Wayland: Unable to connect to %s display", display_name);
     return;
   }
   printk("Wayland: Connected to %s display", display_name);
   kw->fd = wl_display_get_fd(kw->display);
-  kw->info.state = KR_WL_CONNECTED;
+  kw->info->state = KR_WL_CONNECTED;
   kw->xkb.context = xkb_context_new(0);
   kw->registry = wl_display_get_registry(kw->display);
   wl_registry_add_listener(kw->registry, &kw->registry_listener, kw);
@@ -466,18 +444,6 @@ static void kw_init(kr_wayland *kw) {
   kw->registry_listener.global = handle_global;
 }
 
-kr_adapter *kr_wl_open(kr_adapter_setup *setup) {
-  if (setup == NULL) return NULL;
-  printk("Wayland: Adapter opened");
-  kr_wayland *kw;
-  setup->adapter->handle = kr_allocz(1, sizeof(kr_wayland));
-  kw = (kr_wayland *)setup->adapter->handle;
-  kw->info = setup->info.adp.wl;
-  kw_init(kw);
-  kw_connect(kw);
-  return kw;
-}
-
 int kr_wl_lctl(kr_adapter_path *path, kr_patchset *patchset) {
   if (path == NULL) return -1;
   if (patchset == NULL) return -2;
@@ -491,16 +457,40 @@ int kr_wl_unlink(kr_adapter_path *path) {
   return 0;
 }
 
-kr_adapter_path *kr_wl_link(kr_adapter *adp, kr_adapter_path_setup *setup) {
-  if (adp == NULL) return NULL;
-  if (setup == NULL) return NULL;
+int kr_wl_link(kr_adapter *adp, kr_adapter_path *setup) {
+  if (adp == NULL) return -1;
+  if (setup == NULL) return -2;
   printk("Wayland window created");
-  return NULL;
+  return 0;
 }
 
 int kr_wl_ctl(kr_adapter *adp, kr_patchset *patchset) {
   if (adp == NULL) return -1;
   if (patchset == NULL) return -2;
   printk("Wayland adapter controlled");
+  return 0;
+}
+
+int kr_wl_close(kr_adapter *adp) {
+  kr_wayland *kw;
+  if (adp == NULL) return -1;
+  printk("Wayland: Adapter Closing");
+  kw = (kr_wayland *)adp->handle;
+  kw_teardown(kw);
+  free(kw);
+  adp->handle = NULL;
+  printk("Wayland: Adapter Closed");
+  return 0;
+}
+
+int kr_wl_open(kr_adapter *adapter) {
+  if (adapter == NULL) return -1;
+  printk("Wayland: Adapter opened");
+  kr_wayland *kw;
+  adapter->handle = kr_allocz(1, sizeof(kr_wayland));
+  kw = (kr_wayland *)adapter->handle;
+  kw->info = &adapter->info->adp.wl;
+  kw_init(kw);
+  kw_connect(kw);
   return 0;
 }

@@ -8,24 +8,23 @@
 
 #include "kr_adapter.h"
 
-/* Must match the kr_xpdr_type enum */
-
 typedef enum {
-  KR_VIDEO_IN = 1,
+  KR_ADAPTER_CTX = 1,
+  KR_VIDEO_IN,
   KR_VIDEO_OUT,
   KR_AUDIO_IN,
   KR_AUDIO_OUT
-} kr_xpdr_link_mode;
+} kr_xpdr_path_mode;
 
-static const kr_xpdr_link_mode xpdr_type_modes[] = {
-  [0] = 0,
-  [KR_JACK] = 0,
-  [KR_WAYLAND] = 0,
-  [KR_V4L2] = 0,
-  [KR_DECKLINK] = 0,
-  [KR_X11] = 0,
-  [KR_ALSA] = 0,
-  [KR_AUX] = 0, /* End Adapter Contexts */
+static const kr_xpdr_path_mode xpdr_type_modes[] = {
+  [0] = KR_ADAPTER_CTX,
+  [KR_JACK] = KR_ADAPTER_CTX,
+  [KR_WAYLAND] = KR_ADAPTER_CTX,
+  [KR_V4L2] = KR_ADAPTER_CTX,
+  [KR_DECKLINK] = KR_ADAPTER_CTX,
+  [KR_X11] = KR_ADAPTER_CTX,
+  [KR_ALSA] = KR_ADAPTER_CTX,
+  [KR_AUX] = KR_ADAPTER_CTX,
   [KR_JACK_IN] = KR_AUDIO_IN,
   [KR_JACK_OUT] = KR_AUDIO_OUT,
   [KR_WAYLAND_OUT] = KR_VIDEO_OUT,
@@ -99,12 +98,12 @@ static const kr_adapter_spec adapters[] = {
   },
 #else
   [KR_V4L2] = {
-    .lctl = kr_v4l2_lctl,
-    .unlink = kr_v4l2_unlink,
-    .link = kr_v4l2_link,
-    .ctl = kr_v4l2_ctl,
-    .close = kr_v4l2_close,
-    .open = kr_v4l2_open
+    .lctl = NULL,
+    .unlink = NULL,
+    .link = NULL,
+    .ctl = NULL,
+    .close = NULL,
+    .open = NULL
   },
 #endif
 #ifdef KR_USE_DECKLINK
