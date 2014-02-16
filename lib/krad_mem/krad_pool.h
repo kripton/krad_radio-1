@@ -29,12 +29,13 @@ struct kr_pool_setup {
   size_t overlay_sz;
 };
 
+int kr_pool_fd(kr_pool *pool);
+int kr_pool_size(kr_pool *pool);
+int kr_pool_offsetof(kr_pool *pool, void *slice);
 void *kr_pool_iterate_active(kr_pool *pool, int *count);
-
 int kr_pool_slice_ref(kr_pool *pool, void *slice);
 int kr_pool_recycle(kr_pool *pool, void *slice);
 void *kr_pool_slice(kr_pool *pool);
-
 void *kr_pool_slice_num(kr_pool *pool, int num);
 int kr_pool_avail(kr_pool *pool);
 int kr_pool_active(kr_pool *pool);

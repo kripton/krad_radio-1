@@ -20,8 +20,27 @@ struct kr_pool {
   uint16_t slices;
   uint16_t active;
   uint8_t shared;
+  int fd;
   uint8_t ref[KR_POOL_MAX];
 };
+
+int kr_pool_fd(kr_pool *pool) {
+  if (pool == NULL) return -1;
+  if (pool->shared != 1) return -1;
+  return pool->fd;
+}
+
+int kr_pool_size(kr_pool *pool) {
+  if (pool == NULL) return -1;
+  return pool->total_size;
+}
+
+int kr_pool_offsetof(kr_pool *pool, void *slice) {
+  if (pool == NULL) return -1;
+  if (slice == NULL) return -1;
+  /* FIXME check that slice is in pool */
+  return slice - pool->map;
+}
 
 int kr_pool_avail(kr_pool *pool) {
   if (pool == NULL) return -1;
@@ -183,6 +202,9 @@ void kr_pool_debug(kr_pool *pool) {
 int kr_pool_destroy(kr_pool *pool) {
   int ret;
   if (pool == NULL) return -1;
+  if (pool->shared == 1) {
+    close(pool->fd);
+  }
   ret = munmap(pool->map, pool->total_size);
   return ret;
 }
@@ -240,7 +262,11 @@ kr_pool *kr_pool_create(kr_pool_setup *setup) {
     close(fd);
     return NULL;
   }
-  close(fd);
+  if (pool.shared == 1) {
+    pool.fd = fd;
+  } else {
+    close(fd);
+  }
   pool.data = pool.map + (pool.info_size + pool.overlay_actual_sz);
   if (pool.overlay_sz != 0) {
     pool.overlay = pool.map + pool.info_size;

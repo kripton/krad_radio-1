@@ -64,8 +64,8 @@ struct kr_wayland_path {
   struct wl_callback *callback;
   struct wl_shell_surface_listener surface_listener;
   struct wl_callback_listener frame_listener;
-  struct wl_buffer *buffers[KR_WL_BUFFER_COUNT];
-  kr_image_pool *frame_pool;
+  struct wl_buffer *buffer[KR_WL_BUFFER_COUNT];
+  kr_image_pool *pool;
   int (*user_callback)(void *, kr_wayland_event *);
   void *user;
   kr_wayland_path_info *info;
@@ -335,7 +335,10 @@ int kr_wl_unlink(kr_adapter_path *path) {
     wl_callback_destroy(window->callback);
   }
   wl_display_sync(kw->display);
-  //wl_buffer_destroy(window->buffer);
+  for (i = 0; i < KR_WL_BUFFER_COUNT; i++) {
+    wl_buffer_destroy(window->buffer[i]);
+  }
+  kr_pool_destroy(window->pool);
   wl_shell_surface_destroy(window->shell_surface);
   wl_surface_destroy(window->surface);
   wl_display_sync(kw->display);
@@ -348,6 +351,9 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   kr_wayland_path *window;
   kr_wayland_path_info *info;
   struct wl_region *opaque;
+  struct wl_shm_pool *pool;
+  kr_image image;
+  void *buf;
   int i;
   if (adapter == NULL) return -1;
   if (path == NULL) return -2;
@@ -370,14 +376,20 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   window->wayland = kw;
   window->info = &path->info->adp.wl_out;
   window->user = path->user;
-  /*
-  window->frame_pool = wl_shm_create_pool(window->wayland->shm, fd, size);
+  memset(&image, 0, sizeof(image));
+  image.w = info->width;
+  image.h = info->height;
+  image.pps[0] = image.w * 4;
+  window->pool = kr_image_pool_create(&image, 2);
+  pool = wl_shm_create_pool(window->wayland->shm, kr_pool_fd(window->pool),
+   kr_pool_size(window->pool));
   for (i = 0; i < KR_WL_BUFFER_COUNT; i++) {
-    window->buffers[i] = wl_shm_pool_create_buffer(pool,
-     i * window->frame_size, width, height, stride, WL_SHM_FORMAT_XRGB8888);
+    buf = kr_pool_slice(window->pool);
+    window->buffer[i] = wl_shm_pool_create_buffer(pool,
+     kr_pool_offsetof(window->pool, buf), image.w, image.h, image.pps[0],
+     WL_SHM_FORMAT_XRGB8888);
   }
   wl_shm_pool_destroy(pool);
-  */
   window->surface_listener.ping = handle_ping;
   window->surface_listener.configure = handle_configure;
   window->surface_listener.popup_done = handle_popup_done;
