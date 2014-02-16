@@ -130,11 +130,11 @@ void failfast(char* format, ...) {
 void printke(char* format, ...) {
   va_list args;
   while (!__sync_bool_compare_and_swap(&print_lock, 0, 1));
-  fprintf(stderr, "***ERROR!: ");
+  fprintf(stderr, "Error ****: %"PRIu64"\n ", krad_unixtime());
   va_start(args, format);
   vfprintf(stderr, format, args);
   va_end(args);
-  fprintf(stderr, "\nError TS: %"PRIu64"\n", krad_unixtime());
+  printf("\n");
   while (!__sync_bool_compare_and_swap(&print_lock, 1, 0));
 }
 

@@ -356,10 +356,11 @@ int kr_router_handle(kr_router *router, kr_crate *crate) {
         if ((route2 != NULL) && (map->connect == NULL)) return 0;
         if ((route2 == NULL) && (map->create_in == NULL)) return 0;
         if ((route2 == NULL) && (map->create_in != NULL)) {
-          name = create_name(router, sliced.slice[2]);
+          snprintf(temp, sizeof(temp), "%s/%s", sliced.slice[1], sliced.slice[2]);
+          name = create_name(router, temp);
           if (!name) return -6;
           //printk("I will call %p with %p - %p - %p - %p!", map->create_in, map->ptr, route->ptr, route2->ptr, name);
-          ret = map->create_in(route->ptr, (void *)&crate->payload, route2->ptr, name);
+          ret = map->create_in(route->ptr, (void *)&crate->payload, name);
           return ret;
         }
         if ((route2 != NULL) && (map->connect != NULL)) {

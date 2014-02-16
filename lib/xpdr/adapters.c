@@ -16,6 +16,30 @@ typedef enum {
   KR_AUDIO_OUT
 } kr_xpdr_path_mode;
 
+static const kr_xpdr_type adapter_path_adapter_type[] = {
+  [0] = 0,
+  [KR_JACK] = KR_JACK,
+  [KR_WAYLAND] = KR_WAYLAND,
+  [KR_V4L2] = KR_V4L2,
+  [KR_DECKLINK] = KR_DECKLINK,
+  [KR_X11] = KR_X11,
+  [KR_ALSA] = KR_ALSA,
+  [KR_AUX] = KR_AUX,
+  [KR_JACK_IN] = KR_JACK,
+  [KR_JACK_OUT] = KR_JACK,
+  [KR_WAYLAND_OUT] = KR_WAYLAND,
+  [KR_V4L2_IN] = KR_V4L2,
+  [KR_DECKLINK_VIDEO_IN] = KR_DECKLINK,
+  [KR_DECKLINK_AUDIO_IN] = KR_DECKLINK,
+  [KR_X11_IN] = KR_X11,
+  [KR_ALSA_IN] = KR_ALSA,
+  [KR_ALSA_OUT] = KR_ALSA,
+  [KR_AUX_VIDEO_IN] = KR_AUX,
+  [KR_AUX_VIDEO_OUT] = KR_AUX,
+  [KR_AUX_AUDIO_IN] = KR_AUX,
+  [KR_AUX_AUDIO_OUT] = KR_AUX
+};
+
 static const kr_xpdr_path_mode xpdr_type_modes[] = {
   [0] = 0,
   [KR_JACK] = KR_ADAPTER_CTX,

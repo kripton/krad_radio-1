@@ -23,6 +23,8 @@ struct kr_xpdr_path {
   };
   kr_xpdr_path_mode mode;
   kr_xpdr_path_info info;
+  const kr_adapter_spec *adapter_func;
+  kr_xpdr_type adapter_type;
   void *user;
   kr_xpdr *xpdr;
 };
@@ -108,29 +110,29 @@ static int link_destroy(kr_xpdr_path *path) {
   int ret;
   int r;
   ret = 0;
-  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_VIDEO_IN)) {
-    r = adapters[path->info.type].unlink(&path->link.adapter_path);
+  if ((path->mode == KR_AUDIO_IN) || (path->mode == KR_VIDEO_IN)) {
+    r = path->adapter_func->unlink(&path->link.adapter_path);
     if (r != 0) {
       printke("XPDR: Problem unlinking adapter path");
       ret += r;
     }
   }
-  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_AUDIO_OUT)) {
+  if ((path->mode == KR_AUDIO_IN) || (path->mode == KR_AUDIO_OUT)) {
     r = kr_mixer_remove(path->link.mixer_port);
     if (r != 0) {
       printke("XPDR: Problem removing mixer port");
       ret += r;
     }
   }
-  if ((path->mode == KR_VIDEO_IN) || (path->mode = KR_VIDEO_OUT)) {
+  if ((path->mode == KR_VIDEO_IN) || (path->mode == KR_VIDEO_OUT)) {
     r = kr_compositor_remove(path->link.compositor_port);
     if (r != 0) {
       printke("XPDR: Problem removing compositor port");
       ret += r;
     }
   }
-  if ((path->mode == KR_AUDIO_OUT) || (path->mode = KR_VIDEO_OUT)) {
-    r = adapters[path->info.type].unlink(&path->link.adapter_path);
+  if ((path->mode == KR_AUDIO_OUT) || (path->mode == KR_VIDEO_OUT)) {
+    r = path->adapter_func->unlink(&path->link.adapter_path);
     if (r != 0) {
       printke("XPDR: Problem unlinking adapter path");
       ret += r;
@@ -148,14 +150,15 @@ static int link_create(kr_xpdr_path *path) {
   path->link.adapter_path.av_cb = adapter_av;
   path->link.adapter_path.user = path;
   path->link.adapter_path.info = &path->info;
-  if ((path->mode == KR_AUDIO_OUT) || (path->mode = KR_VIDEO_OUT)) {
-    r = adapters[path->info.type].link(path->link.adapter, &path->link.adapter_path);
+  printk("XPDR: link create");
+  if ((path->mode == KR_AUDIO_OUT) || (path->mode == KR_VIDEO_OUT)) {
+    r = path->adapter_func->link(path->link.adapter, &path->link.adapter_path);
     if (r != 0) {
       printke("XPDR: Adapter create link problem");
       ret += r;
     }
   }
-  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_AUDIO_OUT)) {
+  if ((path->mode == KR_AUDIO_IN) || (path->mode == KR_AUDIO_OUT)) {
     if (path->mode == KR_AUDIO_IN) {
       mp_setup.info.type = KR_MXR_SOURCE;
     } else {
@@ -170,7 +173,7 @@ static int link_create(kr_xpdr_path *path) {
       ret += -1;
     }
   }
-  if ((path->mode == KR_VIDEO_IN) || (path->mode = KR_VIDEO_OUT)) {
+  if ((path->mode == KR_VIDEO_IN) || (path->mode == KR_VIDEO_OUT)) {
     if (path->mode == KR_VIDEO_IN) {
       cp_setup.info.type = KR_COM_SOURCE;
     } else {
@@ -185,13 +188,14 @@ static int link_create(kr_xpdr_path *path) {
       ret += -1;
     }
   }
-  if ((path->mode == KR_AUDIO_IN) || (path->mode = KR_VIDEO_IN)) {
-    r = adapters[path->info.type].link(path->link.adapter, &path->link.adapter_path);
+  if ((path->mode == KR_AUDIO_IN) || (path->mode == KR_VIDEO_IN)) {
+    r = path->adapter_func->link(path->link.adapter, &path->link.adapter_path);
     if (r != 0) {
       printke("XPDR: Adapter create link problem");
       ret += r;
     }
   }
+  printk("XPDR: link create done");
   return ret;
 }
 
@@ -211,6 +215,8 @@ static int path_create(kr_xpdr *xpdr, kr_xpdr_path *ap, kr_xpdr_path_info *info,
   path->user = user;
   path->link.adapter = &ap->adapter;
   path->mode = xpdr_type_modes[path->info.type];
+  path->adapter_type = adapter_path_adapter_type[path->info.type];
+  path->adapter_func = &adapters[path->adapter_type];
   if (path->mode == KR_ADAPTER_CTX) {
     path->adapter.info = &path->info;
     path->adapter.event_cb = adapter_event;
@@ -220,12 +226,12 @@ static int path_create(kr_xpdr *xpdr, kr_xpdr_path *ap, kr_xpdr_path_info *info,
       printke("XPDR: Adapter type invalid.");
       ret = -2;
     } else {
-      if (adapters[path->info.type].open == NULL) {
+      if (adapters[path->adapter_type].open == NULL) {
         printke("XPDR: Adapter type is not supported on this system.");
         ret = -3;
       } else {
         printk("XPDR: adapter context create");
-        ret = adapters[path->info.type].open(&path->adapter);
+        ret = path->adapter_func->open(&path->adapter);
       }
     }
   } else {
@@ -242,6 +248,7 @@ static int path_create(kr_xpdr *xpdr, kr_xpdr_path *ap, kr_xpdr_path_info *info,
   event.info = path->info;
   path->xpdr->event_cb(&event);
   path->user = event.user_path;
+  printk("XPDR: path create done");
   return ret;
 }
 
@@ -249,7 +256,7 @@ int kr_xpdr_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
   int ret;
   if ((path == NULL) || (patch == NULL)) return -1;
   printk("XPDR: control");
-  //ret = kr_xpdr_path_info_patch_apply(&path->info, patch);
+  /*ret = kr_xpdr_path_info_patch_apply(&path->info, patch);*/
   return ret;
 }
 
@@ -262,7 +269,7 @@ int kr_xpdr_remove(kr_xpdr_path *path) {
   xpdr = path->xpdr;
   printk("XPDR: remove");
   if (path->mode == KR_ADAPTER_CTX) {
-    ret = adapters[path->info.type].close(&path->adapter);
+    ret = path->adapter_func->close(&path->adapter);
     if (ret != 0) {
       printke("XPDR: Problem closing adapter ctx");
     }
