@@ -2,12 +2,12 @@ include $(top_srcdir)/common.mk
 
 bin_PROGRAMS = kr_cbor_test kr_pool_test kr_alsa_test
 #bin_PROGRAMS += kr_helpers_test kr_ebml_serial_test kr_json_serial_test
-bin_PROGRAMS += kr_graph_test kr_path_test kr_json_patch_test
+bin_PROGRAMS += kr_graph_test kr_graph_tunits kr_path_test kr_json_patch_test
 bin_PROGRAMS += kr_thread_test kr_crypto_test kr_jack_test
 
-if HAVE_WAYLAND
-  bin_PROGRAMS += kr_wayland_test
-endif
+##if HAVE_WAYLAND
+  ##bin_PROGRAMS += kr_wayland_test
+##endif
 
 kr_json_patch_test_SOURCES = kr_json_patch_test.c
 kr_json_patch_test_CFLAGS =
@@ -75,5 +75,12 @@ kr_graph_test_SOURCES = ../lib/krad_system/krad_system.c \
   ../lib/krad_mem/krad_mem.c \
   ../lib/krad_chronometer/krad_timer.c \
   kr_graph_test.c
+
+kr_graph_tunits_SOURCES = ../lib/krad_system/krad_system.c \
+  ../lib/krad_mem/krad_mem.c \
+  ../lib/krad_chronometer/krad_timer.c \
+  ../lib/krad_graph/krad_graph.c \
+  kr_graph_tunits.c
+kr_graph_tunits_CFLAGS = -g
 
 .PHONY: all

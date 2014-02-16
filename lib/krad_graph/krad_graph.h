@@ -42,6 +42,7 @@ typedef struct {
   kr_graph_vertex_process_cb *vertex_process_cb;
 } kr_graph_setup;
 
+int kr_graph_set_user(kr_graph *graph, kr_graph_elem *elem, void *user);
 int kr_graph_in_out_links(kr_graph *graph, kr_graph_elem *elem, int dir, void **user, int max);
 int kr_graph_outputs(kr_graph *graph, kr_graph_elem *elem, void **user, int max);
 int kr_graph_sources(kr_graph *graph, kr_graph_elem *elem, void **user, int max);
