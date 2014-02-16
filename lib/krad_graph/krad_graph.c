@@ -44,6 +44,7 @@ static int visit(kr_graph *graph, uint8_t v, uint8_t *marked);
 static int graph_is_cyclic(kr_graph *graph);
 static int get_in_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max);
 static int get_out_edges(kr_graph *graph, kr_vertex *vertex, void **user, int max);
+static int graph_output_edges(kr_graph *graph, kr_edge **edges);
 static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
   kr_vertex **out, int max, int type);
 static int vertex_deps(kr_graph *graph, kr_vertex *vertex,
@@ -131,6 +132,19 @@ static int get_out_edges(kr_graph *graph, kr_vertex *vertex, void **user, int ma
     }
   }
   return count;
+}
+
+static int graph_output_edges(kr_graph *graph, kr_edge **edges) {
+  int i;
+  int k;
+  for (i = k = 0; i < MAX_EDGES; i++) {
+    if (graph->edges[i].to != NULL) {
+      if (graph->edges[i].to->type == KR_VERTEX_OUTPUT) {
+        edges[k++] = &graph->edges[i];
+      }
+    }
+  }
+  return k;
 }
 
 static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
@@ -234,6 +248,7 @@ static kr_edge *edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, voi
   if (to == NULL || from == NULL) return NULL;
   if (to == from) return NULL;
   if (to->type == 0 || from->type == 0) return NULL;
+  if (from->type == KR_VERTEX_OUTPUT || to->type == KR_VERTEX_SOURCE) return NULL;
   for (i = 0; i < MAX_EDGES; i++) {
     if (!graph->edges[i].from && !graph->edges[i].to) {
       graph->edges[i].from = from;
@@ -355,6 +370,31 @@ static int in_out_links(kr_graph *graph, kr_vertex *vertex,
   return count;
 }
 
+static int graph_vertices(kr_graph *graph, kr_vertex_type type,
+  void **user, int max) {
+  int i;
+  int k;
+  for (i = k = 0; i < MAX_VERTICES; i++) {
+    if (graph->vertices[i].type == type) {
+      if (k >= max) return k;
+      user[k++] = graph->vertices[i].user;
+    }
+  }
+  return k;
+}
+
+int kr_graph_set_user(kr_graph *graph, kr_graph_elem *elem, void *user) {
+  if (graph == NULL) return 1;
+  if (elem->type != KR_GRAPH_VERTEX
+    || elem->type != KR_GRAPH_EDGE) return 1;
+  if (elem->type == KR_GRAPH_VERTEX) {
+    elem->vertex->user = user;
+  } else {
+    elem->edge->user = user;
+  }
+  return 0;
+}
+
 int kr_graph_in_out_links(kr_graph *graph, kr_graph_elem *elem,
   int dir, void **user, int max) {
   if (graph == NULL || elem == NULL) return 0;
@@ -363,7 +403,8 @@ int kr_graph_in_out_links(kr_graph *graph, kr_graph_elem *elem,
 }
 
 int kr_graph_outputs(kr_graph *graph, kr_graph_elem *elem, void **user, int max) {
-  if (max == 0 || elem == NULL) return 0;
+  if (max == 0) return 0;
+  if (elem == NULL) return graph_vertices(graph, KR_VERTEX_OUTPUT, user, max);
   if (elem->type == KR_GRAPH_VERTEX) {
     return output_users_from(graph, elem->vertex, user, max);;
   } else if (elem->type == KR_GRAPH_EDGE) {
@@ -373,11 +414,12 @@ int kr_graph_outputs(kr_graph *graph, kr_graph_elem *elem, void **user, int max)
 }
 
 int kr_graph_sources(kr_graph *graph, kr_graph_elem *elem, void **user, int max) {
-  if (max == 0 || elem == NULL) return 0;
+  if (max == 0) return 0;
+  if (elem == NULL) return graph_vertices(graph, KR_VERTEX_SOURCE, user, max);
   if (elem->type == KR_GRAPH_VERTEX) {
     return source_users_from(graph, elem->vertex, user, max);;
   } else if (elem->type == KR_GRAPH_EDGE) {
-    return source_users_from(graph, elem->edge->to, user, max);;
+    return source_users_from(graph, elem->edge->from, user, max);;
   }
   return 0;
 }
@@ -423,7 +465,30 @@ kr_graph_elem kr_graph_vertex(kr_graph *graph, kr_vertex_type type, void *user) 
 }
 
 int kr_graph_destroy(kr_graph *graph) {
+  int i;
+  int e;
+  kr_edge *output_edges[MAX_EDGES];
   if (graph == NULL) return 1;
+  e = graph_output_edges(graph, output_edges);
+  for (i = 0; i < e; i++) {
+    if (output_edges[i])
+      edge_destroy(graph, output_edges[i]);
+  }
+  for (i = 0; i < MAX_EDGES; i++) {
+    edge_destroy(graph, &graph->edges[i]);
+  }
+  for (i = 0; i < MAX_VERTICES; i++) {
+    if (graph->vertices[i].type == KR_VERTEX_BUS)
+      vertex_destroy(graph, &graph->vertices[i]);
+  }
+  for (i = 0; i < MAX_VERTICES; i++) {
+    if (graph->vertices[i].type == KR_VERTEX_SOURCE)
+      vertex_destroy(graph, &graph->vertices[i]);
+  }
+  for (i = 0; i < MAX_VERTICES; i++) {
+    if (graph->vertices[i].type == KR_VERTEX_OUTPUT)
+      vertex_destroy(graph, &graph->vertices[i]);
+  }
   free(graph);
   return 0;
 }
