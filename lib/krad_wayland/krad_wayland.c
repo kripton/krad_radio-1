@@ -63,7 +63,6 @@ struct kr_wayland_path {
   struct wl_shell_surface *shell_surface;
   struct wl_callback *callback;
   struct wl_shell_surface_listener surface_listener;
-  struct wl_callback_listener frame_listener;
   struct wl_buffer *buffer[KR_WL_BUFFER_COUNT];
   kr_image_pool *pool;
   int (*user_callback)(void *, kr_wayland_event *);
@@ -110,8 +109,7 @@ static void handle_ping(void *data, struct wl_shell_surface *sh_surface,
 static void handle_shm_format(void *data, struct wl_shm *wl_shm, uint32_t format);
 static void handle_global(void *data, struct wl_registry *registry,
  uint32_t id, const char *interface, uint32_t version);
-static void kw_frame_listener(void *data, struct wl_callback *callback,
- uint32_t time);
+static void handle_frame_done(void *ptr, struct wl_callback *cb, uint32_t time);
 
 #include "input.c"
 
@@ -158,36 +156,32 @@ static void handle_global(void *data, struct wl_registry *registry,
   printk("Wayland: global %s", interface);
 }
 
-/*
-static void kw_frame_listener(void *data,
- struct wl_callback *callback, uint32_t time) {
+static void handle_frame_done(void *ptr, struct wl_callback *cb, uint32_t time) {
   kr_wayland_path *window;
   kr_wayland_event wayland_event;
-  int updated;
-  window = data;
-  updated = 0;
+  window = (kr_wayland_path *)ptr;
+  printk("Wayland: frame done");
   memset(&wayland_event, 0, sizeof(kr_wayland_event));
   if (window->user_callback != NULL) {
-    wayland_event.type = KR_WL_FRAME;
-    wayland_event.frame_event.buffer = (uint8_t *)window->shm_data;
-    updated = window->user_callback(window->user, &wayland_event);
+    //wayland_event.type = KR_WL_FRAME;
+    //updated = window->user_callback(window->user, &wayland_event);
   }
-  wl_surface_attach(window->surface, window->buffer, 0, 0);
-  if (updated) {
-    wl_surface_damage(window->surface, 0, 0, window->width, window->height);
-  } else {
-    wl_surface_damage(window->surface, 0, 0, 10, 10);
+  if (cb) {
+    wl_callback_destroy(cb);
   }
-  if (callback) {
-    wl_callback_destroy(callback);
-  }
-  window->callback = wl_surface_frame(window->surface);
-  window->frame_listener.done = kw_frame_listener;
-  wl_callback_add_listener(window->callback, &window->frame_listener,
-   window);
+}
+
+static void write_frame(kr_wayland_path *window) {
+  struct wl_callback *callback;
+  struct wl_callback_listener listener;
+  printk("Wayland: write frame");
+  wl_surface_attach(window->surface, window->buffer[0], 0, 0);
+  wl_surface_damage(window->surface, 0, 0, window->info->width, window->info->height);
+  callback = wl_surface_frame(window->surface);
+  listener.done = handle_frame_done;
+  wl_callback_add_listener(callback, &listener, window);
   wl_surface_commit(window->surface);
 }
-*/
 
 int kr_wayland_handle_out(kr_wayland *kw) {
   int ret;
@@ -318,7 +312,7 @@ static void kw_init(kr_wayland *kw) {
 int kr_wl_lctl(kr_adapter_path *path, kr_patchset *patchset) {
   if (path == NULL) return -1;
   if (patchset == NULL) return -2;
-  printk("Wayland window controlled");
+  printk("Wayland: window control");
   return 0;
 }
 
@@ -327,7 +321,7 @@ int kr_wl_unlink(kr_adapter_path *path) {
   kr_wayland_path *window;
   kr_wayland *kw;
   if (path == NULL) return -1;
-  printk("Wayland window removed");
+  printk("Wayland: window remove");
   window = (kr_wayland_path *)path->handle;
   kw = window->wayland;
   for (i = 0; i < KR_WL_MAX_WINDOWS; i++) {
@@ -335,19 +329,17 @@ int kr_wl_unlink(kr_adapter_path *path) {
       break;
     }
   }
-  wl_display_sync(kw->display);
-  if (window->callback) {
-    wl_callback_destroy(window->callback);
-  }
-  wl_display_sync(kw->display);
+  wl_shell_surface_destroy(window->shell_surface);
+  wl_surface_destroy(window->surface);
+  /*
+  FIXME this should be done on a callback from a sync
   for (i = 0; i < KR_WL_BUFFER_COUNT; i++) {
     wl_buffer_destroy(window->buffer[i]);
   }
   kr_pool_destroy(window->pool);
-  wl_shell_surface_destroy(window->shell_surface);
-  wl_surface_destroy(window->surface);
-  wl_display_sync(kw->display);
   kw->window[i].active = 0;
+  */
+  wl_display_roundtrip(kw->display);
   return 0;
 }
 
@@ -426,14 +418,18 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   }
   window->active = 1;
   path->handle = window;
-  printk("Wayland window created");
+  write_frame(window);
+  wl_display_roundtrip(kw->display);
+  usleep(30 * 1000);
+  wl_display_roundtrip(kw->display);
+  printk("Wayland: Window created");
   return 0;
 }
 
 int kr_wl_ctl(kr_adapter *adp, kr_patchset *patchset) {
   if (adp == NULL) return -1;
   if (patchset == NULL) return -2;
-  printk("Wayland adapter controlled");
+  printk("Wayland: Adapter controlled");
   return 0;
 }
 
