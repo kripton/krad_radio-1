@@ -74,6 +74,6 @@ kr_jack_test_LDFLAGS = ../lib/krad_radio/libkradclient.la ../lib/krad_radio/libk
 kr_graph_test_SOURCES = ../lib/krad_system/krad_system.c \
   ../lib/krad_mem/krad_mem.c \
   ../lib/krad_chronometer/krad_timer.c \
-  ../lib/krad_graph/krad_graph.c kr_graph_test.c
+  kr_graph_test.c
 
 .PHONY: all

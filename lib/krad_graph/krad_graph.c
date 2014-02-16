@@ -234,6 +234,10 @@ static kr_edge *edge_create(kr_graph *graph, kr_vertex *to, kr_vertex *from, voi
   if (to == NULL || from == NULL) return NULL;
   if (to == from) return NULL;
   if (to->type == 0 || from->type == 0) return NULL;
+  if (to->type == KR_VERTEX_OUTPUT && from->type == KR_VERTEX_OUTPUT) {
+    printf("OUTPUT to OUTPUT , verboten\n");
+    return NULL;
+  }
   for (i = 0; i < MAX_EDGES; i++) {
     if (!graph->edges[i].from && !graph->edges[i].to) {
       graph->edges[i].from = from;
