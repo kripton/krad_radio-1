@@ -118,21 +118,25 @@ static void kw_frame_listener(void *data, struct wl_callback *callback,
 static void handle_configure(void *data, struct wl_shell_surface *ss,
  uint32_t edges, int32_t width, int32_t height) {
   /* Nothing here */
+  printk("Wayland: surface configure");
 }
 
 static void handle_popup_done(void *data,
  struct wl_shell_surface *shell_surface) {
   /* Nothing here */
+  printk("Wayland: surface popup done");
 }
 
 static void handle_ping(void *data, struct wl_shell_surface *ss, uint32_t serial) {
   wl_shell_surface_pong(ss, serial);
+  printk("Wayland: surface ping");
 }
 
 static void handle_shm_format(void *data, struct wl_shm *wl_shm, uint32_t format) {
   kr_wayland *kw;
   kw = (kr_wayland *)data;
   kw->formats |= (1 << format);
+  printk("Wayland: shm format %u", format);
 }
 
 static void handle_global(void *data, struct wl_registry *registry,
@@ -151,6 +155,7 @@ static void handle_global(void *data, struct wl_registry *registry,
     kw->shm = wl_registry_bind(kw->registry, id, &wl_shm_interface, 1);
     wl_shm_add_listener(kw->shm, &kw->shm_listener, kw);
   }
+  printk("Wayland: global %s", interface);
 }
 
 /*
@@ -381,13 +386,24 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   image.h = info->height;
   image.pps[0] = image.w * 4;
   window->pool = kr_image_pool_create(&image, 2);
+  if (window->pool == NULL) {
+    printke("Wayland: error creating kr image pool");
+    return -1;
+  }
   pool = wl_shm_create_pool(window->wayland->shm, kr_pool_fd(window->pool),
    kr_pool_size(window->pool));
+  if (pool == NULL) {
+    printke("Wayland: error creating wl_shm_pool");
+    return -1;
+  }
   for (i = 0; i < KR_WL_BUFFER_COUNT; i++) {
     buf = kr_pool_slice(window->pool);
     window->buffer[i] = wl_shm_pool_create_buffer(pool,
      kr_pool_offsetof(window->pool, buf), image.w, image.h, image.pps[0],
      WL_SHM_FORMAT_XRGB8888);
+    if (window->buffer[i] == NULL) {
+      printke("Wayland: error creating wl buffer from wl shm pool");
+    }
   }
   wl_shm_pool_destroy(pool);
   window->surface_listener.ping = handle_ping;

@@ -1,5 +1,6 @@
 #include "kr_client.h"
 
+static int test_wl_create(kr_client *client);
 static int test_aux_create(kr_client *client);
 static int test_aux_in_create(kr_client *client);
 /*
@@ -18,6 +19,17 @@ static int test_aux_create(kr_client *client) {
   name = "Auxilirator";
   strcpy(info.adp.aux.monkeyname, "Bongo");
   info.type = KR_AUX;
+  ret = kr_xpdr_make(client, name, &info);
+  return ret;
+}
+
+static int test_wl_create(kr_client *client) {
+  int ret;
+  kr_xpdr_path_info info;
+  char *name;
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  name = "Wayland";
+  info.type = KR_WAYLAND;
   ret = kr_xpdr_make(client, name, &info);
   return ret;
 }
@@ -173,36 +185,22 @@ static int test_decklink_input_create(kr_client *client, int dev) {
   ret = kr_xpdr_mkpath(client, name, &info);
   return ret;
 }
-
+*/
 static int test_wayland_output_create(kr_client *client) {
   int ret;
   kr_xpdr_path_info info;
+  kr_wayland_path_info *window;
   char *name;
-  char *display_name;
-  int width;
-  int height;
-  int fullscreen;
-  display_name = "";
-  name = "WaylandTest";
-  width = 640;
-  height = 360;
-  fullscreen = 0;
+  name = "Wayland/TestWindow";
   memset(&info, 0, sizeof(kr_xpdr_path_info));
-  info.input.type = KR_XPDR_COMPOSITOR;
-  info.input.info.compositor_path_info.info.output_info.w = width;
-  info.input.info.compositor_path_info.info.output_info.h = height;
-  info.input.info.compositor_path_info.type = KR_COM_OUTPUT;
-  info.output.type = KR_XPDR_ADAPTER;
-  info.output.info.adapter_path_info.api = KR_ADP_WAYLAND;
-  strcpy(info.output.info.adapter_path_info.info.wayland.display_name,
-   display_name);
-  info.output.info.adapter_path_info.info.wayland.width = width;
-  info.output.info.adapter_path_info.info.wayland.height = height;
-  info.output.info.adapter_path_info.info.wayland.fullscreen = fullscreen;
-  ret = kr_xpdr_mkpath(client, name, &info);
+  window = &info.adp.wl_out;
+  info.type = KR_WAYLAND_OUT;
+  window->width = 640;
+  window->height = 360;
+  window->fullscreen = 0;
+  ret = kr_xpdr_make(client, name, &info);
   return ret;
 }
-*/
 
 int test_x11_get(kr_client *client) {
   int ret;
@@ -305,10 +303,13 @@ int run_test(kr_client *client, char *test) {
     ret = test_x11_get(client);
     if (ret != 0) return ret;
   }
-  /*
   if (strmatch(test, "wayland")) {
+    ret = test_wl_create(client);
+  }
+  if (strmatch(test, "window")) {
     ret = test_wayland_output_create(client);
   }
+  /*
   if (strmatch(test, "x11")) {
     ret = test_x11_input_create(client, 0);
     if (ret != 0) return ret;
