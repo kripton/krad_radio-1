@@ -19,7 +19,10 @@ struct kr_image {
   uint32_t w;
   uint32_t h;
   int32_t fmt;
-  uint64_t tc;
+  union {
+    uint64_t tc;
+    struct timeval ts;
+  };
   void *owner;
   int32_t refs;
   kr_buf_release_cb *release_cb;

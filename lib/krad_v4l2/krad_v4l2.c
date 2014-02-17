@@ -36,10 +36,7 @@ struct kr_v4l2 {
   kv_image images[KR_V4L2_NIMAGES];
 };
 
-/*
-int read_image(kr_v4l2 *v4l2, kr_image *image);
-int kv_poll(kr_v4l2 *v4l2, int ms);
-*/
+static int read_image(kr_v4l2 *kv, kr_image *image);
 static int xioctl(int fd, int request, void *arg);
 static int image_release(void *ptr);
 static int capture_off(kr_v4l2 *kv);
@@ -67,32 +64,15 @@ static int image_release(void *ptr) {
   }
   return 0;
 }
-/*
-int kv_poll(kr_v4l2 *kv, int ms) {
 
-  struct pollfd fds[1];
-
-  if (v4l2 == NULL) return -1;
-  if (v4l2->fd == -1) return -1;
-  if (v4l2->info.state != KR_V4L2_CAPTURE) return -1;
-  fds[0].fd = v4l2->fd;
-  fds[0].events = POLLIN;
-
-  return poll(fds, 1, ms);
-}
-
-int kr_v4l2_read(kr_v4l2 *v4l2, kr_image *image) {
-
+static int read_image(kr_v4l2 *kv, kr_image *image) {
   struct v4l2_buffer buf;
-
-  if (v4l2 == NULL) return -1;
+  if (kv == NULL) return -1;
   if (image == NULL) return -1;
-
   memset(&buf, 0, sizeof(buf));
   buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
   buf.memory = V4L2_MEMORY_MMAP;
-
-  if (-1 == xioctl(v4l2->fd, VIDIOC_DQBUF, &buf)) {
+  if (-1 == xioctl(kv->fd, VIDIOC_DQBUF, &buf)) {
     switch (errno) {
       case EAGAIN:
         return 0;
@@ -101,11 +81,10 @@ int kr_v4l2_read(kr_v4l2 *v4l2, kr_image *image) {
         return -1;
     }
   }
-
-  *//*  v4l2->timestamp = buf.timestamp; *//*
+  *image = kv->images[buf.index].image;
+  image->ts = buf.timestamp;
   return 1;
 }
-*/
 
 static int capture_off(kr_v4l2 *kv) {
   enum v4l2_buf_type type;
