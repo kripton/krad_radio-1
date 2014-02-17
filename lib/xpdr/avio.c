@@ -64,5 +64,3 @@ static void adapter_event(kr_adapter_event *event) {
   }
   */
 }
-
-
