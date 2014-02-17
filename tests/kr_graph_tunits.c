@@ -16,10 +16,10 @@ uint randr(uint min, uint max) {
 
 char *tunit_type_to_str(int type) {
   switch(type) {
-    case TU_SOURCE: return "source";
-    case TU_BUS: return "bus";
-    case TU_OUTPUT: return "output";
-    case TU_LINK: return "link";
+    case TU_SOURCE: return "SOURCE";
+    case TU_BUS: return "BUS";
+    case TU_OUTPUT: return "OUTPUT";
+    case TU_LINK: return "LINK";
     default: return NULL;
   }
 }
@@ -30,10 +30,10 @@ tunit *tunit_create(tunit_setup *setup) {
   if (unit == NULL) return unit;
   unit->type = setup->type;
   if (setup->type != TU_LINK) {
-    unit->elem = kr_graph_vertex(setup->graph, setup->type, setup->user);
+    unit->elem = kr_graph_vertex(setup->graph, setup->type, unit);
   } else {
     unit->elem = kr_graph_link(setup->graph, &setup->to->elem,
-     &setup->from->elem, setup->user);
+     &setup->from->elem, unit);
   }
   if (unit->elem.type == 0) {
     free(unit);
@@ -44,11 +44,43 @@ tunit *tunit_create(tunit_setup *setup) {
   return unit;
 }
 
-int tunit_process(tunit *tunit) {
+void print_chains(kr_chain *chains, int n) {
+  int i;
+  int j;
+  tunit *unit;
+  for (i = 0; i < n; i++) {
+    printf("  ");
+    for (j = 0; j < chains[i].len; j++) {
+      unit = (tunit *)chains[i].users[j];
+      printf("%s ",unit->name);
+      if (j != (chains[i].len - 1))
+        printf("---> ");
+    }
+    printf("\n");
+  }
+}
+
+int tunit_process(kr_graph *graph, tunit *unit) {
+  int n;
+  int m;
+  int i;
+  void *outputs[32];
+  kr_chain chains[32];
+  tunit *output;
+  printf("Processing SOURCE %s\n\n",unit->name);
+  n = kr_graph_outputs(graph, &unit->elem, outputs, 32);
+  printf("%d OUTPUT(s) connected to SOURCE %s\n",n,unit->name);
+  for (i = 0; i < n; i++) {
+    output = (tunit *)outputs[i];
+    m = kr_graph_chains(graph, &output->elem, &unit->elem, chains, 32);
+    printf("%d chain(s) from SOURCE %s to OUTPUT %s:\n",m,unit->name,output->name);
+    print_chains(chains, m);
+  }
+  printf("\n");
   return 0;
 }
 
-int tunit_ctl(tunit *tunit) {
+int tunit_ctl(tunit *unit) {
   return 0;
 }
 
@@ -108,12 +140,13 @@ int tunits_random_populate(kr_graph *graph, tunit **units, int max) {
       e++;
     }
   }
-  printf("%d random tunits generated! %d vertices, %d edges\n",v+e,v,e);
+  printf("\n%d random tunits generated! %d vertices, %d edges\n\n",v+e,v,e);
   return v+e;
 }
 
 int run_test() {
   int n;
+  int i;
   tunit *units[32];
   kr_graph *graph;
   kr_graph_setup graph_setup;
@@ -121,7 +154,13 @@ int run_test() {
   graph = kr_graph_create(&graph_setup);
   if (graph == NULL) return 1;
   n = tunits_random_populate(graph, units, 32);
+  for (i = 0; i < n; i++) {
+    if (units[i]->type == TU_SOURCE) {
+      tunit_process(graph, units[i]);
+    }
+  }
   tunits_destroy(units,n);
+  printf("%d units destroyed\n",n);
   kr_graph_destroy(graph);
   return 0;
 }

@@ -17,16 +17,12 @@ static int path_render(kr_compositor_path *path,
 */
 
 static void output_source_render(kr_compositor_path *output, kr_compositor_path *source) {
-  void ***user_chains;
+  kr_chain user_chains[16];
   int n;
   int i;
-  user_chains = alloca(sizeof(void**)*16);
-  for (i = 0; i < 16; i++) {
-    user_chains[i] = alloca(sizeof(void*)*16);
-  }
-  n = kr_graph_chains(output->compositor->graph, &output->g.elem, &source->g.elem, user_chains, 16, 16);
+  n = kr_graph_chains(output->compositor->graph, &output->g.elem, &source->g.elem, user_chains, 16);
   for (i = 0; i < n; i++) {
-    //transform = get_transform(user_chains, len);
+    //transform = get_transform(&user_chains[i]);
     //render(output, source, transform);
   }
 }
