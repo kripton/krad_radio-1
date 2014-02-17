@@ -811,12 +811,14 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
       int fd[n]; \
   }
 
-static int recv_fds(int sock, int *fds, unsigned int nfds, void *buffer) {
+static int recv_fds(int sock, int *fds, unsigned int nfds) {
   struct msghdr msghdr;
   char nothing;
   struct iovec nothing_ptr;
   struct cmsghdr *cmsg;
   int i;
+  int fd[KR_RWFDS_MAX];
+  char buffer[CMSG_SPACE(sizeof(fd))];
   nothing_ptr.iov_base = &nothing;
   nothing_ptr.iov_len = 1;
   msghdr.msg_name = NULL;
@@ -844,12 +846,13 @@ static int recv_fds(int sock, int *fds, unsigned int nfds, void *buffer) {
 }
 
 int kr_app_server_recv_fds(kr_app_server_client *client, int *fd, unsigned int nfds) {
-  KR_FD_BUFFER(KR_RWFDS_MAX) buffer;
   if (nfds > KR_RWFDS_MAX) return -1;
-  return(recv_fds(client->sd, fd, nfds, &buffer));
+  return recv_fds(client->sd, fd, nfds);
 }
 
 int kr_app_server_recv_fd(kr_app_server_client *client, int *fd) {
-  KR_FD_BUFFER(1) buffer;
-  return(recv_fds(client->sd, fd, 1, &buffer) == 1 ? 0 : -1);
+  int ret;
+  ret = recv_fds(client->sd, fd, 1);
+  if (ret == 1) return 0;
+  return -1;
 }

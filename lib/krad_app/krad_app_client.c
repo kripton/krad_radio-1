@@ -175,18 +175,14 @@ static int kr_app_client_init(kr_app_client *client, int timeout_ms) {
   return client->sd;
 }
 
-#define KR_FD_BUFFER(n) \
-  struct { \
-    struct cmsghdr h; \
-      int fd[n]; \
-  }
-
-static int send_fds(int sock, const int *fds, unsigned int nfds, void *buffer) {
+static int send_fds(int sock, const int *fds, unsigned int nfds) {
   struct msghdr msghdr;
   char nothing = '!';
   struct iovec nothing_ptr;
   struct cmsghdr *cmsg;
   int i;
+  int fd[KR_RWFDS_MAX];
+  char buffer[CMSG_SPACE(sizeof(fd))];
   nothing_ptr.iov_base = &nothing;
   nothing_ptr.iov_len = 1;
   msghdr.msg_name = NULL;
@@ -207,12 +203,10 @@ static int send_fds(int sock, const int *fds, unsigned int nfds, void *buffer) {
 }
 
 int kr_app_client_send_fds(kr_app_client *client, const int *fds, unsigned int nfds) {
-  KR_FD_BUFFER(KR_RWFDS_MAX) buffer;
   if (nfds > KR_RWFDS_MAX) return -1;
-  return(send_fds(client->sd, fds, nfds, &buffer));
+  return send_fds(client->sd, fds, nfds);
 }
 
 int kr_app_client_send_fd(kr_app_client *client, int fd) {
-  KR_FD_BUFFER(1) buffer;
-  return(send_fds(client->sd, &fd, 1, &buffer));
+  return send_fds(client->sd, &fd, 1);
 }
