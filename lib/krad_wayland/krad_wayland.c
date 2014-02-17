@@ -112,6 +112,12 @@ static void handle_shm_format(void *data, struct wl_shm *wl_shm, uint32_t format
 static void handle_global(void *data, struct wl_registry *registry,
  uint32_t id, const char *interface, uint32_t version);
 static void handle_frame_done(void *ptr, struct wl_callback *cb, uint32_t time);
+static void kw_init(kr_wayland *kw);
+static void kw_connect(kr_wayland *kw);
+static void kw_teardown(kr_wayland *kw);
+static int handle_in(kr_wayland *kw);
+static int handle_out(kr_wayland *kw);
+static void write_frame(kr_wayland_path *window);
 
 #include "input.c"
 
@@ -184,7 +190,7 @@ static void write_frame(kr_wayland_path *window) {
   wl_surface_commit(window->surface);
 }
 
-int kr_wayland_handle_out(kr_wayland *kw) {
+static int handle_out(kr_wayland *kw) {
   int ret;
   while (wl_display_prepare_read(kw->display) != 0) {
     ret = wl_display_dispatch_pending(kw->display);
@@ -202,7 +208,7 @@ int kr_wayland_handle_out(kr_wayland *kw) {
   return 0;
 }
 
-int kr_wayland_handle_in(kr_wayland *kw) {
+static int handle_in(kr_wayland *kw) {
   int ret;
   ret = wl_display_read_events(kw->display);
   if (ret == -1) {
@@ -218,7 +224,7 @@ int kr_wayland_handle_in(kr_wayland *kw) {
   return 0;
 }
 
-void kw_teardown(kr_wayland *kw) {
+static void kw_teardown(kr_wayland *kw) {
   if (kw == NULL) return;
   if (kw->pointer != NULL) {
     wl_pointer_destroy(kw->pointer);
