@@ -4,12 +4,12 @@ static int test_wl_create(kr_client *client);
 static int test_v4l2_create(kr_client *client);
 static int test_aux_create(kr_client *client);
 static int test_aux_in_create(kr_client *client);
+static int test_wayland_output_create(kr_client *client);
+
 /*
 static int test_jack_input_create(kr_client *client);
 static int test_jack_output_create(kr_client *client);
 static int test_decklink_input_create(kr_client *client, int dev);
-static int test_v4l2_input_create(kr_client *client, int dev);
-static int test_wayland_output_create(kr_client *client);
 */
 
 static int test_aux_create(kr_client *client) {
@@ -45,6 +45,23 @@ static int test_v4l2_create(kr_client *client) {
   name = "V4L2";
   info.type = KR_V4L2;
   vi->dev = 0;
+  ret = kr_xpdr_make(client, name, &info);
+  return ret;
+}
+
+static int test_v4l2_input_create(kr_client *client) {
+  int ret;
+  kr_xpdr_path_info info;
+  kr_v4l2_path_info *vc;
+  char *name;
+  name = "V4L2/Capture";
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  vc = &info.adp.v4l2_in;
+  info.type = KR_V4L2_IN;
+  vc->width = 640;
+  vc->height = 360;
+  vc->num = 30;
+  vc->den = 1;
   ret = kr_xpdr_make(client, name, &info);
   return ret;
 }
@@ -98,38 +115,6 @@ static int test_jack_output_create(kr_client *client) {
   strcpy(info.output.info.adapter_path_info.info.jack.name, name);
   info.output.info.adapter_path_info.info.jack.channels = channels;
   info.output.info.adapter_path_info.info.jack.direction = KR_JACK_OUTPUT;
-  ret = kr_xpdr_mkpath(client, name, &info);
-  return ret;
-}
-
-static int test_v4l2_input_create(kr_client *client, int dev) {
-  int ret;
-  kr_xpdr_path_info info;
-  int device_num;
-  char *name;
-  int width;
-  int height;
-  int num;
-  int den;
-  name = "V4L2Test";
-  device_num = 0;
-  device_num = dev;
-  width = 640;
-  height = 360;
-  num = 30;
-  den = 1;
-  memset(&info, 0, sizeof(kr_xpdr_path_info));
-  info.input.type = KR_XPDR_ADAPTER;
-  info.input.info.adapter_path_info.api = KR_ADP_V4L2;
-  info.input.info.adapter_path_info.info.v4l2.dev = device_num;
-  info.input.info.adapter_path_info.info.v4l2.mode.num = num;
-  info.input.info.adapter_path_info.info.v4l2.mode.den = den;
-  info.input.info.adapter_path_info.info.v4l2.mode.width = width;
-  info.input.info.adapter_path_info.info.v4l2.mode.height = height;
-  info.output.type = KR_XPDR_COMPOSITOR;
-  info.output.info.compositor_path_info.info.source_info.w = width;
-  info.output.info.compositor_path_info.info.source_info.h = height;
-  info.output.info.compositor_path_info.type = KR_COM_SOURCE;
   ret = kr_xpdr_mkpath(client, name, &info);
   return ret;
 }
@@ -320,12 +305,19 @@ int run_test(kr_client *client, char *test) {
   }
   if (strmatch(test, "wayland")) {
     ret = test_wl_create(client);
+    if (ret != 0) return ret;
   }
   if (strmatch(test, "v4l2")) {
     ret = test_v4l2_create(client);
+    if (ret != 0) return ret;
+  }
+  if (strmatch(test, "v4l2cap")) {
+    ret = test_v4l2_input_create(client);
+    if (ret != 0) return ret;
   }
   if (strmatch(test, "window")) {
     ret = test_wayland_output_create(client);
+    if (ret != 0) return ret;
   }
   /*
   if (strmatch(test, "x11")) {
@@ -342,10 +334,6 @@ int run_test(kr_client *client, char *test) {
   }
   if (strmatch(test, "jackinout")) {
     ret = make_jackinout(client);
-    if (ret != 0) return ret;
-  }
-  if (strmatch(test, "v4l2s")) {
-      ret = test_v4l2_input_create(client, 0);
     if (ret != 0) return ret;
   }
   if (strmatch(test, "decklink")) {

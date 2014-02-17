@@ -49,8 +49,9 @@ static int kr_v4l2_buf_release(void *ptr);
 static void kr_v4l2_unmap(kr_v4l2 *v4l2);
 static void kr_v4l2_map(kr_v4l2 *v4l2);
 */
-static void v4l2_close(kr_v4l2 *v4l2);
-static void v4l2_open(kr_v4l2 *v4l2);
+static int kr_v4l2_mode_set(kr_v4l2 *kv);
+static void v4l2_close(kr_v4l2 *kv);
+static void v4l2_open(kr_v4l2 *kv);
 
 static int xioctl(int fd, int request, void *arg) {
   int r;
@@ -222,50 +223,40 @@ static void kr_v4l2_map(kr_v4l2 *v4l2) {
     }
   }
 }
+*/
 
-int kr_v4l2_mode_set(kr_v4l2 *v4l2, kr_v4l2_mode *mode) {
-  struct v4l2_format fmt;
-  struct v4l2_streamparm stream_parameters;
-  if ((v4l2 == NULL) || (mode == NULL)) return -1;
-  kr_v4l2_unmap(v4l2);
-  v4l2->info.mode = *mode;
-  memset(&stream_parameters, 0, sizeof(stream_parameters));
-  memset(&fmt, 0, sizeof(fmt));
-  fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  stream_parameters.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  fmt.fmt.pix.width = v4l2->info.mode.width;
-  fmt.fmt.pix.height = v4l2->info.mode.height;
-  fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
-  fmt.fmt.pix.field = V4L2_FIELD_ANY;
-  if (-1 == xioctl(v4l2->fd, VIDIOC_S_FMT, &fmt)) {
-    printke("Krad V4L2: VIDIOC_S_FMT");
+static int kr_v4l2_mode_set(kr_v4l2 *kv) {
+  kr_v4l2_path_info *info;
+  info = kv->path_info;
+  struct v4l2_format format;
+  struct v4l2_streamparm sps;
+  memset(&sps, 0, sizeof(sps));
+  memset(&format, 0, sizeof(format));
+  format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  format.fmt.pix.width = info->width;
+  format.fmt.pix.height = info->height;
+  format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+  format.fmt.pix.field = V4L2_FIELD_ANY;
+  if (-1 == xioctl(kv->fd, VIDIOC_S_FMT, &format)) {
+    printke("V4L2: Unable to set desired video format");
+    return -1;
+  } else {
+    printk("V4L2: Set %dx%d", info->width, info->height);
+  }
+  sps.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+  if (-1 == xioctl(kv->fd, VIDIOC_G_PARM, &sps)) {
+    printke("V4L2: Unable to get capture parameters");
     return -1;
   }
-  if (-1 == xioctl(v4l2->fd, VIDIOC_G_PARM, &stream_parameters)) {
-    printke("Krad V4L2: VIDIOC_G_PARM");
-    return -1;
-  }
-  */
-  /* typical inverted
-   * printk("mode to %d / %d", v4l2->info.mode.num, v4l2->info.mode.den);
-   */
-  /* stream_parameters.parm.capture.timeperframe.numerator = v4l2->info.mode.num;
-  stream_parameters.parm.capture.timeperframe.denominator = v4l2->info.mode.den;
-  *//*
-  stream_parameters.parm.capture.timeperframe.numerator = v4l2->info.mode.den;
-  stream_parameters.parm.capture.timeperframe.denominator = v4l2->info.mode.num;
-  if (-1 == xioctl(v4l2->fd, VIDIOC_S_PARM, &stream_parameters)) {
-    printke("Krad V4L2: unable to set stream parameters as speced");
-    printke("Krad V4L2: error %d, %s", errno, strerror (errno));
-    return -1;
-  }
-  kr_v4l2_map(v4l2);
-  if (v4l2->nbufs == 0) {
+  sps.parm.capture.timeperframe.numerator = info->den;
+  sps.parm.capture.timeperframe.denominator = info->num;
+  if (-1 == xioctl(kv->fd, VIDIOC_S_PARM, &sps)) {
+    printke("V4L2: Unable to set desired capture parameters");
+    printke("V4L2: error %d, %s", errno, strerror(errno));
     return -1;
   }
   return 0;
 }
-*/
 
 static void v4l2_close(kr_v4l2 *v4l2) {
   if (v4l2->fd > -1) {
@@ -331,11 +322,18 @@ int kr_v4l2_unlink(kr_adapter_path *path) {
 }
 
 int kr_v4l2_link(kr_adapter *adapter, kr_adapter_path *path) {
+  int ret;
+  kr_v4l2 *kv;
   if (adapter == NULL) return -1;
+  kv = (kr_v4l2 *)adapter->handle;
   if (path == NULL) return -2;
   printk("V4L2: Adapter path create");
+  kv->adapter_path = path;
+  kv->path_info = &path->info->adp.v4l2_in;
+  ret = kr_v4l2_mode_set(kv);
+  //kr_v4l2_map(v4l2);
   printk("V4L2: Adapter path created");
-  return 0;
+  return ret;
 }
 
 int kr_v4l2_ctl(kr_adapter *adapter, kr_patchset *patchset) {
@@ -355,7 +353,7 @@ int kr_v4l2_close(kr_adapter *adapter) {
   v4l2_close(kv);
   free(kv);
   adapter->handle = NULL;
-  printk("V4L2 adapter closed");
+  printk("V4L2: adapter closed");
   return 0;
 }
 
@@ -369,6 +367,6 @@ int kr_v4l2_open(kr_adapter *adapter) {
   kv->info = &adapter->info->adp.v4l2;
   v4l2_open(kv);
   adapter->fd = kv->fd;
-  printk("V4L2 adapter opened");
+  printk("V4L2: adapter opened");
   return 0;
 }

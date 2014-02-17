@@ -265,6 +265,7 @@ static int path_create(kr_xpdr *xpdr, kr_xpdr_path *ap, kr_xpdr_path_info *info,
 
 int kr_xpdr_ctl(kr_xpdr_path *path, kr_xpdr_path_info_patch *patch) {
   int ret;
+  ret = -1;
   if ((path == NULL) || (patch == NULL)) return -1;
   printk("XPDR: control");
   /*ret = kr_xpdr_path_info_patch_apply(&path->info, patch);*/

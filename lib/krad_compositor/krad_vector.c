@@ -27,6 +27,7 @@ struct kr_vector {
   kr_vector_type type;
 };
 
+/*
 static void render_meter(cairo_t *cr, int x, int y, int size, float pos, float opacity);
 static void render_hex(cairo_t *cr, int x, int y, int w, float r, float g, float b, float opacity);
 static void render_grid(cairo_t *cr, int x, int y, int w, int h, int lines, float r, float g, float b, float opacity);
@@ -38,6 +39,7 @@ static void render_arrow(cairo_t *cr, int x, int y, float w, float h, float r, f
 static void render_viper(cairo_t * cr, int x, int y, int size, float direction);
 static void render_clock(cairo_t *cr, int x, int y, int width, int height, float opacity);
 static void render_shadow(cairo_t *cr, int x, int y, int w, int h, float r, float g, float b, float a);
+*/
 
 size_t kr_vector_size() {
   return sizeof(kr_vector);
@@ -196,6 +198,7 @@ void kr_vector_render(kr_vector *krad_vector, cairo_t *cr) {
   */
 }
 
+/*
 static void render_meter(cairo_t *cr, int x, int y, int size, float pos, float opacity) {
 
   pos = pos * 1.8f - 90.0f;
@@ -582,7 +585,6 @@ static void render_clock(cairo_t *cr, int x, int y, int width, int height, float
   cairo_fill(cr) ;
 }
 
-/*
 static void
 patch_arc (cairo_pattern_t *pattern,
      double x, double y,
@@ -672,7 +674,7 @@ patch_rect (cairo_pattern_t *pattern,
     patch_line (pattern, x1, y1, x0, y1, radius, r, g, b, a);
     patch_line (pattern, x0, y1, x0, y0, radius, r, g, b, a);
 }
-*/
+
 static void render_shadow (cairo_t *cr, int x, int y, int w, int h, float r, float g, float b, float a) {
 
   //cairo_pattern_t *pattern;
@@ -685,3 +687,4 @@ static void render_shadow (cairo_t *cr, int x, int y, int w, int h, float r, flo
   //cairo_set_source(cr, pattern);
   //cairo_paint(cr);
 }
+*/

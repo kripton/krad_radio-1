@@ -508,8 +508,8 @@ void kr_sprite_render(kr_sprite *sprite, cairo_t *cr) {
     cairo_paint_with_alpha(cr, input_info->opacity);
   }
   cairo_restore(cr);
-  sprite_tick(sprite);
   */
+  sprite_tick(sprite);
 }
 
 int kr_sprite_info_get(kr_sprite *sprite, kr_sprite_info *info) {

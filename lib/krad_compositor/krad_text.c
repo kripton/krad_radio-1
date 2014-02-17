@@ -40,15 +40,12 @@ int kr_text_init(kr_text *text, char *str, char *font, FT_Library *ftlib) {
 }
 
 static void kr_text_set_font(kr_text *text, char *font) {
-
   static const cairo_user_data_key_t key;
   int status;
-
   if ((font == NULL) || (strlen(font) <= 0)) {
     strcpy(text->info.font, KRAD_TEXT_DEFAULT_FONT);
     return;
   }
-
   if (FT_New_Face(*text->ft_library, font, 0, &text->ft_face) == 0) {
     FT_Set_Char_Size(text->ft_face, 0, 50.0, 100, 100 );
     text->cr_face = cairo_ft_font_face_create_for_ft_face(text->ft_face, 0);
@@ -74,15 +71,11 @@ void kr_text_prerender_cancel(kr_text *text, cairo_t *cr) {
 }
 
 void kr_text_prerender(kr_text *krad_text, cairo_t *cr) {
-
   cairo_text_extents_t extents;
-
   if (krad_text->prerendered == 1) {
     kr_text_prerender_cancel(krad_text, cr);
   }
-
   cairo_save(cr);
-
   if (krad_text->cr_face != NULL) {
     cairo_set_font_face(cr, krad_text->cr_face);
   } else {
@@ -97,9 +90,11 @@ void kr_text_prerender(kr_text *krad_text, cairo_t *cr) {
                          krad_text->info.green,
                          krad_text->info.blue,
                          krad_text->info.input_info.opacity);
+*/
   cairo_text_extents (cr, krad_text->info.string, &extents);
+/*
   krad_text->info.input_info.pos.w = extents.width;
-//  krad_text->info.input_info.pos.h = extents.height;
+  krad_text->info.input_info.pos.h = extents.height;
   cairo_translate (cr, krad_text->info.input_info.pos.x, krad_text->info.input_info.pos.y);
   if (krad_text->info.input_info.rotation != 0.0f) {
     cairo_translate (cr, krad_text->info.input_info.pos.w / 2,
@@ -113,12 +108,12 @@ void kr_text_prerender(kr_text *krad_text, cairo_t *cr) {
 }
 
 void kr_text_render(kr_text *text, cairo_t *cr) {
+  /*kr_compositor_input_info *input_info;*/
   kr_text_prerender(text, cr);
   cairo_show_text(cr, text->info.string);
   cairo_stroke(cr);
   cairo_restore(cr);
   text->prerendered = 0;
-  kr_compositor_input_info *input_info;
   /*
   input_info = &text->info.input_info;
   printk("rendered %s %s %f %f %f %f %f %d %d %d %d", text->info.string,
@@ -129,7 +124,6 @@ void kr_text_render(kr_text *text, cairo_t *cr) {
 }
 
 int kr_text_info_get(kr_text *text, kr_text_info *info) {
-
   if ((text == NULL) || (info == NULL)) {
     return -1;
   }

@@ -31,22 +31,34 @@ typedef struct {
   kr_compositor_path *to;
 } kr_compositor_path_setup;
 
-static float kr_round3(float f);
-static kr_vertex_type path_vertex_type(kr_compositor_path_type type);
-static kr_compositor_path *path_create(kr_compositor *comp,
- kr_compositor_path_setup *setup);
+/*
 static void path_release(kr_compositor *compositor, kr_compositor_path *path);
-static void path_output(kr_compositor_path *path, kr_image *image);
-static int path_render(kr_compositor_path *path,
-  kr_compositor_input_info *input_info, kr_image *image, cairo_t *cr);
+static float kr_round3(float f);
+*/
+static kr_vertex_type path_vertex_type(kr_compositor_path_type type);
 static int path_info_check(kr_compositor_path_info *info);
 static int path_setup_check(kr_compositor_path_setup *setup);
+static kr_compositor_path *path_create(kr_compositor *comp,
+ kr_compositor_path_setup *setup);
+
+#include "render.c"
+
+/*
+static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
+  if (path->perspective != NULL) {
+    kr_perspective_destroy(&path->perspective);
+  }
+  kr_image_convert_clear(&path->converter);
+  kr_graph_remove(path->compositor->graph, &path->g.elem);
+  kr_pool_recycle(path->compositor->path_pool, path);
+}
 
 static float kr_round3(float f) {
   f = rintf(f * 1000.0);
   f = f / 1000.0;
   return f;
 }
+*/
 
 static kr_vertex_type path_vertex_type(kr_compositor_path_type type) {
   switch (type) {
@@ -64,6 +76,34 @@ static kr_vertex_type path_vertex_type(kr_compositor_path_type type) {
   return -1;
 }
 
+static int path_info_check(kr_compositor_path_info *info) {
+  if ((info->type != KR_COM_OVERLAY)
+   && (info->type != KR_COM_SOURCE)
+   && (info->type != KR_COM_INPUT)
+   && (info->type != KR_COM_BUS)
+   && (info->type != KR_COM_OUTPUT)) {
+    return -4;
+  }
+  /*
+  if ((info->width == 0) || (info->height == 0)) {
+    return -1;
+  }
+  */
+  return 0;
+}
+
+static int path_setup_check(kr_compositor_path_setup *setup) {
+  kr_compositor_path_info *info;
+  info = setup->info;
+  if ((setup->frame_user == NULL) || (setup->frame_cb == NULL)) {
+    /* FIXME HRMMM */
+  }
+  if (setup->control_user == NULL) {
+    /* FIXME HRMMM */
+  }
+  return  path_info_check(info);
+}
+
 static kr_compositor_path *path_create(kr_compositor *comp,
  kr_compositor_path_setup *setup) {
   int ret;
@@ -73,12 +113,12 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   if ((comp == NULL) || (setup == NULL)) return NULL;
   ret = path_setup_check(setup);
   if (ret) {
-    printke("compositor mkpath failed setup check: %d", ret);
+    printke("Compositor: path_setup_check failed: %d", ret);
     return NULL;
   }
   path = kr_pool_slice(comp->path_pool);
   if (path == NULL) {
-    printke("compositor mkpath could not slice new path");
+    printke("Compositor: No free slices in pool");
     return NULL;
   }
   path->g.ptr = NULL;
@@ -106,112 +146,6 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   path->compositor->event_cb(&event);
   path->control_user = event.user_path;
   return path;
-}
-
-static void path_release(kr_compositor *compositor, kr_compositor_path *path) {
-  if (path->perspective != NULL) {
-    kr_perspective_destroy(&path->perspective);
-  }
-  kr_image_convert_clear(&path->converter);
-  kr_graph_remove(path->compositor->graph, &path->g.elem);
-  kr_pool_recycle(path->compositor->path_pool, path);
-}
-
-static void path_output(kr_compositor_path *path, kr_image *image) {
-  kr_frame_event event;
-  event.user = path->frame_user;
-  path->frame_cb(&event);
-  memcpy(event.image.px, image->px, image->w * image->h * 4);
-}
-
-static int path_render(kr_compositor_path *path,
-  kr_compositor_input_info *input_info, kr_image *dst, cairo_t *cr) {
-  return 0;
-}
-
-static int path_info_check(kr_compositor_path_info *info) {
-  if ((info->type != KR_COM_OVERLAY)
-   && (info->type != KR_COM_INPUT)
-   && (info->type != KR_COM_BUS)
-   && (info->type != KR_COM_OUTPUT)) {
-    return -4;
-  }
-
-  /* FIXME check info->info */
-
-  return 0;
-}
-
-static int path_setup_check(kr_compositor_path_setup *setup) {
-  kr_compositor_path_info *info;
-  info = setup->info;
-  if ((setup->frame_user == NULL) || (setup->frame_cb == NULL)) {
-    /* FIXME HRMMM */
-  }
-  if (setup->control_user == NULL) {
-    /* FIXME HRMMM */
-  }
-/*  if ((info->width == 0) || (info->height == 0)) {
-    return -1;
-  }*/
-  if ((info->type != KR_COM_INPUT) && (info->type != KR_COM_OUTPUT)) {
-    return -2;
-  }
-  /* FIXME check more things out */
-  return 0;
-}
-
-
-static void output_source_render(kr_compositor_path *output, kr_compositor_path *source) {
-  void ***user_chains;
-  int n;
-  int i;
-  user_chains = alloca(sizeof(void**)*16);
-  for (i = 0; i < 16; i++) {
-    user_chains[i] = alloca(sizeof(void*)*16);
-  }
-  n = kr_graph_chains(output->compositor->graph, &output->g.elem, &source->g.elem, user_chains, 16, 16);
-  for (i = 0; i < n; i++) {
-    //transform = get_transform(user_chains, len);
-    //render(output, source, transform);
-  }
-}
-
-static void output_render(kr_compositor_path *output) {
-  void *source_users[16];
-  kr_compositor_path *source;
-  int i;
-  int n;
-  n = kr_graph_sources(output->compositor->graph,
-    &output->g.elem, source_users, 16);
-  for (i = 0; i < n; i++) {
-    source = (kr_compositor_path *)source_users[i];
-    output_source_render(output, source);
-  }
-}
-
-int kr_compositor_process(kr_compositor_path *path) {
-  void *output_users[16];
-  kr_compositor_path *output;
-  int i;
-  int n;
-  if (path == NULL) return -1;
-  if (path->info.type == KR_COM_OUTPUT) {
-    //if (path->writeable) {
-      output_render(path);
-    //}
-    return 0;
-  } else {
-    n = kr_graph_outputs(path->compositor->graph,
-        &path->g.elem, output_users, 16);
-    for (i = 0; i < n; i++) {
-      output = (kr_compositor_path *)output_users[i];
-      //if (output->writeable) {
-      output_render(output);
-      //}
-    }
-  }
-  return 0;
 }
 
 int kr_compositor_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch) {
