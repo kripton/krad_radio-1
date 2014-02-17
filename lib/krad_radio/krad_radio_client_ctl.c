@@ -145,36 +145,5 @@ int krad_radio_destroy(char *sysname) {
 }
 
 void krad_radio_launch(char *sysname) {
-  pid_t pid;
-  FILE *refp;
-  pid = fork();
-  if (pid < 0) {
-    exit(3);
-  }
-  if (pid > 0) {
-    if (waitpid(pid, NULL, 0) != pid) {
-      failfast("waitpid error launching daemon!");
-    }
-    return;
-  }
-  pid = fork();
-  if (pid < 0) {
-    exit(4);
-  }
-  if (pid > 0) {
-    exit(0);
-  }
-  refp = freopen("/dev/null", "r", stdin);
-  if (refp == NULL) {
-    exit(5);
-  }
-  refp = freopen("/dev/null", "w", stdout);
-  if (refp == NULL) {
-    exit(6);
-  }
-  refp = freopen("/dev/null", "w", stderr);
-  if (refp == NULL) {
-    exit(7);
-  }
   execlp("krad_radio", "krad_radio", sysname, (char *)NULL);
 }

@@ -31,39 +31,6 @@ static int systemd_notify(const char *data) {
   return -1;
 }
 
-static void daemonize() {
-  pid_t pid;
-  pid_t sid;
-  FILE *refp;
-  pid = fork();
-  if (pid < 0) {
-    exit(EXIT_FAILURE);
-  }
-  if (pid > 0) {
-    exit(EXIT_SUCCESS);
-  }
-  refp = freopen("/dev/null", "r", stdin);
-  if (refp == NULL) {
-    exit(EXIT_FAILURE);
-  }
-  refp = freopen("/dev/null", "w", stdout);
-  if (refp == NULL) {
-    exit(EXIT_FAILURE);
-  }
-  refp = freopen("/dev/null", "w", stderr);
-  if (refp == NULL) {
-    exit(EXIT_FAILURE);
-  }
-  umask(0);
-  sid = setsid();
-  if (sid < 0) {
-    exit(EXIT_FAILURE);
-  }
-  if ((chdir("/")) < 0) {
-    exit(EXIT_FAILURE);
-  }
-}
-
 int main(int argc, char *argv[]) {
   kr_radio *radio;
   int sfd;
@@ -92,9 +59,7 @@ int main(int argc, char *argv[]) {
   if (!radio) {
     exit(1);
   }
-  if (systemd_notify("READY=1") != 0) {
-    daemonize();
-  }
+  systemd_notify("READY=1");
   printk("Daemon: Waiting on signals..");
   for (;;) {
     s = read(sfd, &fdsi, sizeof(struct signalfd_siginfo));
