@@ -134,7 +134,7 @@ static void handle_shm_format(void *data, struct wl_shm *wl_shm, uint32_t format
   kr_wayland *kw;
   kw = (kr_wayland *)data;
   kw->formats |= (1 << format);
-  printk("Wayland: shm format %u", format);
+  printk("Wayland: shm format %#010x", format);
 }
 
 static void handle_global(void *data, struct wl_registry *registry,
