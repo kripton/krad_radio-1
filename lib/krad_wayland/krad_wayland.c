@@ -69,6 +69,7 @@ struct kr_wayland_path {
   void *user;
   kr_wayland_path_info *info;
   kr_wayland *wayland;
+  kr_adapter_path *adapter_path;
 };
 
 struct kr_wayland {
@@ -99,6 +100,7 @@ struct kr_wayland {
     xkb_mod_mask_t shift_mask;
   } xkb;
   kr_wayland_info *info;
+  kr_adapter *adapter;
 };
 
 static void handle_configure(void *data, struct wl_shell_surface *ss,
@@ -158,17 +160,16 @@ static void handle_global(void *data, struct wl_registry *registry,
 
 static void handle_frame_done(void *ptr, struct wl_callback *cb, uint32_t time) {
   kr_wayland_path *window;
-  kr_wayland_event wayland_event;
+  kr_avio_event event;
   window = (kr_wayland_path *)ptr;
+  wl_callback_destroy(cb);
   printk("Wayland: frame done");
-  memset(&wayland_event, 0, sizeof(kr_wayland_event));
-  if (window->user_callback != NULL) {
-    //wayland_event.type = KR_WL_FRAME;
-    //updated = window->user_callback(window->user, &wayland_event);
-  }
-  if (cb) {
-    wl_callback_destroy(cb);
-  }
+  memset(&event, 0, sizeof(kr_avio_event));
+  event.state = KR_AVIO_WANT_OUTPUT_FRAME;
+  event.user = window->adapter_path->user;
+  event.path = window->adapter_path;
+  /* FIXME attach avail image buffer to event */
+  window->adapter_path->avio_cb(&event);
 }
 
 static void write_frame(kr_wayland_path *window) {
@@ -418,6 +419,7 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   }
   window->active = 1;
   path->handle = window;
+  window->adapter_path = path;
   write_frame(window);
   wl_display_roundtrip(kw->display);
   usleep(30 * 1000);
@@ -451,6 +453,7 @@ int kr_wl_open(kr_adapter *adapter) {
   kr_wayland *kw;
   adapter->handle = kr_allocz(1, sizeof(kr_wayland));
   kw = (kr_wayland *)adapter->handle;
+  kw->adapter = adapter;
   kw->info = &adapter->info->adp.wl;
   kw_init(kw);
   kw_connect(kw);

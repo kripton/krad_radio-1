@@ -40,7 +40,7 @@ struct kr_xpdr {
 
 static void compositor_frame(kr_frame_event *event);
 static void mixer_audio(kr_audio_event *event);
-static void adapter_av(kr_adapter_path_av_event *event);
+static void adapter_avio(kr_avio_event *event);
 static void adapter_event(kr_adapter_event *event);
 static int link_destroy(kr_xpdr_path *path);
 static int link_create(kr_xpdr_path *path);
@@ -58,11 +58,22 @@ static void mixer_audio(kr_audio_event *event) {
   event->audio = path->link.audio;
 }
 
-static void adapter_av(kr_adapter_path_av_event *event) {
+static void adapter_avio(kr_avio_event *event) {
   kr_xpdr_path *path;
   path = (kr_xpdr_path *)event->user;
   path->link.audio = event->audio;
   path->link.image = event->image;
+  if (event->state == KR_AVIO_WANT_OUTPUT_FRAME) {
+    printk("XPDR: Got AVIO event with state: want output frame");
+  }
+  if (event->state == KR_AVIO_HAVE_INPUT_FRAME) {
+    printk("XPDR: Got AVIO event with state: have input frame");
+  }
+  if (event->state == KR_AVIO_NONE) {
+    printk("XPDR: Got AVIO event with state NONE");
+  }
+  /* FIXME take event image/audio and call a m/c function to
+   * propagate the state */
 }
 
 static void adapter_event(kr_adapter_event *event) {
@@ -147,7 +158,7 @@ static int link_create(kr_xpdr_path *path) {
   kr_mixer_port_setup mp_setup;
   kr_compositor_port_setup cp_setup;
   ret = 0;
-  path->link.adapter_path.av_cb = adapter_av;
+  path->link.adapter_path.avio_cb = adapter_avio;
   path->link.adapter_path.user = path;
   path->link.adapter_path.info = &path->info;
   printk("XPDR: link create");
