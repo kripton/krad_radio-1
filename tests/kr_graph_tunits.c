@@ -14,6 +14,16 @@ uint randr(uint min, uint max) {
   return min + floor(rand() * scale);;
 }
 
+char *tunit_type_to_str(int type) {
+  switch(type) {
+    case TU_SOURCE: return "source";
+    case TU_BUS: return "bus";
+    case TU_OUTPUT: return "output";
+    case TU_LINK: return "link";
+    default: return NULL;
+  }
+}
+
 tunit *tunit_create(tunit_setup *setup) {
   tunit *unit;
   unit = calloc(1, sizeof(tunit));
@@ -49,6 +59,7 @@ int tunit_destroy(tunit *unit) {
 
 tunit *tunit_random_gen(kr_graph *graph, int type, int k, tunit **units, int nv) {
   tunit_setup tunit_setup;
+  tunit *unit;
   memset(&tunit_setup, 0, sizeof(tunit_setup));
   tunit_setup.graph = graph;
   tunit_setup.name = names[k];
@@ -58,7 +69,14 @@ tunit *tunit_random_gen(kr_graph *graph, int type, int k, tunit **units, int nv)
     tunit_setup.from = units[randr(0, nv)];
     tunit_setup.to = units[randr(0, nv)];
   }
-  return tunit_create(&tunit_setup);
+  unit = tunit_create(&tunit_setup);
+  if (unit && type == TU_LINK) {
+    printf("new %s %s from %s to %s\n",tunit_type_to_str(unit->type),
+      unit->name,tunit_setup.from->name,tunit_setup.to->name);
+  } else if (unit && type != TU_LINK) {
+    printf("new %s %s\n",tunit_type_to_str(unit->type),unit->name);
+  }
+  return unit;
 }
 
 void tunits_destroy(tunit **units, int n) {
@@ -74,7 +92,7 @@ int tunits_random_populate(kr_graph *graph, tunit **units, int max) {
   int e;
   int i;
   tunit *tunit;
-  n = randr(4,max);
+  n = randr(4,max/2);
   for (i = v = 0; i < n; i++) {
     tunit = tunit_random_gen(graph, randr(TU_SOURCE, TU_OUTPUT+1), v, NULL, 0);
     if (tunit) {
@@ -82,7 +100,7 @@ int tunits_random_populate(kr_graph *graph, tunit **units, int max) {
       v++;
     }
   }
-  n = randr(0,max-v);
+  n = randr(4,max/2);
   for (i = e = 0; i < n; i++) {
     tunit = tunit_random_gen(graph, TU_LINK, v+e, units, v);
     if (tunit) {
