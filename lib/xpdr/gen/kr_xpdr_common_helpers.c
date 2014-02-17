@@ -242,7 +242,7 @@ int kr_xpdr_type_info_init(kr_xpdr_type_info *st, int idx) {
       break;
     }
     case 10: {
-      kr_v4l2_open_info_init(&st->v4l2_in);
+      kr_v4l2_path_info_init(&st->v4l2_in);
       break;
     }
     case 11: {
@@ -322,7 +322,7 @@ int kr_xpdr_type_info_valid(kr_xpdr_type_info *st, int idx) {
       break;
     }
     case 10: {
-      kr_v4l2_open_info_valid(&st->v4l2_in);
+      kr_v4l2_path_info_valid(&st->v4l2_in);
       break;
     }
     case 11: {
@@ -403,7 +403,7 @@ int kr_xpdr_type_info_random(kr_xpdr_type_info *st, int idx) {
       break;
     }
     case 10: {
-      kr_v4l2_open_info_random(&st->v4l2_in);
+      kr_v4l2_path_info_random(&st->v4l2_in);
       break;
     }
     case 11: {

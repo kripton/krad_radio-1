@@ -4,6 +4,6 @@ if KR_IZ_US
 	KR_TESTS = tests
 endif
 if KR_ENABLE_TOOLS
-  KR_TOOLS = tools
+#  KR_TOOLS = tools
 endif
 SUBDIRS = $(KR_DEV_TOOLS) . lib daemon clients $(KR_TESTS) $(KR_TOOLS)

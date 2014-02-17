@@ -7,9 +7,19 @@ typedef enum {
   KR_V4L2_CAPTURE
 } kr_v4l2_state;
 
-typedef struct kr_v4l2_mode kr_v4l2_mode;
-typedef struct kr_v4l2_info kr_v4l2_info;
-typedef struct kr_v4l2_open_info kr_v4l2_open_info;
+typedef struct {
+  int width;
+  int height;
+  int num;
+  int den;
+  int format;
+} kr_v4l2_path_info;
+
+typedef struct {
+  int dev;
+  int priority;
+  kr_v4l2_state state;
+} kr_v4l2_info;
 
 #include "gen/krad_v4l2_common_to_text.h"
 #include "gen/krad_v4l2_common_to_json.h"
@@ -17,26 +27,5 @@ typedef struct kr_v4l2_open_info kr_v4l2_open_info;
 #include "gen/krad_v4l2_common_to_ebml.h"
 #include "gen/krad_v4l2_common_from_ebml.h"
 #include "gen/krad_v4l2_common_helpers.h"
-
-struct kr_v4l2_mode {
-  int width;
-  int height;
-  int num;
-  int den;
-  int format;
-};
-
-struct kr_v4l2_info {
-  int dev;
-  int priority;
-  kr_v4l2_state state;
-  kr_v4l2_mode mode;
-};
-
-struct kr_v4l2_open_info {
-  int dev;
-  int priority;
-  kr_v4l2_mode mode;
-};
 
 #endif

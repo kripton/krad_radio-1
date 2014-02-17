@@ -1,7 +1,24 @@
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/mman.h>
+#include <sys/ioctl.h>
+#include <math.h>
+#include <asm/types.h>
 #include <poll.h>
+#include <dirent.h>
+#include <linux/videodev2.h>
+#include <linux/uvcvideo.h>
 #include "krad_v4l2.h"
+#include "krad_image_pool.h"
+#include "krad_convert.h"
 
 #define KR_V4L2_BUFS_DEF 12
+
+typedef struct kr_v4l2 kr_v4l2;
 
 typedef struct {
   void *start;
@@ -11,15 +28,27 @@ typedef struct {
 
 struct kr_v4l2 {
   int fd;
-  kr_v4l2_info info;
+  kr_v4l2_info *info;
+  kr_v4l2_path_info *path_info;
+  kr_adapter *adapter;
+  kr_adapter_path *adapter_path;
+  kr_image_pool *pool;
   uint32_t nbufs;
   kr_v4l2_buf bufs[KR_V4L2_BUFS_DEF];
 };
 
+/*
+int kr_v4l2_read(kr_v4l2 *v4l2, kr_image *image);
+int kr_v4l2_poll(kr_v4l2 *v4l2, int ms);
+int kr_v4l2_capture(kr_v4l2 *v4l2, int on);
+int kr_v4l2_mode_set(kr_v4l2 *v4l2, kr_v4l2_mode *mode);
+*/
 static int xioctl(int fd, int request, void *arg);
+/*
 static int kr_v4l2_buf_release(void *ptr);
 static void kr_v4l2_unmap(kr_v4l2 *v4l2);
 static void kr_v4l2_map(kr_v4l2 *v4l2);
+*/
 static void v4l2_close(kr_v4l2 *v4l2);
 static void v4l2_open(kr_v4l2 *v4l2);
 
@@ -29,7 +58,7 @@ static int xioctl(int fd, int request, void *arg) {
   while (-1 == r && EINTR == errno);
   return r;
 }
-
+/*
 int kr_v4l2_buf_release(void *ptr) {
   kr_v4l2_buf *buf;
   if (ptr == NULL) return -1;
@@ -75,18 +104,18 @@ int kr_v4l2_read(kr_v4l2 *v4l2, kr_image *image) {
     }
   }
 
-  /*  v4l2->timestamp = buf.timestamp; */
+  *//*  v4l2->timestamp = buf.timestamp; *//*
   image->px = v4l2->bufs[buf.index].start;
   image->ppx[0] = image->px;
   image->ppx[1] = NULL;
   image->ppx[2] = NULL;
   image->ppx[3] = NULL;
-  image->pps[0] = v4l2->info.mode.width * 2;
-  image->pps[1] = 0; /*v4l2->info.mode.width/2;*/
-  image->pps[2] = 0; /*v4l2->info.mode.width/2;*/
+  image->pps[0] = v4l2->info.width * 2;
+  image->pps[1] = 0; *//*v4l2->info.width/2;*//*
+  image->pps[2] = 0; *//*v4l2->info.width/2;*//*
   image->pps[3] = 0;
-  image->w = v4l2->info.mode.width;
-  image->h = v4l2->info.mode.height;
+  image->w = v4l2->info.width;
+  image->h = v4l2->info.height;
   image->fmt = PIX_FMT_YUYV422;
   image->release_cb = kr_v4l2_buf_release;
   image->owner = &v4l2->bufs[buf.index];
@@ -216,12 +245,13 @@ int kr_v4l2_mode_set(kr_v4l2 *v4l2, kr_v4l2_mode *mode) {
     printke("Krad V4L2: VIDIOC_G_PARM");
     return -1;
   }
+  */
   /* typical inverted
    * printk("mode to %d / %d", v4l2->info.mode.num, v4l2->info.mode.den);
    */
   /* stream_parameters.parm.capture.timeperframe.numerator = v4l2->info.mode.num;
   stream_parameters.parm.capture.timeperframe.denominator = v4l2->info.mode.den;
-  */
+  *//*
   stream_parameters.parm.capture.timeperframe.numerator = v4l2->info.mode.den;
   stream_parameters.parm.capture.timeperframe.denominator = v4l2->info.mode.num;
   if (-1 == xioctl(v4l2->fd, VIDIOC_S_PARM, &stream_parameters)) {
@@ -235,13 +265,14 @@ int kr_v4l2_mode_set(kr_v4l2 *v4l2, kr_v4l2_mode *mode) {
   }
   return 0;
 }
+*/
 
 static void v4l2_close(kr_v4l2 *v4l2) {
   if (v4l2->fd > -1) {
-    kr_v4l2_unmap(v4l2);
+    //kr_v4l2_unmap(v4l2);
     close(v4l2->fd);
     v4l2->fd = -1;
-    v4l2->info.state = KR_V4L2_VOID;
+    v4l2->info->state = KR_V4L2_VOID;
   }
 }
 
@@ -249,7 +280,7 @@ static void v4l2_open(kr_v4l2 *v4l2) {
   struct stat st;
   char device[128];
   struct v4l2_capability cap;
-  snprintf(device, sizeof(device), "/dev/video%d", v4l2->info.dev);
+  snprintf(device, sizeof(device), "/dev/video%d", v4l2->info->dev);
   if (-1 == stat(device, &st)) {
     printke("Krad V4L2: Cannot identify '%s': %d, %s", device, errno,
      strerror(errno));
@@ -281,61 +312,63 @@ static void v4l2_open(kr_v4l2 *v4l2) {
       return;
     }
   }
-  v4l2->info.state = KR_V4L2_OPEN;
-}
-
-int kr_v4l2_destroy(kr_v4l2 *v4l2) {
-  if (v4l2 == NULL) return -1;
-  v4l2_close(v4l2);
-  free(v4l2);
-  return 0;
-}
-
-kr_v4l2 *kr_v4l2_create(kr_v4l2_setup *setup) {
-  kr_v4l2 *v4l2;
-  if (setup == NULL) return NULL;
-  v4l2 = kr_allocz(1, sizeof(kr_v4l2));
-  v4l2->info.dev = setup->dev;
-  v4l2->info.priority = setup->priority;
-  v4l2_open(v4l2);
-  return v4l2;
+  v4l2->info->state = KR_V4L2_OPEN;
 }
 
 int kr_v4l2_lctl(kr_adapter_path *path, kr_patchset *patchset) {
   if (path == NULL) return -1;
   if (patchset == NULL) return -2;
-  printk("V4L2 adapter path controlled");
+  printk("V4L2: Adapter path control");
+  printk("V4L2: Adapter path controlled");
   return 0;
 }
 
 int kr_v4l2_unlink(kr_adapter_path *path) {
   if (path == NULL) return -1;
-  printk("V4L2 adapter path removed");
+  printk("V4L2: Adapter path remove");
+  printk("V4L2: Adapter path remove");
   return 0;
 }
 
 int kr_v4l2_link(kr_adapter *adapter, kr_adapter_path *path) {
   if (adapter == NULL) return -1;
   if (path == NULL) return -2;
-  printk("V4L2 adapter path created");
+  printk("V4L2: Adapter path create");
+  printk("V4L2: Adapter path created");
   return 0;
 }
 
-int kr_v4l2_ctl(kr_adapter *adp, kr_patchset *patchset) {
-  if (adp == NULL) return -1;
+int kr_v4l2_ctl(kr_adapter *adapter, kr_patchset *patchset) {
+  if (adapter == NULL) return -1;
   if (patchset == NULL) return -2;
-  printk("V4L2 adapter controlled");
+  printk("V4L2: Adapter control");
+  printk("V4L2: Adapter controlled");
   return 0;
 }
 
-int kr_v4l2_close(kr_adapter *adp) {
-  if (adp == NULL) return -1;
+int kr_v4l2_close(kr_adapter *adapter) {
+  kr_v4l2 *kv;
+  if (adapter == NULL) return -1;
+  kv = (kr_v4l2 *)adapter->handle;
+  if (kv == NULL) return -1;
+  printk("V4L2: Adapter closing");
+  v4l2_close(kv);
+  free(kv);
+  adapter->handle = NULL;
   printk("V4L2 adapter closed");
   return 0;
 }
 
 int kr_v4l2_open(kr_adapter *adapter) {
+  kr_v4l2 *kv;
   if (adapter == NULL) return -1;
+  printk("V4L2: Adapter opening");
+  adapter->handle = kr_allocz(1, sizeof(kr_v4l2));
+  kv = (kr_v4l2 *)adapter->handle;
+  kv->adapter = adapter;
+  kv->info = &adapter->info->adp.v4l2;
+  v4l2_open(kv);
+  adapter->fd = kv->fd;
   printk("V4L2 adapter opened");
   return 0;
 }

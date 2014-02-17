@@ -95,7 +95,7 @@ int kr_xpdr_type_info_to_json(char *json, void *st, int32_t max) {
     }
     case 10: {
       uber.actual = &(actual->v4l2_in);
-      uber.type = JSON_KR_V4L2_OPEN_INFO;
+      uber.type = JSON_KR_V4L2_PATH_INFO;
       res += info_pack_to_json(&json[res],&uber,max-res);
       break;
     }

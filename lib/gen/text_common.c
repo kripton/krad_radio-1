@@ -1,6 +1,6 @@
 #include "gen.h"
 int info_pack_to_text(char *text, uber_St *uber, int32_t max) {
-  const info_pack_to_text_func to_text_functions[60] = {kr_aux_info_to_text,
+  const info_pack_to_text_func to_text_functions[59] = {kr_aux_info_to_text,
   kr_aux_path_info_to_text,kr_alsa_info_to_text,
   kr_alsa_path_info_to_text,kr_method_to_text,
   kr_crate_to_text,kr_easing_to_text,
@@ -25,12 +25,12 @@ int info_pack_to_text(char *text, uber_St *uber, int32_t max) {
   kr_eq_info_to_text,kr_lowpass_info_to_text,
   kr_highpass_info_to_text,kr_volume_info_to_text,
   kr_analog_info_to_text,kr_v4l2_state_to_text,
-  kr_v4l2_mode_to_text,kr_v4l2_info_to_text,
-  kr_v4l2_open_info_to_text,kr_wayland_state_to_text,
-  kr_wayland_info_to_text,kr_wayland_path_info_to_text,
-  kr_x11_info_to_text,kr_x11_path_info_to_text,
-  kr_xpdr_type_to_text,kr_xpdr_type_info_to_text,
-  kr_xpdr_path_info_to_text};
+  kr_v4l2_path_info_to_text,kr_v4l2_info_to_text,
+  kr_wayland_state_to_text,kr_wayland_info_to_text,
+  kr_wayland_path_info_to_text,kr_x11_info_to_text,
+  kr_x11_path_info_to_text,kr_xpdr_type_to_text,
+  kr_xpdr_type_info_to_text,kr_xpdr_path_info_to_text
+  };
   return to_text_functions[uber->type-1](text , uber->actual, max);
 }
 

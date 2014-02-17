@@ -1,6 +1,7 @@
 #include "kr_client.h"
 
 static int test_wl_create(kr_client *client);
+static int test_v4l2_create(kr_client *client);
 static int test_aux_create(kr_client *client);
 static int test_aux_in_create(kr_client *client);
 /*
@@ -30,6 +31,20 @@ static int test_wl_create(kr_client *client) {
   memset(&info, 0, sizeof(kr_xpdr_path_info));
   name = "Wayland";
   info.type = KR_WAYLAND;
+  ret = kr_xpdr_make(client, name, &info);
+  return ret;
+}
+
+static int test_v4l2_create(kr_client *client) {
+  int ret;
+  kr_xpdr_path_info info;
+  kr_v4l2_info *vi;
+  vi = &info.adp.v4l2;
+  char *name;
+  memset(&info, 0, sizeof(kr_xpdr_path_info));
+  name = "V4L2";
+  info.type = KR_V4L2;
+  vi->dev = 0;
   ret = kr_xpdr_make(client, name, &info);
   return ret;
 }
@@ -305,6 +320,9 @@ int run_test(kr_client *client, char *test) {
   }
   if (strmatch(test, "wayland")) {
     ret = test_wl_create(client);
+  }
+  if (strmatch(test, "v4l2")) {
+    ret = test_v4l2_create(client);
   }
   if (strmatch(test, "window")) {
     ret = test_wayland_output_create(client);

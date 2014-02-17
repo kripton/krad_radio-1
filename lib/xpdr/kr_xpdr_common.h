@@ -45,7 +45,7 @@ typedef union {
   kr_jack_path_info jack_in;
   kr_jack_path_info jack_out;
   kr_wayland_path_info wl_out;
-  kr_v4l2_open_info v4l2_in;
+  kr_v4l2_path_info v4l2_in;
   kr_decklink_path_info dl_in;
   kr_x11_path_info x11_in;
   kr_alsa_path_info alsa_in;

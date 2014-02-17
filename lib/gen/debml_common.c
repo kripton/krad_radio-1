@@ -1,7 +1,7 @@
 #include "gen.h"
 #include "krad_ebmlx.h"
 int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber) {
-  const info_unpack_fr_ebml_func fr_ebml_functions[60] = {kr_aux_info_fr_ebml,
+  const info_unpack_fr_ebml_func fr_ebml_functions[59] = {kr_aux_info_fr_ebml,
   kr_aux_path_info_fr_ebml,kr_alsa_info_fr_ebml,
   kr_alsa_path_info_fr_ebml,kr_method_fr_ebml,
   kr_crate_fr_ebml,kr_easing_fr_ebml,
@@ -26,12 +26,12 @@ int info_unpack_fr_ebml(kr_ebml *ebml, uber_St *uber) {
   kr_eq_info_fr_ebml,kr_lowpass_info_fr_ebml,
   kr_highpass_info_fr_ebml,kr_volume_info_fr_ebml,
   kr_analog_info_fr_ebml,kr_v4l2_state_fr_ebml,
-  kr_v4l2_mode_fr_ebml,kr_v4l2_info_fr_ebml,
-  kr_v4l2_open_info_fr_ebml,kr_wayland_state_fr_ebml,
-  kr_wayland_info_fr_ebml,kr_wayland_path_info_fr_ebml,
-  kr_x11_info_fr_ebml,kr_x11_path_info_fr_ebml,
-  kr_xpdr_type_fr_ebml,kr_xpdr_type_info_fr_ebml,
-  kr_xpdr_path_info_fr_ebml};
+  kr_v4l2_path_info_fr_ebml,kr_v4l2_info_fr_ebml,
+  kr_wayland_state_fr_ebml,kr_wayland_info_fr_ebml,
+  kr_wayland_path_info_fr_ebml,kr_x11_info_fr_ebml,
+  kr_x11_path_info_fr_ebml,kr_xpdr_type_fr_ebml,
+  kr_xpdr_type_info_fr_ebml,kr_xpdr_path_info_fr_ebml
+  };
   return fr_ebml_functions[uber->type-1](ebml , uber->actual);
 }
 

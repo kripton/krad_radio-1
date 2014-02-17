@@ -170,7 +170,7 @@ int kr_xpdr_type_info_fr_json(char *json, void *st) {
     }
     case 10: {
       uber.actual = &(actual->v4l2_in);
-      uber.type = DEJSON_KR_V4L2_OPEN_INFO;
+      uber.type = DEJSON_KR_V4L2_PATH_INFO;
       json[tokens[k].end] = '\0';
       res += info_unpack_fr_json(&json[tokens[k].start],&uber);
       if (res < 0) {

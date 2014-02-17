@@ -99,7 +99,7 @@ int kr_xpdr_type_info_to_text(char *text, void *st, int32_t max) {
     }
     case 10: {
       uber.actual = &(actual->v4l2_in);
-      uber.type = TEXT_KR_V4L2_OPEN_INFO;
+      uber.type = TEXT_KR_V4L2_PATH_INFO;
       res += info_pack_to_text(&text[res],&uber,max-res);
       break;
     }
