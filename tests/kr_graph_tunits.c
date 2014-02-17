@@ -16,10 +16,10 @@ uint randr(uint min, uint max) {
 
 char *tunit_type_to_str(int type) {
   switch(type) {
-    case TU_SOURCE: return "source";
-    case TU_BUS: return "bus";
-    case TU_OUTPUT: return "output";
-    case TU_LINK: return "link";
+    case TU_SOURCE: return "SOURCE";
+    case TU_BUS: return "BUS";
+    case TU_OUTPUT: return "OUTPUT";
+    case TU_LINK: return "LINK";
     default: return NULL;
   }
 }
@@ -122,6 +122,7 @@ int run_test() {
   if (graph == NULL) return 1;
   n = tunits_random_populate(graph, units, 32);
   tunits_destroy(units,n);
+  printf("%d units destroyed\n",n);
   kr_graph_destroy(graph);
   return 0;
 }
