@@ -61,7 +61,7 @@ static kr_vertex *vertex_create(kr_graph *graph, kr_vertex_type type, void *user
 static int output_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
 static int source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, int max);
 static int graph_chains(kr_graph *graph, kr_vertex *to,
-  kr_vertex *from, void ***user, int max, int max_len);
+  kr_vertex *from, kr_chain *chains, int max);
 
 static int vertex_index(kr_graph *graph, kr_vertex *v) {
   int8_t i;
@@ -300,12 +300,15 @@ static int output_users_from(kr_graph *graph, kr_vertex *vertex, void **user, in
   int k;
   if (vertex == NULL) return 0;
   k = 0;
-  if (vertex->type == KR_VERTEX_OUTPUT) user[k++] = vertex->user;
-  max--;
+  if (vertex->type == KR_VERTEX_OUTPUT) {
+    user[k++] = vertex->user;
+    max--;
+  }
   n = vertex_indeps(graph, vertex, indeps, max);
   for (i = 0; i < n; i++) {
+    if (k >= max) return k;
     if (indeps[i]->type == KR_VERTEX_OUTPUT) {
-      user[k] = indeps[k]->user;
+      user[k] = indeps[i]->user;
       k++;
     }
   }
@@ -319,12 +322,15 @@ static int source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, in
   int k;
   if (vertex == NULL) return 0;
   k = 0;
-  if (vertex->type == KR_VERTEX_SOURCE) user[k++] = vertex->user;
-  max--;
+  if (vertex->type == KR_VERTEX_SOURCE) {
+    user[k++] = vertex->user;
+    max--;
+  }
   n = vertex_deps(graph, vertex, deps, max);
   for (i = 0; i < n; i++) {
+    if (k >= max) return k;
     if (deps[i]->type == KR_VERTEX_SOURCE) {
-      user[k] = deps[k]->user;
+      user[k] = deps[i]->user;
       k++;
     }
   }
@@ -332,21 +338,25 @@ static int source_users_from(kr_graph *graph, kr_vertex *vertex, void **user, in
 }
 
 static int graph_chains(kr_graph *graph, kr_vertex *to,
-  kr_vertex *from, void ***user, int max, int max_len) {
-  kr_graph_chain chains[256];
+  kr_vertex *from, kr_chain *chains, int max) {
+  kr_graph_chain gchains[256];
   int i;
   int j;
   int n;
   int count;
   count = 0;
-  if (max == 0 || max_len == 0) return 0;
-  n = all_chains_from(graph, from, chains);
+  if (max == 0) return 0;
+  n = all_chains_from(graph, from, gchains);
   if (n >= max) return 0;
   for (i = 0; i < n; i++) {
-    if (chains[i].chain[chains[i].len-1] == to) {
-      for (j = 0; j < chains[i].len; j++) {
-        if (j >= max_len) return 0;
-        user[count][j] = chains[i].chain[j]->user;
+    if (gchains[i].chain[gchains[i].len-1] == to) {
+      chains[count].len = gchains[i].len;
+      for (j = 0; j < gchains[i].len; j++) {
+        if (j >= max) {
+          chains[count].len = 0;
+          return 0;
+        }
+        chains[count].users[j] = gchains[i].chain[j]->user;
       }
       count++;
     }
@@ -425,11 +435,12 @@ int kr_graph_sources(kr_graph *graph, kr_graph_elem *elem, void **user, int max)
 }
 
 int kr_graph_chains(kr_graph *graph, kr_graph_elem *to,
-  kr_graph_elem *from, void ***user, int max, int max_len) {
-  if (graph == NULL) return 0;
+  kr_graph_elem *from, kr_chain *chains, int max) {
+  if (graph == NULL || chains == NULL) return 0;
   if (to == NULL || from == NULL) return 0;
+  if (max > MAX_USERS) return 0;
   if (to->type != KR_GRAPH_VERTEX || from->type != KR_GRAPH_VERTEX) return 0;
-  return graph_chains(graph, to->vertex, from->vertex, user, max, max_len);
+  return graph_chains(graph, to->vertex, from->vertex, chains, max);
 }
 
 kr_graph_elem kr_graph_link(kr_graph *graph, kr_graph_elem *to, kr_graph_elem *from, void *user) {

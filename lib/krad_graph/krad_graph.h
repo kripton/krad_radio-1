@@ -3,11 +3,13 @@
 #define KRAD_GRAPH_H
 #define MAX_VERTICES 64
 #define MAX_EDGES 1024
+#define MAX_USERS 32
 
 typedef struct kr_graph kr_graph;
 typedef struct kr_vertex kr_vertex;
 typedef struct kr_edge kr_edge;
 typedef struct kr_graph_elem kr_graph_elem;
+typedef struct kr_chain kr_chain;
 typedef enum kr_vertex_type kr_vertex_type;
 typedef enum kr_edge_dir kr_edge_dir;
 typedef enum kr_graph_elem_type kr_graph_elem_type;
@@ -34,6 +36,11 @@ struct kr_graph_elem {
   };
 };
 
+struct kr_chain {
+  void *users[MAX_USERS];
+  int len;
+};
+
 typedef struct {
   int inputs;
   int outputs;
@@ -46,7 +53,7 @@ int kr_graph_set_user(kr_graph *graph, kr_graph_elem *elem, void *user);
 int kr_graph_in_out_links(kr_graph *graph, kr_graph_elem *elem, int dir, void **user, int max);
 int kr_graph_outputs(kr_graph *graph, kr_graph_elem *elem, void **user, int max);
 int kr_graph_sources(kr_graph *graph, kr_graph_elem *elem, void **user, int max);
-int kr_graph_chains(kr_graph *graph, kr_graph_elem *to, kr_graph_elem *from, void ***user, int max, int max_len);
+int kr_graph_chains(kr_graph *graph, kr_graph_elem *to, kr_graph_elem *from, kr_chain *chain, int max);
 kr_graph_elem kr_graph_link(kr_graph *graph, kr_graph_elem *to, kr_graph_elem *from, void *user);
 kr_graph_elem kr_graph_vertex(kr_graph *graph, kr_vertex_type type, void *user);
 int kr_graph_remove(kr_graph *graph, kr_graph_elem *elem);

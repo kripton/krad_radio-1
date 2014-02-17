@@ -16,11 +16,10 @@ typedef struct {
 } tunit;
 
 typedef struct {
-  char *name;
+  const char *name;
   tunit_type type;
   int integer;
   kr_graph *graph;
-  void *user;
   tunit *to;
   tunit *from;
 } tunit_setup;
