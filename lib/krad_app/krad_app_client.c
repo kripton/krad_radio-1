@@ -55,7 +55,7 @@ int kr_app_client_get_fd(kr_app_client *client) {
 void kr_app_disconnect(kr_app_client *client) {
   if (client != NULL) {
     if (client->sd != 0) {
-      close (client->sd);
+      close(client->sd);
     }
     free(client);
   }
@@ -68,9 +68,9 @@ kr_app_client *kr_app_connect(char *sysname, int timeout_ms) {
     failfast("Krad APP Client mem alloc fail");
     return NULL;
   }
-  uname (&client->unixname);
+  uname(&client->unixname);
   if (krad_valid_host_and_port (sysname)) {
-    krad_get_host_and_port (sysname, client->host, &client->tcp_port);
+    krad_get_host_and_port(sysname, client->host, &client->tcp_port);
   } else {
     strncpy (client->sysname, sysname, sizeof (client->sysname));
     if (strncmp(client->unixname.sysname, "Linux", 5) == 0) {
@@ -112,7 +112,7 @@ static int kr_app_client_init(kr_app_client *client, int timeout_ms) {
     hints.ai_flags = AI_NUMERICSERV;
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    rc = inet_pton (AF_INET, client->host, &serveraddr);
+    rc = inet_pton(AF_INET, client->host, &serveraddr);
     if (rc == 1) {
       hints.ai_family = AF_INET;
       hints.ai_flags |= AI_NUMERICHOST;
@@ -175,30 +175,44 @@ static int kr_app_client_init(kr_app_client *client, int timeout_ms) {
   return client->sd;
 }
 
-int kr_app_client_send_fd(kr_app_client *client, int fd) {
-  krad_system_set_socket_blocking (client->sd);
-  char buf[1];
-  struct iovec iov;
-  struct msghdr msg;
+#define KR_FD_BUFFER(n) \
+  struct { \
+    struct cmsghdr h; \
+      int fd[n]; \
+  }
+
+static int send_fds(int sock, const int *fds, unsigned int nfds, void *buffer) {
+  struct msghdr msghdr;
+  char nothing = '!';
+  struct iovec nothing_ptr;
   struct cmsghdr *cmsg;
-  int n;
-  char cms[CMSG_SPACE(sizeof(int))];
-  buf[0] = 0;
-  iov.iov_base = buf;
-  iov.iov_len = 1;
-  memset(&msg, 0, sizeof msg);
-  msg.msg_iov = &iov;
-  msg.msg_iovlen = 1;
-  msg.msg_control = (caddr_t)cms;
-  msg.msg_controllen = CMSG_LEN(sizeof(int));
-  cmsg = CMSG_FIRSTHDR(&msg);
-  cmsg->cmsg_len = CMSG_LEN(sizeof(int));
+  int i;
+  nothing_ptr.iov_base = &nothing;
+  nothing_ptr.iov_len = 1;
+  msghdr.msg_name = NULL;
+  msghdr.msg_namelen = 0;
+  msghdr.msg_iov = &nothing_ptr;
+  msghdr.msg_iovlen = 1;
+  msghdr.msg_flags = 0;
+  msghdr.msg_control = buffer;
+  msghdr.msg_controllen = sizeof(struct cmsghdr) + sizeof(int) * nfds;
+  cmsg = CMSG_FIRSTHDR(&msghdr);
+  cmsg->cmsg_len = msghdr.msg_controllen;
   cmsg->cmsg_level = SOL_SOCKET;
   cmsg->cmsg_type = SCM_RIGHTS;
-  memmove(CMSG_DATA(cmsg), &fd, sizeof(int));
-  if ((n=sendmsg(client->sd, &msg, 0)) != iov.iov_len) {
-    krad_system_set_socket_nonblocking (client->sd);
-    return 0;
+  for (i = 0; i < nfds; i++) {
+    ((int *)CMSG_DATA(cmsg))[i] = fds[i];
   }
-  return 1;
+  return (sendmsg(sock, &msghdr, 0) >= 0 ? 0 : -1);
+}
+
+int kr_app_client_send_fds(kr_app_client *client, const int *fds, unsigned int nfds) {
+  KR_FD_BUFFER(KR_RWFDS_MAX) buffer;
+  if (nfds > KR_RWFDS_MAX) return -1;
+  return(send_fds(client->sd, fds, nfds, &buffer));
+}
+
+int kr_app_client_send_fd(kr_app_client *client, int fd) {
+  KR_FD_BUFFER(1) buffer;
+  return(send_fds(client->sd, &fd, 1, &buffer));
 }

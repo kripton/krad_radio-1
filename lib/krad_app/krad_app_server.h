@@ -52,6 +52,9 @@ struct kr_app_server_client_setup {
   kr_app_server_io_cb *output_cb;
 };
 
+int kr_app_server_recv_fds(kr_app_server_client *client, int *fd, unsigned int nfds);
+int kr_app_server_recv_fd(kr_app_server_client *client, int *fd);
+
 int kr_app_server_client_create(kr_app_server *server,
  kr_app_server_client_setup *setup);
 

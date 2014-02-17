@@ -804,3 +804,52 @@ kr_app_server *kr_app_server_create(kr_app_server_setup *setup) {
   printk("App Server: Created");
   return server;
 }
+
+#define KR_FD_BUFFER(n) \
+  struct { \
+    struct cmsghdr h; \
+      int fd[n]; \
+  }
+
+static int recv_fds(int sock, int *fds, unsigned int nfds, void *buffer) {
+  struct msghdr msghdr;
+  char nothing;
+  struct iovec nothing_ptr;
+  struct cmsghdr *cmsg;
+  int i;
+  nothing_ptr.iov_base = &nothing;
+  nothing_ptr.iov_len = 1;
+  msghdr.msg_name = NULL;
+  msghdr.msg_namelen = 0;
+  msghdr.msg_iov = &nothing_ptr;
+  msghdr.msg_iovlen = 1;
+  msghdr.msg_flags = 0;
+  msghdr.msg_control = buffer;
+  msghdr.msg_controllen = sizeof(struct cmsghdr) + sizeof(int) * nfds;
+  cmsg = CMSG_FIRSTHDR(&msghdr);
+  cmsg->cmsg_len = msghdr.msg_controllen;
+  cmsg->cmsg_level = SOL_SOCKET;
+  cmsg->cmsg_type = SCM_RIGHTS;
+  for (i = 0; i < nfds; i++) {
+    ((int *)CMSG_DATA(cmsg))[i] = -1;
+  }
+  if(recvmsg(sock, &msghdr, 0) < 0) {
+    return -1;
+  }
+  for (i = 0; i < nfds; i++) {
+    fds[i] = ((int *)CMSG_DATA(cmsg))[i];
+  }
+  nfds = (msghdr.msg_controllen - sizeof(struct cmsghdr)) / sizeof(int);
+  return nfds;
+}
+
+int kr_app_server_recv_fds(kr_app_server_client *client, int *fd, unsigned int nfds) {
+  KR_FD_BUFFER(KR_RWFDS_MAX) buffer;
+  if (nfds > KR_RWFDS_MAX) return -1;
+  return(recv_fds(client->sd, fd, nfds, &buffer));
+}
+
+int kr_app_server_recv_fd(kr_app_server_client *client, int *fd) {
+  KR_FD_BUFFER(1) buffer;
+  return(recv_fds(client->sd, fd, 1, &buffer) == 1 ? 0 : -1);
+}

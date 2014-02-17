@@ -19,6 +19,7 @@ int kr_app_client_local(kr_app_client *client);
 int kr_app_client_get_fd(kr_app_client *client);
 kr_app_client *kr_app_connect(char *sysname, int timeout_ms);
 void kr_app_disconnect(kr_app_client *client);
+int kr_app_client_send_fds(kr_app_client *client, const int *fds, unsigned int nfds);
 int kr_app_client_send_fd(kr_app_client *client, int fd);
 
 #endif
