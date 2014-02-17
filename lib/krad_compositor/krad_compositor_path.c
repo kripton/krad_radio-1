@@ -12,7 +12,6 @@ struct kr_compositor_path {
   kr_compositor_path_info info;
   void *frame_user;
   void *control_user;
-  kr_frame_cb *frame_cb;
   kr_compositor *compositor;
   kr_convert converter;
   kr_perspective *perspective;
@@ -26,7 +25,6 @@ typedef struct {
   kr_compositor_path_info *info;
   void *control_user;
   void *frame_user;
-  kr_frame_cb *frame_cb;
   kr_compositor_path *from;
   kr_compositor_path *to;
 } kr_compositor_path_setup;
@@ -95,7 +93,7 @@ static int path_info_check(kr_compositor_path_info *info) {
 static int path_setup_check(kr_compositor_path_setup *setup) {
   kr_compositor_path_info *info;
   info = setup->info;
-  if ((setup->frame_user == NULL) || (setup->frame_cb == NULL)) {
+  if (setup->frame_user == NULL) {
     /* FIXME HRMMM */
   }
   if (setup->control_user == NULL) {
@@ -136,7 +134,6 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   path->info = *setup->info;
   path->frame_user = setup->frame_user;
   path->control_user = setup->control_user;
-  path->frame_cb = setup->frame_cb;
   kr_image_convert_init(&path->converter);
   event.user = path->compositor->user;
   event.user_path = path->control_user;
@@ -146,6 +143,22 @@ static kr_compositor_path *path_create(kr_compositor *comp,
   path->compositor->event_cb(&event);
   path->control_user = event.user_path;
   return path;
+}
+
+int kr_compositor_frame(kr_compositor_path *path, kr_image *image) {
+  if ((path == NULL) || (image == NULL)) return -1;
+  switch (path->info.type) {
+    case KR_COM_SOURCE:
+      printk("Compositor: frame submitted source port");
+      break;
+    case KR_COM_OUTPUT:
+      printk("Compositor: frame requested from output port");
+      break;
+    default:
+      printke("Compositor: frame submitted to incorrect path type");
+      return -1;
+  }
+  return 0;
 }
 
 int kr_compositor_ctl(kr_compositor_path *path, kr_compositor_path_info_patch *patch) {
@@ -225,7 +238,6 @@ int kr_compositor_bus(kr_compositor *c, kr_compositor_path_info *i, void *user) 
   setup.info = i;
   setup.control_user = user;
   setup.frame_user = NULL;
-  setup.frame_cb = NULL;
   path = path_create(c, &setup);
   if (path == NULL) return -2;
   return 0;
@@ -238,7 +250,6 @@ kr_compositor_path *kr_compositor_port(kr_compositor *com,
   setup.info = &port_setup->info;
   setup.control_user = port_setup->control_user;
   setup.frame_user = port_setup->frame_user;
-  setup.frame_cb = port_setup->frame_cb;
   return path_create(com, &setup);
 }
 
@@ -251,7 +262,6 @@ int kr_compositor_link(kr_compositor_path *to, kr_compositor_path *fr,
   setup.info = info;
   setup.control_user = user;
   setup.frame_user = NULL;
-  setup.frame_cb = NULL;
   setup.from = fr;
   setup.to = to;
   path = path_create(to->compositor, &setup);

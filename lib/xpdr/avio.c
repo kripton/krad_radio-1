@@ -1,36 +1,27 @@
-static void compositor_frame(kr_frame_event *event);
-static void mixer_audio(kr_audio_event *event);
-static void adapter_avio(kr_avio_event *event);
+static int adapter_avio(kr_av_event *event);
 static void adapter_event(kr_adapter_event *event);
-
-static void compositor_frame(kr_frame_event *event) {
-  kr_xpdr_path *path;
-  path = (kr_xpdr_path *)event->user;
-  event->image = path->link.image;
-}
 
 static void mixer_audio(kr_audio_event *event) {
   kr_xpdr_path *path;
   path = (kr_xpdr_path *)event->user;
-  event->audio = path->link.audio;
+  //event->audio = path->link.audio;
 }
 
-static void adapter_avio(kr_avio_event *event) {
+static int adapter_avio(kr_av_event *event) {
+  int ret;
+  ret = -1;
   kr_xpdr_path *path;
   path = (kr_xpdr_path *)event->user;
-  path->link.audio = event->audio;
-  path->link.image = event->image;
-  if (event->state == KR_AVIO_WANT_OUTPUT_FRAME) {
-    printk("XPDR: Got AVIO event with state: want output frame");
+  if ((path->mode == KR_VIDEO_IN) || (path->mode == KR_VIDEO_OUT)) {
+    if (path->mode == KR_VIDEO_IN) {
+      printk("XPDR: Got a frame in from a video in adapter");
+    }
+    if (path->mode == KR_VIDEO_OUT) {
+      printk("XPDR: Got a frame request from a video out adapter");
+    }
+    ret = kr_compositor_frame(path->link.compositor_port, event->image);
   }
-  if (event->state == KR_AVIO_HAVE_INPUT_FRAME) {
-    printk("XPDR: Got AVIO event with state: have input frame");
-  }
-  if (event->state == KR_AVIO_NONE) {
-    printk("XPDR: Got AVIO event with state NONE");
-  }
-  /* FIXME take event image/audio and call a m/c function to
-   * propagate the state */
+  return ret;
 }
 
 static void adapter_event(kr_adapter_event *event) {

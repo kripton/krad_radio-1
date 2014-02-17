@@ -17,8 +17,6 @@ struct kr_xpdr_path {
         kr_mixer_path *mixer_port;
         kr_compositor_path *compositor_port;
       };
-      kr_audio audio;
-      kr_image image;
     } link;
   };
   kr_xpdr_path_mode mode;
@@ -85,17 +83,10 @@ static int link_create(kr_xpdr_path *path) {
   kr_mixer_port_setup mp_setup;
   kr_compositor_port_setup cp_setup;
   ret = 0;
-  path->link.adapter_path.avio_cb = adapter_avio;
+  path->link.adapter_path.av_handler = adapter_avio;
   path->link.adapter_path.user = path;
   path->link.adapter_path.info = &path->info;
   printk("XPDR: link create");
-  if ((path->mode == KR_AUDIO_OUT) || (path->mode == KR_VIDEO_OUT)) {
-    r = path->adapter_func->link(path->link.adapter, &path->link.adapter_path);
-    if (r != 0) {
-      printke("XPDR: Adapter create link problem");
-      ret += r;
-    }
-  }
   if ((path->mode == KR_AUDIO_IN) || (path->mode == KR_AUDIO_OUT)) {
     if (path->mode == KR_AUDIO_IN) {
       mp_setup.info.type = KR_MXR_SOURCE;
@@ -117,7 +108,6 @@ static int link_create(kr_xpdr_path *path) {
     } else {
       cp_setup.info.type = KR_COM_OUTPUT;
     }
-    cp_setup.frame_cb = compositor_frame;
     cp_setup.frame_user = path;
     cp_setup.control_user = path->user;
     path->link.compositor_port = kr_compositor_port(path->xpdr->compositor, &cp_setup);
@@ -126,12 +116,10 @@ static int link_create(kr_xpdr_path *path) {
       ret += -1;
     }
   }
-  if ((path->mode == KR_AUDIO_IN) || (path->mode == KR_VIDEO_IN)) {
-    r = path->adapter_func->link(path->link.adapter, &path->link.adapter_path);
-    if (r != 0) {
-      printke("XPDR: Adapter create link problem");
-      ret += r;
-    }
+  r = path->adapter_func->link(path->link.adapter, &path->link.adapter_path);
+  if (r != 0) {
+    printke("XPDR: Adapter create link problem");
+    ret += r;
   }
   printk("XPDR: link create done");
   return ret;

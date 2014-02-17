@@ -16,7 +16,7 @@
 #include "krad_image_pool.h"
 
 #define KR_WL_MAX_WINDOWS 4
-#define KR_WL_BUFFER_COUNT 2
+#define KR_WL_NIMAGES 2
 
 typedef struct kr_wayland kr_wayland;
 typedef struct kr_wayland_path kr_wayland_path;
@@ -63,7 +63,8 @@ struct kr_wayland_path {
   struct wl_shell_surface *shell_surface;
   struct wl_callback *callback;
   struct wl_shell_surface_listener surface_listener;
-  struct wl_buffer *buffer[KR_WL_BUFFER_COUNT];
+  struct wl_buffer *buffer[KR_WL_NIMAGES];
+  kr_image image[KR_WL_NIMAGES];
   kr_image_pool *pool;
   int (*user_callback)(void *, kr_wayland_event *);
   void *user;
@@ -111,13 +112,14 @@ static void handle_ping(void *data, struct wl_shell_surface *sh_surface,
 static void handle_shm_format(void *data, struct wl_shm *wl_shm, uint32_t format);
 static void handle_global(void *data, struct wl_registry *registry,
  uint32_t id, const char *interface, uint32_t version);
+static int request_frame(kr_wayland_path *window);
 static void handle_frame_done(void *ptr, struct wl_callback *cb, uint32_t time);
+static int handle_frame(kr_av_event *event);
 static void kw_init(kr_wayland *kw);
 static void kw_connect(kr_wayland *kw);
 static void kw_teardown(kr_wayland *kw);
 static int handle_in(kr_wayland *kw);
 static int handle_out(kr_wayland *kw);
-static void write_frame(kr_wayland_path *window);
 
 #include "input.c"
 
@@ -164,21 +166,29 @@ static void handle_global(void *data, struct wl_registry *registry,
   printk("Wayland: global %s", interface);
 }
 
+static int request_frame(kr_wayland_path *window) {
+  kr_av_event event;
+  memset(&event, 0, sizeof(kr_av_event));
+  event.user = window->adapter_path->user;
+  event.image = &window->image[0];
+  return window->adapter_path->av_handler(&event);
+}
+
 static void handle_frame_done(void *ptr, struct wl_callback *cb, uint32_t time) {
   kr_wayland_path *window;
-  kr_avio_event event;
   window = (kr_wayland_path *)ptr;
   wl_callback_destroy(cb);
   printk("Wayland: frame done");
-  memset(&event, 0, sizeof(kr_avio_event));
-  event.state = KR_AVIO_WANT_OUTPUT_FRAME;
-  event.user = window->adapter_path->user;
-  event.path = window->adapter_path;
-  /* FIXME attach avail image buffer to event */
-  window->adapter_path->avio_cb(&event);
+  request_frame(window);
 }
 
-static void write_frame(kr_wayland_path *window) {
+static int handle_frame(kr_av_event *event) {
+  kr_wayland_path *window;
+  window = (kr_wayland_path *)event->image->owner;
+  if (window == NULL) {
+    printke("Wayland: handle_frame with no window");
+    return -1;
+  }
   struct wl_callback *callback;
   struct wl_callback_listener listener;
   printk("Wayland: write frame");
@@ -188,6 +198,7 @@ static void write_frame(kr_wayland_path *window) {
   listener.done = handle_frame_done;
   wl_callback_add_listener(callback, &listener, window);
   wl_surface_commit(window->surface);
+  return 0;
 }
 
 static int handle_out(kr_wayland *kw) {
@@ -340,7 +351,7 @@ int kr_wl_unlink(kr_adapter_path *path) {
   wl_surface_destroy(window->surface);
   /*
   FIXME this should be done on a callback from a sync
-  for (i = 0; i < KR_WL_BUFFER_COUNT; i++) {
+  for (i = 0; i < KR_WL_NIMAGES; i++) {
     wl_buffer_destroy(window->buffer[i]);
   }
   kr_pool_destroy(window->pool);
@@ -357,7 +368,6 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   struct wl_region *opaque;
   struct wl_shm_pool *pool;
   kr_image image;
-  void *buf;
   int i;
   if (adapter == NULL) return -1;
   if (path == NULL) return -2;
@@ -395,11 +405,15 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
     printke("Wayland: error creating wl_shm_pool");
     return -1;
   }
-  for (i = 0; i < KR_WL_BUFFER_COUNT; i++) {
-    buf = kr_pool_slice(window->pool);
+  for (i = 0; i < KR_WL_NIMAGES; i++) {
+    image.px = kr_pool_slice(window->pool);
+    image.ppx[0] = image.px;
+    image.owner = window;
+    image.ready = handle_frame;
     window->buffer[i] = wl_shm_pool_create_buffer(pool,
-     kr_pool_offsetof(window->pool, buf), image.w, image.h, image.pps[0],
+     kr_pool_offsetof(window->pool, image.px), image.w, image.h, image.pps[0],
      WL_SHM_FORMAT_XRGB8888);
+    window->image[i] = image;
     if (window->buffer[i] == NULL) {
       printke("Wayland: error creating wl buffer from wl shm pool");
     }
@@ -426,10 +440,8 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   window->active = 1;
   path->handle = window;
   window->adapter_path = path;
-  write_frame(window);
   wl_display_roundtrip(kw->display);
-  usleep(30 * 1000);
-  wl_display_roundtrip(kw->display);
+  request_frame(window);
   printk("Wayland: Window created");
   return 0;
 }

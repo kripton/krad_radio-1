@@ -3,15 +3,12 @@
 
 #include <inttypes.h>
 
-typedef struct kr_image kr_image;
-typedef struct kr_audio kr_audio;
+typedef struct kr_av_event kr_av_event;
 
-typedef int (kr_buf_release_cb)(void *ptr);
+typedef int (kr_av_release_cb)(void *ptr);
+typedef int (kr_av_handler)(kr_av_event *);
 
-int kr_image_ref(kr_image *image);
-int kr_image_unref(kr_image *image);
-
-struct kr_image {
+typedef struct {
   uint8_t *px;
   uint8_t *ppx[4];
   int32_t pps[4];
@@ -25,16 +22,28 @@ struct kr_image {
   };
   void *owner;
   int32_t refs;
-  kr_buf_release_cb *release_cb;
-};
+  kr_av_release_cb *release;
+  kr_av_handler *ready;
+} kr_image;
 
-struct kr_audio {
+typedef struct {
   float *samples[8];
   uint32_t channels;
   int32_t count;
   int32_t rate;
   uint64_t stc;
   void *owner;
+} kr_audio;
+
+struct kr_av_event {
+  union {
+    kr_image *image;
+    kr_audio *audio;
+  };
+  void *user;
 };
+
+int kr_image_ref(kr_image *image);
+int kr_image_unref(kr_image *image);
 
 #endif

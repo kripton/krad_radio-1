@@ -6,7 +6,7 @@ static int path_render(kr_compositor_path *path,
 static void path_output(kr_compositor_path *path, kr_image *image) {
   kr_frame_event event;
   event.user = path->frame_user;
-  path->frame_cb(&event);
+  //path->frame_cb(&event);
   memcpy(event.image.px, image->px, image->w * image->h * 4);
 }
 
@@ -63,5 +63,3 @@ int kr_compositor_process(kr_compositor_path *path) {
   }
   return 0;
 }
-
-

@@ -198,7 +198,7 @@ static int map_images(kr_v4l2 *kv) {
     image->w = kv->path_info->width;
     image->h = kv->path_info->height;
     image->fmt = PIX_FMT_YUYV422;
-    image->release_cb = image_release;
+    image->release = image_release;
     image->owner = &kv->images[buf.index];
   }
   return 0;

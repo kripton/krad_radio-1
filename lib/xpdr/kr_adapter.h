@@ -20,23 +20,7 @@ typedef struct {
   kr_adapter_event_type type;
 } kr_adapter_event;
 
-typedef enum {
-  KR_AVIO_NONE,
-  KR_AVIO_WANT_OUTPUT_FRAME,
-  KR_AVIO_HAVE_INPUT_FRAME
-} kr_avio_state;
-
-typedef struct {
-  kr_adapter_path *path;
-  kr_avio_state state;
-  kr_image image;
-  kr_image *image_in;
-  kr_audio audio;
-  void *user;
-} kr_avio_event;
-
 typedef void (kr_adapter_event_cb)(kr_adapter_event *);
-typedef void (kr_avio_cb)(kr_avio_event *);
 
 struct kr_adapter {
   void *handle;
@@ -49,7 +33,7 @@ struct kr_adapter {
 struct kr_adapter_path {
   void *handle;
   void *user;
-  kr_avio_cb *avio_cb;
+  kr_av_handler *av_handler;
   kr_xpdr_path_info *info;
 };
 
