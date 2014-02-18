@@ -120,6 +120,7 @@ static void kw_connect(kr_wayland *kw);
 static void kw_teardown(kr_wayland *kw);
 static int handle_in(kr_wayland *kw);
 static int handle_out(kr_wayland *kw);
+static int handle_event(kr_event *fd_event);
 
 #include "input.c"
 
@@ -231,6 +232,23 @@ static int handle_in(kr_wayland *kw) {
   if (ret == -1) {
     printke("Wayland: Error on dispatch pending");
     return -1;
+  }
+  return 0;
+}
+
+static int handle_event(kr_event *fd_event) {
+  if (fd_event == NULL) return -1;
+  kr_wayland *kw;
+  int ret;
+  kw = (kr_wayland *)fd_event->user;
+  if (fd_event->ev.events & EPOLLIN) {
+    ret = handle_in(kw);
+    if (ret == 0) {
+      ret = handle_out(kw);
+    }
+    return ret;
+  } else {
+    printke("Wayland: Got an unreadable event");
   }
   return 0;
 }
@@ -357,7 +375,7 @@ int kr_wl_unlink(kr_adapter_path *path) {
   kr_pool_destroy(window->pool);
   kw->window[i].active = 0;
   */
-  wl_display_roundtrip(kw->display);
+  //wl_display_roundtrip(kw->display);
   return 0;
 }
 
@@ -440,7 +458,7 @@ int kr_wl_link(kr_adapter *adapter, kr_adapter_path *path) {
   window->active = 1;
   path->handle = window;
   window->adapter_path = path;
-  wl_display_roundtrip(kw->display);
+  //wl_display_roundtrip(kw->display);
   request_frame(window);
   printk("Wayland: Window created");
   return 0;
@@ -453,22 +471,28 @@ int kr_wl_ctl(kr_adapter *adp, kr_patchset *patchset) {
   return 0;
 }
 
-int kr_wl_close(kr_adapter *adp) {
+int kr_wl_close(kr_adapter *adapter) {
   kr_wayland *kw;
-  if (adp == NULL) return -1;
+  int ret;
+  if (adapter == NULL) return -1;
   printk("Wayland: Adapter Closing");
-  kw = (kr_wayland *)adp->handle;
+  kw = (kr_wayland *)adapter->handle;
   kw_teardown(kw);
+  ret = kr_loop_destroy(adapter->loop);
+  if (ret != 0) {
+    printke("Wayland: trouble unlooping");
+  }
   free(kw);
-  adp->handle = NULL;
+  adapter->handle = NULL;
   printk("Wayland: Adapter Closed");
   return 0;
 }
 
 int kr_wl_open(kr_adapter *adapter) {
   if (adapter == NULL) return -1;
-  printk("Wayland: Adapter opened");
+  printk("Wayland: Adapter opening");
   kr_wayland *kw;
+  kr_harness harness;
   adapter->handle = kr_allocz(1, sizeof(kr_wayland));
   kw = (kr_wayland *)adapter->handle;
   kw->adapter = adapter;
@@ -476,5 +500,12 @@ int kr_wl_open(kr_adapter *adapter) {
   kw_init(kw);
   kw_connect(kw);
   adapter->fd = kw->fd;
+  adapter->loop = kr_loop_create();
+  //handle_out(kw);
+  harness.user = kw;
+  harness.fd = kw->fd;
+  harness.handler = handle_event;
+  kr_loop_harness(adapter->loop, &harness);
+  printk("Wayland: Adapter opened");
   return 0;
 }

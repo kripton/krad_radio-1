@@ -7,6 +7,7 @@ typedef struct kr_adapter_path kr_adapter_path;
 
 #include "kr_xpdr_common.h"
 #include "krad_av.h"
+#include "kr_loop.h"
 
 typedef enum {
   KR_ADAPTER_PROCESS, /* Process all paths: jack,alsa,decklink */
@@ -28,6 +29,7 @@ struct kr_adapter {
   void *user;
   kr_adapter_event_cb *event_cb;
   kr_xpdr_path_info *info;
+  kr_loop *loop;
 };
 
 struct kr_adapter_path {

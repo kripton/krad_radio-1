@@ -150,6 +150,7 @@ int kr_compositor_frame(kr_compositor_path *path, kr_image *image) {
   switch (path->info.type) {
     case KR_COM_SOURCE:
       printk("Compositor: frame submitted source port");
+      image->release(image->owner);
       break;
     case KR_COM_OUTPUT:
       printk("Compositor: frame requested from output port");

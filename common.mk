@@ -32,6 +32,7 @@ AM_CPPFLAGS = \
 -I../lib/krad_x11 \
 -I../lib/krad_vorbis \
 -I../lib/krad_framepool \
+-I../lib/loop \
 -I../lib/xpdr \
 -I../lib/aux \
 -I../lib/krad_mixer \

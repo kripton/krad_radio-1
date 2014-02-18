@@ -11,6 +11,7 @@
 #include <sys/epoll.h>
 #include <sys/eventfd.h>
 
+#include "krad_system.h"
 #include "kr_loop.h"
 
 enum kr_loop_state {
@@ -97,13 +98,6 @@ static kr_thread *kr_thread_create(kr_thread_params *params) {
   return (kr_thread *)thread.stack;
 }
 
-#ifndef printk
-#define printk printf
-#endif
-#ifndef printke
-#define printke printf
-#endif
-
 static void loop_cycle(void *arg) {
   int n;
   int i;
@@ -113,11 +107,11 @@ static void loop_cycle(void *arg) {
   struct epoll_event events[KR_LOOP_NEVENTS];
   loop = (kr_loop *)arg;
   loop->state = KR_LOOP_LOOPING;
-  printk("Loop: starting\n");
+  printk("Loop: starting");
   while (loop->state == KR_LOOP_LOOPING) {
     n = epoll_wait(loop->pd, events, KR_LOOP_NEVENTS, -1);
     if (n < 1) {
-      printk("Loop: error on epoll wait\n");
+      printk("Loop: error on epoll wait");
       break;
     }
     for (i = 0; i < n; i++) {
@@ -133,7 +127,7 @@ static void loop_cycle(void *arg) {
       }
     }
   }
-  printk("Loop: exiting\n");
+  printk("Loop: exiting");
   loop->state = KR_LOOP_DONE;
 }
 
@@ -183,13 +177,13 @@ int kr_loop_harness(kr_loop *loop, kr_harness *harness) {
 
 int kr_loop_destroy(kr_loop *loop) {
   if (loop == NULL) return -1;
-  printk("Loop: destroy\n");
+  printk("Loop: destroy");
   uint64_t u;
   int s;
   u = 666;
   s = write(loop->ed, &u, sizeof(uint64_t));
   if (s != sizeof(uint64_t)) {
-    printk("Loop: error writing to loop ed\n");
+    printk("Loop: error writing to loop ed");
   }
   while (loop->state != KR_LOOP_DONE) {
     usleep(420);
@@ -199,7 +193,7 @@ int kr_loop_destroy(kr_loop *loop) {
   kr_thread_free(loop->thread);
   usleep(420);
   free(loop);
-  printk("Loop: destroyed\n");
+  printk("Loop: destroyed");
   return 0;
 }
 
@@ -238,7 +232,7 @@ kr_loop *kr_loop_create() {
   }
   loop->thread = kr_thread_create(&params);
   if (!loop->thread) {
-    printf("Thread launch Error: %s\n", strerror(errno));
+    printf("Thread launch Error: %s", strerror(errno));
     close(loop->ed);
     close(loop->pd);
     free(loop);

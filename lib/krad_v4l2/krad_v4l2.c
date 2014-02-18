@@ -36,8 +36,9 @@ struct kr_v4l2 {
   kv_image images[KR_V4L2_NIMAGES];
 };
 
-static int read_image(kr_v4l2 *kv, kr_image *image);
+static int read_image(kr_v4l2 *kv, kr_image **image);
 static int xioctl(int fd, int request, void *arg);
+static int handle_event(kr_event *fd_event);
 static int image_release(void *ptr);
 static int capture_off(kr_v4l2 *kv);
 static int capture_on(kr_v4l2 *kv);
@@ -65,7 +66,7 @@ static int image_release(void *ptr) {
   return 0;
 }
 
-static int read_image(kr_v4l2 *kv, kr_image *image) {
+static int read_image(kr_v4l2 *kv, kr_image **image) {
   struct v4l2_buffer buf;
   if (kv == NULL) return -1;
   if (image == NULL) return -1;
@@ -81,9 +82,32 @@ static int read_image(kr_v4l2 *kv, kr_image *image) {
         return -1;
     }
   }
-  *image = kv->images[buf.index].image;
-  image->ts = buf.timestamp;
+  kv->images[buf.index].image.ts = buf.timestamp;
+  *image = &kv->images[buf.index].image;
   return 1;
+}
+
+static int handle_event(kr_event *fd_event) {
+  if (fd_event == NULL) return -1;
+  kr_v4l2 *kv;
+  int ret;
+  kr_image *image;
+  kr_av_event event;
+  kv = (kr_v4l2 *)fd_event->user;
+  if (fd_event->ev.events & EPOLLIN) {
+    memset(&event, 0, sizeof(kr_av_event));
+    event.user = kv->adapter_path->user;
+    ret = read_image(kv, &image);
+    if (ret != 1) {
+      printke("V4L2: problem reading image");
+      return -1;
+    }
+    event.image = image;
+    return kv->adapter_path->av_handler(&event);
+  } else {
+    printke("V4L2: Got an unreadable event");
+  }
+  return 0;
 }
 
 static int capture_off(kr_v4l2 *kv) {
@@ -304,6 +328,7 @@ int kr_v4l2_unlink(kr_adapter_path *path) {
 int kr_v4l2_link(kr_adapter *adapter, kr_adapter_path *path) {
   int ret;
   kr_v4l2 *kv;
+  kr_harness harness;
   if (adapter == NULL) return -1;
   kv = (kr_v4l2 *)adapter->handle;
   if (path == NULL) return -2;
@@ -316,6 +341,10 @@ int kr_v4l2_link(kr_adapter *adapter, kr_adapter_path *path) {
   if (ret != 0) return ret;
   ret = capture_on(kv);
   if (ret != 0) return ret;
+  harness.user = kv;
+  harness.fd = kv->fd;
+  harness.handler = handle_event;
+  kr_loop_harness(adapter->loop, &harness);
   printk("V4L2: Adapter path created");
   return ret;
 }
@@ -329,12 +358,17 @@ int kr_v4l2_ctl(kr_adapter *adapter, kr_patchset *patchset) {
 }
 
 int kr_v4l2_close(kr_adapter *adapter) {
+  int ret;
   kr_v4l2 *kv;
   if (adapter == NULL) return -1;
   kv = (kr_v4l2 *)adapter->handle;
   if (kv == NULL) return -1;
   printk("V4L2: Adapter closing");
   teardown(kv);
+  ret = kr_loop_destroy(adapter->loop);
+  if (ret != 0) {
+    printke("V4L2: trouble unlooping");
+  }
   free(kv);
   adapter->handle = NULL;
   printk("V4L2: adapter closed");
@@ -353,6 +387,7 @@ int kr_v4l2_open(kr_adapter *adapter) {
   ret = kv_init(kv);
   if (ret != 0) return ret;
   adapter->fd = kv->fd;
+  adapter->loop = kr_loop_create();
   printk("V4L2: adapter opened");
   return 0;
 }
