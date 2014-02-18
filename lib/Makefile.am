@@ -56,6 +56,7 @@ krad_flac/krad_flac.c \
 krad_opus/krad_opus.c \
 krad_opus/opus_header.c \
 krad_ring/krad_ring.c \
+loop/loop.c \
 xpdr/xpdr.c \
 aux/aux.c \
 krad_web/krad_web_server.c \
