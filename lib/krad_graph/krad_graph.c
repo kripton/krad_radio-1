@@ -147,6 +147,14 @@ static int graph_output_edges(kr_graph *graph, kr_edge **edges) {
   return k;
 }
 
+static int distinct(kr_vertex **vertices, kr_vertex *v, int n) {
+  int i;
+  for (i = 0; i < n; i++) {
+    if (vertices[i] == v) return 0;
+  }
+  return 1;
+}
+
 static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
   kr_vertex **out, int max, int type) {
   kr_vertex *vertices[MAX_VERTICES];
@@ -159,6 +167,7 @@ static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
   k = 0;
   count = 0;
   vertices[k++] = vertex;
+  printf("deps indeps\n");
   while (k) {
     vertex = vertices[--k];
     if (type == DEPS)
@@ -178,8 +187,12 @@ static int vertex_deps_indeps(kr_graph *graph, kr_vertex *vertex,
   k = 0;
   for (i = count-1; i >= 0; i--) {
     if (k >= max) return k;
-    out[k++] = done[i];
+    if (distinct(out, done[i], count)) {
+      out[k++] = done[i];
+    }
+    printf("%p ",done[i]);
   }
+  printf("\n");
   return k;
 }
 
